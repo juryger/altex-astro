@@ -1,0 +1,22 @@
+---
+import altexLogo from '../assets/altex-logo-md.png';
+---
+
+<footer class="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-10">
+  <nav class="grid grid-flow-col gap-4">
+    <a class="link link-info link-hover">О компании</a>
+    <a class="link link-info link-hover">Каталог</a>
+    <a class="link link-info link-hover">Контакты</a>
+  </nav>
+  <aside class="grid-flow-col items-center">
+    <img alt="Tailwind CSS Navbar component" src={altexLogo.src} class="w-16">
+    <p>
+      ИП Герасимов Алексей Владимирович 
+      <br />
+      Поставка надежных товаров и услуг с 2010 г.
+    </p>
+  </aside>
+  <aside>
+    <p>Copyright © {new Date().getFullYear()} - Все права защищены</p>
+  </aside>
+</footer>
