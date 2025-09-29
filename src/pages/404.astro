@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AstroLogo from '../assets/astro.svg';
+---
+
+<BaseLayout title="Страница не найдена">
+  <div class="flex flex-col items-center justify-center h-[16rem] bg-cover bg-center bg-[url(/public/background.svg)]">
+    <img src={AstroLogo.src} class="w-10 h-10"/>
+    <h1>
+      <span class="text-error font-bold text-xl">404: </span>
+      <span class="font-bold text-xl">Страница не найдена</span>
+    </h1>
+    <span class="font-medium text-lg">Просим прощение за неудобство, скоро мы это исправим.</span>
+  </div>
+</BaseLayout>
