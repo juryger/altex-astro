@@ -1,0 +1,21 @@
+---
+import { GET } from '../pages/api/category.ts'
+
+let response = await GET(Astro);
+const data = await response.json();
+---
+
+<div class="hero bg-base-100">
+  <div class="hero-content flex-col lg:flex-row">
+    <div class="px-3">
+      <p class="py-1">
+        Список категорий товаров.<br />
+        <ul class="list-disc">
+          {data && data.map((x: any) => (
+            <li>{x.value}</li>
+          ))}
+        </ul>
+      </p>
+    </div>
+  </div>
+</div>

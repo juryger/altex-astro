@@ -1,5 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
+import PathMapper from '../utils/pathMapper';
+
+var allPaths = new PathMapper().getAllPaths();
 ---
 
 <div class="navbar bg-base-100">
@@ -10,15 +14,16 @@ import AltexLogo from '../assets/altex-logo-md.png';
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> 
         </svg>
       </div>
-      <ul tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li><a href="/about">О компании</a></li>
-        <li><a href="/catalog">Каталог</a></li>
-        <li><a href="/contacts">Контакты</a></li>
+      <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        {allPaths && allPaths.map((x) => (
+          <li>
+            <a href={x.path}>{x.displayValue}</a>
+          </li>
+        ))}
       </ul>
     </div>
     <a href="/">
-      <img alt="Logo" src={AltexLogo.src} class="w-16">
+      <Image src={AltexLogo} class="w-16" alt="Logo" />
     </a>
     <div class="px-3 hidden md:flex">
       <a class="text-xl font-bold decoration-0" href="/">АЛТЕХ</a>
@@ -26,9 +31,11 @@ import AltexLogo from '../assets/altex-logo-md.png';
   </div>
   <div class="navbar-center hidden sm:flex">
     <ul class="menu menu-horizontal px-1 font-semibold">
-      <li><a href="/about">О компании</a></li>
-      <li><a href="/catalog">Каталог</a></li>
-      <li><a href="/contacts">Контакты</a></li>
+      {allPaths && allPaths.map((x) => (
+        <li>
+          <a href={x.path}>{x.displayValue}</a>
+        </li>
+      ))}
       <li class="px-3">
         <input type="text" placeholder="Поиск" class="input input-sm w-24 md:w-auto" />
       </lid>
@@ -81,27 +88,27 @@ import AltexLogo from '../assets/altex-logo-md.png';
       </ul>
     </div>
     <div>
-      <label class="toggle text-base-content">
-      <input type="checkbox" value="dark" class="theme-controller" />
-      <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 24 24">
-        <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-          <circle cx="12" cy="12" r="5"></circle>
-          <path d="M12 2v2"></path>
-          <path d="M12 20v2"></path>
-          <path d="m4.93 4.93 1.41 1.41"></path>
-          <path d="m17.66 17.66 1.41 1.41"></path>
-          <path d="M2 12h2"></path>
-          <path d="M20 12h2"></path>
-          <path d="m6.34 17.66-1.41 1.41"></path>
-          <path d="m19.07 4.93-1.41 1.41"></path>
+      <span class="toggle text-base-content">
+        <input type="checkbox" value="dark" class="theme-controller"/>
+        <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 24 24">
+          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="5"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </g>
+        </svg>
+        <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
         </g>
-      </svg>
-      <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-      </g>
-      </svg>
-    </label>
+        </svg>
+      </span>
     </div>
   </div>
 </div>
