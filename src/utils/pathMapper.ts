@@ -6,9 +6,9 @@ class PathMapper {
   constructor() {
     this.data = [
       <PathItem> { path: '/', displayValue: 'Главная'}, 
-      <PathItem> { path: '/about', displayValue: 'О компании'},
+      <PathItem> { path: '/about', displayValue: 'Обо мне'},
       <PathItem> { path: '/catalog', displayValue: 'Каталог'},
-      <PathItem> { path: '/contacts', displayValue: 'Контакты'}
+      <PathItem> { path: '/contact', displayValue: 'Контакты'}
     ];
   }
 
