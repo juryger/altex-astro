@@ -1,4 +1,4 @@
-export type PathItem = {
+export type NavPathItem = {
   path: string;
   displayValue: string;
 };

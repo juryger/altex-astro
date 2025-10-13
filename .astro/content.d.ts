@@ -195,5 +195,5 @@ declare module 'astro:content' {
 	>;
 
 	export type ContentConfig = typeof import("../src/content.config.mjs");
-	export type LiveContentConfig = never;
+	export type LiveContentConfig = typeof import("../src/live.config.js");
 }

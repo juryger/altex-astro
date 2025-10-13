@@ -1,20 +1,35 @@
 ---
-import { GET } from '../pages/api/category.ts'
+export const prerender = false;
 
-let response = await GET(Astro);
-const data = await response.json();
+import { undefined } from 'astro:schema';
+import { GET } from '../pages/api/category.ts'
+import { getLiveCollection, getLiveEntry } from 'astro:content';
+
+//const result = undefined;
+
+const { entries: categories, error } = await getLiveCollection('categories');
+// , {
+//    slug: undefined,
+//    parentSlug: undefined
+// } as any
+
+console.log('Categories > live collection: ' + JSON.stringify(categories) + ", error=" + JSON.stringify(error));
+
+//let response = await GET(Astro);
+//const result = await response.json();
 ---
 
 <div class="hero bg-base-100">
   <div class="hero-content flex-col lg:flex-row">
     <div class="px-3">
       <p class="py-1">
-        Список категорий товаров.<br />
+        Список категорий товаров:<br />
         <ul class="list-disc">
-          {data && data.map((x: any) => (
-            <li>{x.value}</li>
+          {categories && categories.map((x: any) => (
+            <li>{x.title}</li>
           ))}
         </ul>
+        { !categories && <span>Категории не найдены</span> }
       </p>
     </div>
   </div>

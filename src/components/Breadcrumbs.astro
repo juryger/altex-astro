@@ -1,17 +1,17 @@
 ---
-import { type PathItem } from '../types/common';
-import PathMapper from '../utils/pathMapper';
+import { type NavPathItem } from '../types/common';
+import PathMapper from '../utils/path-mapper';
 
 const { currentPath } = Astro.props;
 const pathMapper = new PathMapper();
 
-const getBreadcrumbs = (path: string): Array<PathItem> => {
+const getBreadcrumbs = (path: string): Array<NavPathItem> => {
   console.log('breadcrumbs > original ' + path);
   const splitPath = path.split('/');
   console.log('breadcrumbs > split ' + splitPath);
   if (path.endsWith("/")) splitPath.pop();
   
-  var result: Array<PathItem> = [];
+  var result: Array<NavPathItem> = [];
   while(splitPath.length > 0) { 
     const pathItem =  `/${splitPath.pop()}`;
     console.log('breadcrumbs > pathItem > ' + pathItem);
@@ -21,13 +21,13 @@ const getBreadcrumbs = (path: string): Array<PathItem> => {
   return result;
 }
 
-const breadcrumbs: Array<PathItem> = getBreadcrumbs(currentPath).reverse();
+const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath).reverse();
 console.log('breadcrumbs > parsed ' + JSON.stringify(breadcrumbs));
 ---
 
 <div class="breadcrumbs text-sm px-5">
   {breadcrumbs.length > 1 && <ul class="list-disc">
-      {breadcrumbs && breadcrumbs.map((x: PathItem, index: number) => (
+      {breadcrumbs && breadcrumbs.map((x: NavPathItem, index: number) => (
         <li>
           {(index !== breadcrumbs.length - 1) ? <a href={x.path}>{x.displayValue}</a> : <span class="!no-underline !cursor-default">{x.displayValue}</span>} 
         </li>
