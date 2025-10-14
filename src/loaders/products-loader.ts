@@ -16,26 +16,29 @@ interface Product {
   slug: string;
 }
 
-interface ProductFilter {
-  slug?: string;
+interface CollectionFilter {
   categorySlug?: string;
 }
 
-export function createProductLoader(
+interface EntryFilter {
+  slug?: string;
+}
+
+export function createProductsLoader(
   config: {
     baseUrl: string
   }
-): LiveLoader<Product, ProductFilter> {
+): LiveLoader<Product, EntryFilter, CollectionFilter> {
   return {
     name: 'product-loader',
     loadCollection: async ({ filter }) => {
       try {
-        const url = new URL(`${config.baseUrl}/product`);
+        const url = new URL(`${config.baseUrl}/products`);
       
-        const parentSlug = "";
-        var x = (filter as unknown) as ProductFilter;
-        if (filter !== undefined && x !== undefined) {
-          url.searchParams.set('category', x.categorySlug ?? "") ;
+        //const parentSlug = "";
+        //var x = (filter as unknown) as ProductFilter;
+        if (filter !== undefined/* && x !== undefined*/) {
+          url.searchParams.set('category', filter.categorySlug ?? "") ;
         }
 
         const response = await fetch(url.toString());

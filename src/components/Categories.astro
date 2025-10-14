@@ -2,21 +2,30 @@
 export const prerender = false;
 
 import { undefined } from 'astro:schema';
-import { GET } from '../pages/api/category.ts'
+//import { GET } from '../pages/api/categories.ts'
 import { getLiveCollection, getLiveEntry } from 'astro:content';
-
-//const result = undefined;
+import { LiveCollectionValidationError } from 'astro/content/runtime';
+import type { Category } from '../loaders/categories-loader';
 
 const { entries: categories, error } = await getLiveCollection('categories');
+console.log("🚀 ~ categories:", categories)
+const { entry: category, error: error2 } = await getLiveEntry('categories', { slug: 'test-1' });
+console.log("🚀 ~ category:", category)
 // , {
-//    slug: undefined,
 //    parentSlug: undefined
 // } as any
 
-console.log('Categories > live collection: ' + JSON.stringify(categories) + ", error=" + JSON.stringify(error));
+if (LiveCollectionValidationError.is(error2)) {
+  console.log("🚀 ~ error2:", error2)
+}
 
-//let response = await GET(Astro);
-//const result = await response.json();
+if (LiveCollectionValidationError.is(error)) {
+  console.log("🚀 ~ error:", error)
+}
+
+// let response = await GET(Astro);
+// const result = await response.json();
+// console.log("🚀 ~ result:", result)
 ---
 
 <div class="hero bg-base-100">
@@ -24,10 +33,14 @@ console.log('Categories > live collection: ' + JSON.stringify(categories) + ", e
     <div class="px-3">
       <p class="py-1">
         Список категорий товаров:<br />
+        {category && <span>{category.id} - {(category as unknown as Category).slug}</span>}
         <ul class="list-disc">
-          {categories && categories.map((x: any) => (
-            <li>{x.title}</li>
-          ))}
+          {
+            categories && categories.map((x) => {
+              const item = x as unknown as Category;
+              return (<li>{item.id} - {item.slug}</li>);
+            })
+          }
         </ul>
         { !categories && <span>Категории не найдены</span> }
       </p>
