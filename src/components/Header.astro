@@ -3,8 +3,59 @@ import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
 import PathMapper from '../utils/path-mapper';
 
-var allPaths = new PathMapper().getAllPaths();
+const allPaths = new PathMapper().getAllPaths();
 ---
+
+<script>
+  // Handle theme toggling logic with read/save to localStorage 
+
+  const togglerEl = document.querySelector('[data-theme-toggler]');
+  const togglerElInput = (togglerEl as HTMLInputElement);
+  const togglerDarkEl = document.querySelector('[data-theme-toggler-dark]');
+  const togglerLightEl = document.querySelector('[data-them-toggler-light]');
+
+  // Save user preference on toggle
+  togglerElInput?.addEventListener('click', () => {
+    const currentTheme = localStorage.getItem('theme-toggler') ?? 'light';
+    const newTheme = (currentTheme === 'light') ? 'dark' : 'light';
+    localStorage.setItem('theme-toggler', newTheme);
+    console.log(`User changed theme to ${newTheme}, saving preferences.`);
+  });
+  
+  const isClientDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (isClientDarkMode) {
+    console.log('Client OS is set to dark mode.');
+    togglerEl?.setAttribute('value', 'light'); 
+    togglerDarkEl?.classList.replace('swap-on', 'swap-off');    
+    togglerLightEl?.classList.replace('swap-off', 'swap-on');
+
+    const savedTheme = localStorage.getItem('theme-toggler');
+    if (savedTheme && savedTheme === 'light') {
+      console.log('User have earlier saved theme, switching to Light mode.');
+      togglerElInput?.click();
+      localStorage.setItem('theme-toggler', 'light');
+    }
+    else {
+      console.log("Saving current theme 'Dark' as preferred.");
+      localStorage.setItem('theme-toggler', 'dark');
+    }
+  } else {
+    console.log('Client OS is set to light mode (or no specific preference).');
+    togglerEl?.setAttribute('value', 'dark');
+    togglerDarkEl?.classList.replace('swap-off', 'swap-on');
+    togglerLightEl?.classList.replace('swap-on', 'swap-off');
+
+    const savedTheme = localStorage.getItem('theme-toggler');
+    if (savedTheme && savedTheme === 'dark') {
+      console.log('User have earlier saved theme, switching to Dark mode.');
+      togglerElInput?.click();
+      localStorage.setItem('theme-toggler', 'dark');
+    } else {
+      console.log("Saving current theme 'Light' as preferred.");
+      localStorage.setItem('theme-toggler', 'light');
+    }
+  }
+</script>
 
 <div class="navbar bg-base-100">
   <div class="navbar-start px-2">
@@ -88,27 +139,47 @@ var allPaths = new PathMapper().getAllPaths();
       </ul>
     </div>
     <div>
-      <label class="toggle text-base-content">
-        <input type="checkbox" value="dark" class="theme-controller"/>
-        <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 24 24">
-          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="5"></circle>
-            <path d="M12 2v2"></path>
-            <path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.41 1.41"></path>
-            <path d="m17.66 17.66 1.41 1.41"></path>
-            <path d="M2 12h2"></path>
-            <path d="M20 12h2"></path>
-            <path d="m6.34 17.66-1.41 1.41"></path>
-            <path d="m19.07 4.93-1.41 1.41"></path>
-          </g>
+      <label class="swap swap-rotate">
+        <!-- this hidden checkbox controls the state -->
+        <input type="checkbox" class="theme-controller" value="dark" data-theme-toggler />
+        <!-- moon icon -->
+        <svg data-theme-toggler-dark
+            class="swap-on h-6 w-6 fill-current"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path
+              d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
         </svg>
-        <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-        </g>
+        <!-- sun icon -->
+        <svg data-them-toggler-light
+            class="swap-off h-7 w-7 fill-current"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path
+              d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
         </svg>
       </label>
+      <!-- <label class="toggle text-base-content">
+        <input type="checkbox" value={themeSwitchTo} data-theme-toggler class="theme-controller"/>
+          <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="5"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </g>
+          </svg> 
+          <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </g>
+          </svg>
+      </label> -->
     </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 import type { LiveLoader } from 'astro/loaders';
 import { parseApiError } from '../utils/error-parser';
 
-interface Product {
+export type Product = {
   id: number;
   title: string;
   description?: string;
@@ -32,6 +32,7 @@ export function createProductsLoader(
   return {
     name: 'product-loader',
     loadCollection: async ({ filter }) => {
+      console.log("🚀 ~ createProductsLoader ~ collection ~ filter:", filter);
       try {
         const url = new URL(`${config.baseUrl}/products`);
       
@@ -50,7 +51,7 @@ export function createProductsLoader(
           };
         }
         const data = await response.json();
-
+        console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
         return {
           entries: data.map((x: Product) => ({
             ...x
@@ -63,8 +64,9 @@ export function createProductsLoader(
       }
     },
     loadEntry: async ({ filter }) => {
+      console.log("🚀 ~ createProductsLoader ~ entry ~ filter:", filter);
       try {
-        const response = await fetch(`${config.baseUrl}/api/product/${filter.slug}`);
+        const response = await fetch(`${config.baseUrl}/api/products/${filter.slug}`);
         if (!response.ok) {
           return {
             error: new Error(
@@ -73,7 +75,8 @@ export function createProductsLoader(
           };
         }
         const data = await response.json();
-        return data.find((x: Product) => x.slug === filter.slug);
+        console.log("🚀 ~ createProductsLoader ~ entry ~ data:", data);
+        return data;
       } catch (error: unknown) {
         return {
             error: parseApiError(error, "product"),

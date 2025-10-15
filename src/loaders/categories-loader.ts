@@ -3,11 +3,11 @@ import { parseApiError } from '../utils/error-parser';
 
 export type Category = {
   id: string;
-  //title: string;
-  //description?: string;
-  //image: string;
+  title: string;
+  description?: string;
+  image: string;
   slug: string;
-  //parent?: string;
+  parent?: string;
 }
 
 export type CollectionFilter = {
@@ -27,7 +27,7 @@ export function createCategoriesLoader(
     name: 'categories-loader',
     loadCollection: async ({ filter }) => {
       try {
-        console.log('Categories > prepare for filter ' + JSON.stringify(filter) + ", baseUrl=" + config.baseUrl);
+        console.log("🚀 ~ createCategoriesLoader ~ collection ~ filter:", filter);
         const url = new URL(`${config.baseUrl}/categories`);
       
         //const parentSlug = "";
@@ -46,8 +46,7 @@ export function createCategoriesLoader(
           };
         }
         const data = await response.json();
-        console.log('Categories > API endpoint response for All: ' + JSON.stringify(data));
-        
+        console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
         return {
           entries: data.map((x: Category) => ({
             ...x
@@ -60,7 +59,8 @@ export function createCategoriesLoader(
       }
     },
     loadEntry: async ({ filter }) => {
-      console.log('Category > prepare for filter ' + JSON.stringify(filter) + ", baseUrl=" + config.baseUrl);
+      console.log("🚀 ~ createCategoriesLoader ~ entry ~ filter:", filter);
+
       try {
         const response = await fetch(`${config.baseUrl}/categories/${filter.slug}`);
         if (!response.ok) {
@@ -71,8 +71,7 @@ export function createCategoriesLoader(
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createCategoriesLoader ~ data:", data);
-        
+        console.log("🚀 ~ createCategoriesLoader ~ entry ~ data:", data);
         return data;
       } catch (error: unknown) {
         return {

@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro'
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
-  console.log("🚀 ~ GET ~ params:", params)
+  console.log("🚀 ~ GET ~ category ~ params:", params)
   const { slug } = params;
 
   // TODO: query database for category by slug
@@ -17,12 +17,12 @@ export const GET: APIRoute = async ({ params, request }) => {
 
   return new Response(
     JSON.stringify({
-        id: 123,
-        //title: "Test 1",
-        //description: 'Description 1',
-        //image: 'https://via.placeholder.com/150',
+        id: 1,
+        title: "Test 1",
+        description: 'Description 1',
+        image: 'https://via.placeholder.com/150',
         slug: 'test-1',
-        //parent: '',
+        parent: null,
       }
     ), {
       status: 200,
