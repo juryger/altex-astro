@@ -1,9 +1,9 @@
 ---
 import { type NavPathItem } from '../types/common';
-import PathMapper from '../utils/path-mapper';
+import NavPathMapper from '../utils/path-mapper';
 
 const { currentPath } = Astro.props;
-const pathMapper = new PathMapper();
+const pathMapper = new NavPathMapper();
 
 const getBreadcrumbs = (path: string): Array<NavPathItem> => {
   console.log('breadcrumbs > original ' + path);

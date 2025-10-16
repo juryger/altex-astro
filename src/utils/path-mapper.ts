@@ -1,12 +1,12 @@
 import { type NavPathItem } from '../types/common';
 
-class PathMapper {
+class NavPathMapper {
   private data: Array<NavPathItem>
   
   constructor() {
     this.data = [
       <NavPathItem> { path: '/', displayValue: 'Главная'}, 
-      <NavPathItem> { path: '/about', displayValue: 'Обо мне'},
+      <NavPathItem> { path: '/about', displayValue: 'О Компании'},
       <NavPathItem> { path: '/catalog', displayValue: 'Каталог'},
       <NavPathItem> { path: '/contact', displayValue: 'Контакты'}
     ];
@@ -20,4 +20,4 @@ class PathMapper {
   });  
 }
 
-export default PathMapper;
+export default NavPathMapper;
