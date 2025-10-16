@@ -18,10 +18,10 @@ export const GET: APIRoute = async ({ params, request }) => {
   return new Response(
     JSON.stringify({
         id: 1,
-        title: "Test 1",
-        description: 'Description 1',
-        image: 'https://via.placeholder.com/150',
-        slug: 'test-1',
+        title: "Замковая фурнитура",
+        description: 'Замкки, личинки, проушины и прочее',
+        image: 'http://localhost:4321/public/categories/locks.png',
+        slug: 'locks',
         parent: null,
       }
     ), {

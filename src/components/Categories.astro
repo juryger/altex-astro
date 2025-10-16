@@ -5,10 +5,7 @@ import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import type { Category } from '../loaders/categories-loader';
 
-const { entries: categories, error } = await getLiveCollection('categories');
-// , {
-//    parentSlug: undefined
-// } as any
+const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: 'locks'  });
 console.log("🚀 ~ categories:", categories)
 
 if (LiveCollectionValidationError.is(error)) {
@@ -16,23 +13,31 @@ if (LiveCollectionValidationError.is(error)) {
 } else if (error) {
   console.log("🚀 ~ Categories component ~ error:", error)
 }
+
+const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
+console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
 ---
 
-<div class="hero bg-base-100">
-  <div class="hero-content flex-col lg:flex-row">
-    <div class="px-3">
-      <p class="py-1">
-        Список категорий товаров:<br />
-        <ul class="list-disc">
-          {
-            categories && categories.map((x) => {
-              const item = x as unknown as Category;
-              return (<li>{item.id} - {item.slug}</li>);
-            })
-          }
-        </ul>
-        { !categories && <span>Категории не найдены</span> }
-      </p>
-    </div>
+<div class="px-4 pt-4 bg-base-100">
+  <h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров:</h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2 ">
+    {categories && categories.map(
+      x => {
+        const item = x as unknown as Category;
+        return (<div class="card bg-base-100 w-auto shadow-sm">
+          <figure class="px-10 pt-10">
+            <img
+              src=`${categoriesBlobStorageUrl}/${item.image}`
+              alt=`${item.title}`
+              class="rounded-xl" />
+          </figure>
+          <div class="card-body items-center text-center">
+            <span class="card-title">{item.title}</span>
+            {item.description && <p>{item.description}</p>}
+          </div>
+        </div>);
+      })
+    }
   </div>
+  {!categories && <span>Категории отстуствуют</span>}
 </div>

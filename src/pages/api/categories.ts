@@ -4,38 +4,59 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
   console.log("🚀 ~ GET ~ categories ~ params:", params)
+  console.log("🚀 ~ GET ~ request:", URL.parse(request.url))
   
   // TODO: query database for Categories
-  
+  var allItems = [
+    {
+      id: 1,
+      title: "Замковая фурнитура",
+      description: 'Замкки, личинки, проушины и прочее',
+      image: 'locks.png',
+      slug: 'locks',
+      parent: null,
+    }, {
+      id: 2,
+      title: "Инструменты",
+      description: 'Инструменты для сада и хоязяйства',
+      image: 'tools.png',
+      slug: 'tools',
+      parent: undefined,
+    }, {
+      id: 3,
+      title: "Навесные замки",
+      description: 'Навесные замки и прочее',
+      image: 'padlocks.png',
+      slug: 'padlocks',
+      parent: 'locks',
+    }, {
+      id: 4,
+      title: "Личинки",
+      description: 'Заменяемые личинки для замков',
+      image: 'lock-barrels.png',
+      slug: 'lock-barrels',
+      parent: 'locks',
+    }, {
+      id: 5,
+      title: "Проушины",
+      description: 'Проушины для замков',
+      image: 'padlock-eyes.png',
+      slug: 'padlock-eyes',
+      parent: 'locks',
+    },         
+  ];
+
+  const url = URL.parse(request.url);
+  var parentSlug = "";
+  if (url?.search && url.searchParams) {
+    parentSlug = url.searchParams.get('parent') ?? "";
+  }
   return new Response(
     JSON.stringify(
-      [
-        {
-          id: 1,
-          title: "Замки",
-          description: 'Замкковая фурнитура',
-          image: 'http://localhost:4321/public/categories/locks.png',
-          slug: 'locks',
-          parent: null,
-        }, 
-        {
-          id: 2,
-          title: "Category 2",
-          description: 'Category description 2',
-          image: 'https://via.placeholder.com/150',
-          slug: 'category-2',
-          parent: null,
-        },
-        {
-          id: 3,
-          title: "Sub-category 1.1 of Category 1",
-          description: 'Category description 3',
-          image: 'https://via.placeholder.com/150',
-          slug: 'category-3',
-          parent: 'category-1',
-        },
-      ]
-    ), {
+      !parentSlug ? 
+        allItems.filter(x => !x.parent) : 
+        allItems.filter(x => x.parent === parentSlug)
+      ), {
       status: 200,
       headers: {
         "Content-Type": "application/json"

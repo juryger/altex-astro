@@ -1,20 +1,22 @@
 ---
 import { type NavPathItem } from '../types/common';
-import NavPathMapper from '../utils/path-mapper';
+import NavPathMapper from '../utils/nav-path-mapper';
 
 const { currentPath } = Astro.props;
 const pathMapper = new NavPathMapper();
 
 const getBreadcrumbs = (path: string): Array<NavPathItem> => {
-  console.log('breadcrumbs > original ' + path);
   const splitPath = path.split('/');
-  console.log('breadcrumbs > split ' + splitPath);
-  if (path.endsWith("/")) splitPath.pop();
-  
+  console.log("🚀 ~ Breadcrumbs component ~ path:", path)
+  console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
+  if (path.endsWith("/")) {
+    splitPath.pop();
+  }
+
   var result: Array<NavPathItem> = [];
   while(splitPath.length > 0) { 
     const pathItem =  `/${splitPath.pop()}`;
-    console.log('breadcrumbs > pathItem > ' + pathItem);
+    console.log("🚀 ~ Breadcrumbs component ~ path item:", pathItem)
     result.push({ path: pathItem, displayValue: pathMapper.getDispalyValueForPath(pathItem)});
   }
   
@@ -22,7 +24,7 @@ const getBreadcrumbs = (path: string): Array<NavPathItem> => {
 }
 
 const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath).reverse();
-console.log('breadcrumbs > parsed ' + JSON.stringify(breadcrumbs));
+console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
 ---
 
 <div class="breadcrumbs text-sm px-5">

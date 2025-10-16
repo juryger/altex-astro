@@ -33,19 +33,19 @@ export const GET: APIRoute = async ({ params, request }) => {
 
   return new Response(
     JSON.stringify({
-          id: 1,
-          title: "Product 1",
-          description: 'Product description 1',
-          unit: 'шт',
-          quantityInPack: 1,
-          price: 100,
-          whsPrice1: 90,
-          whsPrice2: 80,
-          category: 'category-3',
-          colors: ['red', 'blue'],
-          image: 'https://via.placeholder.com/150',
-          slug: 'product-1',
-        }
+        id: 1,
+        title: "Замок навесной",
+        description: 'Product description 1',
+        unit: 'шт',
+        quantityInPack: 1,
+        price: 100,
+        whsPrice1: 90,
+        whsPrice2: 80,
+        category: 'padlocks',
+        colors: ['red', 'blue'],
+        image: 'padlock-master-vline.png',
+        slug: 'padlock-master-vline',
+      }
     ), {
       status: 200,
       headers: {

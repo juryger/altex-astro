@@ -1,10 +1,9 @@
 // Handle theme toggle logic with support of localStorage 
 export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelector: Element | null, lightThemeSelector: Element | null): void => {  
   const localStorageKey = 'theme-toggle';
-
-  console.log("🚀 ~ applyThemeToggle ~ themeSelector:", themeSelector)
-  console.log("🚀 ~ applyThemeToggle ~ darkThemeSelector:", darkThemeSelector)
-  console.log("🚀 ~ applyThemeToggle ~ lightThemeSelector:", lightThemeSelector)
+  //console.log("🚀 ~ applyThemeToggle ~ themeSelector:", themeSelector)
+  //console.log("🚀 ~ applyThemeToggle ~ darkThemeSelector:", darkThemeSelector)
+  //console.log("🚀 ~ applyThemeToggle ~ lightThemeSelector:", lightThemeSelector)
 
   // On theme switch, saves user preference to localStorage
   const themeSelectorInput = (themeSelector as HTMLInputElement);

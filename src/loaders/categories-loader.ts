@@ -10,11 +10,11 @@ export type Category = {
   parent?: string;
 }
 
-export type CollectionFilter = {
+interface CollectionFilter {
   parentSlug?: string;
 }
 
-type EntryFilter ={
+interface EntryFilter {
   slug?: string;
 }
 
@@ -30,13 +30,11 @@ export function createCategoriesLoader(
         console.log("🚀 ~ createCategoriesLoader ~ collection ~ filter:", filter);
         const url = new URL(`${config.baseUrl}/categories`);
       
-        //const parentSlug = "";
-        //var x = (filter as unknown) as CategoryFilter;
-        if (filter !== undefined /*&& x !== undefined*/) {
+        if (filter !== undefined) {
           url.searchParams.set('parent', filter.parentSlug ?? "") ;
         }
-
-        console.log('Categories > fetch from ' + url.toString());
+        
+        console.log("🚀 ~ createCategoriesLoader ~ collection ~ url:", url.toString());
         const response = await fetch(url.toString());
         if (!response.ok) {
           return {
