@@ -24,18 +24,19 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
     {categories && categories.map(
       x => {
         const item = x as unknown as Category;
-        return (<div class="card bg-base-100 w-auto shadow-sm">
-          <figure class="px-10 pt-10">
-            <img
-              src=`${categoriesBlobStorageUrl}/${item.image}`
-              alt=`${item.title}`
-              class="rounded-xl" />
-          </figure>
-          <div class="card-body items-center text-center">
-            <span class="card-title">{item.title}</span>
-            {item.description && <p>{item.description}</p>}
-          </div>
-        </div>);
+        return (
+          <div class="card bg-base-100 w-auto shadow-sm">
+            <figure class="px-10 pt-10">
+              <img
+                src=`${categoriesBlobStorageUrl}/${item.image}`
+                alt=`${item.title}`
+                class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+              <span class="card-title">{item.title}</span>
+              {item.description && <p>{item.description}</p>}
+            </div>
+          </div>);
       })
     }
   </div>
