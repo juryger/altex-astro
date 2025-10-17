@@ -27,7 +27,7 @@ const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath).reverse();
 console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
 ---
 
-<div class="breadcrumbs text-sm px-5">
+<div class="breadcrumbs text-sm px-8">
   {breadcrumbs.length > 1 && <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: NavPathItem, index: number) => (
         <li>

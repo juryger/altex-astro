@@ -6,7 +6,7 @@ import NavPathMapper from '../utils/nav-path-mapper';
 var allPaths = new NavPathMapper().getAllPaths();
 ---
 
-<footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded p-10">
+<footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded pt-2 pb-2">
   <nav class="grid grid-flow-col gap-4">
     {allPaths && allPaths.map((x) => (
       <a class="link link-info link-hover" href={x.path}>{x.displayValue}</a>

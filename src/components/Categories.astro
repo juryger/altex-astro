@@ -26,13 +26,13 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
         const item = x as unknown as Category;
         return (
           <div class="card bg-base-100 w-auto shadow-sm">
-            <figure class="px-10 pt-10">
+            <figure class="px-1 pt-1">
               <img
                 src=`${categoriesBlobStorageUrl}/${item.image}`
                 alt=`${item.title}`
-                class="rounded-xl" />
+                class="rounded-xl max-w-24" />
             </figure>
-            <div class="card-body items-center text-center">
+            <div class="card-body items-center text-center !px-1 !py-1">
               <span class="card-title">{item.title}</span>
               {item.description && <p>{item.description}</p>}
             </div>
