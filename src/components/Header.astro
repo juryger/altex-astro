@@ -1,21 +1,23 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import NavPathMapper from '../utils/nav-path-mapper';
+import NavPathResolver from '../utils/nav-path-resolver';
 
-const allPaths = new NavPathMapper().getAllPaths();
+const allPaths = new NavPathResolver().resolveAllPaths({ isMainMenu: true });
 ---
 
 <script>
   import { applyThemeToggle } from "../utils/theme-toggle";
   
+  console.log("🚀 ~ Header ~ Apply them toggler");
+
   applyThemeToggle(document.querySelector('[data-theme-toggle]'),
     document.querySelector('[data-theme-toggle-dark]'), 
     document.querySelector('[data-theme-toggle-light]')
   );
 </script>
 
-<div class="navbar bg-base-100">
+<div class="navbar sticky top-0 z-50 bg-base-100 border-b border-solid border-neutral-content">
   <div class="navbar-start pl-3">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost md:hidden">
@@ -26,7 +28,7 @@ const allPaths = new NavPathMapper().getAllPaths();
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
         {allPaths && allPaths.map((x) => (
           <li>
-            <a href={x.path}>{x.displayValue}</a>
+            <a href={x.url}>{x.value}</a>
           </li>
         ))}
       </ul>
@@ -42,7 +44,7 @@ const allPaths = new NavPathMapper().getAllPaths();
     <ul class="menu menu-horizontal px-1 font-semibold">
       {allPaths && allPaths.map((x) => (
         <li>
-          <a href={x.path}>{x.displayValue}</a>
+          <a href={x.url}>{x.value}</a>
         </li>
       ))}
       <li class="px-3">
@@ -68,7 +70,7 @@ const allPaths = new NavPathMapper().getAllPaths();
             </svg>
           </div>
         </div>
-        <div tabindex="0" class="card card-compact dropdown-content bg-base-100 z-1 mt-3 w-52 shadow">
+        <div tabindex="0" class="card card-compact dropdown-content bg-base-300 z-1 mt-3 w-52 shadow">
           <div class="card-body">
             <span class="text-lg font-bold">Товаров: 0</span>
             <span class="text-info">На сумму: 0 руб.</span>
@@ -90,7 +92,7 @@ const allPaths = new NavPathMapper().getAllPaths();
       </div>
       <ul
         tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        class="menu menu-sm dropdown-content bg-base-300 rounded-box z-1 mt-3 w-52 p-2 shadow">
         <li>
           <a class="justify-between">
             Мой профиль

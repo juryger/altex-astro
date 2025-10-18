@@ -27,14 +27,14 @@ export function createCategoriesLoader(
     name: 'categories-loader',
     loadCollection: async ({ filter }) => {
       try {
-        console.log("🚀 ~ createCategoriesLoader ~ collection ~ filter:", filter);
+        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ filter:", filter);
         const url = new URL(`${config.baseUrl}/categories`);
       
         if (filter !== undefined) {
           url.searchParams.set('parent', filter.parentSlug ?? "") ;
         }
         
-        console.log("🚀 ~ createCategoriesLoader ~ collection ~ url:", url.toString());
+        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ url:", url.toString());
         const response = await fetch(url.toString());
         if (!response.ok) {
           return {
@@ -44,7 +44,7 @@ export function createCategoriesLoader(
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
+        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
         return {
           entries: data.map((x: Category) => ({
             ...x
@@ -57,8 +57,7 @@ export function createCategoriesLoader(
       }
     },
     loadEntry: async ({ filter }) => {
-      console.log("🚀 ~ createCategoriesLoader ~ entry ~ filter:", filter);
-
+      //console.log("🚀 ~ createCategoriesLoader ~ entry ~ filter:", filter);
       try {
         const response = await fetch(`${config.baseUrl}/categories/${filter.slug}`);
         if (!response.ok) {
@@ -69,7 +68,7 @@ export function createCategoriesLoader(
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createCategoriesLoader ~ entry ~ data:", data);
+        //console.log("🚀 ~ createCategoriesLoader ~ entry ~ data:", data);
         return data;
       } catch (error: unknown) {
         return {

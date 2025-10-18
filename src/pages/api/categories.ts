@@ -3,18 +3,18 @@ import type { APIRoute } from 'astro'
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, request }) => {
-  console.log("🚀 ~ GET ~ categories ~ params:", params)
-  console.log("🚀 ~ GET ~ request:", URL.parse(request.url))
+  //console.log("🚀 ~ GET ~ categories ~ params:", params)
+  //console.log("🚀 ~ GET ~ request:", URL.parse(request.url))
   
   // TODO: query database for Categories
   var allItems = [
     {
       id: 1,
-      title: "Замковая фурнитура",
+      title: "Замковая фурнитура afdfaf 234",
       description: 'Замкки, личинки, проушины и прочее',
       image: 'locks.png',
       slug: 'locks',
-      parent: null,
+      parent: undefined,
     }, {
       id: 2,
       title: "Инструменты",

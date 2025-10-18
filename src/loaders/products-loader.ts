@@ -32,13 +32,10 @@ export function createProductsLoader(
   return {
     name: 'product-loader',
     loadCollection: async ({ filter }) => {
-      console.log("🚀 ~ createProductsLoader ~ collection ~ filter:", filter);
+      //console.log("🚀 ~ createProductsLoader ~ collection ~ filter:", filter);
       try {
         const url = new URL(`${config.baseUrl}/products`);
-      
-        //const parentSlug = "";
-        //var x = (filter as unknown) as ProductFilter;
-        if (filter !== undefined/* && x !== undefined*/) {
+        if (filter !== undefined) {
           url.searchParams.set('category', filter.categorySlug ?? "") ;
         }
 
@@ -51,7 +48,7 @@ export function createProductsLoader(
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
+        //console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
         return {
           entries: data.map((x: Product) => ({
             ...x
@@ -64,7 +61,7 @@ export function createProductsLoader(
       }
     },
     loadEntry: async ({ filter }) => {
-      console.log("🚀 ~ createProductsLoader ~ entry ~ filter:", filter);
+      //console.log("🚀 ~ createProductsLoader ~ entry ~ filter:", filter);
       try {
         const response = await fetch(`${config.baseUrl}/api/products/${filter.slug}`);
         if (!response.ok) {
@@ -75,7 +72,7 @@ export function createProductsLoader(
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createProductsLoader ~ entry ~ data:", data);
+        //console.log("🚀 ~ createProductsLoader ~ entry ~ data:", data);
         return data;
       } catch (error: unknown) {
         return {

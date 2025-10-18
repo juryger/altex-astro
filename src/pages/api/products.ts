@@ -19,10 +19,9 @@ export const prerender = false;
 }
 */
 export const GET: APIRoute = async ({ params, request }) => {
-  console.log("🚀 ~ GET ~ products ~ params:", params)
+  //console.log("🚀 ~ GET ~ products ~ params:", params)
   
   // TODO: query database for Categories
-  
   return new Response(
     JSON.stringify([
       {

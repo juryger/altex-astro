@@ -10,6 +10,27 @@ const currentPath = Astro.url.pathname;
 const MainTitle = `АЛТЕХ - ${title}`;
 ---
 
+<script>
+  import { getWorkersFactory, type WorkerInfo } from "../utils/workers-factory";
+
+	window.workers = window.workers ?? {} as WorkerInfo;
+
+	console.log("🚀 ~ BaseLayout ~ creating catalog-sync-worker");
+	const factory = getWorkersFactory(window.workers);
+	const catalogSyncWorker = factory.findOrCreateCatalogSyncWorker(
+		e => {
+			if (e.data === 'command') {
+				console.log("🚀 ~ BaseLayout ~ response from catalog-sync-worker:", e.data);
+			}
+		}, err => {
+			console.error("🚀 ~ BaseLayout ~ error in catalog-sync-worker:", err.message);
+		}
+  );
+
+	catalogSyncWorker.postMessage("sync-categories");
+</script>
+
+
 <!doctype html>
 <html lang="ru">
 	<head>

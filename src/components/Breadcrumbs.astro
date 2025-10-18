@@ -1,29 +1,44 @@
 ---
-import { type NavPathItem } from '../types/common';
-import NavPathMapper from '../utils/nav-path-mapper';
+import NavPathResolver, { type NavPathItem } from '../utils/nav-path-resolver';
 
 const { currentPath } = Astro.props;
-const pathMapper = new NavPathMapper();
+const pathResolver = new NavPathResolver();
 
 const getBreadcrumbs = (path: string): Array<NavPathItem> => {
-  const splitPath = path.split('/');
-  console.log("🚀 ~ Breadcrumbs component ~ path:", path)
-  console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
+  const splitPath = path.split('/').reverse();
+  //console.log("🚀 ~ Breadcrumbs component ~ path:", path)
+  //console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
+  
   if (path.endsWith("/")) {
     splitPath.pop();
   }
 
   var result: Array<NavPathItem> = [];
+  var currentRelativePath = '';
+
   while(splitPath.length > 0) { 
-    const pathItem =  `/${splitPath.pop()}`;
-    console.log("🚀 ~ Breadcrumbs component ~ path item:", pathItem)
-    result.push({ path: pathItem, displayValue: pathMapper.getDispalyValueForPath(pathItem)});
+    const pathItem =  splitPath.pop() ?? "";
+    currentRelativePath += `${pathItem}/`;
+    //console.log("🚀 ~ Breadcrumbs component ~ processing path item: %s", pathItem)
+
+    const resolvedPathItem = pathResolver.resolvePathItem(pathItem);
+    if (resolvedPathItem) {
+      //console.log("🚀 ~ Breadcrumbs component ~ resolved path item:", resolvedPathItem)
+      resolvedPathItem.url = currentRelativePath;
+      if (resolvedPathItem.displayOptions.isBreadcrumbs) {
+        result.push(resolvedPathItem);
+      } else {
+        console.log("🚀 ~ Breadcrumbs component ~ path item is marked as excluded from the breadcrumbs and will be skipped:", pathItem)
+      }
+    } else {
+      console.error("🚀 ~ Breadcrumbs component ~ could not resolve path item:", pathItem)
+    }
   }
   
   return result;
 }
 
-const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath).reverse();
+const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath);
 console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
 ---
 
@@ -31,7 +46,9 @@ console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
   {breadcrumbs.length > 1 && <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: NavPathItem, index: number) => (
         <li>
-          {(index !== breadcrumbs.length - 1) ? <a href={x.path}>{x.displayValue}</a> : <span class="!no-underline !cursor-default">{x.displayValue}</span>} 
+          {(index !== breadcrumbs.length - 1) ? 
+            <a href={x.url}>{x.value}</a> : 
+            <span class="!no-underline !cursor-default">{x.value}</span>} 
         </li>
       ))}
     </ul>}

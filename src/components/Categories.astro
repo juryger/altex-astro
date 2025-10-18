@@ -4,9 +4,10 @@ export const prerender = false;
 import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import type { Category } from '../loaders/categories-loader';
+import { createTextHelper } from '../utils/text-helper';
 
-const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: 'locks'  });
-console.log("🚀 ~ categories:", categories)
+const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
+//console.log("🚀 ~ categories:", categories)
 
 if (LiveCollectionValidationError.is(error)) {
   console.log("🚀 ~ Categories component ~ shema validation errors:", error)
@@ -15,7 +16,7 @@ if (LiveCollectionValidationError.is(error)) {
 }
 
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
-console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
+//console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
 ---
 
 <div class="px-4 pt-4 bg-base-100">
@@ -26,16 +27,24 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
         const item = x as unknown as Category;
         return (
           <div class="card bg-base-100 w-auto shadow-sm">
-            <figure class="px-1 pt-1">
-              <img
-                src=`${categoriesBlobStorageUrl}/${item.image}`
-                alt=`${item.title}`
-                class="rounded-xl max-w-24" />
-            </figure>
-            <div class="card-body items-center text-center !px-1 !py-1">
-              <span class="card-title">{item.title}</span>
-              {item.description && <p>{item.description}</p>}
-            </div>
+            <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
+              <figure class="px-1 pt-1">
+                <img
+                  src=`${categoriesBlobStorageUrl}/${item.image}`
+                  alt=`${item.title}`
+                  class="rounded-xl max-w-24" />
+              </figure>
+              <div class="card-body items-center text-center !px-1 !py-1">
+                <span class="card-title text-sm font-bold" title={item.title}>
+                  {createTextHelper(item.title).trimEnd(21, '.')}
+                </span>
+                {item.description && <p>
+                  <span title={item.description}>
+                    {createTextHelper(item.description).trimEnd(100, '.')}
+                  </span>
+                </p>}
+              </div>
+            </a>
           </div>);
       })
     }
