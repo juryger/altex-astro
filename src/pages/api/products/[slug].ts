@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ params, request }) => {
 
   // TODO: query database for category by slug
 
-  if (!slug || slug !== 'product-1') {
+  if (!slug || slug !== 'padlock-master-vline') {
     return new Response(null, {
       status: 404,
       statusText: "Not found",

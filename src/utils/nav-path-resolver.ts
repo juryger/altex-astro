@@ -3,7 +3,7 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 interface NavPathItem {
   path: string,
   value: string,
-  url: string,
+  __url: string,
   displayOptions: {
     isMainMenu: boolean,
     isFooter: boolean,
@@ -16,21 +16,21 @@ export default class NavPathResolver {
   
   constructor() {
     this.data = [
-      { path: '', value: 'Главная', url: '', 
+      { path: '/', value: 'Главная', __url: '', 
         displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } }, 
-      { path: 'about', value: 'О Компании', url: '', 
+        { path: '/catalog', value: 'Каталог', __url: '', 
+          displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
+        { path: '/categories', value: 'Категории товаров', __url: '', 
+          displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
+        { path: '/products', value: 'Товары', __url: '', 
+          displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
+      { path: '/about', value: 'О Компании', __url: '', 
         displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-      { path: 'contact', value: 'Контакты', url: '', 
+      { path: '/contact', value: 'Контакты', __url: '', 
         displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-      { path: 'catalog', value: 'Каталог', url: '', 
-        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-      { path: 'categories', value: 'Категории товаров', url: '', 
-        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
-      { path: 'products', value: 'Товары', url: '', 
-        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
-      { path: 'cart', value: 'Корзина', url: '', 
+      { path: '/cart', value: 'Корзина', __url: '', 
         displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } },
-      { path: 'profile', value: 'Мой профиль', url: '', 
+      { path: '/profile', value: 'Мой профиль', __url: '', 
         displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } },
     ];
   }
@@ -50,7 +50,8 @@ export default class NavPathResolver {
   }
 
   public resolvePathItem = ((value: string): NavPathItem | undefined => {
-    const index: number = this.data.findIndex((x: NavPathItem) => x.path === value);
+    const pathValue = value.indexOf('/') === 0 ? value : `/${value}`;
+    const index: number = this.data.findIndex((x: NavPathItem) => x.path === pathValue);
     return index != -1 ? this.data.at(index) : undefined;
   });  
 }

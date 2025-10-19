@@ -1,13 +1,14 @@
 ---
 import NavPathResolver, { type NavPathItem } from '../utils/nav-path-resolver';
+import { currentProduct } from '../stores/product-store';
 
 const { currentPath } = Astro.props;
 const pathResolver = new NavPathResolver();
 
 const getBreadcrumbs = (path: string): Array<NavPathItem> => {
   const splitPath = path.split('/').reverse();
-  //console.log("🚀 ~ Breadcrumbs component ~ path:", path)
-  //console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
+  console.log("🚀 ~ Breadcrumbs component ~ path:", path)
+  console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
   
   if (path.endsWith("/")) {
     splitPath.pop();
@@ -24,7 +25,7 @@ const getBreadcrumbs = (path: string): Array<NavPathItem> => {
     const resolvedPathItem = pathResolver.resolvePathItem(pathItem);
     if (resolvedPathItem) {
       //console.log("🚀 ~ Breadcrumbs component ~ resolved path item:", resolvedPathItem)
-      resolvedPathItem.url = currentRelativePath;
+      resolvedPathItem.__url = currentRelativePath;
       if (resolvedPathItem.displayOptions.isBreadcrumbs) {
         result.push(resolvedPathItem);
       } else {
@@ -38,6 +39,8 @@ const getBreadcrumbs = (path: string): Array<NavPathItem> => {
   return result;
 }
 
+console.log("🚀 ~ Breadcrumbs component ~ current product:", currentProduct?.value)
+
 const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath);
 console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
 ---
@@ -47,7 +50,7 @@ console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
       {breadcrumbs && breadcrumbs.map((x: NavPathItem, index: number) => (
         <li>
           {(index !== breadcrumbs.length - 1) ? 
-            <a href={x.url}>{x.value}</a> : 
+            <a href={x.__url}>{x.value}</a> : 
             <span class="!no-underline !cursor-default">{x.value}</span>} 
         </li>
       ))}

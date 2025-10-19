@@ -1,7 +1,30 @@
 ---
+
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getLiveEntry } from 'astro:content';
+import { LiveCollectionValidationError } from 'astro/content/runtime';
+import { type Product } from '../../../loaders/products-loader';
+import { currentProduct, assignCurrentProduct } from '../../../stores/product-store';
 
 export const prerender = false;
+const { slug } = Astro.params;
+console.log("🚀 ~ Product component ~ slug:", slug)
+
+const { entry: product, error } = await getLiveEntry('products', { slug: slug ?? "" });
+if (LiveCollectionValidationError.is(error)) {
+  console.error("🚀 ~ Product component ~ collection shema validation errors:", error)
+} else if (error) {
+  console.error("🚀 ~ Product component ~ collection error:", error)
+}
+
+var extractedProduct: Product | undefined;
+if (product) {
+  extractedProduct = product as unknown as Product;
+  console.log("🚀 ~ Product component ~ save product to state store:", extractedProduct)
+} else {
+  console.error("🚀 ~ Product component ~ could not get product by slug:", product)
+}
+assignCurrentProduct(extractedProduct);
 ---
 
 <BaseLayout title="Карточка товара">

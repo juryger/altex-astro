@@ -1,9 +1,9 @@
 // Handle theme toggle logic with support of localStorage 
 export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelector: Element | null, lightThemeSelector: Element | null): void => {  
   const localStorageKey = 'theme-toggle';
-  //console.log("🚀 ~ applyThemeToggle ~ themeSelector:", themeSelector)
-  //console.log("🚀 ~ applyThemeToggle ~ darkThemeSelector:", darkThemeSelector)
-  //console.log("🚀 ~ applyThemeToggle ~ lightThemeSelector:", lightThemeSelector)
+  // console.log("🚀 ~ applyThemeToggle ~ themeSelector:", themeSelector)
+  // console.log("🚀 ~ applyThemeToggle ~ darkThemeSelector:", darkThemeSelector)
+  // console.log("🚀 ~ applyThemeToggle ~ lightThemeSelector:", lightThemeSelector)
 
   // On theme switch, saves user preference to localStorage
   const themeSelectorInput = (themeSelector as HTMLInputElement);
@@ -11,7 +11,7 @@ export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelecto
     const currentTheme = localStorage.getItem(localStorageKey) ?? 'light';
     const newTheme = (currentTheme === 'light') ? 'dark' : 'light';
     localStorage.setItem(localStorageKey, newTheme);
-    console.log(`🚀 ~ applyThemeToggle ~ User changed theme to ${newTheme}, saving preferences.`);
+    //console.log(`🚀 ~ applyThemeToggle ~ User changed theme to ${newTheme}, saving preferences.`);
   });
 
   const syncUIBasedOnClientOSTheme = (theme: string): void => {
@@ -40,26 +40,26 @@ export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelecto
   const isClientOSDarkThemeOn = window.matchMedia("(prefers-color-scheme: dark)").matches;
   
   if (isClientOSDarkThemeOn) {
-    console.log("🚀 ~ applyThemeToggle ~ Client OS theme is set to Dark.");
+    //console.log("🚀 ~ applyThemeToggle ~ Client OS theme is set to Dark.");
     syncUIBasedOnClientOSTheme('dark');
     
     if (savedTheme && savedTheme === 'light') {
-      console.log("🚀 ~ applyThemeToggle ~ User have earlier saved theme, switching to Light theme.");
+      //console.log("🚀 ~ applyThemeToggle ~ User have earlier saved theme, switching to Light theme.");
       toggleLightTheme();
     }
     else {
-      console.log("🚀 ~ applyThemeToggle ~ Saving current theme 'Dark' as preferred.");
+      //console.log("🚀 ~ applyThemeToggle ~ Saving current theme 'Dark' as preferred.");
       localStorage.setItem(localStorageKey, 'dark');
     }
   } else {
-    console.log("🚀 ~ applyThemeToggle ~ Client OS theme is set to Light (or no specific preference).");
+    //console.log("🚀 ~ applyThemeToggle ~ Client OS theme is set to Light (or no specific preference).");
     syncUIBasedOnClientOSTheme('light');
     
     if (savedTheme && savedTheme === 'dark') {
-      console.log("🚀 ~ applyThemeToggle ~ User have earlier saved theme, switching to Dark theme.");
+      //console.log("🚀 ~ applyThemeToggle ~ User have earlier saved theme, switching to Dark theme.");
       toggleDarkTheme();
     } else {
-      console.log("🚀 ~ applyThemeToggle ~ Saving current theme 'Light' as preferred.");
+      //console.log("🚀 ~ applyThemeToggle ~ Saving current theme 'Light' as preferred.");
       localStorage.setItem(localStorageKey, 'light');
     }
   }

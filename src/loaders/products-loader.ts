@@ -32,7 +32,7 @@ export function createProductsLoader(
   return {
     name: 'product-loader',
     loadCollection: async ({ filter }) => {
-      //console.log("🚀 ~ createProductsLoader ~ collection ~ filter:", filter);
+      console.log("🚀 ~ createProductsLoader ~ collection ~ filter:", filter);
       try {
         const url = new URL(`${config.baseUrl}/products`);
         if (filter !== undefined) {
@@ -61,9 +61,9 @@ export function createProductsLoader(
       }
     },
     loadEntry: async ({ filter }) => {
-      //console.log("🚀 ~ createProductsLoader ~ entry ~ filter:", filter);
+      console.log("🚀 ~ createProductsLoader ~ entry ~ filter:", filter);
       try {
-        const response = await fetch(`${config.baseUrl}/api/products/${filter.slug}`);
+        const response = await fetch(`${config.baseUrl}/products/${filter.slug}`);
         if (!response.ok) {
           return {
             error: new Error(

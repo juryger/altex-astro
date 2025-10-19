@@ -31,8 +31,8 @@ export function createCategoriesLoader(
         const url = new URL(`${config.baseUrl}/categories`);
       
         if (filter !== undefined) {
-          url.searchParams.set('parent', filter.parentSlug ?? "") ;
-        }
+          url.searchParams.set('parent', filter.parentSlug ?? "");
+        } 
         
         //console.log("🚀 ~ createCategoriesLoader ~ collection ~ url:", url.toString());
         const response = await fetch(url.toString());

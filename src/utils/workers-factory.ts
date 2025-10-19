@@ -10,6 +10,7 @@ export interface WorkersList {
 }
 
 export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
+	console.log("🚀 ~ getWorkersFactory ~ workers:", workers);
   return {
     findOrCreateCatalogSyncWorker: (
       onMessage: (e: MessageEvent<any>) => void,
@@ -17,8 +18,11 @@ export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
     ): Worker => {
       const name: string = 'catalog-sync-worker';
 
-      if (workers[name]) {
-				console.log("🚀 ~ worker-factory ~ using earlier created worker: ", name);
+      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", (name in workers));
+      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", Object.hasOwn(workers, name));
+      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", workers.hasOwnProperty(name));
+      if (Object.hasOwn(workers, name)) {
+				console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ using earlier created worker: ", name);
         return workers[name];
       } 
 
@@ -27,7 +31,7 @@ export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
           type: 'module' 
         }
       );
-      console.log("🚀 ~ worker-factory ~ created new instance of worker: ", name);
+      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ created new instance of worker: ", name);
 
       worker.onmessage = (e) => {
         onMessage(e);
@@ -38,7 +42,9 @@ export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
       };
 
 
-      workers[name] = worker
+      workers[name] = worker;
+      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ new instance added to window.workers collection:", window.workers);
+      
       return worker;
     } 
   };

@@ -10,7 +10,6 @@ const allPaths = new NavPathResolver().resolveAllPaths({ isMainMenu: true });
   import { applyThemeToggle } from "../utils/theme-toggle";
   
   console.log("🚀 ~ Header ~ Apply them toggler");
-
   applyThemeToggle(document.querySelector('[data-theme-toggle]'),
     document.querySelector('[data-theme-toggle-dark]'), 
     document.querySelector('[data-theme-toggle-light]')
@@ -28,7 +27,7 @@ const allPaths = new NavPathResolver().resolveAllPaths({ isMainMenu: true });
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
         {allPaths && allPaths.map((x) => (
           <li>
-            <a href={x.url}>{x.value}</a>
+            <a href={x.path}>{x.value}</a>
           </li>
         ))}
       </ul>
@@ -44,7 +43,7 @@ const allPaths = new NavPathResolver().resolveAllPaths({ isMainMenu: true });
     <ul class="menu menu-horizontal px-1 font-semibold">
       {allPaths && allPaths.map((x) => (
         <li>
-          <a href={x.url}>{x.value}</a>
+          <a href={x.path}>{x.value}</a>
         </li>
       ))}
       <li class="px-3">

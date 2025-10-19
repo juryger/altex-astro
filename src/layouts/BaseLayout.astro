@@ -15,11 +15,13 @@ const MainTitle = `АЛТЕХ - ${title}`;
 
 	window.workers = window.workers ?? {} as WorkerInfo;
 
-	console.log("🚀 ~ BaseLayout ~ creating catalog-sync-worker");
+	console.log("🚀 ~ BaseLayout ~ prepare worker factory ~ window.workers:", window.workers);
 	const factory = getWorkersFactory(window.workers);
+
+	console.log("🚀 ~ BaseLayout ~ creating catalog-sync-worker");
 	const catalogSyncWorker = factory.findOrCreateCatalogSyncWorker(
 		e => {
-			if (e.data === 'command') {
+			if (e.data) {
 				console.log("🚀 ~ BaseLayout ~ response from catalog-sync-worker:", e.data);
 			}
 		}, err => {
@@ -27,7 +29,8 @@ const MainTitle = `АЛТЕХ - ${title}`;
 		}
   );
 
-	catalogSyncWorker.postMessage("sync-categories");
+	console.log("🚀 ~ BaseLayout ~ sending data to catalog-sync-worker:", 6);
+	catalogSyncWorker.postMessage(6);
 </script>
 
 

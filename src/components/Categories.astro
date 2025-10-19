@@ -10,9 +10,9 @@ const { entries: categories, error } = await getLiveCollection('categories', { p
 //console.log("🚀 ~ categories:", categories)
 
 if (LiveCollectionValidationError.is(error)) {
-  console.log("🚀 ~ Categories component ~ shema validation errors:", error)
+  console.error("🚀 ~ Categories component ~ shema validation errors:", error)
 } else if (error) {
-  console.log("🚀 ~ Categories component ~ error:", error)
+  console.error("🚀 ~ Categories component ~ error:", error)
 }
 
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
