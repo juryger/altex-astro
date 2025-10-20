@@ -2,9 +2,8 @@ import type { APIRoute } from 'astro'
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, request }) => {
-  //console.log("🚀 ~ GET ~ categories ~ params:", params)
-  //console.log("🚀 ~ GET ~ request:", URL.parse(request.url))
+export const GET: APIRoute = async ({ /*params, */request }) => {
+  console.log("🚀 ~ GET ~ request:", URL.parse(request.url))
   
   // TODO: query database for Categories
   var allItems = [

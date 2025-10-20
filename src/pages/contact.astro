@@ -2,6 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import contactLogo from '../assets/contact-logo.png';
+import { setLatVisitedPage } from '../stores/last-visited-page-store';
+
+setLatVisitedPage("Contacts");
 ---
 
 <BaseLayout title="Контакты">

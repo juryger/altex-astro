@@ -1,6 +1,13 @@
 ---
 import NavPathResolver, { type NavPathItem } from '../utils/nav-path-resolver';
-import { currentProduct } from '../stores/product-store';
+import { $currentProduct } from '../stores/product-store';
+import { $lastVisitedPage } from '../stores/last-visited-page-store';
+import { logger } from '@nanostores/logger';
+
+logger({
+  'CurrentProduct': $currentProduct,
+  'LastVisitedPage': $lastVisitedPage
+});
 
 const { currentPath } = Astro.props;
 const pathResolver = new NavPathResolver();
@@ -39,7 +46,7 @@ const getBreadcrumbs = (path: string): Array<NavPathItem> => {
   return result;
 }
 
-console.log("🚀 ~ Breadcrumbs component ~ current product:", currentProduct?.value)
+console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.value)
 
 const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath);
 console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
@@ -55,4 +62,5 @@ console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
         </li>
       ))}
     </ul>}
+  <span class="text-xs text-secondary-content">(LVP: {$lastVisitedPage?.value ?? "none"})</span>
 </div>

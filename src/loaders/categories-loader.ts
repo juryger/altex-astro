@@ -23,6 +23,8 @@ export function createCategoriesLoader(
     baseUrl: string
   }
 ): LiveLoader<Category, EntryFilter, CollectionFilter> {
+  console.log("🚀 ~ createCategoriesLoader ~ baseUrl:", config.baseUrl)
+  
   return {
     name: 'categories-loader',
     loadCollection: async ({ filter }) => {

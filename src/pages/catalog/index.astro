@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import Categories from '../../components/Categories.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { setLatVisitedPage } from '../../stores/last-visited-page-store';
+
+setLatVisitedPage("Catalog");
+---
+
+<BaseLayout title="Каталог">
+    <div class="px-4">
+			<h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
+      <Categories />
+    </div>
+</BaseLayout>

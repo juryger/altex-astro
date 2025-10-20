@@ -29,6 +29,7 @@ export function createProductsLoader(
     baseUrl: string
   }
 ): LiveLoader<Product, EntryFilter, CollectionFilter> {
+  console.log("🚀 ~ createProductsLoader ~ baseUrl:", config.baseUrl)
   return {
     name: 'product-loader',
     loadCollection: async ({ filter }) => {

@@ -1,5 +1,3 @@
-import Breadcrumbs from "../components/Breadcrumbs.astro";
-
 interface NavPathItem {
   path: string,
   value: string,

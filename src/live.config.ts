@@ -1,11 +1,13 @@
-import { z, reference, defineLiveCollection } from 'astro:content';
+import { /*z, reference, */defineLiveCollection } from 'astro:content';
 import { createCategoriesLoader } from './loaders/categories-loader';
 import { createProductsLoader } from './loaders/products-loader';
 
-const API_BASE_URL = import.meta.env.API_BASE_URL || 'http://localhost:4321/api';
+const apiBaseUrl = `${import.meta.env.API_BASE_URL}`
+console.log("🚀 ~ live.config ~ API url:", apiBaseUrl)
+
 
 const categories = defineLiveCollection({
-  loader: createCategoriesLoader({ baseUrl: API_BASE_URL }),
+  loader: createCategoriesLoader({ baseUrl: apiBaseUrl }),
   // schema: z
   //   .object({
   //     id: z.number(),
@@ -21,7 +23,7 @@ const categories = defineLiveCollection({
 });
 
 const products = defineLiveCollection({
-  loader: createProductsLoader({ baseUrl: API_BASE_URL }),
+  loader: createProductsLoader({ baseUrl: apiBaseUrl }),
   // schema: z
   //   .object({
   //     id: z.number(),

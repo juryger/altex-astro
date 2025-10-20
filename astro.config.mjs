@@ -9,8 +9,12 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://altexweb.ru',
   adapter: node({
-    mode: 'standalone'
+    mode: 'standalone',
+    imageService: true,
   }),
+  image: {
+    domains: ["altexweb.ru", "localhost:4321"],
+  },
   vite: {
     plugins: [tailwindcss()]
   },

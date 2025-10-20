@@ -1,13 +1,14 @@
 ---
 export const prerender = false;
 
+// import { Image } from 'astro:assets';
 import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import type { Category } from '../loaders/categories-loader';
 import { createTextHelper } from '../utils/text-helper';
 
 const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
-//console.log("🚀 ~ categories:", categories)
+console.log("🚀 ~ Categories component ~ obtained lists of categories:", categories)
 
 if (LiveCollectionValidationError.is(error)) {
   console.error("🚀 ~ Categories component ~ shema validation errors:", error)
@@ -16,11 +17,10 @@ if (LiveCollectionValidationError.is(error)) {
 }
 
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
-//console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
+console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
 ---
 
 <div class="px-4 pt-4 bg-base-100">
-  <h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров:</h3>
   <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2 ">
     {categories && categories.map(
       x => {
@@ -29,10 +29,8 @@ const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORI
           <div class="card bg-base-100 w-auto shadow-sm">
             <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
               <figure class="px-1 pt-1">
-                <img
-                  src=`${categoriesBlobStorageUrl}/${item.image}`
-                  alt=`${item.title}`
-                  class="rounded-xl max-w-24" />
+                {/* <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/> */}
+                <img src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl" />
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">
                 <span class="card-title text-sm font-bold" title={item.title}>
