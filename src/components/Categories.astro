@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-// import { Image } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import type { Category } from '../loaders/categories-loader';
@@ -29,8 +29,8 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
           <div class="card bg-base-100 w-auto shadow-sm">
             <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
               <figure class="px-1 pt-1">
-                {/* <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/> */}
-                <img src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl" />
+                <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
+                {/* <img src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl" /> */}
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">
                 <span class="card-title text-sm font-bold" title={item.title}>

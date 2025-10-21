@@ -10,7 +10,7 @@ export default defineConfig({
   site: 'https://altexweb.ru',
   adapter: node({
     mode: 'standalone',
-    imageService: true,
+    experimentalDisableStreaming: true,
   }),
   image: {
     domains: ["altexweb.ru", "localhost:4321"],

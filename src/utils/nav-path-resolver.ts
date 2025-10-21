@@ -14,22 +14,46 @@ export default class NavPathResolver {
   
   constructor() {
     this.data = [
-      { path: '/', value: 'Главная', __url: '', 
-        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } }, 
-        { path: '/catalog', value: 'Каталог', __url: '', 
-          displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-        { path: '/categories', value: 'Категории товаров', __url: '', 
-          displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
-        { path: '/products', value: 'Товары', __url: '', 
-          displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } },
-      { path: '/about', value: 'О Компании', __url: '', 
-        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-      { path: '/contact', value: 'Контакты', __url: '', 
-        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } },
-      { path: '/cart', value: 'Корзина', __url: '', 
-        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } },
-      { path: '/profile', value: 'Мой профиль', __url: '', 
-        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } },
+      { 
+        path: '/', value: 'Главная', __url: '', 
+        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
+      }, 
+      { 
+        path: '/catalog', value: 'Каталог', __url: '', 
+        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
+      },
+      { 
+        path: '/categories', value: 'Категории товаров', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
+      },
+      {
+        path: '/products', value: 'Товары', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
+      },
+      { 
+        path: '/about', value: 'О Компании', __url: '', 
+        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
+      },
+      { 
+        path: '/contact', value: 'Контакты', __url: '', 
+        displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
+      },
+      { 
+        path: '/cart', value: 'Корзина', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } 
+      },
+      { 
+        path: '/profile', value: 'Мой профиль', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } 
+      },
+      { 
+        path: '/404', value: 'Страница не найдена', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
+      },
+      { 
+        path: '/500', value: 'Техническая неисправность', __url: '', 
+        displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
+      },
     ];
   }
 

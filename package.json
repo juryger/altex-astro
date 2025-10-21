@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build",
+    "copy": "cp package.json dist/server && cp pnpm-lock.yaml dist/server && cp pnpm-workspace.yaml dist/server && cp .deploy/astro-nodejs-run.sh dist && cp .deploy/website-deploy.sh dist",
+    "copy-win": "copy \"package.json\" \"dist/server\" && copy \"pnpm-lock.yaml\" \"dist/server\" && copy \"pnpm-workspace.yaml\" \"dist/server\" && copy \".deploy/astro-nodejs-run.sh\" \"dist\" && copy \".deploy/website-deploy.sh\" \"dist\"",
     "preview": "astro preview",
     "astro": "astro"
   },

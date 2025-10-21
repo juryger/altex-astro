@@ -5,28 +5,48 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getLiveEntry } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import { type Product } from '../../../loaders/products-loader';
-import { setCurrentProduct } from '../../../stores/product-store';
-import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
 
 const { slug } = Astro.params;
-console.log("🚀 ~ Product component ~ slug:", slug)
+console.log("🚀 ~ Product page ~ slug (server):", slug)
 
 const { entry: productItem, error } = await getLiveEntry('products', { slug: slug ?? "" });
 if (LiveCollectionValidationError.is(error)) {
-  console.error("🚀 ~ Product component ~ collection shema validation errors:", error)
+  console.error("🚀 ~ Product page ~ collection shema validation errors:", error)
 } else if (error) {
-  console.error("🚀 ~ Product component ~ collection error:", error)
+  console.error("🚀 ~ Product page ~ collection error:", error)
 }
 
 if (!productItem)
-console.error("🚀 ~ Product component ~ could not get product by slug:", productItem)
+  console.error("🚀 ~ Product page ~ could not get product by slug:", slug)
 
 
 var extractedProduct: Product | undefined = productItem as unknown as Product;
-console.log("🚀 ~ Product component ~ set current product at store:")
-setCurrentProduct(extractedProduct);
-setLatVisitedPage(slug);
+console.log("🚀 ~ Product page ~ data:", extractedProduct)
+/*
+export type Product = {
+  id: number;
+  title: string;
+  description?: string;
+  unit?: string;
+  quantityInPack?: number;
+  price: number;
+  whsPrice1: number;
+  whsPrice2: number
+  category: string;
+  colors: Array<string>;
+  image: string;
+  slug: string;
+}
+*/
 ---
+<script is:inline data-slug={slug}>
+  //import { setCurrentProduct } from '../../../stores/product-store';
+  //import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
+
+  //setCurrentProduct({ title, category });
+  //setLatVisitedPage(slug);
+  console.log("🚀 ~ Product page ~ slug (client):", dataset.slug)
+</script>
 
 <BaseLayout title=`Каталог - ${extractedProduct?.title}`>
     <div class="px-4">

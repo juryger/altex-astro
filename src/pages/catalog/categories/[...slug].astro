@@ -2,15 +2,19 @@
 export const prerender = false;
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Categories page ~ slug:", slug)
-
-setLatVisitedPage(slug);
 ---
 
-<BaseLayout title=`Каталог - ${slug ?? "???"}`>
+<script is:inline data-slug={slug}>
+  //import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
+  //setLatVisitedPage(`Category (client): ${slug ?? "none"}`);
+  console.log("🚀 ~ Category page ~ slug (client):", dataset.slug)
+</script>
+
+
+<BaseLayout title=`Каталог - ${slug ?? "TODO: lookup in indexedDb"}`>
   <div class="px-4">
     <span>Страница в разработке...</span>
   </div>
