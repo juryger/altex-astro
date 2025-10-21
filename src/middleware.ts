@@ -3,7 +3,6 @@ import { NotFoundError, ServerError } from "./utils/errors";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   try {    
-    console.log("🚀 ~ middlewear")
     return await next();
   } catch (e) {
     console.log("🚀 ~ middlewear ~ exception occured:", e)

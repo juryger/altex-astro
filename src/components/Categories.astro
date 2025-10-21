@@ -20,8 +20,9 @@ const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORI
 console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
 ---
 
-<div class="px-4 pt-4 bg-base-100">
-  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2 ">
+<div class="mx-4 bg-base-100">
+  <h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
+  <div class="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
     {categories && categories.map(
       x => {
         const item = x as unknown as Category;
@@ -30,7 +31,6 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
             <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
               <figure class="px-1 pt-1">
                 <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
-                {/* <img src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl" /> */}
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">
                 <span class="card-title text-sm font-bold" title={item.title}>

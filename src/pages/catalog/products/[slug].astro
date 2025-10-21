@@ -16,40 +16,27 @@ if (LiveCollectionValidationError.is(error)) {
   console.error("🚀 ~ Product page ~ collection error:", error)
 }
 
-if (!productItem)
+if (!productItem) {
   console.error("🚀 ~ Product page ~ could not get product by slug:", slug)
-
-
-var extractedProduct: Product | undefined = productItem as unknown as Product;
-console.log("🚀 ~ Product page ~ data:", extractedProduct)
-/*
-export type Product = {
-  id: number;
-  title: string;
-  description?: string;
-  unit?: string;
-  quantityInPack?: number;
-  price: number;
-  whsPrice1: number;
-  whsPrice2: number
-  category: string;
-  colors: Array<string>;
-  image: string;
-  slug: string;
 }
-*/
----
-<script is:inline data-slug={slug}>
-  //import { setCurrentProduct } from '../../../stores/product-store';
-  //import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
 
-  //setCurrentProduct({ title, category });
-  //setLatVisitedPage(slug);
-  console.log("🚀 ~ Product page ~ slug (client):", dataset.slug)
+const extractedProduct: Product | undefined = productItem as unknown as Product;
+console.log("🚀 ~ Product page ~ data:", extractedProduct)
+
+// Keep selected product in Session
+Astro.session?.set('currentProduct', extractedProduct);
+const sessionProduct = await Astro.session?.get('currentProduct');
+---
+
+<script>
+  const element = document.getElementById('my-element');
+  const productSlug = element?.dataset.slug;
+  console.log("🚀 ~ Product page ~ slug (client):", productSlug)
 </script>
 
 <BaseLayout title=`Каталог - ${extractedProduct?.title}`>
-    <div class="px-4">
+    <div class="px-4" data-slug={slug} data-title={extractedProduct.title} data-category-id={extractedProduct.categoryId} data-category-slug={extractedProduct.categorySlug}>
       <span>Страница в разработке...</span>
+      <span>Значение продукта из сессии {sessionProduct?.title}</span>
     </div>
 </BaseLayout>

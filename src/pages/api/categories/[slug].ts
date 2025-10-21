@@ -22,7 +22,8 @@ export const GET: APIRoute = async ({ params/*, request*/ }) => {
         description: 'Замкки, личинки, проушины и прочее',
         image: 'http://localhost:4321/public/categories/locks.png',
         slug: 'locks',
-        parent: null,
+        parentId: undefined,
+        parentSlug: undefined,
       }
     ), {
       status: 200,

@@ -5,17 +5,16 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Categories page ~ slug:", slug)
+//locks/padlocks/eye-locks
+//split(slug, '/') -> [locks, padlocks, eyelocks] 
+// get categories for Eyelocks with parent Padlocks and ignore Locks
+
+const sessionProduct = await Astro.session?.get('currentProduct');
 ---
-
-<script is:inline data-slug={slug}>
-  //import { setLatVisitedPage } from '../../../stores/last-visited-page-store';
-  //setLatVisitedPage(`Category (client): ${slug ?? "none"}`);
-  console.log("🚀 ~ Category page ~ slug (client):", dataset.slug)
-</script>
-
 
 <BaseLayout title=`Каталог - ${slug ?? "TODO: lookup in indexedDb"}`>
   <div class="px-4">
     <span>Страница в разработке...</span>
+    <span>Значение продукта из сессии {sessionProduct?.title ?? "none"}</span>
   </div>
 </BaseLayout>

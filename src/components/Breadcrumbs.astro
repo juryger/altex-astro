@@ -50,6 +50,8 @@ console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.
 
 const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath);
 console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
+
+const sessionProduct = await Astro.session?.get('currentProduct');
 ---
 
 <div class="breadcrumbs text-sm px-8">
@@ -63,4 +65,5 @@ console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
       ))}
     </ul>}
   <span class="text-xs text-secondary-content">(LVP: {$lastVisitedPage?.value ?? "none"})</span>
+  <span class="text-xs text-secondary-content">(Product: {sessionProduct?.title ?? "none"})</span>
 </div>

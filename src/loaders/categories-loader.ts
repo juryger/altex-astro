@@ -7,7 +7,8 @@ export type Category = {
   description?: string;
   image: string;
   slug: string;
-  parent?: string;
+  parentId?: number;
+  parentSlug?: string;
 }
 
 interface CollectionFilter {

@@ -13,35 +13,40 @@ export const GET: APIRoute = async ({ /*params, */request }) => {
       description: 'Замкки, личинки, проушины и прочее',
       image: 'locks.png',
       slug: 'locks',
-      parent: undefined,
+      parentId: undefined,
+      parentSlug: undefined,
     }, {
       id: 2,
       title: "Инструменты",
       description: 'Инструменты для сада и хоязяйства',
       image: 'tools.png',
       slug: 'tools',
-      parent: undefined,
+      parentId: undefined,
+      parentSlug: undefined,
     }, {
       id: 3,
       title: "Навесные замки",
       description: 'Навесные замки и прочее',
       image: 'padlocks.png',
       slug: 'padlocks',
-      parent: 'locks',
+      parentId: 1,
+      parentSlug: 'locks',
     }, {
       id: 4,
       title: "Личинки",
       description: 'Заменяемые личинки для замков',
       image: 'lock-barrels.png',
       slug: 'lock-barrels',
-      parent: 'locks',
+      parentId: 1,
+      parentSlug: 'locks',
     }, {
       id: 5,
       title: "Проушины",
       description: 'Проушины для замков',
       image: 'padlock-eyes.png',
       slug: 'padlock-eyes',
-      parent: 'locks',
+      parentId: 1,
+      parentSlug: 'locks',
     },         
   ];
 
@@ -53,8 +58,8 @@ export const GET: APIRoute = async ({ /*params, */request }) => {
   return new Response(
     JSON.stringify(
       !parentSlug ? 
-        allItems.filter(x => !x.parent) : 
-        allItems.filter(x => x.parent === parentSlug)
+        allItems.filter(x => !x.parentId) : 
+        allItems.filter(x => x.parentSlug === parentSlug)
       ), {
       status: 200,
       headers: {

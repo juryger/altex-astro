@@ -10,7 +10,8 @@ export type Product = {
   price: number;
   whsPrice1: number;
   whsPrice2: number
-  category: string;
+  categoryId: number;
+  categorySlug: string;
   colors: Array<string>;
   image: string;
   slug: string;
