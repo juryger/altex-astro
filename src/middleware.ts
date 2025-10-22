@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro/middleware";
-import { NotFoundError, ServerError } from "./utils/errors";
+import { NotFoundError, ServerError } from "./types/errors";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   try {    

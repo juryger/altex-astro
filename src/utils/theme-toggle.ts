@@ -1,10 +1,11 @@
 // Handle theme toggle logic with support of localStorage 
 export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelector: Element | null, lightThemeSelector: Element | null): void => {  
+  console.assert(themeSelector !== undefined, "🚀 ~ applyThemeToggle ~ %s is not defined", Object.keys({themeSelector})[0])
+  console.assert(darkThemeSelector !== undefined, "🚀 ~ applyThemeToggle ~ %s is not defined", Object.keys({darkThemeSelector})[0])
+  console.log(lightThemeSelector !== undefined, "🚀 ~ applyThemeToggle ~ %s is not defined", Object.keys({lightThemeSelector})[0])
+  
   const localStorageKey = 'theme-toggle';
-  // console.log("🚀 ~ applyThemeToggle ~ themeSelector:", themeSelector)
-  // console.log("🚀 ~ applyThemeToggle ~ darkThemeSelector:", darkThemeSelector)
-  // console.log("🚀 ~ applyThemeToggle ~ lightThemeSelector:", lightThemeSelector)
-
+  
   // On theme switch, saves user preference to localStorage
   const themeSelectorInput = (themeSelector as HTMLInputElement);
   themeSelectorInput?.addEventListener('click', () => {
@@ -14,7 +15,7 @@ export const applyThemeToggle = (themeSelector: Element | null, darkThemeSelecto
     //console.log(`🚀 ~ applyThemeToggle ~ User changed theme to ${newTheme}, saving preferences.`);
   });
 
-  const syncUIBasedOnClientOSTheme = (theme: string): void => {
+ const syncUIBasedOnClientOSTheme = (theme: string): void => {
     if (theme === 'dark') {
       themeSelector?.setAttribute('value', 'light'); 
       darkThemeSelector?.classList.replace('swap-on', 'swap-off');    

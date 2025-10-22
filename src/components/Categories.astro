@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
 import type { Category } from '../loaders/categories-loader';
-import { createTextHelper } from '../utils/text-helper';
+import { getTextHandler } from '../utils/text-utils';
 
 const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
 console.log("🚀 ~ Categories component ~ obtained lists of categories:", categories)
@@ -16,6 +16,7 @@ if (LiveCollectionValidationError.is(error)) {
   console.error("🚀 ~ Categories component ~ error:", error)
 }
 
+const textHandler = getTextHandler();
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
 console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
 ---
@@ -34,11 +35,11 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">
                 <span class="card-title text-sm font-bold" title={item.title}>
-                  {createTextHelper(item.title).trimEnd(21, '.')}
+                  {textHandler.trimEnd(item.title, 21, '.')}
                 </span>
                 {item.description && <p>
                   <span title={item.description}>
-                    {createTextHelper(item.description).trimEnd(100, '.')}
+                    {textHandler.trimEnd(item.description, 100, '.')}
                   </span>
                 </p>}
               </div>

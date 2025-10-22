@@ -1,5 +1,5 @@
 import type { LiveLoader } from 'astro/loaders';
-import { parseApiError } from '../utils/error-parser';
+import { parseApiError } from '../utils/api-error-parser';
 
 export type Product = {
   id: number;

@@ -1,69 +1,29 @@
 ---
-import NavPathResolver, { type NavPathItem } from '../utils/nav-path-resolver';
+import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../utils/breadcrubm-resolver';
 import { $currentProduct } from '../stores/product-store';
 import { $lastVisitedPage } from '../stores/last-visited-page-store';
-import { logger } from '@nanostores/logger';
+//import { logger } from '@nanostores/logger';
 
-logger({
-  'CurrentProduct': $currentProduct,
-  'LastVisitedPage': $lastVisitedPage
-});
+// logger({
+//   'CurrentProduct': $currentProduct,
+//   'LastVisitedPage': $lastVisitedPage
+// });
 
 const { currentPath } = Astro.props;
-const pathResolver = new NavPathResolver();
-
-const getBreadcrumbs = (path: string): Array<NavPathItem> => {
-  const splitPath = path.split('/').reverse();
-  console.log("🚀 ~ Breadcrumbs component ~ path:", path)
-  console.log("🚀 ~ Breadcrumbs component ~ path collection:", splitPath)
-  
-  if (path.endsWith("/")) {
-    splitPath.pop();
-  }
-
-  var result: Array<NavPathItem> = [];
-  var currentRelativePath = '';
-
-  while(splitPath.length > 0) { 
-    const pathItem =  splitPath.pop() ?? "";
-    currentRelativePath += `${pathItem}/`;
-    //console.log("🚀 ~ Breadcrumbs component ~ processing path item: %s", pathItem)
-
-    const resolvedPathItem = pathResolver.resolvePathItem(pathItem);
-    if (resolvedPathItem) {
-      //console.log("🚀 ~ Breadcrumbs component ~ resolved path item:", resolvedPathItem)
-      resolvedPathItem.__url = currentRelativePath;
-      if (resolvedPathItem.displayOptions.isBreadcrumbs) {
-        result.push(resolvedPathItem);
-      } else {
-        console.log("🚀 ~ Breadcrumbs component ~ path item is marked as excluded from the breadcrumbs and will be skipped:", pathItem)
-      }
-    } else {
-      console.error("🚀 ~ Breadcrumbs component ~ could not resolve path item:", pathItem)
-    }
-  }
-  
-  return result;
-}
+const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
 
 console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.value)
-
-const breadcrumbs: Array<NavPathItem> = getBreadcrumbs(currentPath);
-console.log("🚀 ~ Breadcrumbs component ~ parsed path:", breadcrumbs)
-
-const sessionProduct = await Astro.session?.get('currentProduct');
 ---
 
 <div class="breadcrumbs text-sm px-8">
   {breadcrumbs.length > 1 && <ul class="list-disc">
-      {breadcrumbs && breadcrumbs.map((x: NavPathItem, index: number) => (
+      {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (
         <li>
           {(index !== breadcrumbs.length - 1) ? 
-            <a href={x.__url}>{x.value}</a> : 
+            <a href={x.url}>{x.value}</a> : 
             <span class="!no-underline !cursor-default">{x.value}</span>} 
         </li>
       ))}
     </ul>}
   <span class="text-xs text-secondary-content">(LVP: {$lastVisitedPage?.value ?? "none"})</span>
-  <span class="text-xs text-secondary-content">(Product: {sessionProduct?.title ?? "none"})</span>
 </div>

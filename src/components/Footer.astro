@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import NavPathResolver from '../utils/nav-path-resolver';
+import { getNavPathResolver } from '../utils/nav-path-resolver';
 
-var allPaths = new NavPathResolver().resolveAllPaths({ isFooter: true });
+const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: false, isFooter: true, isBreadcrumbs: false });
 ---
 
 <footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded pt-2 pb-2">

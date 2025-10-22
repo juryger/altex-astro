@@ -10,28 +10,25 @@ const MainTitle = `АЛТЕХ - ${title}`;
 ---
 
 <script>
-  import { getWorkersFactory, type WorkerInfo } from "../utils/workers-factory";
+  import { getWorkersFactory, type WorkerInfo } from "../factories/workers-factory";
 
+	console.log("🚀 ~ BaseLayout ~ obtain worker factory Catalog sync worker");
 	window.workers = window.workers ?? {} as WorkerInfo;
-
-	console.log("🚀 ~ BaseLayout ~ prepare worker factory ~ window.workers:", window.workers);
 	const factory = getWorkersFactory(window.workers);
 
-	console.log("🚀 ~ BaseLayout ~ creating catalog-sync-worker");
 	const catalogSyncWorker = factory.findOrCreateCatalogSyncWorker(
 		e => {
 			if (e.data) {
-				console.log("🚀 ~ BaseLayout ~ response from catalog-sync-worker:", e.data);
+				console.log("🚀 ~ BaseLayout ~ obtained response from catalog-sync-worker:", e.data);
 			}
 		}, err => {
 			console.error("🚀 ~ BaseLayout ~ error in catalog-sync-worker:", err.message);
 		}
   );
 
-	console.log("🚀 ~ BaseLayout ~ sending data to catalog-sync-worker:", 6);
+	console.log("🚀 ~ BaseLayout ~ sending command to catalog-sync-worker:", "sync_categories");
 	catalogSyncWorker.postMessage(6);
 </script>
-
 
 <!doctype html>
 <html lang="ru">

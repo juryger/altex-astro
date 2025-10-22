@@ -1,4 +1,4 @@
-import { type WorkerInfo } from "../utils/workers-factory";
+import { type WorkerInfo } from "../factories/workers-factory";
 
 export {}
 

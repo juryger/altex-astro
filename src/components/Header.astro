@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import NavPathResolver from '../utils/nav-path-resolver';
+import { getNavPathResolver } from '../utils/nav-path-resolver';
 
-const allPaths = new NavPathResolver().resolveAllPaths({ isMainMenu: true });
+const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
 ---
 
 <script>

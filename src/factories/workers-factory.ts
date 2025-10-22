@@ -18,9 +18,6 @@ export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
     ): Worker => {
       const name: string = 'catalog-sync-worker';
 
-      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", (name in workers));
-      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", Object.hasOwn(workers, name));
-      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ checking for worker:", workers.hasOwnProperty(name));
       if (Object.hasOwn(workers, name)) {
 				console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ using earlier created worker: ", name);
         return workers[name];
@@ -41,10 +38,7 @@ export const getWorkersFactory = (workers: WorkerInfo): WorkersList => {
         onError(err);
       };
 
-
       workers[name] = worker;
-      console.log("🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ new instance added to window.workers collection:", window.workers);
-      
       return worker;
     } 
   };
