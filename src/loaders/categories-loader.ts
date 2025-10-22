@@ -1,5 +1,5 @@
 import type { LiveLoader } from 'astro/loaders';
-import { parseApiError } from '../utils/api-error-parser';
+import { parseEndpointError } from '../utils/endpoint-error-parser';
 
 export type Category = {
   id: string;
@@ -55,7 +55,7 @@ export function createCategoriesLoader(
         };
       } catch (error: unknown) {
         return {
-          error: parseApiError(error, "categories"),
+          error: parseEndpointError(error, "categories"),
         }
       }
     },
@@ -75,7 +75,7 @@ export function createCategoriesLoader(
         return data;
       } catch (error: unknown) {
         return {
-            error: parseApiError(error, "category"),
+            error: parseEndpointError(error, "category"),
         }
       }
     }

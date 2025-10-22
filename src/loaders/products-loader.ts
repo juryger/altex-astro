@@ -1,5 +1,5 @@
 import type { LiveLoader } from 'astro/loaders';
-import { parseApiError } from '../utils/api-error-parser';
+import { parseEndpointError } from '../utils/endpoint-error-parser';
 
 export type Product = {
   id: number;
@@ -58,7 +58,7 @@ export function createProductsLoader(
         };
       } catch (error: unknown) {
         return {
-          error: parseApiError(error, "products"),
+          error: parseEndpointError(error, "products"),
         }
       }
     },
@@ -78,7 +78,7 @@ export function createProductsLoader(
         return data;
       } catch (error: unknown) {
         return {
-            error: parseApiError(error, "product"),
+            error: parseEndpointError(error, "product"),
         }
       }
     }
