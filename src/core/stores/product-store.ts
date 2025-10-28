@@ -1,5 +1,5 @@
 import { atom } from 'nanostores'
-import type { Product } from '../loaders/products-loader';
+import type { Product } from '../models/product';
 
 export const $currentProduct = atom<Product | undefined>();
 

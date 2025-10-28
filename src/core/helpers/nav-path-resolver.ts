@@ -16,43 +16,43 @@ interface NavPathFilter {
 
 const _allNavPaths: Array<NavPathItem> = [
   { 
-    path: '/', value: 'Главная', __url: '', 
+    path: '/', value: 'Главная', 
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
   }, 
   { 
-    path: '/catalog', value: 'Каталог', __url: '', 
+    path: '/catalog', value: 'Каталог',
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
   },
   { 
-    path: '/categories', value: 'Категории товаров', __url: '', 
+    path: '/categories', value: 'Категории товаров',
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
   },
   {
-    path: '/products', value: 'Товары', __url: '', 
+    path: '/products', value: 'Товары',
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
   },
   { 
-    path: '/about', value: 'О Компании', __url: '', 
+    path: '/about', value: 'О Компании', 
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
   },
   { 
-    path: '/contact', value: 'Контакты', __url: '', 
+    path: '/contact', value: 'Контакты', 
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true } 
   },
   { 
-    path: '/cart', value: 'Корзина', __url: '', 
+    path: '/cart', value: 'Корзина', 
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } 
   },
   { 
-    path: '/profile', value: 'Мой профиль', __url: '', 
+    path: '/profile', value: 'Мой профиль', 
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true } 
   },
   { 
-    path: '/404', value: 'Страница не найдена', __url: '', 
+    path: '/404', value: 'Страница не найдена', 
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
   },
   { 
-    path: '/500', value: 'Техническая неисправность', __url: '', 
+    path: '/500', value: 'Техническая неисправность', 
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: false } 
   },
 ];

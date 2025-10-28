@@ -1,41 +1,41 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute } from "astro";
+import type { Product } from "../../../core/models/product";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params/*, request*/ }) => {
-  console.log("🚀 ~ GET ~ product ~ params:", params)
+export const GET: APIRoute = async ({ params /*, request*/ }) => {
+  console.log("🚀 ~ GET ~ product ~ params:", params);
   const { slug } = params;
 
   // TODO: query database for category by slug
 
-  if (!slug || slug !== 'padlock-master-vline') {
+  if (!slug || slug !== "padlock-master-vline") {
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
 
-  return new Response(
-    JSON.stringify({
-        id: 1,
-        title: "Замок навесной",
-        description: 'Product description 1',
-        unit: 'шт',
-        quantityInPack: 1,
-        price: 100,
-        whsPrice1: 90,
-        whsPrice2: 80,
-        categoryId: 3, 
-        categorySlug: 'padlocks',
-        colors: ['red', 'blue'],
-        image: 'padlock-master-vline.png',
-        slug: 'padlock-master-vline',
-      }
-    ), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }
-  )
-}
+  const item = {
+    id: "1cbaccdf-eb85-4132-b342-deccc2901f94",
+    title: "Замок навесной",
+    description: "Product description 1",
+    unit: "шт",
+    quantityInPack: 1,
+    price: 100,
+    whsPrice1: 90,
+    whsPrice2: 80,
+    categoryId: "8532f731-caea-4972-8287-acdb17d4a95d",
+    categorySlug: "padlocks",
+    colors: ["red", "blue"],
+    image: "padlock-master-vline.png",
+    slug: "padlock-master-vline",
+  } as Product;
+
+  return new Response(JSON.stringify(item), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

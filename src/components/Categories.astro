@@ -4,8 +4,8 @@ export const prerender = false;
 import { Image } from 'astro:assets';
 import { getLiveCollection } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
-import type { Category } from '../loaders/categories-loader';
-import { getTextHandler } from '../utils/text-utils';
+import type { Category } from '../core/models/category';
+import { getTextHandler } from '../core/helpers/text-utils';
 
 const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
 console.log("🚀 ~ Categories component ~ obtained lists of categories:", categories)

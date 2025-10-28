@@ -3,14 +3,7 @@ export const prerender = false;
 
 import Categories from '../../components/Categories.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-
-console.log("🚀 ~ Catalog page (server)")
 ---
-<script>
-  import { setLatVisitedPage } from '../../stores/last-visited-page-store';
-  setLatVisitedPage("Catalog (client)");
-  console.log("🚀 ~ Catalog page (client-side)")
-</script>
 
 <BaseLayout title="Каталог">
   <Categories />

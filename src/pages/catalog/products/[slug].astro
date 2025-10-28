@@ -4,7 +4,8 @@ export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getLiveEntry } from 'astro:content';
 import { LiveCollectionValidationError } from 'astro/content/runtime';
-import { type Product } from '../../../loaders/products-loader';
+import { type Product } from '../../../core/models/product';
+import { setCurrentProduct } from "../../../core/stores/product-store";
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Product page ~ slug (server):", slug)
@@ -24,18 +25,25 @@ if (!productItem) {
 //Astro.session?.set('currentProduct', extractedProduct);
 //const sessionProduct = await Astro.session?.get('currentProduct');
 
-const extractedProduct: Product | undefined = productItem as unknown as Product;
-console.log("🚀 ~ Product page ~ data:", extractedProduct)
+const product: Product | undefined = productItem as unknown as Product;
+console.log("🚀 ~ Product page ~ data:", product)
+
+console.log("🚀 ~ Product page ~ save product to Nanostore:", product)
+setCurrentProduct(product);
 ---
 
 <script>
-  const element = document.getElementById('my-element');
-  const productSlug = element?.dataset.slug;
-  console.log("🚀 ~ Product page ~ slug (client):", productSlug)
+  const element = document.getElementById('product-card');
+  
+  // TODO: save currentProduct to IndexedDb?
+  //if (element !== null) {
+  //}
+  
+  console.log("🚀 ~ Product page ~ slug: %s", element?.dataset.slug);  
 </script>
 
-<BaseLayout title=`Каталог - ${extractedProduct?.title}`>
-    <div class="px-4" data-slug={slug} data-title={extractedProduct.title} data-category-id={extractedProduct.categoryId} data-category-slug={extractedProduct.categorySlug}>
+<BaseLayout title=`Каталог - ${product?.title}`>
+    <div id="product-card" class="px-4" data-slug={product?.slug} data-id={product?.id} data-title={product?.title} data-categoryid={product?.categoryId} data-categoryslug={product?.categorySlug}>
       <span>Страница в разработке...</span>
       <!-- <span>Значение продукта из сессии {sessionProduct?.title}</span> -->
     </div>

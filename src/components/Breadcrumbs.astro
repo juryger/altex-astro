@@ -1,13 +1,7 @@
 ---
-import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../utils/breadcrubm-resolver';
-import { $currentProduct } from '../stores/product-store';
-import { $lastVisitedPage } from '../stores/last-visited-page-store';
-//import { logger } from '@nanostores/logger';
-
-// logger({
-//   'CurrentProduct': $currentProduct,
-//   'LastVisitedPage': $lastVisitedPage
-// });
+import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/helpers/breadcrubms-parser';
+import type { Product } from '../core/models/product';
+import { $currentProduct } from '../core/stores/product-store';
 
 const { currentPath } = Astro.props;
 const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
@@ -15,8 +9,17 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
 console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.value)
 ---
 
+<script>
+  import { db } from "../core/db/client-db";
+
+  const categories = db.categories.filter(obj => obj.slug === "locks");
+  const lockCategory = await categories.first();
+  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)
+</script>
+
 <div class="breadcrumbs text-sm px-8">
-  {breadcrumbs.length > 1 && <ul class="list-disc">
+  {breadcrumbs.length > 1 && 
+    <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (
         <li>
           {(index !== breadcrumbs.length - 1) ? 
@@ -25,5 +28,5 @@ console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.
         </li>
       ))}
     </ul>}
-  <span class="text-xs text-secondary-content">(LVP: {$lastVisitedPage?.value ?? "none"})</span>
+    <span class="text-xs text-secondary-content">(LVP: {($currentProduct?.value as Product)?.title ?? "none"})</span>
 </div>
