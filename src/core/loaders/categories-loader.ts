@@ -1,32 +1,34 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../helpers/endpoint-error-parser";
-import type { Category } from "../models/category";
-import type { LiveDataEntry } from "astro";
+import { CategorySchema, type Category } from "../models/category";
+import { type LiveDataEntry } from "astro";
 
-interface CollectionFilter {
+export type CategoryCollectionFilter = {
   parentSlug?: string;
-}
+};
 
-interface EntryFilter {
+export type CategoryEntryFilter = {
   slug?: string;
-}
+};
 
 export function createCategoriesLoader(config: {
   baseUrl: string;
-}): LiveLoader<Category, EntryFilter, CollectionFilter> {
-  console.log("🚀 ~ createCategoriesLoader ~ baseUrl:", config.baseUrl);
+}): LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter> {
+  console.log("🚀 ~ createCategoriesLoader ~ config:", config);
   return {
     name: "categories-loader",
     loadCollection: async ({ filter }) => {
       try {
-        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ filter:", filter);
-        const url = new URL(`${config.baseUrl}/categories`);
+        console.log(
+          "🚀 ~ createCategoriesLoader ~ collection retrieving ~ filter:",
+          filter
+        );
 
+        const url = new URL(`${config.baseUrl}/categories`);
         if (filter !== undefined) {
           url.searchParams.set("parent", filter.parentSlug ?? "");
         }
 
-        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ url:", url.toString());
         const response = await fetch(url.toString());
         if (!response.ok) {
           return {
@@ -36,14 +38,10 @@ export function createCategoriesLoader(config: {
           };
         }
         const data = await response.json();
-        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
+        console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
+
         return {
-          entries: data.map(
-            (x: Category) =>
-              ({
-                ...x,
-              } as Category)
-          ),
+          entries: data.map((x: Category) => ({ id: x.id, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -52,8 +50,12 @@ export function createCategoriesLoader(config: {
       }
     },
     loadEntry: async ({ filter }) => {
-      //console.log("🚀 ~ createCategoriesLoader ~ entry ~ filter:", filter);
       try {
+        console.log(
+          "🚀 ~ createCategoriesLoader ~ entry retrieving ~ filter:",
+          filter
+        );
+
         const response = await fetch(
           `${config.baseUrl}/categories/${filter.slug}`
         );
@@ -64,9 +66,14 @@ export function createCategoriesLoader(config: {
             ),
           };
         }
+
         const data = await response.json();
-        //console.log("🚀 ~ createCategoriesLoader ~ entry ~ data:", data);
-        return data as LiveDataEntry<Category>;
+        const value = data as Category;
+        console.log("🚀 ~ createCategoriesLoader ~ entry ~ value:", value);
+
+        return value !== undefined
+          ? { id: value.id, data: value }
+          : { error: new Error(`No category found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {
           error: parseEndpointError(error, "category"),

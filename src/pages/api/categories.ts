@@ -7,15 +7,13 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   console.log("🚀 ~ GET ~ request:", URL.parse(request.url));
 
   // TODO: query database for Categories
-  var allItems: Array<Category> = [
+  const allItems: Category[] = [
     {
       id: "3b7ef178-3b3d-49a1-9851-5042ec9da1d2",
       title: "Замковая фурнитура afdfaf 234",
       description: "Замкки, личинки, проушины и прочее",
       image: "locks.png",
       slug: "locks",
-      parentId: undefined,
-      parentSlug: undefined,
     },
     {
       id: "a26d33ad-15ee-4cd0-a373-8c045e7ec70d",
@@ -23,8 +21,6 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       description: "Инструменты для сада и хоязяйства",
       image: "tools.png",
       slug: "tools",
-      parentId: undefined,
-      parentSlug: undefined,
     },
     {
       id: "8532f731-caea-4972-8287-acdb17d4a95d",

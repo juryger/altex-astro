@@ -8,8 +8,6 @@ import type { Category } from '../core/models/category';
 import { getTextHandler } from '../core/helpers/text-utils';
 
 const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
-console.log("🚀 ~ Categories component ~ obtained lists of categories:", categories)
-
 if (LiveCollectionValidationError.is(error)) {
   console.error("🚀 ~ Categories component ~ shema validation errors:", error)
 } else if (error) {
@@ -19,6 +17,7 @@ if (LiveCollectionValidationError.is(error)) {
 const textHandler = getTextHandler();
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
 console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
+console.log("🚀 ~ Categories component ~ data:", categories)
 ---
 
 <div class="mx-4 bg-base-100">
@@ -26,7 +25,7 @@ console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobSto
   <div class="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
     {categories && categories.map(
       x => {
-        const item = x as unknown as Category;
+        const item = x.data;
         return (
           <div class="card bg-base-100 w-auto shadow-sm">
             <a class="no-underline" href=`/catalog/categories/${item.slug}`>     

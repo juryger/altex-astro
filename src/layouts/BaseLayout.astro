@@ -10,10 +10,14 @@ const MainTitle = `АЛТЕХ - ${title}`;
 ---
 
 <script>
+	/*
 	import { getWorkerFactory, type WorkerFactory, type WorkerInfo } from "../core/factories/worker-factory";
 	import { getLocalStorageManager } from "../core/helpers/local-storage-manager"; 
 	import { CatalogSyncType, type CatalogSyncStatus } from "../core/models/catalog-sync";
-
+	*/
+	
+	// Need to open API endpoint for public, postponed
+	/*
 	const localStorageManager = getLocalStorageManager();
 
 	const processWorkerMessage = (msg: MessageEvent<any>, factory: WorkerFactory, workerName: string): void => {
@@ -46,8 +50,6 @@ const MainTitle = `АЛТЕХ - ${title}`;
 		factory.terminateWorker(window.workers, workerName);
 	}
 
-	// Need to open API endpoint for public, postponed
-	/*
 	if (localStorageManager.checkCataloSyncRequired(7)) {
 		console.log("🚀 ~ BaseLayout ~ Catalog data is outdated, preaparing for syncing.");
 		window.workers = window.workers ?? {} as WorkerInfo;
