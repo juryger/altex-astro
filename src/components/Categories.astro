@@ -4,15 +4,24 @@ export const prerender = false;
 import { Image } from 'astro:assets';
 import { getTextHandler } from '../core/helpers/text-utils';
 import { LiveCollectionNames } from '../core/const';
-import { getCollectionByParentSlug } from '../core/helpers/live-collection-manager';
+import { getCollectionByFilter } from '../core/helpers/live-collection-manager';
 import type { Category } from '../core/models/category';
+import { defaultPaging } from '../core/models';
 
-var categories = await getCollectionByParentSlug(LiveCollectionNames.Categories)
-    .then(result => {
-      if (!result.value) console.log("🚀 ~ Categories component ~ collection not found by filter:", result.parentSlug ?? "(empty)");
-      return result.value as { id: string, data: Category }[] | undefined;
-    })
-    .catch(reason => console.error(reason));
+interface Props {
+  parentSlug?: string;
+}
+
+const { parentSlug } = Astro.props;
+
+var categories = await getCollectionByFilter<Category>(LiveCollectionNames.Categories, {
+    parentSlug,
+    ignoreParent: false,
+    paging: defaultPaging
+  }).then(result => {
+    if (!result.value) console.log("🚀 ~ Categories component ~ collection not found");
+    return result.value as { id: string, data: Category }[] | undefined;
+  }).catch(reason => console.error(reason));
 
 const textHandler = getTextHandler();
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
@@ -25,18 +34,18 @@ console.log("🚀 ~ Categories component ~ blob storage url: %s, data: %o", cate
     {categories && categories.map(x => {
       const item = x.data;
       return (
-        <div class="card bg-base-100 w-auto shadow-sm">
+        <div class="card bg-base-200 w-auto shadow-sm">
           <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
-            <figure class="px-1 pt-1">
+            <figure class="px-1 pt-2.5">
               <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
             </figure>
             <div class="card-body items-center text-center !px-1 !py-1">
               <span class="card-title text-sm font-bold" title={item.title}>
-                {textHandler.trimEnd(item.title, 21, '.')}
+                {textHandler.trimEnd(item.title, 21)}
               </span>
               {item.description && <p>
                 <span title={item.description}>
-                  {textHandler.trimEnd(item.description, 100, '.')}
+                  {textHandler.trimEnd(item.description, 100)}
                 </span>
               </p>}
             </div>

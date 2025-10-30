@@ -42,7 +42,7 @@ export const getCatalogSyncHandler = (config: {
             title: x.title,
             slug: x.slug,
             parentId: x.parentId,
-            parentUid: x.parentUid,
+            parentSlug: x.parentSlug,
           } as CategoryCache)
       );
 

@@ -1,5 +1,8 @@
 import type { APIRoute } from "astro";
 import type { Category } from "../../core/models/category";
+import { defaultPaging, type Pagable } from "../../core/models";
+import { APISearchParamNames } from "../../core/const";
+import { regexTruePattern } from "../../core/helpers/regex";
 
 export const prerender = false;
 
@@ -10,8 +13,8 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const allItems: Category[] = [
     {
       id: 1,
-      title: "Замковая фурнитура afdfaf 234",
-      description: "Замкки, личинки, проушины и прочее",
+      title: "Замочная фурнитура",
+      description: "Замкки и прочее",
       image: "locks.png",
       slug: "locks",
     },
@@ -49,17 +52,48 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       parentId: 1,
       parentSlug: "locks",
     },
+    {
+      id: 6,
+      title: "Отвертки",
+      description: "Отвертки и прочие товары",
+      image: "screwdrivers.png",
+      slug: "screwdrivers",
+      parentId: 2,
+      parentSlug: "tools",
+    },
   ];
 
-  const url = URL.parse(request.url);
   var parentSlug: string | null = null;
-  if (url?.search && url.searchParams && url.searchParams.has("parent")) {
-    parentSlug = url.searchParams.get("parent");
+  var ignoreParent: boolean = false;
+  var paging: Pagable = { current: 0, limit: 100 };
+
+  const url = URL.parse(request.url);
+  if (url?.search && url.searchParams) {
+    if (url.searchParams.has(APISearchParamNames.Parent)) {
+      parentSlug = url.searchParams.get(APISearchParamNames.Parent);
+    }
+    if (url.searchParams.has(APISearchParamNames.IgnoreParent)) {
+      ignoreParent = regexTruePattern.test(
+        url.searchParams.get(APISearchParamNames.IgnoreParent) ?? "false"
+      );
+    }
+
+    var checkInt = parseInt(
+      url.searchParams.get(APISearchParamNames.Page) ?? ""
+    );
+    paging.current = !isNaN(checkInt) ? checkInt : defaultPaging.current;
+
+    checkInt = parseInt(
+      url.searchParams.get(APISearchParamNames.PageSize) ?? ""
+    );
+    paging.limit = !isNaN(checkInt) ? checkInt : defaultPaging.limit;
   }
 
   return new Response(
     JSON.stringify(
-      !parentSlug
+      ignoreParent
+        ? allItems
+        : !parentSlug
         ? allItems.filter((x) => !x.parentId)
         : allItems.filter((x) => x.parentSlug === parentSlug)
     ),

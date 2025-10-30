@@ -15,29 +15,30 @@ setActiveProduct(undefined);
 setActiveCategory(undefined);
 
 if (slug) {
-  var product = await getEntryBySlug(LiveCollectionNames.Products, slug)
+  const product = await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
     .then(result => {
       if (!result.value) console.log("🚀 ~ Product page ~ product not found by slug:", result.slug);
       if (result.value) setActiveProduct(result.value as Product);
-      return result.value as Product | undefined;
+      return result.value;
     })
-    .catch(reason => console.error(reason));
-      
-    if (product) {
-      await getEntryBySlug(LiveCollectionNames.Categories, product.categorySlug)
-        .then((result) => {
-          if (!result.value) console.log("🚀 ~ Product page ~ category not found by slug:", result.slug);
-          if (result.value) setActiveCategory(result.value as Category);
-        })
-        .catch(reason => console.error(reason));
-    }
+    .catch(reason => {
+      console.error((reason as Error).message);
+    });
+  
+  if (!product) return Astro.redirect("/404");
+  
+  const category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, product.categorySlug)
+    .then((result) => {
+      if (!result.value) console.log("🚀 ~ Product page ~ category not found by slug:", result.slug);
+      if (result.value) setActiveCategory(result.value as Category);
+      return result.value;
+    })
+    .catch(reason => {
+      console.error((reason as Error).message);        
+    });
+  
+  if (!category) return Astro.redirect("/404");
 }
-
-console.log(
-  "🚀 ~ Product page ~ parsed active product '%s' and its category '%s'", 
-  $activeProduct?.value?.title,
-  $activeCategory?.value?.title, 
-);
 ---
 
 <script>

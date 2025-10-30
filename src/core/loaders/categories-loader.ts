@@ -1,9 +1,13 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../helpers/endpoint-error-parser";
 import type { Category } from "../models/category";
+import type { Pagable } from "../models";
+import { APIEndpointNames, APISearchParamNames } from "../const";
 
 export type CategoryCollectionFilter = {
   parentSlug?: string;
+  ignoreParent: boolean;
+  paging: Pagable;
 };
 
 export type CategoryEntryFilter = {
@@ -23,9 +27,26 @@ export function createCategoriesLoader(config: {
           filter
         );
 
-        const url = new URL(`${config.baseUrl}/categories`);
+        const url = new URL(`${config.baseUrl}/${APIEndpointNames.Categories}`);
         if (filter !== undefined) {
-          url.searchParams.set("parent", filter.parentSlug ?? "");
+          if (!filter.ignoreParent) {
+            url.searchParams.set(
+              APISearchParamNames.Parent,
+              filter.parentSlug ?? ""
+            );
+          }
+          url.searchParams.set(
+            APISearchParamNames.IgnoreParent,
+            filter.ignoreParent.toString()
+          );
+          url.searchParams.set(
+            APISearchParamNames.Page,
+            filter.paging.current.toString()
+          );
+          url.searchParams.set(
+            APISearchParamNames.PageSize,
+            filter.paging.limit.toString()
+          );
         }
 
         const response = await fetch(url.toString());
@@ -40,7 +61,7 @@ export function createCategoriesLoader(config: {
         console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
 
         return {
-          entries: data.map((x: Category) => ({ id: x.uid, data: x })),
+          entries: data.map((x: Category) => ({ id: x.slug, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -71,7 +92,7 @@ export function createCategoriesLoader(config: {
         console.log("🚀 ~ createCategoriesLoader ~ entry ~ value:", value);
 
         return value !== undefined
-          ? { id: value.uid, data: value }
+          ? { id: value.slug, data: value }
           : { error: new Error(`No category found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

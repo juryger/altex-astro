@@ -1,9 +1,12 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../helpers/endpoint-error-parser";
 import type { Product } from "../models/product";
+import type { Pagable } from "../models";
+import { APIEndpointNames, APISearchParamNames } from "../const";
 
 export type ProductCollectionFilter = {
-  categorySlug?: string;
+  categorySlug: string;
+  paging: Pagable;
 };
 
 export type ProductEntryFilter = {
@@ -23,9 +26,20 @@ export function createProductsLoader(config: {
           filter
         );
 
-        const url = new URL(`${config.baseUrl}/products`);
+        const url = new URL(`${config.baseUrl}/${APIEndpointNames.Products}`);
         if (filter !== undefined) {
-          url.searchParams.set("category", filter.categorySlug ?? "");
+          url.searchParams.set(
+            APISearchParamNames.Category,
+            filter.categorySlug
+          );
+          url.searchParams.set(
+            APISearchParamNames.Page,
+            filter.paging.current.toString()
+          );
+          url.searchParams.set(
+            APISearchParamNames.PageSize,
+            filter.paging.limit.toString()
+          );
         }
 
         const response = await fetch(url.toString());
@@ -40,7 +54,7 @@ export function createProductsLoader(config: {
         console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
 
         return {
-          entries: data.map((x: Product) => ({ id: x.uid, data: x })),
+          entries: data.map((x: Product) => ({ id: x.slug, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -71,7 +85,7 @@ export function createProductsLoader(config: {
         console.log("🚀 ~ createProductsLoader ~ entry ~ value:", value);
 
         return value !== undefined
-          ? { id: value.uid, data: value }
+          ? { id: value.slug, data: value }
           : { error: new Error(`No product found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

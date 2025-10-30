@@ -6,6 +6,7 @@ import { LiveCollectionNames } from '../../../core/const';
 import { type Category } from '../../../core/models/category';
 import { $activeCategory, setActiveCategory } from '../../../core/stores/catalog-store';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
+import Categories from '../../../components/Categories.astro';
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Category page ~ slug: %s", slug);
@@ -13,22 +14,41 @@ console.log("🚀 ~ Category page ~ slug: %s", slug);
 setActiveCategory(undefined);
 
 if (slug) {
-  await getEntryBySlug(LiveCollectionNames.Categories, slug)
+  var category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
     .then((result) => {
       if (!result.value) console.log("🚀 ~ Category page ~ category not found by slug:", result.slug);
       if (result.value) setActiveCategory(result.value as Category);
+      return result.value;
     })
-    .catch((reason) => console.error(reason));
+    .catch((reason) => {
+      console.error((reason as Error).message);
+    });
+  
+  if (!category) return Astro.redirect("/404");
 }
-
-console.log(
-  "🚀 ~ Category page ~ parsed category:", 
-  $activeCategory?.value?.title
-);
 ---
 
-<BaseLayout title=`Каталог - ${slug ?? "None"}`>
-  <div class="px-4">
-    <span>Страница в разработке...</span>
-  </div>
+<BaseLayout title=`Каталог - ${$activeCategory?.value?.title}`>
+  <Categories parentSlug=`${$activeCategory?.value?.slug}` server:defer>
+		<div slot="fallback" class="mx-3.5">
+			<h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
+				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+					<div class="skeleton h-32 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+				</div>
+				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+					<div class="skeleton h-32 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+				</div>
+				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+					<div class="skeleton h-32 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+					<div class="skeleton h-4 w-full"></div>
+				</div>
+			</div>
+		</div>
+	</Categories>
 </BaseLayout>

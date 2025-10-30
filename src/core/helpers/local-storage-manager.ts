@@ -1,3 +1,5 @@
+import { regexTruePattern } from "./regex";
+
 type StateManagerFeatures = {
   checkCataloSyncRequired(expireDays: number): boolean;
   checkCatalogSyncInProgress(): boolean;
@@ -22,8 +24,6 @@ const LocalStorageKeys = {
 } as const;
 
 const getLocalStorageManager = (): StateManagerFeatures => {
-  const regexTruePattern: RegExp = /^true$/i;
-
   return {
     checkCataloSyncRequired: (expireDays: number): boolean => {
       const isSyncing = localStorage.getItem(

@@ -1,11 +1,14 @@
 import type { APIRoute } from "astro";
 import type { Product } from "../../core/models/product";
+import type { Pagable } from "../../core/models";
+import { APISearchParamNames } from "../../core/const";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  console.log("🚀 ~ GET ~ products ~ params:", params);
+export const GET: APIRoute = async ({ /*params, */ request }) => {
+  console.log("🚀 ~ GET ~ products ~ request:", URL.parse(request.url));
 
+  // TODO: query database for Categories
   var allItems: Array<Product> = [
     {
       id: 1,
@@ -54,11 +57,40 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     },
   ];
 
-  // TODO: query database for Categories
-  return new Response(JSON.stringify(allItems), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  var categorySlug: string | null = null;
+  var paging: Pagable = { current: 0, limit: 100 };
+
+  const url = URL.parse(request.url);
+  if (url?.search && url.searchParams) {
+    if (url.searchParams.has(APISearchParamNames.Category)) {
+      categorySlug = url.searchParams.get(APISearchParamNames.Category);
+    }
+
+    var checkInt = parseInt(
+      url.searchParams.get(APISearchParamNames.Page) ?? "0"
+    );
+    if (!isNaN(checkInt)) paging.current = checkInt;
+
+    checkInt = parseInt(
+      url.searchParams.get(APISearchParamNames.PageSize) ?? "100"
+    );
+    if (!isNaN(checkInt)) paging.limit = checkInt;
+  }
+
+  if (!categorySlug) {
+    return new Response(null, {
+      status: 404,
+      statusText: "Not found",
+    });
+  }
+
+  return new Response(
+    JSON.stringify(allItems.filter((x) => x.categorySlug === categorySlug)),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 };
