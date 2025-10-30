@@ -1,8 +1,12 @@
 ---
+import { NavPathNames } from '../core/const';
 import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/helpers/breadcrubms-manager';
+import { getTextHandler } from '../core/helpers/text-utils';
 
 const { currentPath } = Astro.props;
 const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
+const textUtils = getTextHandler();
+const requiredLabelLen = 20;
 ---
 
 <script>
@@ -20,10 +24,35 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
     <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (
         <li>
-          {index !== breadcrumbs.length - 1 
-            ? <a href=`/${x.path}`>{x.value}</a> 
-            : <span class="!no-underline !cursor-default text-gray-400 italic">{x.value}</span>} 
+          {index !== breadcrumbs.length - 1 /* all elements displayed as link except the last one */
+            ? <a href=`/${x.path}`>
+                {x.path === NavPathNames.Home &&
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                  <span class="!hidden md:!flex">{x.value}</span>
+                }
+                {x.path === NavPathNames.Catalog &&
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                  </svg>
+                  <span class="!hidden md:!flex">{x.value}</span>
+                }
+                {x.path === NavPathNames.Categories &&
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5" />
+                  </svg>
+                  <span class="!hidden md:!flex">{x.value}</span>
+                }
+                {x.path !== NavPathNames.Home && x.path !== NavPathNames.Catalog && x.path !== NavPathNames.Categories &&
+                  <span title={x.value}>{textUtils.trimEnd(x.value, requiredLabelLen)}</span>
+                }
+              </a>
+            : <span class="!no-underline !cursor-default text-gray-400 italic" title={x.value}>{textUtils.trimEnd(x.value, requiredLabelLen)}</span>
+          }
         </li>
       ))}
-    </ul>}
+    </ul>
+  }
 </div>

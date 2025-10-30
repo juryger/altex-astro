@@ -56,7 +56,7 @@ const _allNavPaths: Array<NavPathItem> = [
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true },
   },
   {
-    path: `${NavPathNames.Cart}`,
+    path: `${NavPathNames.ShoppingCart}`,
     value: "Корзина",
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true },
   },

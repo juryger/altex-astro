@@ -10,7 +10,7 @@ enum NavPathNames {
   Products = "products",
   About = "about",
   Contacts = "contacts",
-  Cart = "cart",
+  ShoppingCart = "shopping-cart",
   MyProfile = "my-profile",
   PageNotFound = "404",
   ServerError = "500",
