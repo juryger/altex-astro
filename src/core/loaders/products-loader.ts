@@ -40,7 +40,7 @@ export function createProductsLoader(config: {
         console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
 
         return {
-          entries: data.map((x: Product) => ({ id: x.id, data: x })),
+          entries: data.map((x: Product) => ({ id: x.uid, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -71,7 +71,7 @@ export function createProductsLoader(config: {
         console.log("🚀 ~ createProductsLoader ~ entry ~ value:", value);
 
         return value !== undefined
-          ? { id: value.id, data: value }
+          ? { id: value.uid, data: value }
           : { error: new Error(`No product found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

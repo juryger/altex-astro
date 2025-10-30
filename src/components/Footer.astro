@@ -1,15 +1,15 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import { getNavPathResolver } from '../core/helpers/nav-path-resolver';
+import { getNavPathManager } from '../core/helpers/nav-path-manager';
 
-const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: false, isFooter: true, isBreadcrumbs: false });
+const allPaths = getNavPathManager().getAllPaths({ isMainMenu: false, isFooter: true, isBreadcrumbs: false });
 ---
 
 <footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded pt-2 pb-2">
   <nav class="grid grid-flow-col gap-4">
     {allPaths && allPaths.map((x) => (
-      <a class="link link-info link-hover" href={x.path}>{x.value}</a>
+      <a class="link link-info link-hover" href=`/${x.path}`>{x.value}</a>
     ))}
   </nav>
   <aside class="grid-flow-col items-center">

@@ -15,8 +15,6 @@ export const getCatalogSyncHandler = (config: {
   return {
     async syncCategories() {
       const url = new URL(`${config.apiBaseUrl}/categories`);
-      await fetch(url).then();
-
       const response = await fetch(url);
       if (!response.ok) {
         response.text().then((errorMessage) => {
@@ -43,7 +41,8 @@ export const getCatalogSyncHandler = (config: {
             id: x.id,
             title: x.title,
             slug: x.slug,
-            parentSlug: x.parentSlug,
+            parentId: x.parentId,
+            parentUid: x.parentUid,
           } as CategoryCache)
       );
 

@@ -8,22 +8,32 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
   const { slug } = params;
 
   // TODO: query database for category by slug
-  if (!slug || slug !== "locks") {
+
+  if (!slug || (slug !== "locks" && slug !== "padlocks")) {
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
 
-  const item = {
-    id: "3b7ef178-3b3d-49a1-9851-5042ec9da1d2",
-    title: "Замковая фурнитура",
-    description: "Замкки, личинки, проушины и прочее",
-    image: "http://localhost:4321/public/categories/locks.png",
-    slug: "locks",
-    parentId: undefined,
-    parentSlug: undefined,
-  } as Category;
+  const item: Category =
+    slug === "locks"
+      ? {
+          id: 1,
+          title: "Замковая фурнитура",
+          description: "Замкки, личинки, проушины и прочее",
+          image: "locks.png",
+          slug: "locks",
+        }
+      : {
+          id: 3,
+          title: "Навесные замки",
+          description: "Навесные замки и прочее",
+          image: "padlocks.png",
+          slug: "padlocks",
+          parentId: 1,
+          parentSlug: "locks",
+        };
 
   return new Response(JSON.stringify(item), {
     status: 200,

@@ -2,50 +2,48 @@
 export const prerender = false;
 
 import { Image } from 'astro:assets';
-import { getLiveCollection } from 'astro:content';
-import { LiveCollectionValidationError } from 'astro/content/runtime';
-import type { Category } from '../core/models/category';
 import { getTextHandler } from '../core/helpers/text-utils';
+import { LiveCollectionNames } from '../core/const';
+import { getCollectionByParentSlug } from '../core/helpers/live-collection-manager';
+import type { Category } from '../core/models/category';
 
-const { entries: categories, error } = await getLiveCollection('categories', { parentSlug: ''  });
-if (LiveCollectionValidationError.is(error)) {
-  console.error("🚀 ~ Categories component ~ shema validation errors:", error)
-} else if (error) {
-  console.error("🚀 ~ Categories component ~ error:", error)
-}
+var categories = await getCollectionByParentSlug(LiveCollectionNames.Categories)
+    .then(result => {
+      if (!result.value) console.log("🚀 ~ Categories component ~ collection not found by filter:", result.parentSlug ?? "(empty)");
+      return result.value as { id: string, data: Category }[] | undefined;
+    })
+    .catch(reason => console.error(reason));
 
 const textHandler = getTextHandler();
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
-console.log("🚀 ~ Categories component ~ blob storage url:", categoriesBlobStorageUrl)
-console.log("🚀 ~ Categories component ~ data:", categories)
+console.log("🚀 ~ Categories component ~ blob storage url: %s, data: %o", categoriesBlobStorageUrl, categories)
 ---
 
 <div class="mx-4 bg-base-100">
   <h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
   <div class="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
-    {categories && categories.map(
-      x => {
-        const item = x.data;
-        return (
-          <div class="card bg-base-100 w-auto shadow-sm">
-            <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
-              <figure class="px-1 pt-1">
-                <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
-              </figure>
-              <div class="card-body items-center text-center !px-1 !py-1">
-                <span class="card-title text-sm font-bold" title={item.title}>
-                  {textHandler.trimEnd(item.title, 21, '.')}
+    {categories && categories.map(x => {
+      const item = x.data;
+      return (
+        <div class="card bg-base-100 w-auto shadow-sm">
+          <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
+            <figure class="px-1 pt-1">
+              <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
+            </figure>
+            <div class="card-body items-center text-center !px-1 !py-1">
+              <span class="card-title text-sm font-bold" title={item.title}>
+                {textHandler.trimEnd(item.title, 21, '.')}
+              </span>
+              {item.description && <p>
+                <span title={item.description}>
+                  {textHandler.trimEnd(item.description, 100, '.')}
                 </span>
-                {item.description && <p>
-                  <span title={item.description}>
-                    {textHandler.trimEnd(item.description, 100, '.')}
-                  </span>
-                </p>}
-              </div>
-            </a>
-          </div>);
+              </p>}
+            </div>
+          </a>
+        </div>);
       })
     }
   </div>
-  {!categories && <span>Категории отстуствуют</span>}
+  {(!categories || categories.length == 0) && <span>Категории отстуствуют</span>}
 </div>

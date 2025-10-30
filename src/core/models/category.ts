@@ -1,20 +1,21 @@
 import { z } from "astro/zod";
 
 export const CategoryCacheSchema = z.object({
-  id: z.string(), //.uuid()
+  id: z.number(),
   title: z.string(),
   slug: z.string(),
+  parentId: z.number().optional(),
   parentSlug: z.string().optional(),
 });
 
 export const CategorySchema = z.object({
-  id: z.string(), //.uuid(),
+  id: z.number(),
   title: z.string(),
   description: z.string().optional(),
-  image: z.string(), //.url(),
+  image: z.string(),
   slug: z.string(),
-  parentId: z.string().optional(), //.uuid()
-  parentSlug: z.string().optional(), //reference('categories').optional(),
+  parentId: z.number().optional(),
+  parentSlug: z.string().optional(),
 });
 
 export type Category = z.infer<typeof CategorySchema>;

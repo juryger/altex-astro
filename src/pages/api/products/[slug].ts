@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
   }
 
   const item = {
-    id: "1cbaccdf-eb85-4132-b342-deccc2901f94",
+    id: 1,
     title: "Замок навесной",
     description: "Product description 1",
     unit: "шт",
@@ -25,7 +25,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     price: 100,
     whsPrice1: 90,
     whsPrice2: 80,
-    categoryId: "8532f731-caea-4972-8287-acdb17d4a95d",
+    categoryId: 3,
     categorySlug: "padlocks",
     colors: ["red", "blue"],
     image: "padlock-master-vline.png",

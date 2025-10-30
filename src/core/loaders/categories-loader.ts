@@ -1,7 +1,6 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../helpers/endpoint-error-parser";
-import { CategorySchema, type Category } from "../models/category";
-import { type LiveDataEntry } from "astro";
+import type { Category } from "../models/category";
 
 export type CategoryCollectionFilter = {
   parentSlug?: string;
@@ -41,7 +40,7 @@ export function createCategoriesLoader(config: {
         console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
 
         return {
-          entries: data.map((x: Category) => ({ id: x.id, data: x })),
+          entries: data.map((x: Category) => ({ id: x.uid, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -72,7 +71,7 @@ export function createCategoriesLoader(config: {
         console.log("🚀 ~ createCategoriesLoader ~ entry ~ value:", value);
 
         return value !== undefined
-          ? { id: value.id, data: value }
+          ? { id: value.uid, data: value }
           : { error: new Error(`No category found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

@@ -2,27 +2,42 @@
 export const prerender = false;
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { getLiveEntry } from 'astro:content';
-import { LiveCollectionValidationError } from 'astro/content/runtime';
-import { setCurrentProduct } from "../../../core/stores/product-store";
+import { $activeCategory, $activeProduct, setActiveCategory, setActiveProduct } from "../../../core/stores/catalog-store";
+import { LiveCollectionNames } from '../../../core/const';
+import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
+import type { Product } from '../../../core/models/product';
+import type { Category } from '../../../core/models/category';
 
 const { slug } = Astro.params;
-console.log("🚀 ~ Product page ~ slug (server):", slug)
+console.log("🚀 ~ Product page ~ slug: %s", slug);
 
-const { entry: productItem, error } = await getLiveEntry('products', { slug: slug ?? "" });
-if (LiveCollectionValidationError.is(error)) {
-  console.error("🚀 ~ Product page ~ collection shema validation errors:", error)
-} else if (error) {
-  console.error("🚀 ~ Product page ~ collection error:", error)
+setActiveProduct(undefined);
+setActiveCategory(undefined);
+
+if (slug) {
+  var product = await getEntryBySlug(LiveCollectionNames.Products, slug)
+    .then(result => {
+      if (!result.value) console.log("🚀 ~ Product page ~ product not found by slug:", result.slug);
+      if (result.value) setActiveProduct(result.value as Product);
+      return result.value as Product | undefined;
+    })
+    .catch(reason => console.error(reason));
+      
+    if (product) {
+      await getEntryBySlug(LiveCollectionNames.Categories, product.categorySlug)
+        .then((result) => {
+          if (!result.value) console.log("🚀 ~ Product page ~ category not found by slug:", result.slug);
+          if (result.value) setActiveCategory(result.value as Category);
+        })
+        .catch(reason => console.error(reason));
+    }
 }
 
-// Keep selected product in Session
-//Astro.session?.set('currentProduct', extractedProduct);
-//const sessionProduct = await Astro.session?.get('currentProduct');
-
-const value = productItem?.data;
-console.log("🚀 ~ Product page ~ data:", value)
-setCurrentProduct(value);
+console.log(
+  "🚀 ~ Product page ~ parsed active product '%s' and its category '%s'", 
+  $activeProduct?.value?.title,
+  $activeCategory?.value?.title, 
+);
 ---
 
 <script>
@@ -31,8 +46,14 @@ setCurrentProduct(value);
   // console.log("🚀 ~ Product page ~ slug: %s", element?.dataset.slug);  
 </script>
 
-<BaseLayout title=`Каталог - ${value?.title}`>
-    <div id="product-card" class="px-4" data-slug={value?.slug} data-id={value?.id} data-title={value?.title} data-categoryid={value?.categoryId} data-categoryslug={value?.categorySlug}>
+<BaseLayout title=`Каталог - ${$activeProduct?.value?.title}`>
+    <div id="product-card" class="px-4" 
+      data-slug={$activeProduct?.value?.slug} 
+      data-id={$activeProduct?.value?.id} 
+      data-title={$activeProduct?.value?.title} 
+      data-categoryid={$activeProduct?.value?.categoryId} 
+      data-categoryid={$activeProduct?.value?.categoryId}
+    >
       <span>Страница в разработке...</span>
       <!-- <span>Значение продукта из сессии {sessionProduct?.title}</span> -->
     </div>

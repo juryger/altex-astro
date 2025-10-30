@@ -1,32 +1,29 @@
 ---
-import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/helpers/breadcrubms-parser';
-import type { Product } from '../core/models/product';
-import { $currentProduct } from '../core/stores/product-store';
+import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/helpers/breadcrubms-manager';
 
 const { currentPath } = Astro.props;
 const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
-
-console.log("🚀 ~ Breadcrumbs component ~ current product:", $currentProduct?.value)
 ---
 
 <script>
+  // Example of accessing IndexedDB data from client-side script (not used at the moment)
+  /* 
   import { db } from "../core/db/client-db";
-
   const categories = db.categories.filter(obj => obj.slug === "locks");
   const lockCategory = await categories.first();
-  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)
+  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)   
+  */
 </script>
 
 <div class="breadcrumbs text-sm px-8">
-  {breadcrumbs.length > 1 && 
+  {breadcrumbs.length > 1 /* skip home page */ && 
     <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (
         <li>
-          {(index !== breadcrumbs.length - 1) ? 
-            <a href={x.url}>{x.value}</a> : 
-            <span class="!no-underline !cursor-default">{x.value}</span>} 
+          {index !== breadcrumbs.length - 1 
+            ? <a href=`/${x.path}`>{x.value}</a> 
+            : <span class="!no-underline !cursor-default text-gray-400 italic">{x.value}</span>} 
         </li>
       ))}
     </ul>}
-    <span class="text-xs text-secondary-content">(LVP: {($currentProduct?.value as Product)?.title ?? "none"})</span>
 </div>

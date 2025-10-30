@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import { getNavPathResolver } from '../core/helpers/nav-path-resolver';
+import { getNavPathManager } from '../core/helpers/nav-path-manager';
 
-const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
+const allPaths = getNavPathManager().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
 ---
 
 <script>
@@ -27,7 +27,7 @@ const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: true, isFooter: 
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
         {allPaths && allPaths.map((x) => (
           <li>
-            <a href={x.path}>{x.value}</a>
+            <a href=`/${x.path}`>{x.value}</a>
           </li>
         ))}
       </ul>
@@ -43,7 +43,7 @@ const allPaths = getNavPathResolver().getAllPaths({ isMainMenu: true, isFooter: 
     <ul class="menu menu-horizontal px-1 font-semibold">
       {allPaths && allPaths.map((x) => (
         <li>
-          <a href={x.path}>{x.value}</a>
+          <a href=`/${x.path}`>{x.value}</a>
         </li>
       ))}
       <li class="px-3">
