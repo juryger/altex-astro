@@ -1,3 +1,4 @@
+import { getDateHandler } from "./date-utils";
 import { regexTruePattern } from "./regex";
 
 type StateManagerFeatures = {
@@ -6,14 +7,10 @@ type StateManagerFeatures = {
   setLastSyncDate(value: Date): void;
   setCatalogSyncInProgress(value: boolean): void;
   setCatalogSyncPostponed(value: boolean): void;
-  getUserThemPreference(): string;
+  getUserThemePreference(): string | undefined;
   setUserThemePreference(value: string): void;
-};
-
-const addDays = (date: Date, days: number): Date => {
-  const currentDay = date.getDate();
-  date.setDate(currentDay + days);
-  return date;
+  getUserThemeChangeDate(): Date | undefined;
+  setUserThemeChangeDate(value: Date): void;
 };
 
 const LocalStorageKeys = {
@@ -21,6 +18,7 @@ const LocalStorageKeys = {
   CATALOG_SYNC_IN_PROGRESS: "catalog-sync-in-progress",
   CATALOG_SYNC_POSTPONED: "catalog-sync-postponed",
   USER_THEME_PREFERENCE: "user-theme-preference",
+  USER_THEME_CHANGED: "user-theme-changed",
 } as const;
 
 const getLocalStorageManager = (): StateManagerFeatures => {
@@ -40,9 +38,11 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       const lastSyncDate = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_DATE
       );
+
+      const dateHandler = getDateHandler();
       return (
         lastSyncDate === null ||
-        addDays(new Date(lastSyncDate), expireDays) <= new Date()
+        dateHandler.addDays(new Date(lastSyncDate), expireDays) <= new Date()
       );
     },
     checkCatalogSyncInProgress: (): boolean => {
@@ -69,13 +69,47 @@ const getLocalStorageManager = (): StateManagerFeatures => {
         value.toString()
       );
     },
-    getUserThemPreference: (): string => {
-      return (
-        localStorage.getItem(LocalStorageKeys.USER_THEME_PREFERENCE) ?? "light"
+    getUserThemePreference: (): string | undefined => {
+      var value = localStorage.getItem(LocalStorageKeys.USER_THEME_PREFERENCE);
+      if (!value) return undefined;
+
+      // Check user's last visit date and if it was more than 4 hrs ago, reset Theme preference
+      const dateHandler = getDateHandler();
+      const lastChange = localStorage.getItem(
+        LocalStorageKeys.USER_THEME_CHANGED
       );
+      console.log(
+        "~ localStorageManger ~ theme last changed date:",
+        lastChange
+      );
+
+      if (
+        !lastChange ||
+        dateHandler.addHours(new Date(lastChange), 4) <= new Date()
+      ) {
+        console.log(
+          "~ localStorageManger ~ removing theme selection based on last change date %s vs now %s",
+          lastChange ? dateHandler.addMinutes(new Date(lastChange), 1) : "none",
+          new Date()
+        );
+        localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);
+        return undefined;
+      }
+
+      return value;
     },
     setUserThemePreference: (value: string): void => {
       localStorage.setItem(LocalStorageKeys.USER_THEME_PREFERENCE, value);
+    },
+    getUserThemeChangeDate: (): Date | undefined => {
+      const value = localStorage.getItem(LocalStorageKeys.USER_THEME_CHANGED);
+      return value ? new Date(value) : undefined;
+    },
+    setUserThemeChangeDate: (value: Date): void => {
+      localStorage.setItem(
+        LocalStorageKeys.USER_THEME_CHANGED,
+        value.toISOString()
+      );
     },
   };
 };

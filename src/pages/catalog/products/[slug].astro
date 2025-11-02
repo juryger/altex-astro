@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { $activeCategory, $activeProduct, setActiveCategory, setActiveProduct } from "../../../core/stores/catalog-store";
+import { $activeProduct, setActiveCategory, setActiveProduct } from "../../../core/stores/catalog-store";
 import { LiveCollectionNames } from '../../../core/const';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
 import type { Product } from '../../../core/models/product';
@@ -24,7 +24,6 @@ if (slug) {
     .catch(reason => {
       console.error((reason as Error).message);
     });
-  
   if (!product) return Astro.redirect("/404");
   
   const category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, product.categorySlug)
@@ -36,7 +35,6 @@ if (slug) {
     .catch(reason => {
       console.error((reason as Error).message);        
     });
-  
   if (!category) return Astro.redirect("/404");
 }
 ---
@@ -53,9 +51,8 @@ if (slug) {
       data-id={$activeProduct?.value?.id} 
       data-title={$activeProduct?.value?.title} 
       data-categoryid={$activeProduct?.value?.categoryId} 
-      data-categoryid={$activeProduct?.value?.categoryId}
+      data-categoryslug={$activeProduct?.value?.categorySlug}
     >
       <span>Страница в разработке...</span>
-      <!-- <span>Значение продукта из сессии {sessionProduct?.title}</span> -->
     </div>
 </BaseLayout>

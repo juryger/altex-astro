@@ -1,0 +1,100 @@
+---
+export const prerender = false;
+
+import { Image } from 'astro:assets';
+import { getTextHandler } from '../core/helpers/text-utils';
+import { LiveCollectionNames } from '../core/const';
+import { getCollectionByFilter } from '../core/helpers/live-collection-manager';
+import { defaultPaging } from '../core/models';
+import type { Product } from '../core/models/product';
+
+interface Props {
+  categorySlug?: string;
+}
+
+const { categorySlug } = Astro.props;
+const subTitle = "Список товаров"
+
+var products = await getCollectionByFilter<Product>(LiveCollectionNames.Products, {
+    categorySlug,
+    paging: defaultPaging
+  }).then(result => {
+    if (!result.value) console.log("🚀 ~ Products component ~ collection not found");
+    return result.value as { id: string, data: Product }[] | undefined;
+  }).catch(reason => console.error(reason));
+
+const textHandler = getTextHandler();
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`
+console.log("🚀 ~ Products component ~ blob storage url: %s, data: %o", productsBlobStorageUrl, products)
+---
+
+<div class="mx-4 mb-2 bg-base-100">
+  <h3 class="text-lg font-bold text-center sm:text-left py-2">{subTitle}</h3>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+    {products && products.map(x => {
+      const item = x.data;
+      return (
+        <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
+          <a class="group no-underline" href=`/catalog/products/${item.slug}`>
+            <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[250px]">
+              <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="250" height="250" class="rounded-xl"/>
+            </figure>
+            <div class="card-body !px-1 !py-1">
+              <div class="min-h-[40px] grid grid-cols-[1fr_auto] items-start">
+                <span class="card-title text-sm font-bold" title={item.title}>
+                  {textHandler.trimEnd(item.title, 50)} 
+                </span>
+                <div class="flex flex-col text-center">
+                  <span class="text-xs">Артикул</span>
+                  <span class="text-xs">{item.articleNumber}</span>
+                </div>
+              </div>          
+              <div class="grid grid-cols-2 gap-1 px-1">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                  </svg>
+                  <span>В упаковке: </span>
+                  <span>{item.quantityInPack}</span>
+                </div>
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                  </svg>
+                  <span>Мин. к заказу: </span>
+                  <span>{item.minQuantityToBuy}</span>
+                </div>
+              </div>
+              <div class="stats shadow">
+                <div class="stat place-items-center">
+                  <div class="stat-title">Розн. цена</div>
+                  <div class="stat-value text-base">{item.price} р.</div>              
+                </div>
+                <div class="stat place-items-center">
+                  <div class="stat-title">Опт. цена</div>
+                  <div class="stat-value text-base">{item.whsPrice1} р.</div>
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <span>Доступные цвета:</span>
+              </div>
+              <div class="flex items-center justify-center gap-2 my-1">
+                <input
+                  type="radio" name=`radio-color-${item.id}` checked="checked"
+                  class="radio bg-red-100 border-red-300 checked:bg-red-200 checked:text-red-600 checked:border-red-600" />
+                <input
+                  type="radio" name=`radio-color-${item.id}` checked="checked"
+                  class="radio bg-blue-100 border-blue-300 checked:bg-blue-200 checked:text-blue-600 checked:border-blue-600" />
+                <input
+                  type="radio" name=`radio-color-${item.id}` checked="checked"
+                  class="radio bg-amber-100 border-amber-300 checked:bg-amber-200 checked:text-amber-600 checked:border-amber-800" />
+              </div>
+              <button class="btn btn-active btn-primary">В корзину</button>
+            </div>
+          </a>
+        </div>);
+      })
+    }
+  </div>
+  {(!products || products.length == 0) && <span>Товары не представлены в данной категории</span>}
+</div>

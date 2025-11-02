@@ -4,51 +4,56 @@ export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveCollectionNames } from '../../../core/const';
 import { type Category } from '../../../core/models/category';
-import { $activeCategory, setActiveCategory } from '../../../core/stores/catalog-store';
+import { $activeCategory, setActiveCategory, setActiveParentCategory } from '../../../core/stores/catalog-store';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
 import Categories from '../../../components/Categories.astro';
+import Products from '../../../components/Products.astro';
+import CollectionFallback from '../../../components/CollectionFallback.astro';
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Category page ~ slug: %s", slug);
 
+setActiveParentCategory(undefined);
 setActiveCategory(undefined);
 
 if (slug) {
   var category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
     .then((result) => {
       if (!result.value) console.log("🚀 ~ Category page ~ category not found by slug:", result.slug);
-      if (result.value) setActiveCategory(result.value as Category);
+      if (result.value) setActiveCategory(result.value);
       return result.value;
     })
     .catch((reason) => {
       console.error((reason as Error).message);
     });
-  
   if (!category) return Astro.redirect("/404");
+
+  if (category.parentSlug) {
+    const parentCategory = await getEntryBySlug<Category>(LiveCollectionNames.Categories, category.parentSlug)
+      .then((result) => {
+        if (!result.value) console.log("🚀 ~ Product page ~ category not found by slug:", result.slug);
+        if (result.value) setActiveParentCategory(result.value);
+        return result.value;
+      })
+      .catch(reason => {
+        console.error((reason as Error).message);        
+      });
+    if (!parentCategory) return Astro.redirect("/404");
+  }
 }
+
+const subTitle = "Список подкатегорий";
 ---
 
 <BaseLayout title=`Каталог - ${$activeCategory?.value?.title}`>
-  <Categories parentSlug=`${$activeCategory?.value?.slug}` server:defer>
+  <Categories parentSlug={$activeCategory?.value?.slug} title={subTitle} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
-			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
-				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-					<div class="skeleton h-32 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-				</div>
-				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-					<div class="skeleton h-32 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-				</div>
-				<div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-					<div class="skeleton h-32 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-					<div class="skeleton h-4 w-full"></div>
-				</div>
-			</div>
+			<CollectionFallback title={subTitle} />
 		</div>
 	</Categories>
+	<Products categorySlug={$activeCategory?.value?.slug} server:defer>
+		<div slot="fallback" class="mx-3.5">
+			<CollectionFallback title={subTitle} />
+		</div>
+	</Products>
 </BaseLayout>

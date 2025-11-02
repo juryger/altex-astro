@@ -1,5 +1,9 @@
 import { NavPathNames } from "../const";
-import { $activeCategory, $activeProduct } from "../stores/catalog-store";
+import {
+  $activeCategory,
+  $activeParentCategory,
+  $activeProduct,
+} from "../stores/catalog-store";
 import { getNavPathManager, type NavPathItem } from "./nav-path-manager";
 
 type BreadcrumbItem = {
@@ -14,6 +18,12 @@ const mapNavPathItemToBreadcrumb = (
   const result: BreadcrumbItem[] = [];
   if (!item.displayOptions.isBreadcrumbs) {
     if (url.indexOf(`/${NavPathNames.Categories}`) !== -1) {
+      if ($activeParentCategory?.value) {
+        result.push({
+          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${$activeParentCategory.value.slug}`,
+          value: $activeParentCategory.value.title,
+        });
+      }
       if ($activeCategory?.value) {
         result.push({
           path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${$activeCategory.value.slug}`,

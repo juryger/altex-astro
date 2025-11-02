@@ -71,7 +71,7 @@ const _allNavPaths: Array<NavPathItem> = [
     displayOptions: {
       isMainMenu: false,
       isFooter: false,
-      isBreadcrumbs: false,
+      isBreadcrumbs: true,
     },
   },
   {
@@ -80,7 +80,7 @@ const _allNavPaths: Array<NavPathItem> = [
     displayOptions: {
       isMainMenu: false,
       isFooter: false,
-      isBreadcrumbs: false,
+      isBreadcrumbs: true,
     },
   },
 ];

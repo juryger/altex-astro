@@ -4,6 +4,7 @@ import type { Category } from "../models/category";
 
 export const $activeProduct = atom<Product | undefined>();
 export const $activeCategory = atom<Category | undefined>();
+export const $activeParentCategory = atom<Category | undefined>();
 
 export function setActiveProduct(value: Product | undefined) {
   if (value) $activeProduct.set({ ...value });
@@ -13,4 +14,9 @@ export function setActiveProduct(value: Product | undefined) {
 export function setActiveCategory(value: Category | undefined) {
   if (value) $activeCategory.set({ ...value });
   else $activeCategory.set(undefined);
+}
+
+export function setActiveParentCategory(value: Category | undefined) {
+  if (value) $activeParentCategory.set({ ...value });
+  else $activeParentCategory.set(undefined);
 }

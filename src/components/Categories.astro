@@ -10,9 +10,10 @@ import { defaultPaging } from '../core/models';
 
 interface Props {
   parentSlug?: string;
+  title: string;
 }
 
-const { parentSlug } = Astro.props;
+const { parentSlug, title } = Astro.props;
 
 var categories = await getCollectionByFilter<Category>(LiveCollectionNames.Categories, {
     parentSlug,
@@ -28,31 +29,31 @@ const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORI
 console.log("🚀 ~ Categories component ~ blob storage url: %s, data: %o", categoriesBlobStorageUrl, categories)
 ---
 
-<div class="mx-4 bg-base-100">
-  <h3 class="text-lg font-bold text-center lg:text-left">Список категорий товаров</h3>
-  <div class="grid grid-cols-1 sm:grid-col-2 md:grid-cols-3 lg:grid-cols-5 gap-5 py-2">
-    {categories && categories.map(x => {
-      const item = x.data;
-      return (
-        <div class="card bg-base-200 w-auto shadow-sm">
-          <a class="no-underline" href=`/catalog/categories/${item.slug}`>     
-            <figure class="px-1 pt-2.5">
-              <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="75" height="75" class="rounded-xl"/>
-            </figure>
-            <div class="card-body items-center text-center !px-1 !py-1">
-              <span class="card-title text-sm font-bold" title={item.title}>
-                {textHandler.trimEnd(item.title, 21)}
-              </span>
-              {item.description && <p>
-                <span title={item.description}>
-                  {textHandler.trimEnd(item.description, 100)}
+{(!categories || categories.length > 0) &&
+  <div class="mx-4 mb-2 bg-base-100">
+    <h3 class="text-lg font-bold text-center sm:text-left py-2">{title}</h3>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+      {categories && categories.map(x => {
+        const item = x.data;
+        return (
+          <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
+            <a class="group no-underline" href=`/catalog/categories/${item.slug}`>     
+              <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[150px]">
+                <Image src=`${categoriesBlobStorageUrl}/${item.image}` alt=`${item.title}` width="150" height="150" class="rounded-xl"/>
+              </figure>
+              <div class="card-body items-center text-center !px-1 !py-1">
+                <span class="card-title text-sm font-bold" title={item.title}>
+                  {textHandler.trimEnd(item.title, 21)}
                 </span>
-              </p>}
-            </div>
-          </a>
-        </div>);
-      })
-    }
+                {item.description &&
+                  <span class="text-sm" title={item.description}>
+                    {textHandler.trimEnd(item.description, 100)}
+                  </span>}
+              </div>
+            </a>
+          </div>);
+        })
+      }
+    </div>
   </div>
-  {(!categories || categories.length == 0) && <span>Категории отстуствуют</span>}
-</div>
+}

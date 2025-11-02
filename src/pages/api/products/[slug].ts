@@ -18,16 +18,17 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
 
   const item = {
     id: 1,
-    title: "Замок навесной",
-    description: "Product description 1",
-    unit: "шт",
+    title: "Замок АПЕКС PD-38 перфо-ключ",
+    articleNumber: "АХ-3101",
+    unit: 1, //"шт",
     quantityInPack: 1,
-    price: 100,
+    minQuantityToBuy: 1,
+    price: 97.3,
     whsPrice1: 90,
     whsPrice2: 80,
     categoryId: 3,
     categorySlug: "padlocks",
-    colors: ["red", "blue"],
+    colors: ["AB", "CP", "AC", "PB"],
     image: "padlock-master-vline.png",
     slug: "padlock-master-vline",
   } as Product;

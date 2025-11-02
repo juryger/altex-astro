@@ -1,15 +1,10 @@
 import { getLocalStorageManager } from "./local-storage-manager";
 
-// Handle theme toggle logic with support of localStorage
-export const applyThemeToggle = (
+const assertInputs = (
   themeSelector: Element | null,
   darkThemeSelector: Element | null,
   lightThemeSelector: Element | null
-): void => {
-  const lightThemeName = "light";
-  const darkThemeName = "dark";
-  const localStorageManager = getLocalStorageManager();
-
+) => {
   console.assert(
     themeSelector !== null,
     "applyThemeToggle ~ '%s' is not defined",
@@ -27,14 +22,47 @@ export const applyThemeToggle = (
     "applyThemeToggle ~ '%s' is not defined",
     Object.keys({ lightThemeSelector })[0]
   );
+};
 
-  // On theme switch, saves user preference to localStorage
+// Handle theme toggle logic with support of localStorage
+export const applyThemeToggle = async (
+  themeSelector: Element | null,
+  darkThemeSelector: Element | null,
+  lightThemeSelector: Element | null
+): Promise<void> => {
+  const lightThemeName = "light";
+  const darkThemeName = "dark";
+  const localStorageManager = getLocalStorageManager();
+
+  assertInputs(themeSelector, darkThemeSelector, lightThemeSelector);
+
+  var newTheme: string | undefined;
+  var currentTheme = localStorageManager.getUserThemePreference();
+  console.log(
+    "🚀 ~ Header ~ user preferred theme from localStorage:",
+    currentTheme
+  );
+
   const themeSelectorInput = themeSelector as HTMLInputElement;
-  themeSelectorInput?.addEventListener("click", () => {
-    const currentTheme = localStorageManager.getUserThemPreference();
-    const newTheme =
-      currentTheme === lightThemeName ? darkThemeName : lightThemeName;
+  themeSelectorInput?.addEventListener("click", async () => {
+    // On theme switch, saves user preference to localStorage
+    if (!newTheme || newTheme === currentTheme) {
+      console.warn(
+        "🚀 ~ Header ~ userPreferredTheme ~ theme change will not be saved as new theme '%s' is either not set or same as current '%s'",
+        newTheme,
+        currentTheme
+      );
+      return;
+    }
+
     localStorageManager.setUserThemePreference(newTheme);
+    localStorageManager.setUserThemeChangeDate(new Date());
+    currentTheme = newTheme;
+
+    console.log(
+      "🚀 ~ Header ~ userPreferredTheme ~ current theme switched to new theme:",
+      newTheme
+    );
   });
 
   const syncUIBasedOnClientOSTheme = (theme: string): void => {
@@ -51,34 +79,31 @@ export const applyThemeToggle = (
 
   const toggleDarkTheme = (): void => {
     themeSelectorInput?.click();
-    localStorageManager.setUserThemePreference("dark");
   };
 
   const toggleLightTheme = (): void => {
     themeSelectorInput?.click();
-    localStorageManager.setUserThemePreference("light");
   };
 
-  const savedTheme = localStorageManager.getUserThemPreference();
   const isClientOSDarkThemeOn = window.matchMedia(
     "(prefers-color-scheme: dark)"
   ).matches;
 
   if (isClientOSDarkThemeOn) {
     syncUIBasedOnClientOSTheme(darkThemeName);
-
-    if (savedTheme && savedTheme === lightThemeName) {
+    if (currentTheme && currentTheme === lightThemeName) {
       toggleLightTheme();
+      newTheme = darkThemeName;
     } else {
-      localStorageManager.setUserThemePreference(darkThemeName);
+      newTheme = lightThemeName;
     }
   } else {
     syncUIBasedOnClientOSTheme(lightThemeName);
-
-    if (savedTheme && savedTheme === darkThemeName) {
+    if (currentTheme && currentTheme === darkThemeName) {
       toggleDarkTheme();
+      newTheme = lightThemeName;
     } else {
-      localStorageManager.setUserThemePreference(lightThemeName);
+      newTheme = darkThemeName;
     }
   }
 };
