@@ -1,0 +1,29 @@
+---
+import type { ProductColor } from '../core/const'
+
+interface Props {
+  productId: number,
+  color: ProductColor,
+  isDefault: boolean
+}
+
+const colorNames: { [key: number]: { color: string, border: string, title: string } } = {
+  0: { color: "bg-amber-500", border: "border-gray-400", title: "Бронза" },
+  1: { color: "bg-orange-700", border: "border-gray-400", title: 'Медь' },
+  2: {color: "bg-slate-200", border: "border-gray-600", title: 'Хром'},
+  3: {color: "bg-yellow-400", border: "border-gray-400", title: 'Латунь'},
+  4: {color: "bg-gray-300", border: "border-gray-600", title: 'Матовый хром'},
+  5: {color: "bg-white", border: "border-gray-400", title: 'Белый'},
+  6: {color: "bg-black", border: "border-gray-600", title: 'Черный'},
+};
+
+
+const { productId, color, isDefault } = Astro.props;
+var colorItem = colorNames[color];
+
+console.log('~ ColorBlock component ~ colorItem:%o, props:%o', colorItem, Astro.props);
+---
+
+<input
+  type="radio" name=`radio-color-${productId}` checked={isDefault ? "checked" : undefined} title={colorItem.title}
+  class=`size-5 appearance-none rounded-full ${colorItem.color} border-1 ${colorItem.border} checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4`/>

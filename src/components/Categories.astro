@@ -29,11 +29,11 @@ const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORI
 console.log("🚀 ~ Categories component ~ blob storage url: %s, data: %o", categoriesBlobStorageUrl, categories)
 ---
 
-{(!categories || categories.length > 0) &&
+{(categories && categories.length > 0) &&
   <div class="mx-4 mb-2 bg-base-100">
     <h3 class="text-lg font-bold text-center sm:text-left py-2">{title}</h3>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {categories && categories.map(x => {
+      {categories.map(x => {
         const item = x.data;
         return (
           <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
@@ -48,7 +48,8 @@ console.log("🚀 ~ Categories component ~ blob storage url: %s, data: %o", cate
                 {item.description &&
                   <span class="text-sm" title={item.description}>
                     {textHandler.trimEnd(item.description, 100)}
-                  </span>}
+                  </span>
+                }
               </div>
             </a>
           </div>);
