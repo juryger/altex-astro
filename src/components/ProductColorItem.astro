@@ -1,0 +1,27 @@
+---
+import { colorMetadata, type ColorKind } from '../core/models/color';
+
+interface Props {
+  id: number,
+  color: ColorKind,
+  isDefault: boolean,
+}
+const { id, color, isDefault } = Astro.props;
+var colorItem = colorMetadata[color];
+
+console.log('~ ColorBlock component ~ color dictionary lookup by ID:%i, %s', color, colorItem);
+---
+
+<product-color-item>
+  <input
+    type="radio" name=`radio-color-${id}` checked={isDefault ? "checked" : undefined} title={colorItem.title} value={color}
+    class=`size-5 appearance-none rounded-full ${colorItem.color} border-1 ${colorItem.border} checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4`/>
+</product-color-item>
+
+<script>
+  class ProductColorItem extends HTMLElement {
+    connectCallback() {
+    }
+  }
+  customElements.define('product-color-item', ProductColorItem)
+</script>

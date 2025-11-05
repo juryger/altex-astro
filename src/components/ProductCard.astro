@@ -1,0 +1,126 @@
+---
+import { Image } from 'astro:assets';
+import { getTextHandler } from '../core/helpers/text-utils';
+import type { Product } from '../core/models/product';
+import ProductColorItem from './ProductColorItem.astro';
+import { unitOfMeasurementMetadata } from '../core/models/unit-of-measurement';
+
+interface Props {
+  item: Product,
+}
+const { item } = Astro.props;
+console.log('🚀 ~ ProductCard component ~ item:', item);
+
+const noProductColors = "Нет информации о цвете";
+const titleAddToCart = "В корзину";
+const titleColorOptions = "Цвет:";
+
+const textHandler = getTextHandler();
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
+const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
+console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
+---
+
+<product-card data-id={item.id}>
+  <div class="group card bg-base-300 w-auto shadow-sm px-2 py-2">
+    <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[250px]">
+      <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="250" height="250" class="rounded-xl"/>
+    </figure>
+    <div class="card-body !px-1 !py-1">
+      {/* Product code */}
+      <div class="flex flex-row justify-end">
+        <span class="text-xs italic \">Артикул:</span>
+        <span class="text-xs italic ml-1">{item.productCode}</span>
+      </div>
+      {/* Ttitle & Box quatnity */}
+      <div>
+        {/* Ttitle */}
+        <div class="min-h-10">
+          <a class="flex flex-row" href=`/catalog/products/${item.slug}`>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+            </svg>
+            <span class="card-title text-sm font-bold pl-2" title={item.title}>
+              {textHandler.trimEnd(item.title, 50)} 
+            </span>
+          </a>
+        </div>
+        {/* Box & min to order quatnities */}
+        <div class="flex flex-row gap-1 justify-around mt-2">
+          <div>
+            <div class="flex flex-row items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+              </svg>
+              <span class="pl-1">В упаковке: </span>
+            </div>
+            <span class="flex justify-center">{item.quantityInPack} {unitItem.title}</span>
+          </div>
+          <div>
+            <div class="flex flex-row items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+              </svg>
+              <span class="pl-1">Мин. заказ: </span>
+            </div>
+            <span class="flex justify-center">{item.minQuantityToBuy} {unitItem.title}</span>
+          </div>
+        </div>
+      </div>
+      {/* Prices block */}
+      <div class="stats shadow">
+        <div class="stat place-items-center">
+          <div class="stat-title">Розн. цена</div>
+          <div class="stat-value text-base">{item.price} р.</div>              
+        </div>
+        <div class="stat place-items-center">
+          <div class="stat-title">Опт. цена</div>
+          <div class="stat-value text-base">{item.whsPrice1} р.</div>
+        </div>
+      </div>
+      <div class="flex justify-center">
+        <span>{titleColorOptions}</span>
+        <span data-selected-color-title class="pl-1"></span>
+      </div>
+      {/* Colors */}
+      {item.colors && item.colors?.length > 0 && 
+        <div class="flex items-center justify-center gap-2 my-1">
+          {item.colors && item.colors.sort().map((x, index) => 
+            <ProductColorItem id={item.id} color={x} isDefault={index === 0} />
+          )}
+        </div>
+      }
+      {(!item.colors || item.colors?.length === 0) && <div class="flex items-center justify-center min-h-8">
+          <span>{noProductColors}</span>
+        </div>
+      }
+      <button class="btn btn-active btn-primary">{titleAddToCart}</button>
+    </div>
+  </div>
+</product-card>
+
+<script>
+  class ProductCard extends HTMLElement {
+    connectedCallback() {
+      const id = this.dataset.id;
+      const selectedColorTitleEl = this.querySelector("[data-selected-color-title]");
+
+      const radioboxes = this.querySelectorAll('input[type=radio]');
+      if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
+        selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
+      }
+      
+      radioboxes.forEach(x => x.addEventListener('click', () => {
+        if (selectedColorTitleEl !== null) selectedColorTitleEl.innerHTML = x.getAttribute("title") ?? ""; 
+      }));
+
+      const button = this.querySelector('button');
+      button?.addEventListener('click', () => {
+        const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
+        alert(`Command to add Product: ${id} with color ${selectedColorEl ? (selectedColorEl as HTMLInputElement).value : "NA"} to shopping card.`);
+      });
+    }
+  }
+
+  customElements.define('product-card', ProductCard);
+</script>

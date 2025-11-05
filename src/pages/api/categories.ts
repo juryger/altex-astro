@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
 import type { Category } from "../../core/models/category";
-import { defaultPaging, type Pagable } from "../../core/models";
+import { type Pagable, defaultPaging } from "../../core/models/paging";
 import { APISearchParamNames } from "../../core/const";
-import { regexTruePattern } from "../../core/helpers/regex";
+import { extractUrlParamValue } from "../../core/helpers/url-utils";
 
 export const prerender = false;
 
@@ -63,31 +63,33 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     },
   ];
 
-  var parentSlug: string | null = null;
-  var ignoreParent: boolean = false;
-  var paging: Pagable = { current: 0, limit: 100 };
-
   const url = URL.parse(request.url);
-  if (url?.search && url.searchParams) {
-    if (url.searchParams.has(APISearchParamNames.Parent)) {
-      parentSlug = url.searchParams.get(APISearchParamNames.Parent);
-    }
-    if (url.searchParams.has(APISearchParamNames.IgnoreParent)) {
-      ignoreParent = regexTruePattern.test(
-        url.searchParams.get(APISearchParamNames.IgnoreParent) ?? "false"
-      );
-    }
+  const parentSlug = extractUrlParamValue(
+    url,
+    APISearchParamNames.Parent,
+    "string"
+  );
 
-    var checkInt = parseInt(
-      url.searchParams.get(APISearchParamNames.Page) ?? ""
-    );
-    paging.current = !isNaN(checkInt) ? checkInt : defaultPaging.current;
+  const ignoreParent = extractUrlParamValue(
+    url,
+    APISearchParamNames.IgnoreParent,
+    "boolean"
+  );
 
-    checkInt = parseInt(
-      url.searchParams.get(APISearchParamNames.PageSize) ?? ""
-    );
-    paging.limit = !isNaN(checkInt) ? checkInt : defaultPaging.limit;
-  }
+  const paging: Pagable = { current: 0, limit: 100 };
+  const pageNumber = extractUrlParamValue(
+    url,
+    APISearchParamNames.Page,
+    "number"
+  );
+  paging.current = pageNumber !== -1 ? pageNumber : defaultPaging.current;
+
+  const pageSize = extractUrlParamValue(
+    url,
+    APISearchParamNames.PageSize,
+    "number"
+  );
+  paging.limit = pageSize !== -1 ? pageSize : defaultPaging.limit;
 
   return new Response(
     JSON.stringify(

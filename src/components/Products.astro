@@ -1,13 +1,11 @@
 ---
 export const prerender = false;
 
-import { Image } from 'astro:assets';
-import { getTextHandler } from '../core/helpers/text-utils';
-import { LiveCollectionNames, ProductColor } from '../core/const';
+import { LiveCollectionNames } from '../core/const';
 import { getCollectionByFilter } from '../core/helpers/live-collection-manager';
-import { defaultPaging } from '../core/models';
 import type { Product } from '../core/models/product';
-import ProductColorBlock from './ProductColorBlock.astro';
+import { defaultPaging } from '../core/models/paging';
+import ProductCard from './ProductCard.astro';
 
 interface Props {
   categorySlug?: string;
@@ -16,9 +14,6 @@ interface Props {
 const { categorySlug } = Astro.props;
 const subTitle = "Список товаров";
 const noProductsForCategory = "Товары не представлены в данной категории";
-const noProductColors = "Не представлены";
-const titleAddToCart = "В корзину";
-const titleColorOptions = "Цветовые варианты:";
 
 var products = await getCollectionByFilter<Product>(LiveCollectionNames.Products, {
     categorySlug,
@@ -28,89 +23,13 @@ var products = await getCollectionByFilter<Product>(LiveCollectionNames.Products
     return result.value as { id: string, data: Product }[] | undefined;
   }).catch(reason => console.error(reason));
 
-const textHandler = getTextHandler();
-const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`
-console.log("🚀 ~ Products component ~ blob storage url: %s, data: %o", productsBlobStorageUrl, products)
+console.log("🚀 ~ Products component ~ collection:", products)
 ---
 
 <div class="mx-4 mb-2 bg-base-100">
   <h3 class="text-lg font-bold text-center sm:text-left py-2">{subTitle}</h3>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-    {products && products.map(x => {
-      const item = x.data;
-      return (
-        <div class="group card bg-base-300 w-auto shadow-sm px-2 py-2">
-          <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[250px]">
-            <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="250" height="250" class="rounded-xl"/>
-          </figure>
-          <div class="card-body !px-1 !py-1">
-            {/* Product code */}
-            <div class="flex flex-row justify-end">
-              <span class="text-xs italic \">Артикул:</span>
-              <span class="text-xs ml-1 italic">{item.productCode}</span>
-            </div>
-            {/* Ttitle & Box quatnity */}
-            <div>
-              {/* Ttitle */}
-              <div class="min-h-10">
-                <a class="flex flex-row" href=`/catalog/products/${item.slug}`>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-                  </svg>
-                  <span class="card-title text-sm font-bold pl-2" title={item.title}>
-                    {textHandler.trimEnd(item.title, 50)} 
-                  </span>
-                </a>
-              </div>
-              {/* Box quatnity */}
-              <div class="flex flex-row gap-2 justify-around mt-2">
-                <div>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                  </svg>
-                  <span>В упаковке: </span>
-                  <span>{item.quantityInPack}</span>
-                </div>
-                <div>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                  </svg>
-                  <span>Мин. заказ: </span>
-                  <span>{item.minQuantityToBuy}</span>
-                </div>
-              </div>
-            </div>
-            {/* Prices block */}
-            <div class="stats shadow">
-              <div class="stat place-items-center">
-                <div class="stat-title">Розн. цена</div>
-                <div class="stat-value text-base">{item.price} р.</div>              
-              </div>
-              <div class="stat place-items-center">
-                <div class="stat-title">Опт. цена</div>
-                <div class="stat-value text-base">{item.whsPrice1} р.</div>
-              </div>
-            </div>
-            <div class="flex justify-center">
-              <span>{titleColorOptions}</span>
-            </div>
-            {/* Colors */}
-            {item.colors && item.colors?.length > 0 && 
-              <div class="flex items-center justify-center gap-2 my-1">
-                {item.colors && item.colors.map((x, index) => 
-                  <ProductColorBlock productId={item.id} color={x} isDefault={index === 0} />
-                )}
-              </div>
-            }
-            {(!item.colors || item.colors?.length === 0) && <div class="flex items-center justify-center min-h-7">
-                <span>{noProductColors}</span>
-              </div>
-            }
-            <button class="btn btn-active btn-primary">{titleAddToCart}</button>
-          </div>
-        </div>);
-      })
-    }
+    {products && products.map(x => <ProductCard item={x.data} />)}
   </div>
   {(!products || products.length == 0) && <span>{noProductsForCategory}</span>}
 </div>

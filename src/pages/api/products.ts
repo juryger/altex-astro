@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 import type { Product } from "../../core/models/product";
-import type { Pagable } from "../../core/models";
+import { defaultPaging, type Pagable } from "../../core/models/paging";
 import { APISearchParamNames } from "../../core/const";
+import { extractUrlParamValue } from "../../core/helpers/url-utils";
 
 export const prerender = false;
 
@@ -14,7 +15,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       id: 1,
       title: "Замок АПЕКС PD-38 перфо-ключ",
       productCode: "1234",
-      unit: 1, //"шт",
+      unit: 0,
       quantityInPack: 1,
       minQuantityToBuy: 1,
       price: 97.3,
@@ -30,7 +31,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       id: 2,
       title: "Product 2",
       productCode: "201",
-      unit: 1, //"шт",
+      unit: 0, //"шт",
       quantityInPack: 10,
       minQuantityToBuy: 1,
       price: 81.34,
@@ -45,13 +46,13 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       id: 3,
       title: "Product 3",
       productCode: "3101",
-      unit: 1, //"шт",
+      unit: 0, //"шт",
       quantityInPack: 1,
       minQuantityToBuy: 1,
       price: 120.45,
       whsPrice1: 90,
       whsPrice2: 80,
-      categoryId: 1,
+      categoryId: 4,
       categorySlug: "locks",
       colors: [0, 2],
       image: "padoc-drive-board.png",
@@ -59,25 +60,27 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     },
   ];
 
-  var categorySlug: string | null = null;
-  var paging: Pagable = { current: 0, limit: 100 };
-
   const url = URL.parse(request.url);
-  if (url?.search && url.searchParams) {
-    if (url.searchParams.has(APISearchParamNames.Category)) {
-      categorySlug = url.searchParams.get(APISearchParamNames.Category);
-    }
+  const categorySlug = extractUrlParamValue(
+    url,
+    APISearchParamNames.Category,
+    "string"
+  );
 
-    var checkInt = parseInt(
-      url.searchParams.get(APISearchParamNames.Page) ?? "0"
-    );
-    if (!isNaN(checkInt)) paging.current = checkInt;
+  var paging: Pagable = { current: 0, limit: 100 };
+  const pageNumber = extractUrlParamValue(
+    url,
+    APISearchParamNames.Page,
+    "number"
+  );
+  paging.current = pageNumber !== -1 ? pageNumber : defaultPaging.current;
 
-    checkInt = parseInt(
-      url.searchParams.get(APISearchParamNames.PageSize) ?? "100"
-    );
-    if (!isNaN(checkInt)) paging.limit = checkInt;
-  }
+  const pageSize = extractUrlParamValue(
+    url,
+    APISearchParamNames.PageSize,
+    "number"
+  );
+  paging.limit = pageSize !== -1 ? pageSize : defaultPaging.limit;
 
   if (!categorySlug) {
     return new Response(null, {

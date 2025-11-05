@@ -1,7 +1,7 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../helpers/endpoint-error-parser";
 import type { Category } from "../models/category";
-import type { Pagable } from "../models";
+import type { Pagable } from "../models/paging";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 
 export type CategoryCollectionFilter = {

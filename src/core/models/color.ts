@@ -1,17 +1,15 @@
-enum UnitOfMeasurementKind {
-  Piece = 0,
-  Pack = 1,
-  Set = 2,
-  Ton = 3,
-  Kilogram = 4,
-  Gram = 5,
-  Liter = 6,
-  Meter = 7,
-  SqMiter = 8,
-  QbMiter = 9,
+enum ColorKind {
+  // AB: bronze, AC: copper, CP: chromium, PB: brass, SN: mat chromium, WW: white, BB: black
+  AB = 0,
+  AC = 1,
+  CP = 2,
+  PB = 3,
+  SN = 4,
+  WW = 5,
+  BB = 6,
 }
 
-type UnitOfMeasurement = {
+type Color = {
   id: number;
   name: string;
 };
@@ -29,23 +27,4 @@ const colorMetadata: {
   6: { color: "bg-black", border: "border-gray-600", title: "Черный" },
 };
 
-const unitOfMeasurementMetadata: {
-  [key: number]: { title: string };
-} = {
-  0: { title: "шт" },
-  1: { title: "короб." },
-  2: { title: "упак." },
-  3: { title: "т" },
-  4: { title: "кг" },
-  5: { title: "гр" },
-  6: { title: "л" },
-  7: { title: "м" },
-  8: { title: "м2" },
-  9: { title: "м3" },
-};
-
-export {
-  type UnitOfMeasurement,
-  UnitOfMeasurementKind,
-  unitOfMeasurementMetadata,
-};
+export { type Color, ColorKind, colorMetadata };
