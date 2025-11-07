@@ -1,0 +1,23 @@
+---
+export interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<!-- You can open the modal using ID.showModal() method -->
+<!-- <button class="btn" onclick="my_modal_3.showModal()">open modal</button> -->
+
+<dialog id={id} class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">{title}</h3>
+    <main>
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      </form>
+      <slot />
+    </main>
+  </div>
+</dialog>

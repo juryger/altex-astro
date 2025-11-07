@@ -11,22 +11,22 @@ interface Props {
   item: Product,
 }
 const { item } = Astro.props;
-console.log('🚀 ~ ProductCard component ~ item:', item);
+console.log('🚀 ~ ProductDetails component ~ item:', item);
 
 const noProductColors = "Нет информации о цвете";
 const titleAddToCart = "В корзину";
 const titleColorOptions = "Цвет:";
 
 const textHandler = getTextHandler();
-const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
 const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
-console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
+console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 ---
 
-<product-card data-id={item.id}>
+<product-details data-id={item.id}>
   <div class="group card bg-base-300 w-auto shadow-sm px-2 py-2">
-    <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[200px]">
-      <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="200" height="200" class="rounded-xl"/>
+    <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[250px]">
+      <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="250" height="250" class="rounded-xl"/>
     </figure>
     <div class="card-body !px-1 !py-1">
       {/* Product code */}
@@ -99,11 +99,11 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       <button class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
   </div>
-</product-card>
+</product-details>
 
 <script>
 
-  class ProductCard extends HTMLElement {
+  class ProductDetails extends HTMLElement {
     colorHandlers: {
       [key: number]: (e: Event) => any;
     } = {};
@@ -157,5 +157,5 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
     }
   }
 
-  customElements.define('product-card', ProductCard);
+  customElements.define('product-card', ProductDetails);
 </script>

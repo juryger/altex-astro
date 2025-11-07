@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 import { colorMetadata, type ColorKind } from '../core/models/color';
 
 interface Props {
@@ -18,10 +20,10 @@ console.log('~ ColorBlock component ~ color dictionary lookup by ID:%i, %s', col
     class=`size-5 appearance-none rounded-full ${colorItem.color} border-1 ${colorItem.border} checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4`/>
 </product-color-item>
 
-<script>
+<!-- <script>
   class ProductColorItem extends HTMLElement {
     connectCallback() {
     }
   }
   customElements.define('product-color-item', ProductColorItem)
-</script>
+</script> -->
