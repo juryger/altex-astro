@@ -1,0 +1,24 @@
+---
+interface Props {
+  price: number,
+  whsPrice1?: number,
+  whsPrice2?: number,
+  isDetailed?: boolean
+}
+
+const { price, whsPrice1, whsPrice2, isDetailed } = Astro.props;
+
+const priceTitle = isDetailed ? "Розничная цена" : "Розн. цена";
+const whsPriceTitle = isDetailed ? "Оптовая цена" : "Опт. цена";
+---
+
+<div class="stats shadow max-w-xl">
+  <div class="stat place-items-center">
+    <div class="stat-title">{priceTitle}</div>
+    <div class="stat-value text-base">{price} р.</div>              
+  </div>
+  <div class="stat place-items-center">
+    <div class="stat-title">{whsPriceTitle}</div>
+    <div class="stat-value text-base">{whsPrice1} р.</div>
+  </div>
+</div>

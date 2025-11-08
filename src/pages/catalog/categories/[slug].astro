@@ -4,10 +4,12 @@ export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveCollectionNames } from '../../../core/const';
 import { type Category } from '../../../core/models/category';
-import { $activeCategory, setActiveCategory, setActiveParentCategory } from '../../../core/stores/catalog-store';
+import { 
+  $activeCategory, setActiveCategory, setActiveParentCategory 
+} from '../../../core/stores/catalog-store';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
-import Categories from '../../../components/Categories.astro';
-import Products from '../../../components/Products.astro';
+import Categories from '../../../components/catalog/Categories.astro';
+import Products from '../../../components/catalog/Products.astro';
 import CollectionFallback from '../../../components/CollectionFallback.astro';
 
 const { slug } = Astro.params;

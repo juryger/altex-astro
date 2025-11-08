@@ -5,7 +5,7 @@ import { getTextHandler } from '../core/helpers/text-utils';
 
 const { currentPath } = Astro.props;
 const textUtils = getTextHandler();
-const requiredLabelLen = 30;
+const requiredLabelLen = 20;
 const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
 ---
 

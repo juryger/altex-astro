@@ -2,11 +2,11 @@
 export const prerender = false;
 
 import { Image } from 'astro:assets';
-import { getTextHandler } from '../core/helpers/text-utils';
-import { LiveCollectionNames } from '../core/const';
-import { getCollectionByFilter } from '../core/helpers/live-collection-manager';
-import type { Category } from '../core/models/category';
-import { defaultPaging } from '../core/models/paging';
+import { getTextHandler } from '../../core/helpers/text-utils';
+import { LiveCollectionNames } from '../../core/const';
+import { getCollectionByFilter } from '../../core/helpers/live-collection-manager';
+import type { Category } from '../../core/models/category';
+import { defaultPaging } from '../../core/models/paging';
 
 interface Props {
   parentSlug?: string;

@@ -2,11 +2,14 @@
 export const prerender = false;
 
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { $activeProduct, setActiveCategory, setActiveProduct } from "../../../core/stores/catalog-store";
+import { 
+  $activeProduct, setActiveCategory, setActiveProduct 
+} from "../../../core/stores/catalog-store";
 import { LiveCollectionNames } from '../../../core/const';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
 import type { Product } from '../../../core/models/product';
 import type { Category } from '../../../core/models/category';
+import ProductDetails from '../../../components/catalog/ProductDetails.astro';
 
 const { slug } = Astro.params;
 console.log("🚀 ~ Product page ~ slug:", slug);
@@ -14,16 +17,19 @@ console.log("🚀 ~ Product page ~ slug:", slug);
 setActiveProduct(undefined);
 setActiveCategory(undefined);
 
+var product: Product | undefined;
 if (slug) {
-  const product = await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
+  product = await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
     .then(result => {
       if (!result.value) console.log("🚀 ~ Product page ~ product not found by slug:", result.slug);
       if (result.value) setActiveProduct(result.value as Product);
-      return result.value;
+      return result.value as Product;
     })
     .catch(reason => {
       console.error((reason as Error).message);
+      return undefined;
     });
+
   if (!product) return Astro.redirect("/404");
   
   const category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, product.categorySlug)
@@ -41,18 +47,18 @@ if (slug) {
 
 <script>
   // Get product data on client-side
-  // const element = document.getElementById('product-card');
+  // const element = document.getElementById('product-container');
   // console.log("🚀 ~ Product page ~ slug: %s", element?.dataset.slug);  
 </script>
 
-<BaseLayout title=`Каталог - ${$activeProduct?.value?.title}`>
-    <div id="product-card" class="px-4" 
-      data-slug={$activeProduct?.value?.slug} 
-      data-id={$activeProduct?.value?.id} 
-      data-title={$activeProduct?.value?.title} 
-      data-categoryid={$activeProduct?.value?.categoryId} 
-      data-categoryslug={$activeProduct?.value?.categorySlug}
+<BaseLayout title=`Каталог - ${product?.title}`>
+    <div id="product-container" class="px-4" 
+      data-slug={product?.slug} 
+      data-id={product?.id} 
+      data-title={product?.title} 
+      data-categoryid={product?.categoryId} 
+      data-categoryslug={product?.categorySlug}
     >
-      <span>Страница в разработке...</span>
+      {product && <ProductDetails item={product} />}
     </div>
 </BaseLayout>

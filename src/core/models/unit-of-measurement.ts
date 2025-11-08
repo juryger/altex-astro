@@ -16,25 +16,12 @@ type UnitOfMeasurement = {
   name: string;
 };
 
-// TODO: title should not be hardcoded and resolved based lookup in the IndexedDB
-const colorMetadata: {
-  [key: number]: { color: string; border: string; title: string };
-} = {
-  0: { color: "bg-amber-600", border: "border-gray-400", title: "Бронза" },
-  1: { color: "bg-orange-800", border: "border-gray-400", title: "Медь" },
-  2: { color: "bg-slate-200", border: "border-gray-600", title: "Хром" },
-  3: { color: "bg-yellow-400", border: "border-gray-400", title: "Латунь" },
-  4: { color: "bg-gray-300", border: "border-gray-600", title: "Матовый хром" },
-  5: { color: "bg-white", border: "border-gray-400", title: "Белый" },
-  6: { color: "bg-black", border: "border-gray-600", title: "Черный" },
-};
-
 const unitOfMeasurementMetadata: {
   [key: number]: { title: string };
 } = {
   0: { title: "шт" },
-  1: { title: "короб." },
-  2: { title: "упак." },
+  1: { title: "кор." },
+  2: { title: "уп." },
   3: { title: "т" },
   4: { title: "кг" },
   5: { title: "гр" },

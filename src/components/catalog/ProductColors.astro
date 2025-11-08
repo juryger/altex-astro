@@ -1,0 +1,30 @@
+---
+import { colorMetadata, type ColorKind } from '../../core/models/color';
+
+interface Props {
+  productId: number,
+  colors?: number[],
+  isDetailed?: boolean
+}
+
+const { productId, colors, isDetailed } = Astro.props;
+const noProductColors = "Нет информации о цвете";
+---
+
+{colors && colors?.length > 0 && 
+  <div class=`flex items-center gap-3 my-1 ${isDetailed ? "justify-start" : "justify-center"}`>
+    {colors && colors.sort().map((x, index) => {
+      const metadata = colorMetadata[x];
+
+      return <input type="radio" name=`radio-color-${productId}`
+        checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
+        class=`${isDetailed ? "size-7" : "size-5"} appearance-none rounded-full ${metadata.color} border-1 ${metadata.border} checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4`/>
+    }
+    )}
+  </div>
+}
+{(!colors || colors?.length === 0) && 
+  <div class=`flex items-center min-h-8 ${isDetailed ? "justify-start" : "justify-center"}`>
+    <span>{noProductColors}</span>
+  </div>
+}

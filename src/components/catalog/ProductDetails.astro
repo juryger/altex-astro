@@ -1,0 +1,126 @@
+---
+export const prerender = false;
+
+import { Image } from 'astro:assets';
+import { getTextHandler } from '../../core/helpers/text-utils';
+import type { Product } from '../../core/models/product';
+import { unitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
+import ProductColors from './ProductColors.astro';
+import ProductPrice from './ProductPrice.astro';
+import ProductPackInfo from './ProductPackInfo.astro';
+import QuantitySelector from '../QuantitySelector.astro';
+
+interface Props {
+  item: Product,
+}
+const { item } = Astro.props;
+console.log('🚀 ~ ProductDetails component ~ item:', item);
+
+const noProductDescription = "Нет дополнительной информации о товаре";
+const titleAddToCart = "В корзину";
+const titleColorOptions = "Цвет:";
+
+const textHandler = getTextHandler();
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
+const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
+console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
+---
+
+<product-details data-id={item.id}>
+  <div class="grid grid-cols-1 gap-2 sm:gap-6 sm:grid-cols-2 px-2 py-2">
+    <div>
+      {/* Product code */}
+      <div class="flex flex-row justify-start">
+        <span class="text-xs italic \">Артикул:</span>
+        <span class="text-xs italic ml-1">{item.productCode}</span>
+      </div>
+      {/* Gallery */}
+      <figure class="bg-base-100 aspect-square w-full object-cover lg:aspect-auto min-h-[500px]">
+        <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="500" height="500" class="rounded-xl"/>
+      </figure>
+    </div>
+    <div class="px-2 py-2">
+      <h1 class="font-bold text-lg mb-2">{item.title}</h1>
+      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
+      {/* Descirption */}
+      <div class="py-3">
+        {(item.description && item.description.length > 0) 
+          ? <span>{item.description}</span>
+          : <span class="italic">{noProductDescription}</span>
+        }
+      </div>
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurementTitle={unitItem.title} />
+      {/* Selecte color */}
+      <div class="flex justify-start my-5">
+        <span>{titleColorOptions}</span>
+        <span data-selected-color-title class="pl-1"></span>
+      </div>
+      {/* Available colors */}
+      <ProductColors productId={item.id} colors={item.colors} isDetailed={true} />  
+      {/* Quantity for the order */}
+      <QuantitySelector quantity={1} />
+      {/* Add to cart */}
+      <div class="my-5">
+        <button class="btn btn-active btn-primary">{titleAddToCart}</button>
+      </div>
+    </div>
+  </div>
+</product-details>
+
+<script>
+  class ProductDetails extends HTMLElement {
+    colorHandlers: {
+      [key: number]: (e: Event) => any;
+    } = {};
+
+    addToCartHandler: any;
+
+    onColorSelect = (el: Element | null, title: string): any => 
+      (event: Event) => {
+        if (el !== null) el.innerHTML = title;
+      };
+
+    onAddToCart = (productId: number) => {
+      return () => {
+        const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
+        alert(`Command to add Product: ${productId} with color ${selectedColorEl ? (selectedColorEl as HTMLInputElement).value : "NA"} to shopping card.`);
+      }
+    }
+    
+    connectedCallback() {
+      const selectedColorTitleEl = this.querySelector("[data-selected-color-title]");
+
+      const radioboxes = this.querySelectorAll('input[type=radio]');
+      if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
+        selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
+      }
+      
+      radioboxes.forEach((x: Element, index: number) => {
+        this.colorHandlers[index] = this.onColorSelect(selectedColorTitleEl, x.getAttribute('title') ?? "");
+        x.addEventListener('click', this.colorHandlers[index] );
+      });
+
+      var prodId =  parseInt(this.dataset.id ?? '0');
+      if (isNaN(prodId)) { 
+        console.warn(`~ ProductCard ~ provided value of product ID is not a number:`, this.dataset.id);
+        prodId = 0;
+      }
+
+      const button = this.querySelector('button');
+      this.addToCartHandler = this.onAddToCart(prodId);
+      button?.addEventListener('click', this.addToCartHandler);
+    }
+
+    disconnectedCallback() {
+      const radioboxes = this.querySelectorAll('input[type=radio]');
+      radioboxes.forEach((x: Element, index: number) => {
+        this.colorHandlers[index] && x.addEventListener('click', this.colorHandlers[index]);
+      });
+
+      const button = this.querySelector('button');
+      button?.removeEventListener('click', this.addToCartHandler);
+    }
+  }
+
+  customElements.define('product-details', ProductDetails);
+</script>

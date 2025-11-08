@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     id: 1,
     title: "Замок АПЕКС PD-38 перфо-ключ",
     productCode: "1234",
-    unit: 1, //"шт",
+    unit: 0, //"шт",
     quantityInPack: 1,
     minQuantityToBuy: 1,
     price: 97.3,
