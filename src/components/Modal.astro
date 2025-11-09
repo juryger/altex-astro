@@ -1,21 +1,22 @@
 ---
 export interface Props {
-  id: string;
-  title: string;
+  id: string,
+  title: string,
+  outsideClickClose?: boolean,
 }
 
-const { id, title } = Astro.props;
+const { id, title, outsideClickClose } = Astro.props;
 ---
 
 <!-- You can open the modal using ID.showModal() method -->
 <!-- <button class="btn" onclick="my_modal_3.showModal()">open modal</button> -->
 
 <dialog id={id} class="modal">
-  <div class="modal-box">
+  <div class="modal-box w-11/12 max-w-5xl">
     <h3 class="text-lg font-bold">{title}</h3>
     <main>
-      <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+      <form method="dialog" class:list={[{'modal-backdrop': outsideClickClose}]}>
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-400">✕</button>
       </form>
       <slot />
     </main>

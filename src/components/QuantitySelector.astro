@@ -26,8 +26,6 @@ const increaseQauntity = "Увеличить количество";
 </quatnity-selector>
 
 <script>
-import { undefined } from "astro:schema";
-
   class QuantitySelector extends HTMLElement {
     private quantity = 1;
     private inputValueChangeHandler: any;
@@ -37,9 +35,9 @@ import { undefined } from "astro:schema";
     private onInputValueChange = () => {
       return (e: Event) => {
         const checkValue = parseInt((e.target as any)?.value, 10);
-        console.warn(`~ QuantitySelector ~ current value entered:`, checkValue);
+        console.warn("~ QuantitySelector ~ current value entered:", checkValue);
         if (isNaN(checkValue) || checkValue <=1 || checkValue >= 5000) {
-          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000)");
           this.syncUI();
           return;
         }
@@ -50,7 +48,7 @@ import { undefined } from "astro:schema";
     private onIncrement = () => {
       return () => {
         if (this.quantity >= 5000) {
-          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000)");
           return;
         }
         this.quantity += 1;
@@ -61,7 +59,7 @@ import { undefined } from "astro:schema";
     private onDecrement = () => {
       return () => {
         if (this.quantity <= 1) {
-          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000)");
           return;
         }
         this.quantity -= 1;
@@ -70,14 +68,19 @@ import { undefined } from "astro:schema";
     }
 
     private syncUI = () => {
-      var inputQuantity = this.querySelector("input[name='quantity-value']") as HTMLInputElement;
-      inputQuantity.value = this.quantity.toString();
+      var checkElement = this.querySelector("input[name='quantity-value']");
+      if (checkElement === null) {
+        console.error('~ QuantitySelector ~ cannot locate input for quantity');
+        return;
+      }
+
+      (checkElement as HTMLInputElement).value = this.quantity.toString();
     }
 
     connectedCallback() {
       const checkValue =  parseInt(this.dataset.quantity ?? '1', 10);
       if (isNaN(checkValue) || checkValue < 1 || checkValue > 5000 ) { 
-        console.warn(`~ QuantitySelector ~ provided value of quantity is not a number or not in the valid range of values (1 - 5000):`, this.dataset.quantity);
+        console.warn("~ QuantitySelector ~ provided value of quantity is not a number or not in the valid range of values (1 - 5000):", this.dataset.quantity);
         this.quantity = 1;
       } else {
         this.quantity = checkValue;

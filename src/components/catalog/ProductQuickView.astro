@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import type { Product } from '../../core/models/product';
+import Modal from '../Modal.astro';
+import ProductDetails from './ProductDetails.astro';
+
+interface Props {
+  item: Product
+}
+
+const { item } = Astro.props;
+
+const quickViewTitle = "Просмотр";
+const productDialogId = `product_preview_${item.id}`;
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
+---
+
+<div>
+  <figure class="aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto min-h-[200px]">
+    <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="200" height="200" class="rounded-xl" />
+    <div class="absolute start-10 end-10 flex items-start p-4">
+      <button type="button" class="flex flex-row gap-1 cursor-pointer outline-none relative z-10 w-full rounded-md bg-white/75 px-4 py-2 text-sm text-gray-900 opacity-0 group-hover:opacity-100 focus:opacity-100"
+        onclick=`${productDialogId}.showModal()`>
+        <span>{quickViewTitle}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+        </svg>
+      </button>
+    </div>
+  </figure>
+  {/* Quick-view modal window */}
+  <Modal id={productDialogId} title={item.title}} outsideClickClose={true}>
+    <ProductDetails item={item} />
+  </Modal>
+</div>

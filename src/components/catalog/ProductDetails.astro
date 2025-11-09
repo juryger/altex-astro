@@ -8,7 +8,6 @@ import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import QuantitySelector from '../QuantitySelector.astro';
-import ProductAddToCart from './ProductAddToCart.astro';
 
 interface Props {
   item: Product,
@@ -17,7 +16,7 @@ const { item } = Astro.props;
 console.log('🚀 ~ ProductDetails component ~ item:', item);
 
 const noProductDescription = "Нет дополнительной информации о товаре";
-
+const titleAddToCart = "В корзину";
 
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
 const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
@@ -53,14 +52,15 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
-      <ProductAddToCart isDetailed={true} />
+      <div class="flex items-center mt-5">
+        <QuantitySelector quantity={1} />
+        <button name="add-to-cart" class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
+      </div>
     </div>
   </div>
 </product-details>
 
 <script>
-import { undefined } from "astro:schema";
-
   class ProductDetails extends HTMLElement {
     private productId: number | undefined;
     private addToCartHandler: any | undefined;
@@ -68,7 +68,12 @@ import { undefined } from "astro:schema";
     private onAddToCart = (productId: number) => {
       return () => {
         const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
-        alert(`Command to add Product: ${productId} with color ${selectedColorEl ? (selectedColorEl as HTMLInputElement).value : "NA"} to shopping card.`);
+        const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+        
+        var quanityEl = this.querySelector("input[name='quantity-value']");
+        const quantity = quanityEl ? (quanityEl as HTMLInputElement).value : "1";
+
+        alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and count ${quantity} to shopping card.`);
       }
     }
     

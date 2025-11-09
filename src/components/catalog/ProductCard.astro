@@ -8,13 +8,15 @@ import { unitOfMeasurementMetadata } from '../../core/models/unit-of-measurement
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
-import ProductAddToCart from './ProductAddToCart.astro';
+import ProductQuickView from './ProductQuickView.astro';
 
 interface Props {
   item: Product,
 }
 
 const { item } = Astro.props;
+
+const titleAddToCart = "В корзину";
 
 const textHandler = getTextHandler();
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
@@ -24,9 +26,10 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
 
 <product-card data-id={item.id}>
   <div class="group card bg-base-300 w-auto shadow-sm px-2 py-2">
-    <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[200px]">
-      <Image src=`${productsBlobStorageUrl}/${item.image}` alt=`${item.title}` width="200" height="200" class="rounded-xl"/>
-    </figure>
+    {/* Product image with quick preivew */}
+    <div>
+      <ProductQuickView item={item} />
+    </div>
     <div class="card-body !px-1 !py-1">
       {/* Product code */}
       <div class="flex flex-row justify-end">
@@ -51,7 +54,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} />
       {/* Add to Shopping Cart */}
-      <ProductAddToCart isDetailed={false} />
+      <button name="add-to-cart" class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
   </div>
 </product-card>
@@ -64,7 +67,9 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
     onAddToCart = (productId: number) => {
       return () => {
         const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
-        alert(`Command to add Product: ${productId} with color ${selectedColorEl ? (selectedColorEl as HTMLInputElement).value : "NA"} to shopping card.`);
+        const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+        const quntity = "1";
+        alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and count ${quntity} to shopping card.`);
       }
     }
     
