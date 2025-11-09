@@ -8,15 +8,16 @@ const decreaseQauntity = "Уменьшить количество";
 const increaseQauntity = "Увеличить количество";
 ---
 
-<quatnity-selector>
-  <div class="inline-flex mt-5">
-    <button aria-label={decreaseQauntity} class="border-0">
+<quatnity-selector data-quantity={quantity}>
+  <div class="flex min-w-24 border-2 border-gray-400 rounded">
+    <button aria-label={decreaseQauntity} name="decrement" class="outline-none cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" focusable="false" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
       </svg>
     </button>
-    <input id="quantity-value" type="text" inputmode="numeric" name="quantity" size="2" value={quantity ?? 0} min="1" autocomplete="off" class="border-0" />
-    <button aria-label={increaseQauntity} class="border-0">
+    <input name="quantity-value" type="number" inputmode="numeric" size="3" value={quantity ?? 1} min="1" max="5000" autocomplete="off" 
+      class="min-w-10 outline-none text-center" />
+    <button aria-label={increaseQauntity} name="increment" class="outline-none cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -25,11 +26,85 @@ const increaseQauntity = "Увеличить количество";
 </quatnity-selector>
 
 <script>
+import { undefined } from "astro:schema";
+
   class QuantitySelector extends HTMLElement {
+    private quantity = 1;
+    private inputValueChangeHandler: any;
+    private incrementHandler: any;
+    private decrementHandler: any;
+
+    private onInputValueChange = () => {
+      return (e: Event) => {
+        const checkValue = parseInt((e.target as any)?.value, 10);
+        console.warn(`~ QuantitySelector ~ current value entered:`, checkValue);
+        if (isNaN(checkValue) || checkValue <=1 || checkValue >= 5000) {
+          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          this.syncUI();
+          return;
+        }
+        this.quantity = checkValue;
+      }
+    }
+
+    private onIncrement = () => {
+      return () => {
+        if (this.quantity >= 5000) {
+          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          return;
+        }
+        this.quantity += 1;
+        this.syncUI();
+      }
+    }
+
+    private onDecrement = () => {
+      return () => {
+        if (this.quantity <= 1) {
+          console.warn(`~ QuantitySelector ~ current value is not in the valid range (1 - 5000)`);
+          return;
+        }
+        this.quantity -= 1;
+        this.syncUI()
+      }
+    }
+
+    private syncUI = () => {
+      var inputQuantity = this.querySelector("input[name='quantity-value']") as HTMLInputElement;
+      inputQuantity.value = this.quantity.toString();
+    }
+
     connectedCallback() {
+      const checkValue =  parseInt(this.dataset.quantity ?? '1', 10);
+      if (isNaN(checkValue) || checkValue < 1 || checkValue > 5000 ) { 
+        console.warn(`~ QuantitySelector ~ provided value of quantity is not a number or not in the valid range of values (1 - 5000):`, this.dataset.quantity);
+        this.quantity = 1;
+      } else {
+        this.quantity = checkValue;
+      }
+
+      this.inputValueChangeHandler = this.onInputValueChange();
+      const inputQuantity = this.querySelector("input[name='quantity-value']");
+      inputQuantity?.addEventListener('change', this.inputValueChangeHandler);
+
+      this.incrementHandler = this.onIncrement();
+      const btnIncrement = this.querySelector("button[name='increment']");
+      btnIncrement?.addEventListener('click', this.incrementHandler);
+
+      this.decrementHandler = this.onDecrement();
+      const btnDecrement = this.querySelector("button[name='decrement']");
+      btnDecrement?.addEventListener('click', this.decrementHandler);
     }
 
     disconnectedCallback() {
+      const inputQuantity = this.querySelector("input[name='quantity-value']");
+      inputQuantity?.removeEventListener('change', this.inputValueChangeHandler);
+
+      const btnIcrement = this.querySelector("button[name='increment']");
+      btnIcrement?.removeEventListener('click', this.incrementHandler);
+
+      const btnDerement = this.querySelector("button[name='decrement']");
+      btnDerement?.removeEventListener('click', this.decrementHandler);
     }
   }
 

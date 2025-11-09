@@ -8,23 +8,79 @@ interface Props {
 }
 
 const { productId, colors, isDetailed } = Astro.props;
+const titleColorOptions = "Цвет:";
 const noProductColors = "Нет информации о цвете";
 ---
 
-{colors && colors?.length > 0 && 
-  <div class=`flex items-center gap-3 my-1 ${isDetailed ? "justify-start" : "justify-center"}`>
-    {colors && colors.sort().map((x, index) => {
-      const metadata = colorMetadata[x];
+<product-colors> 
+  <div class:list={['flex', {'justify-start': isDetailed}, {'my-4': isDetailed}, {'justify-center': !isDetailed}]}>
+    <span>{titleColorOptions}</span>
+    <span data-selected-color class="pl-1"></span>
+  </div>
 
-      return <input type="radio" name=`radio-color-${productId}`
-        checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
-        class=`${isDetailed ? "size-7" : "size-5"} appearance-none rounded-full ${metadata.color} border-1 ${metadata.border} checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4`/>
+  {colors && colors.length > 0 && 
+    <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
+      {colors && colors.sort().map((x, index) => {
+        const metadata = colorMetadata[x];
+        return <input type="radio" name=`radio-color-${productId}`
+          checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
+          class:list={[
+            'appearance-none',
+            'rounded-full', 
+            metadata.color, 
+            'border-1', 
+            metadata.border, 
+            'checked:outline-2',
+            'checked:outline-offset-2', 
+            'checked:outline-gray-400', 
+            'focus-visible:outline-4', 
+            'focus-visible:outline-offset-4',
+            {'size-7': isDetailed}, 
+            {'size-5' : !isDetailed}, 
+          ]}
+        />;
+      })}
+    </div>
+  }
+  {(!colors || colors?.length === 0) && 
+    <div class:list={['flex', 'items-center', 'min-h-7', { 'justify-start': isDetailed }, {'justify-center': !isDetailed }]}>
+      <span class="italic">{noProductColors}</span>
+    </div>
+  }
+</product-colors>
+
+<script>
+  class ProductColors extends HTMLElement {
+    colorHandlers: {
+      [key: number]: (e: Event) => any;
+    } = {};
+
+    onColorSelect = (el: Element | null, title: string): any => 
+      (event: Event) => {
+        if (el !== null) el.innerHTML = title;
+      };
+    
+    connectedCallback() {
+      const selectedColorTitleEl = this.querySelector("[data-selected-color]");
+
+      const radioboxes = this.querySelectorAll('input[type=radio]');
+      if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
+        selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
+      }
+      
+      radioboxes.forEach((x: Element, index: number) => {
+        this.colorHandlers[index] = this.onColorSelect(selectedColorTitleEl, x.getAttribute('title') ?? "");
+        x.addEventListener('click', this.colorHandlers[index] );
+      });
     }
-    )}
-  </div>
-}
-{(!colors || colors?.length === 0) && 
-  <div class=`flex items-center min-h-8 ${isDetailed ? "justify-start" : "justify-center"}`>
-    <span>{noProductColors}</span>
-  </div>
-}
+
+    disconnectedCallback() {
+       const radioboxes = this.querySelectorAll('input[type=radio]');
+      radioboxes.forEach((x: Element, index: number) => {
+        this.colorHandlers[index] && x.addEventListener('click', this.colorHandlers[index]);
+      });
+    }
+  }
+
+  customElements.define('product-colors', ProductColors);
+</script>

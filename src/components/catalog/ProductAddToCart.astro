@@ -1,0 +1,18 @@
+---
+import QuantitySelector from '../QuantitySelector.astro';
+
+interface Props {
+  isDetailed?: boolean,
+}
+
+const { isDetailed } = Astro.props;
+const titleAddToCart = "В корзину";
+---
+
+{isDetailed && 
+  <div class="flex items-center mt-5">
+    <QuantitySelector quantity={1} />
+    <button name="add-to-cart" class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
+  </div>
+}
+{!isDetailed && <button name="add-to-cart" class="btn btn-active btn-primary">{titleAddToCart}</button>}
