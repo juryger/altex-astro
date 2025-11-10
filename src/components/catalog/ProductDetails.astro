@@ -3,7 +3,7 @@ export const prerender = false;
 
 import { Image } from 'astro:assets';
 import type { Product } from '../../core/models/product';
-import { unitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
+import { UnitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -19,7 +19,7 @@ const noProductDescription = "Нет дополнительной информа
 const titleAddToCart = "В корзину";
 
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
-const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
+const unitItem = item.unit ? UnitOfMeasurementMetadata[item.unit] : UnitOfMeasurementMetadata[0];
 console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 ---
 
@@ -38,8 +38,6 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
     </div>
     <div class="px-2 py-2">
       <h1 class="font-bold text-lg mb-2">{item.title}</h1>
-      {/* Prices */}
-      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
       {/* Descirption */}
       <div class="py-3">
         {(item.description && item.description.length > 0) 
@@ -47,6 +45,8 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
           : <span class="italic">{noProductDescription}</span>
         }
       </div>
+      {/* Prices */}
+      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
       {/* Packaging info */}
       <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurementTitle={unitItem.title} />
       {/* Available colors */}

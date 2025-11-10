@@ -15,7 +15,7 @@ type Color = {
 };
 
 // TODO: title should not be hardcoded and resolved based lookup in the IndexedDB
-const colorMetadata: {
+const ColorMetadata: {
   [key: number]: { color: string; border: string; title: string };
 } = {
   0: { color: "bg-amber-600", border: "border-gray-400", title: "Бронза" },
@@ -27,4 +27,4 @@ const colorMetadata: {
   6: { color: "bg-black", border: "border-gray-600", title: "Черный" },
 };
 
-export { type Color, ColorKind, colorMetadata };
+export { type Color, ColorKind, ColorMetadata };

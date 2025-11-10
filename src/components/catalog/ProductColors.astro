@@ -1,5 +1,5 @@
 ---
-import { colorMetadata, type ColorKind } from '../../core/models/color';
+import { ColorMetadata } from '../../core/models/color';
 
 interface Props {
   productId: number,
@@ -21,7 +21,7 @@ const noProductColors = "Нет информации о цвете";
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
       {colors && colors.sort().map((x, index) => {
-        const metadata = colorMetadata[x];
+        const metadata = ColorMetadata[x];
         return <input type="radio" name=`radio-color-${productId}`
           checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
           class:list={[

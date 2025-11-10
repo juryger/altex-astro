@@ -1,10 +1,9 @@
 ---
 export const prerender = false;
 
-import { Image } from 'astro:assets';
 import { getTextHandler } from '../../core/helpers/text-utils';
 import type { Product } from '../../core/models/product';
-import { unitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
+import { UnitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -20,7 +19,7 @@ const titleAddToCart = "В корзину";
 
 const textHandler = getTextHandler();
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
-const unitItem = item.unit ? unitOfMeasurementMetadata[item.unit] : unitOfMeasurementMetadata[0];
+const unitItem = item.unit ? UnitOfMeasurementMetadata[item.unit] : UnitOfMeasurementMetadata[0];
 console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 ---
 
