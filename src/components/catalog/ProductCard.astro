@@ -53,7 +53,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} />
       {/* Add to Shopping Cart */}
-      <button name="add-to-cart" class="btn btn-active btn-primary">{titleAddToCart}</button>
+      <button name="pc-add-to-cart" class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
   </div>
 </product-card>
@@ -63,13 +63,13 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
     private productId: number | undefined;
     private addToCartHandler: any | undefined;
 
-    onAddToCart = (productId: number) => {
-      return () => {
-        const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
+    private onAddToCart = (productId: number) => {
+      return (event: Event) => {
+        const selectedColorEl =  this.querySelector('input[type=radio]:checked');
         const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
         const quntity = "1";
         alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and count ${quntity} to shopping card.`);
-      }
+      };
     }
     
     connectedCallback() {
@@ -82,13 +82,15 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       this.productId = checkValue;
       this.addToCartHandler = this.onAddToCart(this.productId);
 
-      const button = this.querySelector("button[name='add-to-cart']");
+      const button = this.querySelector("button[name='pc-add-to-cart']");
+      console.assert(button !== null, "Cannot find button element with name: %s", "pc-add-to-cart");
       button?.addEventListener('click', this.addToCartHandler);
     }
 
     disconnectedCallback() {
       if (this.addToCartHandler !== undefined) {
-        const button = this.querySelector("button[name='add-to-cart']");
+        const button = this.querySelector("button[name='pc-add-to-cart']");
+        console.assert(button !== null, "Cannot find button element with name: %s", "pc-add-to-cart");
         button?.removeEventListener('click', this.addToCartHandler);
       }
     }

@@ -55,13 +55,15 @@ const noProductColors = "Нет информации о цвете";
       [key: number]: (e: Event) => any;
     } = {};
 
-    onColorSelect = (el: Element | null, title: string): any => 
-      (event: Event) => {
+    onColorSelect = (el: Element | null, title: string): any => {
+      return (event: Event) => {
         if (el !== null) el.innerHTML = title;
       };
+    }
     
     connectedCallback() {
       const selectedColorTitleEl = this.querySelector("[data-selected-color]");
+      console.assert(selectedColorTitleEl !== null, "Cannot find button element with data attribute: %s", "selected-color");
 
       const radioboxes = this.querySelectorAll('input[type=radio]');
       if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
@@ -70,7 +72,7 @@ const noProductColors = "Нет информации о цвете";
       
       radioboxes.forEach((x: Element, index: number) => {
         this.colorHandlers[index] = this.onColorSelect(selectedColorTitleEl, x.getAttribute('title') ?? "");
-        x.addEventListener('click', this.colorHandlers[index] );
+        x.addEventListener('click', this.colorHandlers[index]);
       });
     }
 

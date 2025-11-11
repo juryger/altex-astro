@@ -54,7 +54,7 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
       {/* Add to Shopping Cart */}
       <div class="flex items-center mt-5">
         <QuantitySelector quantity={1} />
-        <button name="add-to-cart" class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
+        <button name="pd-add-to-cart" class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
       </div>
     </div>
   </div>
@@ -67,9 +67,14 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
 
     private onAddToCart = (productId: number) => {
       return () => {
-        const selectedColorEl =  this.querySelector('input[type="radio"]:checked');
-        const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+        const selectedColorEl =  this.querySelector('input[type=radio]:checked');
+        var selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
         
+        const radioboxes = this.querySelectorAll('input[type=radio]')
+        if (!selectedColor && radioboxes.length > 0) {
+          selectedColor = (radioboxes[0] as HTMLInputElement).value;
+        }
+
         var quanityEl = this.querySelector("input[name='quantity-value']");
         const quantity = quanityEl ? (quanityEl as HTMLInputElement).value : "1";
 
@@ -78,6 +83,7 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
     }
     
     connectedCallback() {
+      console.log('~ ProductDetails ~ TP1 constructor')
       const checkValue =  parseInt(this.dataset.id ?? '0', 10);
       if (isNaN(checkValue)) { 
         console.warn(`~ ProductCard ~ provided value of product ID is not a number:`, this.dataset.id);
@@ -87,13 +93,15 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
       this.productId = checkValue;
       this.addToCartHandler = this.onAddToCart(this.productId);
 
-      const button = this.querySelector("button[name='add-to-cart']");
+      const button = this.querySelector("button[name='pd-add-to-cart']");
+      console.assert(button !== null, "Cannot find button element with name: %s", "pd-add-to-cart");
       button?.addEventListener('click', this.addToCartHandler);
     }
 
     disconnectedCallback() {
       if (this.addToCartHandler !== undefined) {
-        const button = this.querySelector("button[name='add-to-cart']");
+        const button = this.querySelector("button[name='pd-add-to-cart']");
+        console.assert(button !== null, "Cannot find button element with name: %s", "pd-add-to-cart");
         button?.removeEventListener('click', this.addToCartHandler);
       }
     }
