@@ -16,6 +16,7 @@ interface Props {
 const { item } = Astro.props;
 
 const titleAddToCart = "В корзину";
+const btnAddToCardName = "pc-add-to-card";
 
 const textHandler = getTextHandler();
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
@@ -23,7 +24,7 @@ const unitItem = item.unit ? UnitOfMeasurementMetadata[item.unit] : UnitOfMeasur
 console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 ---
 
-<product-card data-id={item.id}>
+<product-card data-id={item.id} data-btn_add_to_cart={btnAddToCardName}>
   <div class="group card bg-base-300 w-auto shadow-sm px-2 py-2">
     {/* Product image with quick preivew */}
     <div>
@@ -53,7 +54,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} />
       {/* Add to Shopping Cart */}
-      <button name="pc-add-to-cart" class="btn btn-active btn-primary">{titleAddToCart}</button>
+      <button name={btnAddToCardName} class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
   </div>
 </product-card>
@@ -68,7 +69,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
         const selectedColorEl =  this.querySelector('input[type=radio]:checked');
         const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
         const quntity = "1";
-        alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and count ${quntity} to shopping card.`);
+        alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and quantity ${quntity} to shopping cart.`);
       };
     }
     
@@ -82,15 +83,16 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
       this.productId = checkValue;
       this.addToCartHandler = this.onAddToCart(this.productId);
 
-      const button = this.querySelector("button[name='pc-add-to-cart']");
-      console.assert(button !== null, "Cannot find button element with name: %s", "pc-add-to-cart");
+      const btnAddToCardName = this.dataset.btn_add_to_cart;
+      const button = this.querySelector(`button[name='${btnAddToCardName}']`);
+      console.assert(button !== null, "~ ProductCard ~ cannot find button element with name: %s", btnAddToCardName);
       button?.addEventListener('click', this.addToCartHandler);
     }
 
     disconnectedCallback() {
       if (this.addToCartHandler !== undefined) {
-        const button = this.querySelector("button[name='pc-add-to-cart']");
-        console.assert(button !== null, "Cannot find button element with name: %s", "pc-add-to-cart");
+        const btnAddToCardName = this.dataset.btn_add_to_cart;
+        const button = this.querySelector(`button[name='${btnAddToCardName}']`);
         button?.removeEventListener('click', this.addToCartHandler);
       }
     }

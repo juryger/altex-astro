@@ -1,23 +1,26 @@
 ---
 interface Props {
+  inputControlName: string,
   quantity?: number,
 }
 
-const { quantity } = Astro.props;
+const { inputControlName, quantity } = Astro.props;
+const btnIncrementName = "qs-increment";
+const btnDecrementName = "qs-decrement";
 const decreaseQauntity = "Уменьшить количество";
 const increaseQauntity = "Увеличить количество";
 ---
 
-<quatnity-selector data-quantity={quantity}>
+<quatnity-selector data-input_name={inputControlName} data-btn_increment={btnIncrementName} data-btn_decrement={btnDecrementName} data-quantity={quantity}>
   <div class="flex min-w-24 border-2 border-gray-400 rounded">
-    <button aria-label={decreaseQauntity} name="decrement" class="outline-none cursor-pointer">
+    <button name={btnDecrementName} aria-label={decreaseQauntity} class="outline-none cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" focusable="false" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
       </svg>
     </button>
-    <input name="quantity-value" type="number" inputmode="numeric" size="3" value={quantity ?? 1} min="1" max="5000" autocomplete="off" 
+    <input name={inputControlName} type="number" inputmode="numeric" size="3" value={quantity ?? 1} min="1" max="5000" autocomplete="off" 
       class="min-w-10 outline-none text-center" />
-    <button aria-label={increaseQauntity} name="increment" class="outline-none cursor-pointer">
+    <button name={btnIncrementName} aria-label={increaseQauntity} class="outline-none cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -48,7 +51,7 @@ const increaseQauntity = "Увеличить количество";
     private onIncrement = () => {
       return () => {
         if (this.quantity >= 5000) {
-          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000)");
+          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000):", this.quantity);
           return;
         }
         this.quantity += 1;
@@ -59,7 +62,7 @@ const increaseQauntity = "Увеличить количество";
     private onDecrement = () => {
       return () => {
         if (this.quantity <= 1) {
-          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000)");
+          console.warn("~ QuantitySelector ~ current value is not in the valid range (1 - 5000):", this.quantity);
           return;
         }
         this.quantity -= 1;
@@ -68,7 +71,8 @@ const increaseQauntity = "Увеличить количество";
     }
 
     private syncUI = () => {
-      var checkElement = this.querySelector("input[name='quantity-value']");
+      const inputQuantityName = this.dataset.input_name
+      var checkElement = this.querySelector(`input[name='${inputQuantityName}']`);
       if (checkElement === null) {
         console.error('~ QuantitySelector ~ cannot locate input for quantity');
         return;
@@ -86,27 +90,36 @@ const increaseQauntity = "Увеличить количество";
         this.quantity = checkValue;
       }
 
+      const inputQuantityName = this.dataset.input_name;
+      const inputQuantity = this.querySelector(`input[name='${inputQuantityName}']`); 
+      console.assert(inputQuantity !== null, "~ QuantitySelector ~ cannot find input with name: %s", inputQuantityName);      
       this.inputValueChangeHandler = this.onInputValueChange();
-      const inputQuantity = this.querySelector("input[name='quantity-value']");
       inputQuantity?.addEventListener('change', this.inputValueChangeHandler);
 
+      const btnIncrementName = this.dataset.btn_increment;
+      const btnIncrement = this.querySelector(`button[name='${btnIncrementName}']`);
+      console.assert(btnIncrement !== null, "~ QuantitySelector ~ cannot find button with name: %s", btnIncrementName);
       this.incrementHandler = this.onIncrement();
-      const btnIncrement = this.querySelector("button[name='increment']");
       btnIncrement?.addEventListener('click', this.incrementHandler);
 
+      const btnDecrementName = this.dataset.btn_decrement;
+      const btnDecrement = this.querySelector(`button[name='${btnDecrementName}']`);
+      console.assert(btnIncrement !== null, "~ QuantitySelector ~ cannot find button with name: %s", btnDecrementName);
       this.decrementHandler = this.onDecrement();
-      const btnDecrement = this.querySelector("button[name='decrement']");
       btnDecrement?.addEventListener('click', this.decrementHandler);
     }
 
     disconnectedCallback() {
-      const inputQuantity = this.querySelector("input[name='quantity-value']");
+      const inputQuantityName = this.dataset.input_name;
+      const inputQuantity = this.querySelector(`input[name='${inputQuantityName}']`);
       inputQuantity?.removeEventListener('change', this.inputValueChangeHandler);
 
-      const btnIcrement = this.querySelector("button[name='increment']");
+      const btnIncrementName = this.dataset.btn_increment;
+      const btnIcrement = this.querySelector(`button[name='${btnIncrementName}']`);
       btnIcrement?.removeEventListener('click', this.incrementHandler);
 
-      const btnDerement = this.querySelector("button[name='decrement']");
+      const btnDecrementName = this.dataset.btn_decrement;
+      const btnDerement = this.querySelector(`button[name='${btnDecrementName}']`);
       btnDerement?.removeEventListener('click', this.decrementHandler);
     }
   }
