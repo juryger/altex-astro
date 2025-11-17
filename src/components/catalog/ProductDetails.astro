@@ -3,7 +3,7 @@ export const prerender = false;
 
 import { Image } from 'astro:assets';
 import type { Product } from '../../core/models/product';
-import { UnitOfMeasurementMetadata } from '../../core/models/unit-of-measurement';
+import { UnitOfMeasurementDictionary } from '../../core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -13,19 +13,24 @@ interface Props {
   item: Product,
 }
 const { item } = Astro.props;
-console.log('🚀 ~ ProductDetails component ~ item:', item);
+//console.log('🚀 ~ ProductDetails component ~ item:', item);
+
+const btnAddToCartName = "pd-add-to-cart";
+const inputQuantityName = "pd-quantity-value"
+const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
+const unitItem = item.unit ? UnitOfMeasurementDictionary[item.unit] : UnitOfMeasurementDictionary[0];
+console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 
 const noProductDescription = "Нет дополнительной информации о товаре";
 const titleAddToCart = "В корзину";
-const btnAddToCartName = "pd-add-to-cart";
-const inputQuantityName = "pd-quantity-value"
-
-const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}`;
-const unitItem = item.unit ? UnitOfMeasurementMetadata[item.unit] : UnitOfMeasurementMetadata[0];
-console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
 ---
 
-<product-details data-id={item.id} data-btn_add_to_card={btnAddToCartName} data-input_quatnity={inputQuantityName}>
+<product-details 
+  data-btn_add_to_card={btnAddToCartName} data-input_quatnity={inputQuantityName}
+  data-id={item.id} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
+  data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
+  data-image={item.image} data-slug={item.slug}
+>
   <div class="grid grid-cols-1 gap-2 sm:gap-6 sm:grid-cols-2 px-2 py-2">
     <div>
       {/* Product code */}
@@ -63,12 +68,23 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
 </product-details>
 
 <script>
+  import type { Product } from "../../core/models/product";
+  import { parseProduct } from "../../core/helpers/data-attributes-parser";
+  import type { CartItem } from "../../core/models/cart";
+import { addAlert } from "../../core/stores/alert-store";
+import { AlertKind } from "../../core/models/alert";
+
   class ProductDetails extends HTMLElement {
-    private productId: number | undefined;
+    private value: Product | undefined;
     private addToCartHandler: any | undefined;
 
-    private onAddToCart = (productId: number) => {
-      return () => {
+    private onAddToCart = (): any => {
+      return (e: Event): void => {
+        if (!this.value) {
+          console.warn("~ ProductDetails ~ cannot add product to the cart as it values was not parsed properly.")
+          return;
+        }
+
         const selectedColorEl =  this.querySelector('input[type=radio]:checked');
         var selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
         
@@ -79,34 +95,46 @@ console.log("🚀 ~ ProductDetails component ~ blob storage url %s, unitOfMeasur
 
         const inputQuantityName = this.dataset.input_quatnity;
         var quanityEl = this.querySelector(`input[name='${inputQuantityName}']`);
+        console.assert(quanityEl !== null, "~ ProductDetails ~ cannot find input element with name: %s", inputQuantityName);
+        
         const quantity = quanityEl ? (quanityEl as HTMLInputElement).value : "1";
+        addAlert({ kind: AlertKind.Info, message: `Product "${this.value.title}" (${quantity} pcs) with color ${selectedColor ?? "NA"} added to the cart.`});
 
-        alert(`Command to add product #${productId} with color ${selectedColor ?? "NA"} and quantity ${quantity} to shopping cart.`);
+        // addCartItem({
+        //   id: this.value.id,
+        //   title: this.value.title,
+        //   quantity: parseInt(quantity),
+        //   price: this.value.price,
+        //   whsPrice1: this.value.whsPrice1,
+        //   whsPrice2: this.value.whsPrice2,
+        //   color: selectedColor !== null ? parseInt(selectedColor) : undefined,
+        //   availableColors: this.value.colors,
+        //   image: this.value.image,
+        //   slug: this.value.slug,
+        // } as CartItem);
       }
     }
     
     connectedCallback() {
-      const checkValue =  parseInt(this.dataset.id ?? '0', 10);
-      if (isNaN(checkValue)) { 
-        console.error(`~ ProductDetail ~ provided value of product ID is not a number:`, this.dataset.id);
+      this.value = parseProduct(this.dataset);
+      if (!this.value) {
+        console.warn(`~ ProductDetails ~ provided values of product via data attributes are not valid or complete.`);
         return;
       }
       
-      this.productId = checkValue;
-      this.addToCartHandler = this.onAddToCart(this.productId);
+      this.addToCartHandler = this.onAddToCart();
 
       const btnAddToCardName = this.dataset.btn_add_to_card;
       const button = this.querySelector(`button[name='${btnAddToCardName}']`);
-      console.assert(button !== null, "~ ProductDetail ~ cannot find button element with name: %s", btnAddToCardName);
+      console.assert(button !== null, "~ ProductDetails ~ cannot find button element with name: %s", btnAddToCardName);
+
       button?.addEventListener('click', this.addToCartHandler);
     }
 
     disconnectedCallback() {
-      if (this.addToCartHandler !== undefined) {
-        const btnAddToCardName = this.dataset.btn_add_to_card;
-        const button = this.querySelector(`button[name='${btnAddToCardName}']`);
-        button?.removeEventListener('click', this.addToCartHandler);
-      }
+      const btnAddToCardName = this.dataset.btn_add_to_card;
+      const button = this.querySelector(`button[name='${btnAddToCardName}']`);
+      this.addToCartHandler && button && button.removeEventListener('click', this.addToCartHandler);
     }
   }
   customElements.define('product-details', ProductDetails);

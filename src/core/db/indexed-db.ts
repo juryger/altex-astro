@@ -18,4 +18,4 @@ db.version(1).stores({
   productColors: "++id, name",
 });
 
-export { db };
+export { db as clientDb };

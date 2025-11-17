@@ -16,7 +16,7 @@ type UnitOfMeasurement = {
   name: string;
 };
 
-const UnitOfMeasurementMetadata: {
+const UnitOfMeasurementDictionary: {
   [key: number]: { title: string };
 } = {
   0: { title: "шт" },
@@ -34,5 +34,5 @@ const UnitOfMeasurementMetadata: {
 export {
   type UnitOfMeasurement,
   UnitOfMeasurementKind,
-  UnitOfMeasurementMetadata,
+  UnitOfMeasurementDictionary,
 };

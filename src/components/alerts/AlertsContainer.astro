@@ -1,0 +1,41 @@
+---
+import { AlertKind } from "../../core/models/alert";
+---
+
+<alerts-container data-alerts-container class="toast toast-top toast-center top-20 z-10 m-2 min-w-lg" >
+</alerts-container>
+
+<script>
+  import { createAlert } from "../../core/helpers/alerts-manager";
+  import { $alerts } from "../../core/stores/alert-store";
+  
+  class AlertsContainer extends HTMLElement {
+    private storeUnsubscribe?: () => void;
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.storeUnsubscribe = $alerts.listen((value) => {
+        value.forEach((x, index) => {
+          const key = "alert-".concat(index.toString());
+          const divAlert = document.createElement("div");
+          this.appendChild(divAlert);
+          divAlert.outerHTML = createAlert(key, x.kind, x.message);
+
+          setTimeout(() => {
+            const alertEl = this.querySelector("#".concat(key));
+            alertEl?.remove();
+          }, 3000)
+        });
+      });
+    }
+
+    disconnectedCallback() {
+      this.storeUnsubscribe && this.storeUnsubscribe();
+    }
+  }
+
+  customElements.define('alerts-container', AlertsContainer);
+</script>

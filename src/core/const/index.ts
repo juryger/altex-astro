@@ -11,7 +11,7 @@ enum APIEndpointNames {
 enum APISearchParamNames {
   Category = "category",
   Parent = "parent",
-  IgnoreParent = "ingoreParent",
+  IgnoreParent = "ignoreParent",
   Page = "page",
   PageSize = "pageSize",
 }

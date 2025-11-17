@@ -23,7 +23,7 @@ var products = await getCollectionByFilter<Product>(LiveCollectionNames.Products
     return result.value as { id: string, data: Product }[] | undefined;
   }).catch(reason => console.error(reason));
 
-console.log("🚀 ~ Products component ~ collection:", products)
+//console.log("🚀 ~ Products component ~ collection:", products)
 ---
 
 <div class="mx-4 mb-2 bg-base-100">

@@ -3,7 +3,10 @@ import { NotFoundError, ServerError } from "./core/errors";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   try {
-    context.session?.set("lastVisit", new Date());
+    // if (context.session) {
+    //   console.log("🚀 ~ middlewear ~ operates on session: %o", context.session);
+    //   context.session.set("lastVisit", new Date());
+    // }
     return await next();
   } catch (e) {
     console.log("🚀 ~ middlewear ~ exception occured:", e);

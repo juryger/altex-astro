@@ -51,7 +51,7 @@ export function createProductsLoader(config: {
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
+        //console.log("🚀 ~ createProductsLoader ~ collection ~ data:", data);
 
         return {
           entries: data.map((x: Product) => ({ id: x.slug, data: x })),
@@ -82,7 +82,7 @@ export function createProductsLoader(config: {
 
         const data = await response.json();
         const value = data as Product;
-        console.log("🚀 ~ createProductsLoader ~ entry ~ value:", value);
+        //console.log("🚀 ~ createProductsLoader ~ entry ~ value:", value);
 
         return value !== undefined
           ? { id: value.slug, data: value }

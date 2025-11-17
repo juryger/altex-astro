@@ -3,10 +3,13 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import AlertsContainer from '../components/alerts/AlertsContainer.astro';
 
 const { title } = Astro.props;
 const currentPath = Astro.url.pathname;
 const MainTitle = `АЛТЕХ - ${title}`;
+
+console.log("🚀 ~ BaseLayout ~ current path:", currentPath);
 ---
 
 <script>
@@ -80,7 +83,14 @@ const MainTitle = `АЛТЕХ - ${title}`;
 	</head>
 	<body>
 		<Header />
-		<Breadcrumbs currentPath={currentPath} />
+		<AlertsContainer />
+		{currentPath !== "/" && 
+			<Breadcrumbs currentPath={currentPath} server:defer>
+				<div slot="fallback">
+					<div class="skeleton h-5 w-28"></div>
+				</div>
+			</Breadcrumbs>
+		}
 		<div class="mx-auto max-w-7xl px-4 py-3">
 			<slot />
 		</div>

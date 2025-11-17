@@ -1,14 +1,15 @@
+import { CartDictionary, CartItem } from "./core/models/cart";
 declare namespace App {
   interface SessionData {
-    user: {
-      id?: number;
-      name?: string;
-    };
-    lastVisit: Date;
-    cart: {
+    user?: {
       id: number;
-      productId: number;
-      count: number;
-    }[];
+      name: string;
+    };
+    catalog: {
+      activeProductSlug?: string;
+      activeCategorySlug?: string;
+      activeParentCategorySlug?: string;
+    };
+    cart: CartDictionary;
   }
 }

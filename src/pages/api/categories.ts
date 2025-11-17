@@ -7,7 +7,7 @@ import { extractUrlParamValue } from "../../core/helpers/url-utils";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  console.log("🚀 ~ GET ~ request:", URL.parse(request.url));
+  //console.log("🚀 ~ GET ~ request:", URL.parse(request.url));
 
   // TODO: query database for Categories
   const allItems: Category[] = [

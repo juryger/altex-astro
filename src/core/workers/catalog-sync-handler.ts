@@ -1,4 +1,4 @@
-import { db } from "../db/client-db";
+import { clientDb } from "../db/indexed-db";
 import type { CategoryCache, Category } from "../models/category";
 
 type CatalogSyncHandler = {
@@ -46,7 +46,7 @@ export const getCatalogSyncHandler = (config: {
           } as CategoryCache)
       );
 
-      return db.categories.bulkAdd(dataCache).then((value) => {
+      return clientDb.categories.bulkAdd(dataCache).then((value) => {
         console.log(
           "🚀 ~ catalog-sync-handler ~ Categories has been saved to IndexedDb:",
           value
@@ -62,7 +62,7 @@ export const getCatalogSyncHandler = (config: {
       return;
     },
     async cleanUpCache() {
-      db.categories.clear();
+      clientDb.categories.clear();
       return;
     },
   };

@@ -4,7 +4,7 @@ import type { Product } from "../../../core/models/product";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  console.log("🚀 ~ GET ~ product ~ params:", params);
+  //console.log("🚀 ~ GET ~ product ~ params:", params);
   const { slug } = params;
 
   // TODO: query database for category by slug

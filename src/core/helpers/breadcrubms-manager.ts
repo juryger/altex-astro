@@ -1,9 +1,6 @@
 import { NavPathNames } from "../const";
-import {
-  $activeCategory,
-  $activeParentCategory,
-  $activeProduct,
-} from "../stores/catalog-store";
+import type { Category } from "../models/category";
+import type { Product } from "../models/product";
 import { getNavPathManager, type NavPathItem } from "./nav-path-manager";
 
 type BreadcrumbItem = {
@@ -13,33 +10,36 @@ type BreadcrumbItem = {
 
 const mapNavPathItemToBreadcrumb = (
   item: NavPathItem,
-  url: string
+  url: string,
+  activeProduct?: Product,
+  activeCategory?: Category,
+  activeParentCategory?: Category
 ): BreadcrumbItem[] => {
   const result: BreadcrumbItem[] = [];
   if (!item.displayOptions.isBreadcrumbs) {
     if (url.indexOf(`/${NavPathNames.Categories}`) !== -1) {
-      if ($activeParentCategory?.value) {
+      if (activeParentCategory !== undefined) {
         result.push({
-          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${$activeParentCategory.value.slug}`,
-          value: $activeParentCategory.value.title,
+          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeParentCategory.slug}`,
+          value: activeParentCategory.title,
         });
       }
-      if ($activeCategory?.value) {
+      if (activeCategory !== undefined) {
         result.push({
-          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${$activeCategory.value.slug}`,
-          value: $activeCategory.value.title,
+          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeCategory.slug}`,
+          value: activeCategory.title,
         });
       }
     } else if (url.indexOf(`/${NavPathNames.Products}`) !== -1) {
-      if ($activeProduct?.value && $activeCategory?.value) {
+      if (activeProduct !== undefined && activeCategory !== undefined) {
         result.push(
           {
-            path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${$activeCategory.value.slug}`,
-            value: $activeCategory.value.title,
+            path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeCategory.slug}`,
+            value: activeCategory.title,
           },
           {
-            path: `${NavPathNames.Catalog}/${NavPathNames.Products}/${$activeProduct.value.slug}`,
-            value: $activeProduct.value.title,
+            path: `${NavPathNames.Catalog}/${NavPathNames.Products}/${activeProduct.slug}`,
+            value: activeProduct.title,
           }
         );
       }
@@ -58,7 +58,12 @@ const mapNavPathItemToBreadcrumb = (
   return result;
 };
 
-const getBreadcrumbsFromPath = (fullPath: string): Array<BreadcrumbItem> => {
+const getBreadcrumbsFromPath = (
+  fullPath: string,
+  activeProduct?: Product,
+  activeCategory?: Category,
+  activeParentCategory?: Category
+): Array<BreadcrumbItem> => {
   const pathCollection = fullPath.endsWith("/")
     ? fullPath
         .substring(0, fullPath.length - 1)
@@ -89,7 +94,13 @@ const getBreadcrumbsFromPath = (fullPath: string): Array<BreadcrumbItem> => {
       continue;
     }
 
-    const values = mapNavPathItemToBreadcrumb(navPathItem, overallNavUrl);
+    const values = mapNavPathItemToBreadcrumb(
+      navPathItem,
+      overallNavUrl,
+      activeProduct,
+      activeCategory,
+      activeParentCategory
+    );
     result.push(...values);
   }
 

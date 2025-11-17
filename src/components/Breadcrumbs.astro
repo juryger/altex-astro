@@ -1,12 +1,65 @@
 ---
-import { NavPathNames } from '../core/const';
+export const prerender = false;
+
+import { LiveCollectionNames, NavPathNames } from '../core/const';
 import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/helpers/breadcrubms-manager';
+import { getEntryBySlug } from '../core/helpers/live-collection-manager';
 import { getTextHandler } from '../core/helpers/text-utils';
+import type { Category } from '../core/models/category';
+import type { Product } from '../core/models/product';
 
 const { currentPath } = Astro.props;
 const textUtils = getTextHandler();
-const requiredLabelLen = 20;
-const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
+const maxLabelLength = 20;
+
+const getProduct = async (slug: string): Promise<Product | undefined> => {
+  return await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
+    .then((result) => {
+      if (!result.value)
+        console.error(
+          "🚀 ~ Breadcrumbs ~ product not found by slug:",
+          result.slug
+        );
+      return result.value;
+    })
+    .catch((reason) => {
+      console.error((reason as Error).message);
+      return undefined;
+    });
+};
+
+const getCategory = async (slug: string): Promise<Category | undefined> => {
+  return await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
+    .then((result) => {
+      if (!result.value)
+        console.error(
+          "🚀 ~ Breadcrumbs ~ category not found by slug:",
+          result.slug
+        );
+      return result.value;
+    })
+    .catch((reason) => {
+      console.error((reason as Error).message);
+      return undefined;
+    });
+};
+
+const catalogSessionValue = await Astro.session?.get('catalog');
+
+const activeProduct: Product | undefined = 
+  catalogSessionValue?.activeProductSlug 
+    ? await getProduct(catalogSessionValue.activeProductSlug) 
+    : undefined;
+const activeCategory: Category | undefined = 
+  catalogSessionValue?.activeCategorySlug 
+    ? await getCategory(catalogSessionValue.activeCategorySlug) 
+    : undefined;
+const activeParentCategory: Category | undefined = 
+  catalogSessionValue?.activeParentCategorySlug 
+    ? await getCategory(catalogSessionValue.activeParentCategorySlug) 
+    : undefined;
+
+const breadcrumbs = getBreadcrumbsFromPath(currentPath, activeProduct, activeCategory, activeParentCategory);
 ---
 
 <script>
@@ -15,7 +68,7 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
   import { db } from "../core/db/client-db";
   const categories = db.categories.filter(obj => obj.slug === "locks");
   const lockCategory = await categories.first();
-  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)   
+  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)
   */
 </script>
 
@@ -25,7 +78,7 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
       {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (
         <li>
           {index !== breadcrumbs.length - 1 /* all elements displayed as link except the last one */
-            ? <a href=`/${x.path}`>
+            ? <a href={"/".concat(x.path)}>
                 {x.path === NavPathNames.Home &&
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4.5 mr-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -46,7 +99,7 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
                   <span class="!hidden md:!flex">{x.value}</span>
                 }
                 {x.path !== NavPathNames.Home && x.path !== NavPathNames.Catalog && x.path.indexOf(NavPathNames.Categories) === -1 &&
-                  <span title={x.value}>{textUtils.trimEnd(x.value, requiredLabelLen)}</span>
+                  <span title={x.value}>{textUtils.trimEnd(x.value, maxLabelLength)}</span>
                 }
               </a>
             : <div class="!no-underline !cursor-default">
@@ -76,7 +129,7 @@ const breadcrumbs: Array<BreadcrumbItem> = getBreadcrumbsFromPath(currentPath);
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
                   </svg>
                 }
-                <span class=" text-gray-400 italic" title={x.value}>{textUtils.trimEnd(x.value, requiredLabelLen)}</span>
+                <span class=" text-gray-400 italic" title={x.value}>{textUtils.trimEnd(x.value, maxLabelLength)}</span>
               </div>
           }
         </li>

@@ -4,9 +4,6 @@ export const prerender = false;
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveCollectionNames } from '../../../core/const';
 import { type Category } from '../../../core/models/category';
-import { 
-  $activeCategory, setActiveCategory, setActiveParentCategory 
-} from '../../../core/stores/catalog-store';
 import { getEntryBySlug } from '../../../core/helpers/live-collection-manager';
 import Categories from '../../../components/catalog/Categories.astro';
 import Products from '../../../components/catalog/Products.astro';
@@ -15,47 +12,50 @@ import CollectionFallback from '../../../components/CollectionFallback.astro';
 const { slug } = Astro.params;
 console.log("🚀 ~ Category page ~ slug: %s", slug);
 
-setActiveParentCategory(undefined);
-setActiveCategory(undefined);
-
-if (slug) {
-  var category = await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
+const getCategory = async (slug: string): Promise<Category | undefined>  => {
+  return await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
     .then((result) => {
       if (!result.value) console.log("🚀 ~ Category page ~ category not found by slug:", result.slug);
-      if (result.value) setActiveCategory(result.value);
       return result.value;
     })
     .catch((reason) => {
       console.error((reason as Error).message);
+      return undefined;
     });
-  if (!category) return Astro.redirect("/404");
-
-  if (category.parentSlug) {
-    const parentCategory = await getEntryBySlug<Category>(LiveCollectionNames.Categories, category.parentSlug)
-      .then((result) => {
-        if (!result.value) console.log("🚀 ~ Product page ~ category not found by slug:", result.slug);
-        if (result.value) setActiveParentCategory(result.value);
-        return result.value;
-      })
-      .catch(reason => {
-        console.error((reason as Error).message);        
-      });
-    if (!parentCategory) return Astro.redirect("/404");
-  }
 }
 
-const subTitle = "Список подкатегорий";
+var category: Category | undefined;
+if (slug) {
+  category = await getCategory(slug);
+  if (!category) {
+    Astro.session?.set("catalog", { 
+      activeProductSlug: undefined,
+      activeCategorySlug: undefined,
+      activeParentCategorySlug: undefined 
+    });
+    return Astro.redirect("/404");
+  }
+
+  Astro.session?.set("catalog", { 
+    activeProductSlug: undefined, 
+    activeCategorySlug: category.slug, 
+    activeParentCategorySlug: category.parentSlug 
+  });
+}
+
+const subTitleCategories = "Список подкатегорий";
+const subTitleProducts = "Список товаров";
 ---
 
-<BaseLayout title=`Каталог - ${$activeCategory?.value?.title}`>
-  <Categories parentSlug={$activeCategory?.value?.slug} title={subTitle} server:defer>
+<BaseLayout title=`Каталог - ${category?.title}`>
+  <Categories parentSlug={category?.slug} title={subTitleCategories} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={subTitle} />
+			<CollectionFallback title={subTitleCategories} />
 		</div>
 	</Categories>
-	<Products categorySlug={$activeCategory?.value?.slug} server:defer>
+	<Products categorySlug={category?.slug} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={subTitle} />
+			<CollectionFallback title={subTitleProducts} />
 		</div>
 	</Products>
 </BaseLayout>

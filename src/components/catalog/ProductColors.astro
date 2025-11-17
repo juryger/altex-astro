@@ -1,5 +1,5 @@
 ---
-import { ColorMetadata } from '../../core/models/color';
+import { ColorDictionary } from '../../core/models/color';
 
 interface Props {
   productId: number,
@@ -8,33 +8,26 @@ interface Props {
 }
 
 const { productId, colors, isDetailed } = Astro.props;
+const spanSelectedColorName = "data-selected-color";
 const titleColorOptions = "Цвет:";
 const noProductColors = "Нет информации о цвете";
 ---
 
-<product-colors> 
+<product-colors data-selected_color={spanSelectedColorName}> 
   <div class:list={['flex', {'justify-start': isDetailed}, {'my-4': isDetailed}, {'justify-center': !isDetailed}]}>
     <span>{titleColorOptions}</span>
     <span data-selected-color class="pl-1"></span>
   </div>
-
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
       {colors && colors.sort().map((x, index) => {
-        const metadata = ColorMetadata[x];
-        return <input type="radio" name=`radio-color-${productId}`
+        const metadata = ColorDictionary[x];
+        return <input type="radio" name={"radio-color".concat(productId.toString())}
           checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
+          class="appearance-none rounded-full border-1 checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
           class:list={[
-            'appearance-none',
-            'rounded-full', 
             metadata.color, 
-            'border-1', 
             metadata.border, 
-            'checked:outline-2',
-            'checked:outline-offset-2', 
-            'checked:outline-gray-400', 
-            'focus-visible:outline-4', 
-            'focus-visible:outline-offset-4',
             {'size-7': isDetailed}, 
             {'size-5' : !isDetailed}, 
           ]}
@@ -62,8 +55,9 @@ const noProductColors = "Нет информации о цвете";
     }
     
     connectedCallback() {
-      const selectedColorTitleEl = this.querySelector("[data-selected-color]");
-      console.assert(selectedColorTitleEl !== null, "Cannot find button element with data attribute: %s", "selected-color");
+      const spanSelectedColorName = this.dataset.selected_color;
+      const selectedColorTitleEl = this.querySelector(`[${spanSelectedColorName}]`);
+      console.assert(selectedColorTitleEl !== null, "Cannot find span element for selected color: %s", spanSelectedColorName);
 
       const radioboxes = this.querySelectorAll('input[type=radio]');
       if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
@@ -77,9 +71,9 @@ const noProductColors = "Нет информации о цвете";
     }
 
     disconnectedCallback() {
-       const radioboxes = this.querySelectorAll('input[type=radio]');
+      const radioboxes = this.querySelectorAll('input[type=radio]');
       radioboxes.forEach((x: Element, index: number) => {
-        this.colorHandlers[index] && x.addEventListener('click', this.colorHandlers[index]);
+        this.colorHandlers[index] && x.removeEventListener('click', this.colorHandlers[index]);
       });
     }
   }

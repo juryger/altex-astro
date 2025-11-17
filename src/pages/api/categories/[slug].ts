@@ -4,7 +4,7 @@ import type { Category } from "../../../core/models/category";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  console.log("🚀 ~ GET ~ category ~ params:", params);
+  //console.log("🚀 ~ GET ~ category ~ params:", params);
   const { slug } = params;
 
   // TODO: query database for category by slug

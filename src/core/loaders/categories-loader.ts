@@ -58,7 +58,7 @@ export function createCategoriesLoader(config: {
           };
         }
         const data = await response.json();
-        console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
+        //console.log("🚀 ~ createCategoriesLoader ~ collection ~ data:", data);
 
         return {
           entries: data.map((x: Category) => ({ id: x.slug, data: x })),
@@ -89,7 +89,7 @@ export function createCategoriesLoader(config: {
 
         const data = await response.json();
         const value = data as Category;
-        console.log("🚀 ~ createCategoriesLoader ~ entry ~ value:", value);
+        //console.log("🚀 ~ createCategoriesLoader ~ entry ~ value:", value);
 
         return value !== undefined
           ? { id: value.slug, data: value }
