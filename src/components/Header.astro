@@ -11,11 +11,11 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
 
 <script>
   import { applyThemeToggle } from "../core/helpers/theme-toggle";
-  
+
   console.log("🚀 ~ Header ~ Apply them toggler");
 
   applyThemeToggle(document.querySelector('[data-theme-toggle]'),
-    document.querySelector('[data-theme-toggle-dark]'), 
+    document.querySelector('[data-theme-toggle-dark]'),
     document.querySelector('[data-theme-toggle-light]')
   );
 </script>
@@ -26,7 +26,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost md:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> 
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
         </svg>
       </div>
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
@@ -62,7 +62,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
     {/* Search for mobile screens */}
     <div class="sm:hidden">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="size-5">
-        <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+        <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
     </div>
@@ -74,7 +74,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
         <div class="indicator">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <title>Аккаунт пользователя</title>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
         </div>
@@ -94,7 +94,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
     </div> */}
     {/* Light/Dark theme toggler */}
     <div class="ml-1 mr-5">
-      <label class="swap swap-rotate">
+      <label class="swap swap-rotate hover:text-gray-500">
         <!-- this hidden checkbox controls the state -->
         <input type="checkbox" class="theme-controller" value="dark" data-theme-toggle />
         <!-- sun icon -->

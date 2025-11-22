@@ -1,16 +1,21 @@
 ---
+import CartSidebar from "./CartSidebar.astro";
+
 const titleCart = "Корзина";
 const titleViewCart = "Просмотреть";
 const titleCartItemsNumber = "Товаров:";
 const titleCartCostSum = "На сумму:";
 const titleCurrency = "руб."
+
+const sidebarId = "cart-sidebar";
 ---
 
 <cart-menu>
+  <CartSidebar id={sidebarId} />
   <div class="dropdown dropdown-end">
     <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
       <div class="indicator">
-        <span class="indicator-item badge badge-xs badge-info">0</span>
+        <span data-cart-indicator class="indicator-item badge badge-xs badge-info">0</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
           <title>{titleCart}</title>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -19,21 +24,33 @@ const titleCurrency = "руб."
       </div>
     </div>
     <div tabindex="0" class="card card-compact dropdown-content bg-base-300 z-1 mt-3 w-52 shadow">
-      <div class="card-body">
-        <span class="text-lg font-bold">{titleCartItemsNumber.concat(" 0")}</span>
-        <span class="text-info">{titleCartCostSum.concat(" 0 ").concat(titleCurrency)}</span>
-        <div class="card-actions">
-          <button class="btn btn-primary btn-block">{titleViewCart}</button>
+      <div class="card-body p-4">
+        <div class="flex flex-row gap-1">
+          <span class="text-lg font-bold">{titleCartItemsNumber}</span>
+          <span data-cart-count class="text-lg font-bold">{0}</span>
         </div>
+        <span>{titleCartCostSum}</span>
+        <div class="flex flex-row gap-1">
+          <span data-cart-cost class="text-info">{0}</span>
+          <del data-cart-cost-old class="text-info"></del>
+          <span class="text-info">{titleCurrency}</span>
+        </div>
+        <label for={sidebarId} class="drawer-button btn btn-primary">{titleViewCart}</label>
       </div>
     </div>
   </div>
 </cart-menu>
 
 <script>
-  import type { CartDictionary } from "../../core/models/cart";
-
+  import { DiscountMetadata } from "../../core/models/discount";
+  import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "../../core/stores/cart-store";
+ 
   class CartMenu extends HTMLElement {
+    private storeCountUnsubscribe?: () => void;
+    private storeCostUnsubscribe?: () => void;
+    private storeWhsCost1Unsubscribe?: () => void;
+    private storeWhsCost2Unsubscribe?: () => void;
+
     // onColorSelect = (el: Element | null, title: string): any => {
     //   return (event: Event) => {
     //     if (el !== null) el.innerHTML = title;
@@ -42,16 +59,92 @@ const titleCurrency = "руб."
     
     constructor() {
       super();
-      //console.log(`~ CartMenu ~ current cart: %o`, cartItems);
+    }
+
+    private syncCartFromStore(cartIndicatorEl: Element | null, cartCountEl: Element | null, cartCostEl: Element | null, cartOldCostEl: Element | null): void {
+      const totalCount = $cartCount.get();
+      if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = totalCount.toString();
+      if (cartCountEl !== null) cartCountEl.innerHTML = totalCount.toString();
+
+      const sum = $cartCost.get();
+      const whsSum1 = $cartWhsCost1.get();
+      const whsSum2 = $cartWhsCost2.get();
+      console.log("~ CartMenu ~ Sum breakdown: 1st: '%s', 2nd: '%s', 3rd: '%s'", sum, whsSum1, whsSum2);
+
+      if (sum >= DiscountMetadata[2]?.sum) {
+        console.log("~ CartMenu ~ discount 2: ", sum);
+        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum2.toString();  
+        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+      } else if (sum >= DiscountMetadata[1]?.sum) {
+        console.log("~ CartMenu ~ discount 1: ", sum);
+        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum1.toString();  
+        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+      } else {
+        console.log("~ CartMenu ~ no discounts: ", sum);
+        if (cartCostEl !== null) cartCostEl.innerHTML = sum.toString();
+        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = "";
+      }
     }
 
     connectedCallback() {
-      //const selectedColorTitleEl = this.querySelector("[data-selected-color]");
-      //console.assert(selectedColorTitleEl !== null, "Cannot find button element with data attribute: %s", "selected-color");
+      const cartIndicatorEl = this.querySelector("[data-cart-indicator]");
+      console.assert(cartIndicatorEl !== null, "Cannot find element: [%s]", "data-cart-indicator");
+
+      const cartCountEl = this.querySelector("[data-cart-count]");
+      console.assert(cartCountEl !== null, "Cannot find element [%s]", "data-cart-count")
+
+      const cartCostEl = this.querySelector("[data-cart-cost]");
+      console.assert(cartCostEl !== null, "Cannot find element [%s]", "data-cart-cost")
+      
+      const cartOldCostEl = this.querySelector("[data-cart-cost-old]");
+      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", "data-cart-cost-old")
+
+      this.syncCartFromStore(cartIndicatorEl, cartCountEl, cartCostEl, cartOldCostEl);
+
+      this.storeCountUnsubscribe = $cartCount.listen((value) => {
+        console.log("~ CartMenu component ~ total count has changed:", value);
+        if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = value.toString();
+        if (cartCountEl !== null) cartCountEl.innerHTML = value.toString();
+      });
+
+      this.storeCostUnsubscribe = $cartCost.listen((value) => {
+        console.log("~ CartMenu component ~ total cost has changed:", value);
+         if (cartCostEl !== null) cartCostEl.innerHTML = value.toString();
+      });
+
+      this.storeCostUnsubscribe = $cartCost.listen((value) => {
+        console.log("~ CartMenu component ~ total cost has changed:", value);
+        if (cartCostEl !== null && cartOldCostEl !== null) {
+          console.log("~ CartMenu ~ no discounts: ", value);
+          cartCostEl.innerHTML = value.toString();
+          cartOldCostEl.innerHTML = "";
+        }
+      });
+
+      this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
+        console.log("~ CartMenu component ~ total cost 1 has changed:", value);
+        if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[1]?.sum) {
+          console.log("~ CartMenu ~ discount #1: ", value);
+          cartCostEl.innerHTML = value.toString();
+          cartOldCostEl.innerHTML = $cartCost.get().toString();
+        }
+      });
+
+      this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
+        console.log("~ CartMenu component ~ total cost 2 has changed:", value);
+        if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[2]?.sum) {
+          console.log("~ CartMenu ~ discount #2: ", value);
+          cartCostEl.innerHTML = value.toString();
+          cartOldCostEl.innerHTML = $cartCost.get().toString();
+        }
+      });
     }
 
     disconnectedCallback() {
-       //const radioboxes = this.querySelectorAll('input[type=radio]');
+      this.storeCountUnsubscribe && this.storeCountUnsubscribe();
+      this.storeCostUnsubscribe && this.storeCostUnsubscribe();
+      this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()
+      this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
     }
   }
 

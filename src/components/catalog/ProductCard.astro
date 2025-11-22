@@ -12,7 +12,6 @@ import ProductQuickView from './ProductQuickView.astro';
 interface Props {
   item: Product,
 }
-
 const { item } = Astro.props;
 
 const titleAddToCart = "В корзину";
@@ -65,12 +64,14 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
 </product-card>
 
 <script>
-  import { actions } from "astro:actions";
   import type { Product } from "../../core/models/product";
   import { parseProduct } from "../../core/helpers/data-attributes-parser";
   import type { CartItem } from "../../core/models/cart";
   import { addAlert } from "../../core/stores/alert-store";
   import { AlertKind } from "../../core/models/alert";
+  import { ColorDictionary } from '../../core/models/color';
+  import { addToCart } from "../../core/stores/cart-store";
+  import { CartMessages } from "../../core/const/messages";
 
   class ProductCard extends HTMLElement {
     private value: Product | undefined;
@@ -87,7 +88,30 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
         const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
         const quantity = 1;
 
-        addAlert({ kind: AlertKind.Info, message: `Product "${this.value.title}" (${quantity} pcs) with color ${selectedColor ?? "NA"} added to the cart.`});
+        const colorId = selectedColor !== null ? parseInt(selectedColor) : undefined;
+        const color = selectedColor !== null ? ColorDictionary[parseInt(selectedColor)] : null;
+
+        addAlert({ 
+          kind: AlertKind.Info, 
+          message: `Product "${this.value.title}" (${quantity} pcs) with color '${color ? color.title : "-"}' added to the cart.`});
+
+        addToCart({
+          productId: this.value.id,
+          title: this.value.title,
+          availableColors: this.value.colors,
+          price: this.value.price,
+          whsPrice1: this.value.whsPrice1,
+          whsPrice2: this.value.whsPrice2,
+          image: this.value.image,
+          slug: this.value.slug,
+          color: colorId,
+          quantity: quantity
+        } as CartItem);
+          
+        addAlert({ 
+          kind: AlertKind.Info, 
+          message: CartMessages.AddedToTheCart
+        });
 
         // const { data, error } = await actions.cartActions.addToCart({
         //   id: this.value.id,
