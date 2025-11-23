@@ -93,16 +93,17 @@ const titleAddToCart = "В корзину";
         if (!selectedColor && radioboxes.length > 0) {
           selectedColor = (radioboxes[0] as HTMLInputElement).value;
         }
-
+        
         const inputQuantityName = this.dataset.input_quatnity;
         var quanityEl = this.querySelector(`input[name='${inputQuantityName}']`);
         console.assert(quanityEl !== null, "~ ProductDetails ~ cannot find input element with name: %s", inputQuantityName);
         
+        const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
         const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
-        const colorId = selectedColor !== null ? parseInt(selectedColor) : undefined;
 
          addToCart({
           productId: this.value.id,
+          productCode: this.value.productCode,
           title: this.value.title,
           availableColors: this.value.colors,
           price: this.value.price,
@@ -110,7 +111,7 @@ const titleAddToCart = "В корзину";
           whsPrice2: this.value.whsPrice2,
           image: this.value.image,
           slug: this.value.slug,
-          color: colorId,
+          color: color,
           quantity: quantity
         } as CartItem);
 

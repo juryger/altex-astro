@@ -86,17 +86,12 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
 
         const selectedColorEl =  this.querySelector('input[type=radio]:checked');
         const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+        const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
         const quantity = 1;
-
-        const colorId = selectedColor !== null ? parseInt(selectedColor) : undefined;
-        const color = selectedColor !== null ? ColorDictionary[parseInt(selectedColor)] : null;
-
-        addAlert({ 
-          kind: AlertKind.Info, 
-          message: `Product "${this.value.title}" (${quantity} pcs) with color '${color ? color.title : "-"}' added to the cart.`});
 
         addToCart({
           productId: this.value.id,
+          productCode: this.value.productCode,
           title: this.value.title,
           availableColors: this.value.colors,
           price: this.value.price,
@@ -104,7 +99,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
           whsPrice2: this.value.whsPrice2,
           image: this.value.image,
           slug: this.value.slug,
-          color: colorId,
+          color: color,
           quantity: quantity
         } as CartItem);
           
@@ -112,20 +107,6 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
           kind: AlertKind.Info, 
           message: CartMessages.AddedToTheCart
         });
-
-        // const { data, error } = await actions.cartActions.addToCart({
-        //   id: this.value.id,
-        //   color: selectedColor !== null ? parseInt(selectedColor, 10) : undefined,
-        //   quantity          
-        // });
-
-        // if (error) {
-        //   console.error(
-        //     "~ ProductCard ~ failed to add selected product to the cart:",
-        //     error
-        //   );
-        //   return;
-        // }
       };
     }
 

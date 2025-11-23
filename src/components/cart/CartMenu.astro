@@ -8,14 +8,23 @@ const titleCartCostSum = "На сумму:";
 const titleCurrency = "руб."
 
 const sidebarId = "cart-sidebar";
+const dataCartIndicatorName = "data-cartmenu-indicator";
+const dataCartCountName = "data-cartmenu-count";
+const dataCartCostName = "data-cartmenu-cost";
+const dataCartOldCostName = "data-cartmenu-oldcost";
 ---
 
-<cart-menu>
+<cart-menu 
+  data-cartmenu_indicator={dataCartIndicatorName} 
+  data-cartmenu_count={dataCartCountName} 
+  data-cartmenu_cost={dataCartCostName} 
+  data-cartmenu_oldcost={dataCartOldCostName}
+>
   <CartSidebar id={sidebarId} />
   <div class="dropdown dropdown-end">
     <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
       <div class="indicator">
-        <span data-cart-indicator class="indicator-item badge badge-xs badge-info">0</span>
+        <span data-cartmenu-indicator class="indicator-item badge badge-xs badge-info">0</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
           <title>{titleCart}</title>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -27,12 +36,12 @@ const sidebarId = "cart-sidebar";
       <div class="card-body p-4">
         <div class="flex flex-row gap-1">
           <span class="text-lg font-bold">{titleCartItemsNumber}</span>
-          <span data-cart-count class="text-lg font-bold">{0}</span>
+          <span data-cartmenu-count class="text-lg font-bold">{0}</span>
         </div>
         <span>{titleCartCostSum}</span>
         <div class="flex flex-row gap-1">
-          <span data-cart-cost class="text-info">{0}</span>
-          <del data-cart-cost-old class="text-info"></del>
+          <span data-cartmenu-cost class="text-info">{0}</span>
+          <del data-cartmenu-oldcost class="text-info"></del>
           <span class="text-info">{titleCurrency}</span>
         </div>
         <label for={sidebarId} class="drawer-button btn btn-primary">{titleViewCart}</label>
@@ -51,12 +60,6 @@ const sidebarId = "cart-sidebar";
     private storeWhsCost1Unsubscribe?: () => void;
     private storeWhsCost2Unsubscribe?: () => void;
 
-    // onColorSelect = (el: Element | null, title: string): any => {
-    //   return (event: Event) => {
-    //     if (el !== null) el.innerHTML = title;
-    //   };
-    // }
-    
     constructor() {
       super();
     }
@@ -86,32 +89,15 @@ const sidebarId = "cart-sidebar";
       }
     }
 
-    connectedCallback() {
-      const cartIndicatorEl = this.querySelector("[data-cart-indicator]");
-      console.assert(cartIndicatorEl !== null, "Cannot find element: [%s]", "data-cart-indicator");
-
-      const cartCountEl = this.querySelector("[data-cart-count]");
-      console.assert(cartCountEl !== null, "Cannot find element [%s]", "data-cart-count")
-
-      const cartCostEl = this.querySelector("[data-cart-cost]");
-      console.assert(cartCostEl !== null, "Cannot find element [%s]", "data-cart-cost")
-      
-      const cartOldCostEl = this.querySelector("[data-cart-cost-old]");
-      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", "data-cart-cost-old")
-
-      this.syncCartFromStore(cartIndicatorEl, cartCountEl, cartCostEl, cartOldCostEl);
-
+    private subscribeToCountStore(cartIndicatorEl: Element | null, cartCountEl: Element | null) {
       this.storeCountUnsubscribe = $cartCount.listen((value) => {
         console.log("~ CartMenu component ~ total count has changed:", value);
         if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = value.toString();
         if (cartCountEl !== null) cartCountEl.innerHTML = value.toString();
       });
+    }
 
-      this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        console.log("~ CartMenu component ~ total cost has changed:", value);
-         if (cartCostEl !== null) cartCostEl.innerHTML = value.toString();
-      });
-
+    private subscribeToCostStore(cartCostEl: Element | null, cartOldCostEl: Element | null) {
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
         console.log("~ CartMenu component ~ total cost has changed:", value);
         if (cartCostEl !== null && cartOldCostEl !== null) {
@@ -120,7 +106,9 @@ const sidebarId = "cart-sidebar";
           cartOldCostEl.innerHTML = "";
         }
       });
+    }
 
+    private subscribeToWhsCost1Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
         console.log("~ CartMenu component ~ total cost 1 has changed:", value);
         if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[1]?.sum) {
@@ -129,7 +117,9 @@ const sidebarId = "cart-sidebar";
           cartOldCostEl.innerHTML = $cartCost.get().toString();
         }
       });
+    }
 
+    private subscribeToWhsCost2Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
         console.log("~ CartMenu component ~ total cost 2 has changed:", value);
         if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[2]?.sum) {
@@ -138,6 +128,31 @@ const sidebarId = "cart-sidebar";
           cartOldCostEl.innerHTML = $cartCost.get().toString();
         }
       });
+    }
+
+    connectedCallback() {
+      const dataCartIndicatorName = this.dataset.cartmenu_indicator;
+      const cartIndicatorEl = this.querySelector(`[${dataCartIndicatorName}]`);
+      console.assert(cartIndicatorEl !== null, "Cannot find element: [%s]", dataCartIndicatorName);
+
+      const dataCartCountName = this.dataset.cartmenu_count;
+      const cartCountEl = this.querySelector(`[${dataCartCountName}]`);
+      console.assert(cartCountEl !== null, "Cannot find element [%s]", dataCartCountName);
+
+      const dataCartCostName = this.dataset.cartmenu_cost;
+      const cartCostEl = this.querySelector(`[${dataCartCostName}]`);
+      console.assert(cartCostEl !== null, "Cannot find element [%s]", dataCartCostName);
+      
+      const dataCartOldCostName = this.dataset.cartmenu_oldcost;
+      const cartOldCostEl = this.querySelector(`[${dataCartOldCostName}]`);
+      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", dataCartOldCostName);
+
+      this.syncCartFromStore(cartIndicatorEl, cartCountEl, cartCostEl, cartOldCostEl);
+
+      this.subscribeToCountStore(cartIndicatorEl, cartCountEl);
+      this.subscribeToCostStore(cartCostEl, cartOldCostEl);
+      this.subscribeToWhsCost1Store(cartCostEl, cartOldCostEl);
+      this.subscribeToWhsCost2Store(cartCostEl, cartOldCostEl);
     }
 
     disconnectedCallback() {

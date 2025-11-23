@@ -1,6 +1,10 @@
 import { AlertKind, AlertStylesDictionary } from "../models/alert";
 
-const createAlert = (id: string, type: AlertKind, message: string): string => {
+const createAlertMarkup = (
+  id: string,
+  type: AlertKind,
+  message: string
+): string => {
   var key: string = "default";
   if (type === AlertKind.Info) {
     key = "info";
@@ -23,4 +27,4 @@ const createAlert = (id: string, type: AlertKind, message: string): string => {
   `;
 };
 
-export { createAlert };
+export { createAlertMarkup };

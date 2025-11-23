@@ -2,11 +2,11 @@
 import { AlertKind } from "../../core/models/alert";
 ---
 
-<alerts-container data-alerts-container class="toast toast-top toast-center top-20 z-10 m-2 min-w-lg" >
+<alerts-container class="toast toast-top toast-center top-20 z-10 m-2 min-w-lg" >
 </alerts-container>
 
 <script>
-  import { createAlert } from "../../core/helpers/alerts-manager";
+  import { createAlertMarkup } from "../../core/helpers/alerts-manager";
   import { $alerts } from "../../core/stores/alert-store";
   
   class AlertsContainer extends HTMLElement {
@@ -22,7 +22,7 @@ import { AlertKind } from "../../core/models/alert";
           const key = "alert-".concat(index.toString());
           const divAlert = document.createElement("div");
           this.appendChild(divAlert);
-          divAlert.outerHTML = createAlert(key, x.kind, x.message);
+          divAlert.outerHTML = createAlertMarkup(key, x.kind, x.message);
 
           setTimeout(() => {
             const alertEl = this.querySelector("#".concat(key));

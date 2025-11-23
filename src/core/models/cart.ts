@@ -3,6 +3,7 @@ import { z } from "astro/zod";
 export const CartSchema = z
   .object({
     productId: z.number(),
+    productCode: z.string(),
     title: z.string(),
     availableColors: z.array(z.number()).optional(),
     price: z.number(),

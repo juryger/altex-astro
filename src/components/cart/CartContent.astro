@@ -1,0 +1,241 @@
+---
+const dataCartRootName = "data-cart-root";
+const dataCartCostName = "data-cart-cost";
+const dataCartOldCostName = "data-cart-oldcost";
+const dataCartUpdateCommandName = "update-cart";
+const dataCartRemoveCommandName = "remove-cart";
+
+const titleCheckout = "Перейти к оформлению";
+const titleContinueShopping = "Вернутся в каталог";
+const titleSubtotal = "Итого:"; 
+const titleOr = "или";
+---
+
+<cart-content 
+  data-cart_root={dataCartRootName}
+  data-cart_cost={dataCartCostName}
+  data-cart_oldcost={dataCartOldCostName}
+  data-cart_update={dataCartUpdateCommandName} 
+  data-cart_remove={dataCartRemoveCommandName}
+>
+  <div class="flex h-full flex-col overflow-auto focus:outline-none">
+    <!-- <Cart items /> -->
+    <ul data-cart-root role="list" class="divide-y">
+      <li class="flex py-6">
+        <!-- Cart item -->
+      </li>
+    </ul>
+    <!-- Cart summary -->
+    <div class="border-t border-gray-200 py-6">
+      <div class="flex justify-between text-base font-medium">
+        <p>{titleSubtotal}</p>
+        <span data-cart-cost class="text-info">{0}</span>
+        <del data-cart-oldcost class="text-info"></del>
+      </div>
+      <div class="mt-3">
+        <a href="/cart" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
+          {titleCheckout}
+        </a>
+      </div>
+      <div class="mt-3 flex justify-center text-center text-sm">
+        <p>
+          {titleOr}
+          <a href="/catalog" class="text-primary">
+            {titleContinueShopping}
+            <span class="ml-0.5" aria-hidden="true">→</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</cart-content>
+
+<script>
+  import { CartMessages } from "../../core/const/messages";
+  import { AlertKind } from "../../core/models/alert";
+  import { addAlert } from "../../core/stores/alert-store";
+  import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "../../core/stores/cart-store";
+  import { DiscountMetadata } from "../../core/models/discount";
+  import type { CartItem } from "../../core/models/cart";
+  import { createCartItemMakrup } from "../../core/helpers/cart-manager";
+
+  class CartContent extends HTMLElement {
+    private storeCostUnsubscribe?: () => void;
+    private storeWhsCost1Unsubscribe?: () => void;
+    private storeWhsCost2Unsubscribe?: () => void;
+
+    private updateHandlers: {
+      [key: number]: (e: Event) => any;
+    } = {};
+
+    private removeHandlers: {
+      [key: number]: (e: Event) => any;
+    } = {};
+
+    constructor() {
+      super();
+    }
+
+    private subscribeToCostStore(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+      if (!cartCostEl || !cartOldCostEl) return;
+
+      this.storeCostUnsubscribe = $cartCost.listen((value) => {
+        console.log("~ CartMenu component ~ total cost has changed:", value);
+        console.log("~ CartMenu ~ no discounts: ", value);
+        cartCostEl.innerHTML = value.toString();
+        cartOldCostEl.innerHTML = "";
+      });
+    }
+
+    private subscribeToWhsCost1Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+      if (!cartCostEl || !cartOldCostEl) return;
+
+      this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
+        console.log("~ CartMenu component ~ total cost 1 has changed:", value);
+        if (value >= DiscountMetadata[1]?.sum) {
+          console.log("~ CartMenu ~ discount #1: ", value);
+          cartCostEl.innerHTML = value.toString();
+          cartOldCostEl.innerHTML = $cartCost.get().toString();
+        }
+      });
+    }
+
+    private subscribeToWhsCost2Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+      if (!cartCostEl || !cartOldCostEl) return;
+      
+      this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
+        console.log("~ CartMenu component ~ total cost 2 has changed:", value);
+        if (value >= DiscountMetadata[2]?.sum) {
+          console.log("~ CartMenu ~ discount #2: ", value);
+          cartCostEl.innerHTML = value.toString();
+          cartOldCostEl.innerHTML = $cartCost.get().toString();
+        }
+      });
+    }
+
+    private syncCartFromStore(cartItemsEl: Element | null, updateCartCommandName: string | undefined, removeCartCommandName: string | undefined): CartItem[] {
+      if (!cartItemsEl) return [];
+      if (!updateCartCommandName) return [];
+      if (!removeCartCommandName) return [];
+
+      cartItemsEl.replaceChildren();
+
+      const cartItems = $cart.get().sort((a: CartItem, b: CartItem) => {
+        if (a.title < b.title) return -1;
+        if (a.title > b.title) return 1;
+        return 0;
+      });
+      
+      cartItems.forEach(x => {
+        const divAlert = document.createElement("li");
+        divAlert.classList.add("flex", "py-6");
+        cartItemsEl.appendChild(divAlert);
+        divAlert.innerHTML = createCartItemMakrup(x, updateCartCommandName, removeCartCommandName);
+      });
+
+      return cartItems;
+    }
+
+    private onUpdateCart = (id: string): any => {
+      return (e: Event): void => {
+        var item = $cart.get().find(x => x.id === id);
+        if (!item) {
+          console.warn(`~ CartContent ~ cannot update cart as item with id:'%s' not found`, id);
+          return;
+        }
+
+        const colorEl = this.querySelector("#".concat(id, '-color'));
+        const color = colorEl !== null ? parseInt((colorEl as HTMLInputElement).value) : undefined;
+
+        const quantityEl = this.querySelector("#".concat(id, '-quantity'));
+        const quantity = quantityEl ? parseInt((quantityEl as HTMLInputElement).value) : 1;
+
+        if (item.color !== undefined && item.color !== color) {
+          // color has changed
+          removeFromCart(id);
+
+          const existingItem = $cart.get().find(x => x.productId === item?.productId && x.color === color);
+          if (existingItem) { 
+            updateCart({ ...existingItem, quantity: existingItem.quantity + quantity })
+          } else {
+            addToCart({ ...item, color, quantity})
+          }
+        }
+        else {
+          // just quantity has changed
+          updateCart({ ...item, quantity });
+        }
+
+        addAlert({ 
+          kind: AlertKind.Info, 
+          message: CartMessages.UpdatedInTheCart
+        });
+      }
+    }
+
+    private onRemoveFromCart = (id: string): any => {
+      return (e: Event): void => {        
+        removeFromCart(id);
+
+        addAlert({ 
+          kind: AlertKind.Info, 
+          message: CartMessages.RemovedFromTheCart
+        });
+      }
+    }
+
+    connectedCallback() {
+      const updateCartCommandName = this.dataset.cart_update;
+      console.assert(updateCartCommandName !== undefined, "Cannot find element [%s]", updateCartCommandName);
+
+      const removeCartCommandName = this.dataset.cart_remove;
+      console.assert(updateCartCommandName !== undefined, "Cannot find element [%s]", removeCartCommandName);
+
+      const dataCartCostName = this.dataset.cart_cost;
+      const cartCostEl = this.querySelector(`[${dataCartCostName}]`);
+      console.assert(cartCostEl !== null, "Cannot find element [%s]", dataCartCostName);
+      
+      const dataCartOldCostName = this.dataset.cart_oldcost;
+      const cartOldCostEl = this.querySelector(`[${dataCartOldCostName}]`);
+      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", dataCartOldCostName);
+      
+      this.subscribeToCostStore(cartCostEl, cartOldCostEl);
+      this.subscribeToWhsCost1Store(cartCostEl, cartOldCostEl);
+      this.subscribeToWhsCost2Store(cartCostEl, cartOldCostEl);
+      
+      const dataCartRootName = this.dataset.cart_root;
+      const cartItemsEl = this.querySelector(`[${dataCartRootName}]`);
+      console.assert(cartItemsEl !== null, "Cannot find element [%s]", dataCartRootName)
+
+      var cartItems = this.syncCartFromStore(cartItemsEl, updateCartCommandName, removeCartCommandName);
+
+      this.querySelectorAll(`button[name='${updateCartCommandName}']`).forEach((x, index) => {
+        this.updateHandlers[index] = this.onUpdateCart(cartItems[index].id);
+        x.addEventListener('click', this.updateHandlers[index]);
+      });
+
+      this.querySelectorAll(`button[name='${removeCartCommandName}']`).forEach((x, index) => {
+        this.removeHandlers[index] = this.onRemoveFromCart(cartItems[index].id);
+        x.addEventListener('click', this.removeHandlers[index]);
+      });
+    }
+
+    disconnectedCallback() {
+      this.storeCostUnsubscribe && this.storeCostUnsubscribe();
+      this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()
+      this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
+      
+      const btnUpdateCartName = this.dataset.btn_update_cart;
+      this.querySelectorAll(`button[name='${btnUpdateCartName}']`).forEach((x, index) => 
+        this.updateHandlers[index] && x.removeEventListener('click', this.updateHandlers[index])
+      );
+
+      const btnRemoveFromCartName = this.dataset.btn_remove_from_cart;
+      this.querySelectorAll(`button[name='${btnRemoveFromCartName}']`).forEach((x, index) => 
+        this.removeHandlers[index] && x.removeEventListener('click', this.removeHandlers[index])
+      );
+    }
+  }
+
+  customElements.define('cart-content', CartContent);
+</script>
