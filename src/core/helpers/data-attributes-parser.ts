@@ -1,4 +1,3 @@
-import type { CartItem } from "../models/cart";
 import type { Product } from "../models/product";
 
 const parseProduct = (dataset: DOMStringMap): Product | undefined => {
@@ -15,6 +14,14 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (title === undefined) {
     console.warn(
       `~ Product data attributes parser ~ value of Title is not defined`
+    );
+    return undefined;
+  }
+
+  const productCode = dataset.product_code;
+  if (productCode === undefined) {
+    console.warn(
+      `~ Product data attributes parser ~ value of Product Code is not defined`
     );
     return undefined;
   }
@@ -70,17 +77,34 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     return undefined;
   }
 
+  const categoryId = parseInt(dataset.category_id ?? "0", 10);
+  if (isNaN(categoryId)) {
+    console.warn(
+      `~ Product data attributes parser ~ value of CategoryID is not a number:`,
+      dataset.id
+    );
+    return undefined;
+  }
+
+  const categorySlug = dataset.category_slug;
+  if (categorySlug === undefined) {
+    console.warn(
+      `~ Product data attributes parser ~ value of CategorySlug is not defined`
+    );
+    return undefined;
+  }
+
   return {
     id,
     title,
-    productCode: "",
+    productCode,
     quantityInPack: -1,
     minQuantityToBuy: -1,
     price,
     whsPrice1,
     whsPrice2,
-    categoryId: -1,
-    categorySlug: "",
+    categoryId,
+    categorySlug,
     colors,
     image,
     slug,

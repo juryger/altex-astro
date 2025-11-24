@@ -64,11 +64,13 @@ const dataCartOldCostName = "data-cartmenu-oldcost";
       super();
     }
 
-    private syncCartFromStore(cartIndicatorEl: Element | null, cartCountEl: Element | null, cartCostEl: Element | null, cartOldCostEl: Element | null): void {
+    private syncCartCountFromStore(cartIndicatorEl: Element | null, cartCountEl: Element | null): void {
       const totalCount = $cartCount.get();
       if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = totalCount.toString();
       if (cartCountEl !== null) cartCountEl.innerHTML = totalCount.toString();
+    }
 
+    private syncCartCostFromStore(cartCostEl: Element | null, cartOldCostEl: Element | null): void {
       const sum = $cartCost.get();
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get();
@@ -147,7 +149,8 @@ const dataCartOldCostName = "data-cartmenu-oldcost";
       const cartOldCostEl = this.querySelector(`[${dataCartOldCostName}]`);
       console.assert(cartOldCostEl !== null, "Cannot find element [%s]", dataCartOldCostName);
 
-      this.syncCartFromStore(cartIndicatorEl, cartCountEl, cartCostEl, cartOldCostEl);
+      this.syncCartCountFromStore(cartIndicatorEl, cartCountEl);
+      this.syncCartCostFromStore(cartCostEl, cartOldCostEl);
 
       this.subscribeToCountStore(cartIndicatorEl, cartCountEl);
       this.subscribeToCostStore(cartCostEl, cartOldCostEl);

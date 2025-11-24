@@ -25,8 +25,9 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
 
 <product-card 
   data-btn_add_to_cart={btnAddToCardName} 
-  data-id={item.id} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
+  data-id={item.id} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
+  data-category_id={item.categoryId} data-category_slug={item.categorySlug}
   data-image={item.image} data-slug={item.slug}
 >
   <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
@@ -69,7 +70,6 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
   import type { CartItem } from "../../core/models/cart";
   import { addAlert } from "../../core/stores/alert-store";
   import { AlertKind } from "../../core/models/alert";
-  import { ColorDictionary } from '../../core/models/color';
   import { addToCart } from "../../core/stores/cart-store";
   import { CartMessages } from "../../core/const/messages";
 

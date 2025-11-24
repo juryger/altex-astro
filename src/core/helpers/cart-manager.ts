@@ -8,6 +8,7 @@ const titleProductCode = "Артикул:";
 const titleProductPrice = "Цена:";
 const titleEdit = "Изменить";
 const titleRemove = "Удалить";
+const titleCurrency = "руб.";
 
 const productsBlobStorageUrl = `${
   import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL
@@ -19,6 +20,7 @@ const createCartItemMakrup = (
   removeCarCommandtName: string
 ): string => {
   const textHandler = getTextHandler();
+
   const colorsSelectOptions = Object.keys(ColorDictionary).forEach(
     (key: string, index: number) => {
       var item = ColorDictionary[index];
@@ -39,19 +41,25 @@ const createCartItemMakrup = (
         </figure>
         <div class="flex flex-row justify-start">
           <span class="text-xs italic">
-            ${textHandler.trimEnd(titleProductCode, 100)}
+            ${titleProductCode}
           </span>
           <span class="text-xs italic ml-1">${value.productCode}</span>
         </div>
         <div class="flex flex-col mt-1">
           <span class="font-semibold text-xs">${titleProductPrice}</span>
-          <span class="text-sm text-info">${value.price}</span>
-          <del class="text-sm text-info">${value.whsPrice1}</del>
+          <div class="flex flex-row gap-1 items-center">
+            <span class="text-xs text-info">${value.price}</span>
+            <span class="text-xs text-info">${titleCurrency}</span>
+          </div>
+          <div class="flex flex-row gap-1 items-center">
+            <del class="text-xs text-info">${value.whsPrice1}</del>
+            <span class="text-xs text-info">${titleCurrency}</span>
+          </div>
         </div>
       </div>
       <div id="${value.id}" class="flex flex-col grow">
         <span class="font-bold text-xs min-h-8">
-          ${value.title}
+          ${textHandler.trimEnd(value.title, 100)}
         </span>                 
         <div>
           <legend class="fieldset-legend font-semibold text-xs">${titleProductColor}</legend>
