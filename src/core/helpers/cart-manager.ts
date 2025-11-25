@@ -14,24 +14,48 @@ const productsBlobStorageUrl = `${
   import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL
 }`;
 
-const createCartItemMakrup = (
+const createCartItemMarkup = (
   value: CartItem,
+  discountIndex: number,
   updateCartCommandName: string,
   removeCarCommandtName: string
 ): string => {
   const textHandler = getTextHandler();
 
-  const colorsSelectOptions = Object.keys(ColorDictionary).forEach(
-    (key: string, index: number) => {
-      var item = ColorDictionary[index];
-      return `<option ${value.color && value.color === index ? "selected" : ""}>
-        ${item.title}
-      </option>`;
+  const getPriceWithDiscount = (): string => {
+    if (discountIndex === 2) {
+      return `<span class="text-xs text-info">${value.whsPrice2}</span>
+        <del class="text-xs text-info">${value.price}</del>`;
+    } else if (discountIndex === 1) {
+      return `<span class="text-xs text-info">${value.whsPrice1}</span>
+        <del class="text-xs text-info">${value.price}</del>`;
     }
-  );
+
+    return `<span class="text-xs text-info">${value.price}</span>
+        <del class="text-xs text-info"></del>`;
+  };
+
+  const getColorSelectOptions = (): string => {
+    var result = "";
+    value.availableColors
+      ?.sort((a, b) => a - b)
+      .forEach((key: number) => {
+        var metadata = ColorDictionary[key];
+        result = result.concat(
+          `<option value="${key}"
+            ${
+              value.color !== undefined && value.color === key ? "selected" : ""
+            }>
+            ${metadata.title}
+          </option>`
+        );
+      });
+    return result;
+  };
 
   return `
     <div class="flex flex-row gap-3 items-start">
+      <!-- Item image and code -->
       <div class="grow-0">
         <figure class="aspect-square lg:aspect-auto min-h-[80px]">
           <Image 
@@ -45,43 +69,52 @@ const createCartItemMakrup = (
           </span>
           <span class="text-xs italic ml-1">${value.productCode}</span>
         </div>
-        <div class="flex flex-col mt-1">
-          <span class="font-semibold text-xs">${titleProductPrice}</span>
-          <div class="flex flex-row gap-1 items-center">
-            <span class="text-xs text-info">${value.price}</span>
-            <span class="text-xs text-info">${titleCurrency}</span>
-          </div>
-          <div class="flex flex-row gap-1 items-center">
-            <del class="text-xs text-info">${value.whsPrice1}</del>
-            <span class="text-xs text-info">${titleCurrency}</span>
-          </div>
-        </div>
       </div>
+      <!-- Item details (title, price, color, quantity) -->
       <div id="${value.id}" class="flex flex-col grow">
         <span class="font-bold text-xs min-h-8">
           ${textHandler.trimEnd(value.title, 100)}
-        </span>                 
-        <div>
-          <legend class="fieldset-legend font-semibold text-xs">${titleProductColor}</legend>
-          <select id="${value.id.concat("-color")}" 
-            class="select input-sm max-w-32">
-            ${colorsSelectOptions}
-          </select>
-        </div>
-        <div>
-          <legend class="fieldset-legend font-semibold text-xs">${titleProductQuantity}</legend>
-          <div class="flex gap-2 flex-row">
-            <input id="${value.id.concat("-quantity")}"
-              type="number"
-              class="input validator input-sm w-14"
-              required
-              min="1"
-              max="3000"
-              title="Must be between be 1 to 3000"
-              value="${value.quantity}"
-            />
+        </span>
+        <!-- Prices -->
+        <div class="flex gap-2 justify-start text-base">
+          <span class="font-semibold text-xs">${titleProductPrice}</span>
+          <div class="flex flex-row gap-1">
+            ${getPriceWithDiscount()}
+            <span class="text-xs text-info">${titleCurrency}</span>
           </div>
         </div>
+        <div class="mt-1 flex flex-row gap-2 justify-start">
+          <!-- Color select -->
+          <div class="w-26">
+            <legend class="fieldset-legend font-semibold text-xs">${titleProductColor}</legend>
+            <select id="${value.id}-color" name="${value.id}-color"
+              ${
+                value.availableColors === undefined ||
+                value.availableColors.length === 0
+                  ? "disabled"
+                  : ""
+              }
+              class="select input-sm max-w-26">
+              ${getColorSelectOptions()}
+            </select>
+          </div>
+          <!-- Quantity -->
+          <div class="w-16">
+            <legend class="fieldset-legend font-semibold text-xs">${titleProductQuantity}</legend>
+            <div class="flex gap-2 flex-row">
+              <input id="${value.id}-quantity" name="${value.id}-quantity"
+                type="number"
+                class="input validator input-sm w-14"
+                required
+                min="1"
+                max="3000"
+                title="Must be between be 1 to 3000"
+                value="${value.quantity}"
+              />
+            </div>
+          </div>
+        </div>
+        <!-- Command buttons -->
         <div class="mt-1 flex flex-row gap-3 justify-start">
           <button name="${updateCartCommandName}" type="button" class="cursor-pointer font-medium text-sm text-primary">${titleEdit}</button>
           <button name="${removeCarCommandtName}" type="button" class="cursor-pointer font-medium text-sm text-primary">${titleRemove}</button>
@@ -91,4 +124,4 @@ const createCartItemMakrup = (
   `;
 };
 
-export { createCartItemMakrup };
+export { createCartItemMarkup };

@@ -20,10 +20,10 @@ const noProductColors = "Нет информации о цвете";
   </div>
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
-      {colors && colors.sort().map((x, index) => {
-        const metadata = ColorDictionary[x];
+      {colors && colors.sort().map((key, index) => {
+        const metadata = ColorDictionary[key];
         return <input type="radio" name={"radio-color".concat(productId.toString())}
-          checked={index == 0 ? "checked" : undefined} title={metadata.title} value={x}
+          checked={index == 0 ? "checked" : undefined} title={metadata.title} value={key}
           class="appearance-none rounded-full border-1 checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
           class:list={[
             metadata.color, 

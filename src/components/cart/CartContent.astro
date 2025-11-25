@@ -21,10 +21,7 @@ const titleCurrency = "руб.";
 >
   <div class="flex h-full flex-col overflow-auto focus:outline-none">
     <!-- <Cart items /> -->
-    <ul data-cart-root role="list" class="divide-y">
-      <li class="flex py-6">
-        <!-- Cart item -->
-      </li>
+    <ul data-cart-root role="list" class="divide-y divide-gray-200">
     </ul>
     <!-- Cart summary -->
     <div class="border-t border-gray-200 py-6">
@@ -61,9 +58,10 @@ const titleCurrency = "руб.";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "../../core/stores/cart-store";
   import { DiscountMetadata } from "../../core/models/discount";
   import type { CartItem } from "../../core/models/cart";
-  import { createCartItemMakrup } from "../../core/helpers/cart-manager";
+  import { createCartItemMarkup } from "../../core/helpers/cart-manager";
 
   class CartContent extends HTMLElement {
+    private discountIndex: number = 0;
     private storeCostUnsubscribe?: () => void;
     private storeWhsCost1Unsubscribe?: () => void;
     private storeWhsCost2Unsubscribe?: () => void;
@@ -88,14 +86,17 @@ const titleCurrency = "руб.";
 
       if (sum >= DiscountMetadata[2]?.sum) {
         console.log("~ CartContent ~ discount 2: ", sum);
+        this.discountIndex = 2;
         if (cartCostEl !== null) cartCostEl.innerHTML = whsSum2.toString();  
         if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
       } else if (sum >= DiscountMetadata[1]?.sum) {
         console.log("~ CartContent ~ discount 1: ", sum);
+        this.discountIndex = 1;
         if (cartCostEl !== null) cartCostEl.innerHTML = whsSum1.toString();  
         if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
       } else {
         console.log("~ CartContent ~ no discounts: ", sum);
+        this.discountIndex = 0;
         if (cartCostEl !== null) cartCostEl.innerHTML = sum.toString();
         if (cartOldCostEl !== null) cartOldCostEl.innerHTML = "";
       }
@@ -116,9 +117,9 @@ const titleCurrency = "руб.";
       
       cartItems.forEach(x => {
         const divAlert = document.createElement("li");
-        divAlert.classList.add("flex", "py-6");
+        divAlert.classList.add("flex", "py-3");
         cartItemsEl.appendChild(divAlert);
-        divAlert.innerHTML = createCartItemMakrup(x, updateCartCommandName, removeCartCommandName);
+        divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, updateCartCommandName, removeCartCommandName);
       });
 
       return cartItems;
@@ -130,6 +131,7 @@ const titleCurrency = "руб.";
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
         console.log("~ CartContent ~ total cost has changed:", value);
         console.log("~ CartContent ~ no discounts: ", value);
+        this.discountIndex = 0;
         cartCostEl.innerHTML = value.toString();
         cartOldCostEl.innerHTML = "";
       });
@@ -142,6 +144,7 @@ const titleCurrency = "руб.";
         console.log("~ CartContent ~ total cost 1 has changed:", value);
         if (value >= DiscountMetadata[1]?.sum) {
           console.log("~ CartContent ~ discount #1: ", value);
+          this.discountIndex = 1;
           cartCostEl.innerHTML = value.toString();
           cartOldCostEl.innerHTML = $cartCost.get().toString();
         }
@@ -155,6 +158,7 @@ const titleCurrency = "руб.";
         console.log("~ CartContent ~ total cost 2 has changed:", value);
         if (value >= DiscountMetadata[2]?.sum) {
           console.log("~ CartContent ~ discount #2: ", value);
+          this.discountIndex = 2;
           cartCostEl.innerHTML = value.toString();
           cartOldCostEl.innerHTML = $cartCost.get().toString();
         }
@@ -169,10 +173,10 @@ const titleCurrency = "руб.";
           return;
         }
 
-        const colorEl = this.querySelector("#".concat(id, '-color'));
+        const colorEl = this.querySelector(`select[name='${id}-color']`);
         const color = colorEl !== null ? parseInt((colorEl as HTMLInputElement).value) : undefined;
 
-        const quantityEl = this.querySelector("#".concat(id, '-quantity'));
+        const quantityEl = this.querySelector(`input[name='${id}-quantity']`);
         const quantity = quantityEl ? parseInt((quantityEl as HTMLInputElement).value) : 1;
 
         if (item.color !== undefined && item.color !== color) {
