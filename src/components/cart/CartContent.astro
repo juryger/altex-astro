@@ -1,7 +1,7 @@
 ---
 const dataCartRootName = "data-cart-root";
-const dataCartCostName = "data-cart-cost";
-const dataCartOldCostName = "data-cart-oldcost";
+const dataDiscountedCostName = "data-discounted-cost";
+const dataFullCostName = "data-full-cost";
 const dataCartUpdateCommandName = "update-cart";
 const dataCartRemoveCommandName = "remove-cart";
 
@@ -14,8 +14,8 @@ const titleCurrency = "руб.";
 
 <cart-content 
   data-cart_root={dataCartRootName}
-  data-cart_cost={dataCartCostName}
-  data-cart_oldcost={dataCartOldCostName}
+  data-discounted_cost={dataDiscountedCostName}
+  data-full_cost={dataFullCostName}
   data-cart_update={dataCartUpdateCommandName} 
   data-cart_remove={dataCartRemoveCommandName}
 >
@@ -28,8 +28,8 @@ const titleCurrency = "руб.";
       <div class="flex justify-between text-base font-medium">
         <p>{titleSubtotal}</p>
         <div class="flex flex-row gap-1">
-          <span data-cart-cost class="text-info">{0}</span>
-          <del data-cart-oldcost class="text-info"></del>
+          <span data-discounted-cost class="text-info">{0}</span>
+          <del data-full-cost class="text-info"></del>
           <span class="text-info">{titleCurrency}</span>
         </div>
       </div>
@@ -62,6 +62,12 @@ const titleCurrency = "руб.";
 
   class CartContent extends HTMLElement {
     private discountIndex: number = 0;
+    private discountedCostEl: Element | null = null;
+    private fullCostEl: Element | null = null;
+    private cartRootEl: Element | null = null;
+    private updateCartCommandName: string | undefined;
+    private removeCartCommandName: string | undefined;
+    private storeCartUnsubscribe?: () => void;
     private storeCostUnsubscribe?: () => void;
     private storeWhsCost1Unsubscribe?: () => void;
     private storeWhsCost2Unsubscribe?: () => void;
@@ -78,36 +84,51 @@ const titleCurrency = "руб.";
       super();
     }
 
-    private syncCartCostFromStore(cartCostEl: Element | null, cartOldCostEl: Element | null): void {      
+    private syncCartCostFromStore(): void {      
       const sum = $cartCost.get();
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get();
-      console.log("~ CartContent ~ Sum breakdown: 1st: '%s', 2nd: '%s', 3rd: '%s'", sum, whsSum1, whsSum2);
 
       if (sum >= DiscountMetadata[2]?.sum) {
         console.log("~ CartContent ~ discount 2: ", sum);
         this.discountIndex = 2;
-        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum2.toString();  
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = whsSum2.toString();  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = sum.toString();
       } else if (sum >= DiscountMetadata[1]?.sum) {
         console.log("~ CartContent ~ discount 1: ", sum);
         this.discountIndex = 1;
-        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum1.toString();  
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = whsSum1.toString();  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = sum.toString();
       } else {
         console.log("~ CartContent ~ no discounts: ", sum);
         this.discountIndex = 0;
-        if (cartCostEl !== null) cartCostEl.innerHTML = sum.toString();
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = "";
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = sum.toString();
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
     }
 
-    private syncCartContentFromStore(cartItemsEl: Element | null, updateCartCommandName: string | undefined, removeCartCommandName: string | undefined): CartItem[] {
-      if (!cartItemsEl) return [];
-      if (!updateCartCommandName) return [];
-      if (!removeCartCommandName) return [];
+    private cleanupCartRoot = () => {
+      if (!this.cartRootEl) return [];
+      if (!this.updateCartCommandName) return [];
+      if (!this.removeCartCommandName) return [];
 
-      cartItemsEl.replaceChildren();
+      this.querySelectorAll(`button[name='${this.updateCartCommandName}']`).forEach((x, index) => 
+        this.updateHandlers[index] && x.removeEventListener('click', this.updateHandlers[index])
+      );
+
+      this.querySelectorAll(`button[name='${this.removeCartCommandName}']`).forEach((x, index) => 
+        this.removeHandlers[index] && x.removeEventListener('click', this.removeHandlers[index])
+      );
+
+      this.cartRootEl.replaceChildren();
+    }
+
+    private syncCartContentFromStore() {
+      if (!this.cartRootEl) return [];
+      if (!this.updateCartCommandName) return [];
+      if (!this.removeCartCommandName) return [];
+
+      this.cleanupCartRoot();
 
       const cartItems = $cart.get().sort((a: CartItem, b: CartItem) => {
         if (a.title < b.title) return -1;
@@ -118,49 +139,65 @@ const titleCurrency = "руб.";
       cartItems.forEach(x => {
         const divAlert = document.createElement("li");
         divAlert.classList.add("flex", "py-3");
-        cartItemsEl.appendChild(divAlert);
-        divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, updateCartCommandName, removeCartCommandName);
+        this.cartRootEl && this.cartRootEl.appendChild(divAlert);
+        if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
+          divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.updateCartCommandName, this.removeCartCommandName);
+        }
       });
 
-      return cartItems;
+      // Assign event handlers to each cart item commands (UpdateCart, RemoveCart)
+      this.querySelectorAll(`button[name='${this.updateCartCommandName}']`).forEach((x, index) => {
+        this.updateHandlers[index] = this.onUpdateCart(cartItems[index].id);
+        x.addEventListener('click', this.updateHandlers[index]);
+      });
+      this.querySelectorAll(`button[name='${this.removeCartCommandName}']`).forEach((x, index) => {
+        this.removeHandlers[index] = this.onRemoveFromCart(cartItems[index].id);
+        x.addEventListener('click', this.removeHandlers[index]);
+      });
     }
 
-    private subscribeToCostStore(cartCostEl: Element | null, cartOldCostEl: Element | null) {
-      if (!cartCostEl || !cartOldCostEl) return; 
+    private subscribeToCartStore() {
+      this.storeCartUnsubscribe = $cart.listen(() => {
+        console.log("~ CartContent ~ cart store changed");
+        setTimeout(() => {
+            this.syncCartContentFromStore();
+          }, 500)
+      });
+    }
+
+    private subscribeToCostStore() {
+      if (!this.discountedCostEl || !this.fullCostEl) return; 
 
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        console.log("~ CartContent ~ total cost has changed:", value);
         console.log("~ CartContent ~ no discounts: ", value);
         this.discountIndex = 0;
-        cartCostEl.innerHTML = value.toString();
-        cartOldCostEl.innerHTML = "";
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       });
     }
 
-    private subscribeToWhsCost1Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
-      if (!cartCostEl || !cartOldCostEl) return;
+    private subscribeToWhsCost1Store() {
+      if (!this.discountedCostEl || !this.fullCostEl) return;
 
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
-        console.log("~ CartContent ~ total cost 1 has changed:", value);
         if (value >= DiscountMetadata[1]?.sum) {
           console.log("~ CartContent ~ discount #1: ", value);
           this.discountIndex = 1;
-          cartCostEl.innerHTML = value.toString();
-          cartOldCostEl.innerHTML = $cartCost.get().toString();
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = $cartCost.get().toString();
         }
       });
     }
 
-    private subscribeToWhsCost2Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
-      if (!cartCostEl || !cartOldCostEl) return;
+    private subscribeToWhsCost2Store() {
+      if (!this.discountedCostEl || !this.fullCostEl) return;
       
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
-        console.log("~ CartContent ~ total cost 2 has changed:", value);
         if (value >= DiscountMetadata[2]?.sum) {
           console.log("~ CartContent ~ discount #2: ", value);
           this.discountIndex = 2;
-          cartCostEl.innerHTML = value.toString();
-          cartOldCostEl.innerHTML = $cartCost.get().toString();
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = $cartCost.get().toString();
         }
       });
     }
@@ -213,57 +250,62 @@ const titleCurrency = "руб.";
       }
     }
 
-    connectedCallback() {
-      const updateCartCommandName = this.dataset.cart_update;
-      console.assert(updateCartCommandName !== undefined, "Cannot find element [%s]", updateCartCommandName);
+    private getDiscountedCostElement = (): Element | null => {
+      const dataDiscountedCostName = this.dataset.discounted_cost;
+      const result = this.querySelector(`[${dataDiscountedCostName}]`);
+      console.assert(result !== null, "Cannot find element [%s]", dataDiscountedCostName);
+      return result;
+    }
 
-      const removeCartCommandName = this.dataset.cart_remove;
-      console.assert(updateCartCommandName !== undefined, "Cannot find element [%s]", removeCartCommandName);
+    private getFullCostElement = (): Element | null => {
+      const dataFullCostName = this.dataset.full_cost;
+      const result = this.querySelector(`[${dataFullCostName}]`);
+      console.assert(result !== null, "Cannot find element [%s]", dataFullCostName);
+      return result;
+    }
 
-      const dataCartCostName = this.dataset.cart_cost;
-      const cartCostEl = this.querySelector(`[${dataCartCostName}]`);
-      console.assert(cartCostEl !== null, "Cannot find element [%s]", dataCartCostName);
-      
-      const dataCartOldCostName = this.dataset.cart_oldcost;
-      const cartOldCostEl = this.querySelector(`[${dataCartOldCostName}]`);
-      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", dataCartOldCostName);
-      
-      this.syncCartCostFromStore(cartCostEl, cartOldCostEl)
-      this.subscribeToCostStore(cartCostEl, cartOldCostEl);
-      this.subscribeToWhsCost1Store(cartCostEl, cartOldCostEl);
-      this.subscribeToWhsCost2Store(cartCostEl, cartOldCostEl);
-      
+    private getCartRootElement = (): Element | null => {
       const dataCartRootName = this.dataset.cart_root;
-      const cartItemsEl = this.querySelector(`[${dataCartRootName}]`);
-      console.assert(cartItemsEl !== null, "Cannot find element [%s]", dataCartRootName)
+      const result = this.querySelector(`[${dataCartRootName}]`);
+      console.assert(result !== null, "Cannot find element [%s]", dataCartRootName);
+      return result;
+    } 
 
-      var cartItems = this.syncCartContentFromStore(cartItemsEl, updateCartCommandName, removeCartCommandName);
+    private getUpdateCartCommandName = (): string | undefined => {
+      const result = this.dataset.cart_update;
+      console.assert(result !== undefined, "Cannot find element [%s]", result);
+      return result;
+    }
 
-      this.querySelectorAll(`button[name='${updateCartCommandName}']`).forEach((x, index) => {
-        this.updateHandlers[index] = this.onUpdateCart(cartItems[index].id);
-        x.addEventListener('click', this.updateHandlers[index]);
-      });
+    private getRemoveCartCommandName = (): string | undefined => {
+      const result = this.dataset.cart_remove;
+      console.assert(result !== undefined, "Cannot find element [%s]", result);
+      return result;
+    }
 
-      this.querySelectorAll(`button[name='${removeCartCommandName}']`).forEach((x, index) => {
-        this.removeHandlers[index] = this.onRemoveFromCart(cartItems[index].id);
-        x.addEventListener('click', this.removeHandlers[index]);
-      });
+    connectedCallback() {
+      this.cartRootEl = this.getCartRootElement();
+      this.updateCartCommandName = this.getUpdateCartCommandName();
+      this.removeCartCommandName = this.getRemoveCartCommandName();
+      this.discountedCostEl = this.getDiscountedCostElement();
+      this.fullCostEl = this.getFullCostElement();
+
+      this.subscribeToCartStore();
+      this.subscribeToCostStore();
+      this.subscribeToWhsCost1Store();
+      this.subscribeToWhsCost2Store();
+      
+      this.syncCartCostFromStore()
+      this.syncCartContentFromStore();
     }
 
     disconnectedCallback() {
+      this.storeCartUnsubscribe && this.storeCartUnsubscribe();
       this.storeCostUnsubscribe && this.storeCostUnsubscribe();
       this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()
       this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
       
-      const btnUpdateCartName = this.dataset.btn_update_cart;
-      this.querySelectorAll(`button[name='${btnUpdateCartName}']`).forEach((x, index) => 
-        this.updateHandlers[index] && x.removeEventListener('click', this.updateHandlers[index])
-      );
-
-      const btnRemoveFromCartName = this.dataset.btn_remove_from_cart;
-      this.querySelectorAll(`button[name='${btnRemoveFromCartName}']`).forEach((x, index) => 
-        this.removeHandlers[index] && x.removeEventListener('click', this.removeHandlers[index])
-      );
+      this.cleanupCartRoot();
     }
   }
 

@@ -14,45 +14,44 @@ const productsBlobStorageUrl = `${
   import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL
 }`;
 
+const getPriceWithDiscount = (
+  value: CartItem,
+  discountIndex: number
+): string => {
+  if (discountIndex === 2) {
+    return `<span class="text-xs text-info">${value.whsPrice2}</span>
+      <del class="text-xs text-info">${value.price}</del>`;
+  } else if (discountIndex === 1) {
+    return `<span class="text-xs text-info">${value.whsPrice1}</span>
+      <del class="text-xs text-info">${value.price}</del>`;
+  }
+
+  return `<span class="text-xs text-info">${value.price}</span>
+      <del class="text-xs text-info"></del>`;
+};
+
+const getColorSelectOptions = (value: CartItem): string => {
+  var result = "";
+  value.availableColors
+    ?.sort((a, b) => a - b)
+    .forEach((key: number) => {
+      var metadata = ColorDictionary[key];
+      result = result.concat(
+        `<option value="${key}"
+          ${value.color !== undefined && value.color === key ? "selected" : ""}>
+          ${metadata.title}
+        </option>`
+      );
+    });
+  return result;
+};
+
 const createCartItemMarkup = (
   value: CartItem,
   discountIndex: number,
   updateCartCommandName: string,
   removeCarCommandtName: string
 ): string => {
-  const textHandler = getTextHandler();
-
-  const getPriceWithDiscount = (): string => {
-    if (discountIndex === 2) {
-      return `<span class="text-xs text-info">${value.whsPrice2}</span>
-        <del class="text-xs text-info">${value.price}</del>`;
-    } else if (discountIndex === 1) {
-      return `<span class="text-xs text-info">${value.whsPrice1}</span>
-        <del class="text-xs text-info">${value.price}</del>`;
-    }
-
-    return `<span class="text-xs text-info">${value.price}</span>
-        <del class="text-xs text-info"></del>`;
-  };
-
-  const getColorSelectOptions = (): string => {
-    var result = "";
-    value.availableColors
-      ?.sort((a, b) => a - b)
-      .forEach((key: number) => {
-        var metadata = ColorDictionary[key];
-        result = result.concat(
-          `<option value="${key}"
-            ${
-              value.color !== undefined && value.color === key ? "selected" : ""
-            }>
-            ${metadata.title}
-          </option>`
-        );
-      });
-    return result;
-  };
-
   return `
     <div class="flex flex-row gap-3 items-start">
       <!-- Item image and code -->
@@ -73,13 +72,13 @@ const createCartItemMarkup = (
       <!-- Item details (title, price, color, quantity) -->
       <div id="${value.id}" class="flex flex-col grow">
         <span class="font-bold text-xs min-h-8">
-          ${textHandler.trimEnd(value.title, 100)}
+          ${getTextHandler().trimEnd(value.title, 100)}
         </span>
         <!-- Prices -->
         <div class="flex gap-2 justify-start text-base">
           <span class="font-semibold text-xs">${titleProductPrice}</span>
           <div class="flex flex-row gap-1">
-            ${getPriceWithDiscount()}
+            ${getPriceWithDiscount(value, discountIndex)}
             <span class="text-xs text-info">${titleCurrency}</span>
           </div>
         </div>
@@ -95,7 +94,7 @@ const createCartItemMarkup = (
                   : ""
               }
               class="select input-sm max-w-26">
-              ${getColorSelectOptions()}
+              ${getColorSelectOptions(value)}
             </select>
           </div>
           <!-- Quantity -->
