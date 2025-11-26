@@ -1,4 +1,9 @@
 ---
+interface Props {
+  checkout: boolean,
+}
+const { checkout } = Astro.props;
+
 const dataCartRootName = "data-cart-root";
 const dataDiscountedCostName = "data-discounted-cost";
 const dataFullCostName = "data-full-cost";
@@ -6,6 +11,7 @@ const dataCartUpdateCommandName = "update-cart";
 const dataCartRemoveCommandName = "remove-cart";
 
 const titleCheckout = "Перейти к оформлению";
+const titleConfirmOrder = "Подтвердить заказ";
 const titleContinueShopping = "Вернутся в каталог";
 const titleSubtotal = "Итого:"; 
 const titleOr = "или";
@@ -31,11 +37,16 @@ const titleOr = "или";
           <del data-full-cost class="text-info"></del>
         </div>
       </div>
-      <div class="mt-3">
+      {!checkout && <div class="mt-3">
         <a href="/cart" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
           {titleCheckout}
         </a>
-      </div>
+      </div>}
+      {checkout && <div class="mt-3">
+        <a href="/submit" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
+          {titleConfirmOrder}
+        </a>
+      </div>}
       <div class="mt-3 flex justify-center text-center text-sm">
         <p>
           {titleOr}

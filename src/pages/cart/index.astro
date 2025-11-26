@@ -1,9 +1,22 @@
 ---
+import CartContent from "../../components/cart/CartContent.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const pageTitle = "Корзина";
+const pageTitle = "Оформление заявки на заказ";
+const titleContactInfo = "Контактная информация";
+const titleOrderDetails = "Детали заказа";
 ---
 
 <BaseLayout title={pageTitle}>
-  
+  <div class="flex flex-col sm:flex-row gap-3">
+    <div class="min-w-46">
+      <div class="flex flex-col sm:flex-row">
+        <h2 class="text-lg font-bold">{titleContactInfo}</h2>
+      </div>
+    </div>
+    <div class="min-w-20 sm:min-w-22">
+      <h2 class="text-lg font-bold">{titleOrderDetails}</h2>
+      <CartContent />
+    </div>
+  </div>
 </BaseLayout>
