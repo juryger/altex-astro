@@ -1,6 +1,6 @@
 import type { CartItem } from "../models/cart";
 import { ColorDictionary } from "../models/color";
-import { getTextHandler } from "./text-utils";
+import { formatCurrency, trimEnd } from "./text-utils";
 
 const titleProductColor = "Цвет:";
 const titleProductQuantity = "Количество:";
@@ -8,7 +8,6 @@ const titleProductCode = "Артикул:";
 const titleProductPrice = "Цена:";
 const titleEdit = "Изменить";
 const titleRemove = "Удалить";
-const titleCurrency = "руб.";
 
 const productsBlobStorageUrl = `${
   import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL
@@ -19,14 +18,18 @@ const getPriceWithDiscount = (
   discountIndex: number
 ): string => {
   if (discountIndex === 2) {
-    return `<span class="text-xs text-info">${value.whsPrice2}</span>
-      <del class="text-xs text-info">${value.price}</del>`;
+    return `<span class="text-xs text-info">${formatCurrency(
+      value.whsPrice2
+    )}</span>
+      <del class="text-xs text-info">${formatCurrency(value.price)}</del>`;
   } else if (discountIndex === 1) {
-    return `<span class="text-xs text-info">${value.whsPrice1}</span>
-      <del class="text-xs text-info">${value.price}</del>`;
+    return `<span class="text-xs text-info">${formatCurrency(
+      value.whsPrice1
+    )}</span>
+      <del class="text-xs text-info">${formatCurrency(value.price)}</del>`;
   }
 
-  return `<span class="text-xs text-info">${value.price}</span>
+  return `<span class="text-xs text-info">${formatCurrency(value.price)}</span>
       <del class="text-xs text-info"></del>`;
 };
 
@@ -72,14 +75,13 @@ const createCartItemMarkup = (
       <!-- Item details (title, price, color, quantity) -->
       <div id="${value.id}" class="flex flex-col grow">
         <span class="font-bold text-xs min-h-8">
-          ${getTextHandler().trimEnd(value.title, 100)}
+          ${trimEnd(value.title, 100)}
         </span>
         <!-- Prices -->
         <div class="flex gap-2 justify-start text-base">
           <span class="font-semibold text-xs">${titleProductPrice}</span>
           <div class="flex flex-row gap-1">
             ${getPriceWithDiscount(value, discountIndex)}
-            <span class="text-xs text-info">${titleCurrency}</span>
           </div>
         </div>
         <div class="mt-1 flex flex-row gap-2 justify-start">

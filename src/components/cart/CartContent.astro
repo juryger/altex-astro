@@ -9,7 +9,6 @@ const titleCheckout = "Перейти к оформлению";
 const titleContinueShopping = "Вернутся в каталог";
 const titleSubtotal = "Итого:"; 
 const titleOr = "или";
-const titleCurrency = "руб.";
 ---
 
 <cart-content 
@@ -30,7 +29,6 @@ const titleCurrency = "руб.";
         <div class="flex flex-row gap-1">
           <span data-discounted-cost class="text-info">{0}</span>
           <del data-full-cost class="text-info"></del>
-          <span class="text-info">{titleCurrency}</span>
         </div>
       </div>
       <div class="mt-3">
@@ -59,6 +57,7 @@ const titleCurrency = "руб.";
   import { DiscountMetadata } from "../../core/models/discount";
   import type { CartItem } from "../../core/models/cart";
   import { createCartItemMarkup } from "../../core/helpers/cart-manager";
+  import { formatCurrency } from "../../core/helpers/text-utils";
 
   class CartContent extends HTMLElement {
     private discountIndex: number = 0;
@@ -84,7 +83,7 @@ const titleCurrency = "руб.";
       super();
     }
 
-    private syncCartCostFromStore(): void {      
+    private syncCartCostFromStore(): void {
       const sum = $cartCost.get();
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get();
@@ -92,17 +91,17 @@ const titleCurrency = "руб.";
       if (sum >= DiscountMetadata[2]?.sum) {
         console.log("~ CartContent ~ discount 2: ", sum);
         this.discountIndex = 2;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = whsSum2.toString();  
-        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else if (sum >= DiscountMetadata[1]?.sum) {
         console.log("~ CartContent ~ discount 1: ", sum);
         this.discountIndex = 1;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = whsSum1.toString();  
-        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
         console.log("~ CartContent ~ no discounts: ", sum);
         this.discountIndex = 0;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
     }
@@ -161,7 +160,7 @@ const titleCurrency = "руб.";
         console.log("~ CartContent ~ cart store changed");
         setTimeout(() => {
             this.syncCartContentFromStore();
-          }, 500)
+          }, 300)
       });
     }
 
@@ -171,7 +170,7 @@ const titleCurrency = "руб.";
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
         console.log("~ CartContent ~ no discounts: ", value);
         this.discountIndex = 0;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       });
     }
@@ -183,8 +182,8 @@ const titleCurrency = "руб.";
         if (value >= DiscountMetadata[1]?.sum) {
           console.log("~ CartContent ~ discount #1: ", value);
           this.discountIndex = 1;
-          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
-          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = $cartCost.get().toString();
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }
@@ -196,8 +195,8 @@ const titleCurrency = "руб.";
         if (value >= DiscountMetadata[2]?.sum) {
           console.log("~ CartContent ~ discount #2: ", value);
           this.discountIndex = 2;
-          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = value.toString();
-          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = $cartCost.get().toString();
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }

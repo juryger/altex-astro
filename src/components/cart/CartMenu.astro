@@ -5,20 +5,19 @@ const titleCart = "Корзина";
 const titleViewCart = "Просмотреть";
 const titleCartItemsNumber = "Товаров:";
 const titleCartCostSum = "На сумму:";
-const titleCurrency = "руб."
 
 const sidebarId = "cart-sidebar";
 const dataCartIndicatorName = "data-cartmenu-indicator";
 const dataCartCountName = "data-cartmenu-count";
-const dataCartCostName = "data-cartmenu-cost";
-const dataCartOldCostName = "data-cartmenu-oldcost";
+const dataCartDiscountedCostName = "data-cartmenu-discounted-cost";
+const dataCartFullCostName = "data-cartmenu-full-cost";
 ---
 
 <cart-menu 
   data-cartmenu_indicator={dataCartIndicatorName} 
   data-cartmenu_count={dataCartCountName} 
-  data-cartmenu_cost={dataCartCostName} 
-  data-cartmenu_oldcost={dataCartOldCostName}
+  data-cartmenu_discounted_cost={dataCartDiscountedCostName} 
+  data-cartmenu_full_cost={dataCartFullCostName}
 >
   <CartSidebar id={sidebarId} />
   <div class="dropdown dropdown-end">
@@ -40,9 +39,8 @@ const dataCartOldCostName = "data-cartmenu-oldcost";
         </div>
         <span>{titleCartCostSum}</span>
         <div class="flex flex-row gap-1">
-          <span data-cartmenu-cost class="text-info font-semibold">{0}</span>
-          <del data-cartmenu-oldcost class="text-info font-semibold"></del>
-          <span class="text-info">{titleCurrency}</span>
+          <span data-cartmenu-discounted-cost class="text-info font-semibold">{0}</span>
+          <del data-cartmenu-full-cost class="text-info font-semibold"></del>
         </div>
         <label for={sidebarId} class="drawer-button btn btn-primary">{titleViewCart}</label>
       </div>
@@ -51,10 +49,15 @@ const dataCartOldCostName = "data-cartmenu-oldcost";
 </cart-menu>
 
 <script>
+  import { formatCurrency } from "../../core/helpers/text-utils";
   import { DiscountMetadata } from "../../core/models/discount";
   import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "../../core/stores/cart-store";
  
   class CartMenu extends HTMLElement {
+    private cartIndicatorEl: Element | null = null;
+    private cartCountEl: Element | null = null;
+    private discountedCostEl: Element | null = null;
+    private fullCostEl: Element | null = null;
     private storeCountUnsubscribe?: () => void;
     private storeCostUnsubscribe?: () => void;
     private storeWhsCost1Unsubscribe?: () => void;
@@ -64,98 +67,118 @@ const dataCartOldCostName = "data-cartmenu-oldcost";
       super();
     }
 
-    private syncCartCountFromStore(cartIndicatorEl: Element | null, cartCountEl: Element | null): void {
+    private syncCartCountFromStore(): void {
+      if (!this.cartIndicatorEl || !this.cartCountEl) return;
+
       const totalCount = $cartCount.get();
-      if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = totalCount.toString();
-      if (cartCountEl !== null) cartCountEl.innerHTML = totalCount.toString();
+      this.cartIndicatorEl.innerHTML = totalCount.toString();
+      this.cartCountEl.innerHTML = totalCount.toString();
     }
 
-    private syncCartCostFromStore(cartCostEl: Element | null, cartOldCostEl: Element | null): void {
+    private syncCartCostFromStore(): void {
       const sum = $cartCost.get();
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get();
-      console.log("~ CartMenu ~ Sum breakdown: 1st: '%s', 2nd: '%s', 3rd: '%s'", sum, whsSum1, whsSum2);
 
       if (sum >= DiscountMetadata[2]?.sum) {
         console.log("~ CartMenu ~ discount 2: ", sum);
-        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum2.toString();  
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else if (sum >= DiscountMetadata[1]?.sum) {
         console.log("~ CartMenu ~ discount 1: ", sum);
-        if (cartCostEl !== null) cartCostEl.innerHTML = whsSum1.toString();  
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = sum.toString();
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
         console.log("~ CartMenu ~ no discounts: ", sum);
-        if (cartCostEl !== null) cartCostEl.innerHTML = sum.toString();
-        if (cartOldCostEl !== null) cartOldCostEl.innerHTML = "";
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
     }
 
-    private subscribeToCountStore(cartIndicatorEl: Element | null, cartCountEl: Element | null) {
+    private subscribeToCountStore() {
       this.storeCountUnsubscribe = $cartCount.listen((value) => {
         console.log("~ CartMenu component ~ total count has changed:", value);
-        if (cartIndicatorEl !== null) cartIndicatorEl.innerHTML = value.toString();
-        if (cartCountEl !== null) cartCountEl.innerHTML = value.toString();
+        if (this.cartIndicatorEl !== null) this.cartIndicatorEl.innerHTML = value.toString();
+        if (this.cartCountEl !== null) this.cartCountEl.innerHTML = value.toString();
       });
     }
 
-    private subscribeToCostStore(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+    private subscribeToCostStore() {
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        console.log("~ CartMenu component ~ total cost has changed:", value);
-        if (cartCostEl !== null && cartOldCostEl !== null) {
-          console.log("~ CartMenu ~ no discounts: ", value);
-          cartCostEl.innerHTML = value.toString();
-          cartOldCostEl.innerHTML = "";
-        }
+        if (!this.discountedCostEl || !this.fullCostEl) return;
+
+        console.log("~ CartMenu ~ no discounts: ", value);
+        this.discountedCostEl.innerHTML = formatCurrency(value);
+        this.fullCostEl.innerHTML = "";
       });
     }
 
-    private subscribeToWhsCost1Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+    private subscribeToWhsCost1Store() {
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
-        console.log("~ CartMenu component ~ total cost 1 has changed:", value);
-        if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[1]?.sum) {
+        if (!this.discountedCostEl || !this.fullCostEl) return;
+
+        if (value >= DiscountMetadata[1]?.sum) {
           console.log("~ CartMenu ~ discount #1: ", value);
-          cartCostEl.innerHTML = value.toString();
-          cartOldCostEl.innerHTML = $cartCost.get().toString();
+          this.discountedCostEl.innerHTML = formatCurrency(value);
+          this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }
 
-    private subscribeToWhsCost2Store(cartCostEl: Element | null, cartOldCostEl: Element | null) {
+    private subscribeToWhsCost2Store() {
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
-        console.log("~ CartMenu component ~ total cost 2 has changed:", value);
-        if (cartCostEl !== null && cartOldCostEl !== null && value >= DiscountMetadata[2]?.sum) {
+        if (!this.discountedCostEl || !this.fullCostEl) return;
+
+        if (value >= DiscountMetadata[2]?.sum) {
           console.log("~ CartMenu ~ discount #2: ", value);
-          cartCostEl.innerHTML = value.toString();
-          cartOldCostEl.innerHTML = $cartCost.get().toString();
+          this.discountedCostEl.innerHTML = formatCurrency(value);
+          this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }
+
+    private getCartIndicatorElement = (): Element | null => {
+      const dataCartIndicatorName = this.dataset.cartmenu_indicator;
+      const result = this.querySelector(`[${dataCartIndicatorName}]`);
+      console.assert(result !== null, "~ CartMenu ~ Cannot find element: [%s]", dataCartIndicatorName);
+      return result;
+    }
+
+    private getCartCountElement = (): Element | null => {
+      const dataCartCountName = this.dataset.cartmenu_count;
+      const result = this.querySelector(`[${dataCartCountName}]`);
+      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataCartCountName);
+      return result;
+    }
+
+    private getDiscountedCostElement = (): Element | null => {
+      const dataDiscountedCostName = this.dataset.cartmenu_discounted_cost;
+      const result = this.querySelector(`[${dataDiscountedCostName}]`);
+      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataDiscountedCostName);
+      return result;
+    }
+
+    private getFullCostElement = (): Element | null => {
+      const dataFullCostName = this.dataset.cartmenu_full_cost;
+      const result = this.querySelector(`[${dataFullCostName}]`);
+      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataFullCostName);
+      return result;
+    }
+
 
     connectedCallback() {
-      const dataCartIndicatorName = this.dataset.cartmenu_indicator;
-      const cartIndicatorEl = this.querySelector(`[${dataCartIndicatorName}]`);
-      console.assert(cartIndicatorEl !== null, "Cannot find element: [%s]", dataCartIndicatorName);
-
-      const dataCartCountName = this.dataset.cartmenu_count;
-      const cartCountEl = this.querySelector(`[${dataCartCountName}]`);
-      console.assert(cartCountEl !== null, "Cannot find element [%s]", dataCartCountName);
-
-      const dataCartCostName = this.dataset.cartmenu_cost;
-      const cartCostEl = this.querySelector(`[${dataCartCostName}]`);
-      console.assert(cartCostEl !== null, "Cannot find element [%s]", dataCartCostName);
+      this.cartIndicatorEl = this.getCartIndicatorElement();
+      this.cartCountEl = this.getCartCountElement();
+      this.discountedCostEl = this.getDiscountedCostElement();
+      this.fullCostEl = this.getFullCostElement();
       
-      const dataCartOldCostName = this.dataset.cartmenu_oldcost;
-      const cartOldCostEl = this.querySelector(`[${dataCartOldCostName}]`);
-      console.assert(cartOldCostEl !== null, "Cannot find element [%s]", dataCartOldCostName);
+      this.syncCartCountFromStore();
+      this.syncCartCostFromStore();
 
-      this.syncCartCountFromStore(cartIndicatorEl, cartCountEl);
-      this.syncCartCostFromStore(cartCostEl, cartOldCostEl);
-
-      this.subscribeToCountStore(cartIndicatorEl, cartCountEl);
-      this.subscribeToCostStore(cartCostEl, cartOldCostEl);
-      this.subscribeToWhsCost1Store(cartCostEl, cartOldCostEl);
-      this.subscribeToWhsCost2Store(cartCostEl, cartOldCostEl);
+      this.subscribeToCountStore();
+      this.subscribeToCostStore();
+      this.subscribeToWhsCost1Store();
+      this.subscribeToWhsCost2Store();
     }
 
     disconnectedCallback() {

@@ -1,13 +1,13 @@
 ---
 export const prerender = false;
 
-import { getTextHandler } from '../../core/helpers/text-utils';
 import type { Product } from '../../core/models/product';
 import { UnitOfMeasurementDictionary } from '../../core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
+import { trimEnd } from '../../core/helpers/text-utils';
 
 interface Props {
   item: Product,
@@ -17,7 +17,6 @@ const { item } = Astro.props;
 const titleAddToCart = "В корзину";
 const btnAddToCardName = "pc-add-to-card";
 
-const textHandler = getTextHandler();
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
 const unitItem = item.unit ? UnitOfMeasurementDictionary[item.unit] : UnitOfMeasurementDictionary[0];
 console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
@@ -48,7 +47,7 @@ console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasureme
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
           </svg>
           <span class="card-title text-sm font-bold pl-2" title={item.title}>
-            {textHandler.trimEnd(item.title, 50)} 
+            {trimEnd(item.title, 50)} 
           </span>
         </a>
       </div>

@@ -2,11 +2,11 @@
 export const prerender = false;
 
 import { Image } from 'astro:assets';
-import { getTextHandler } from '../../core/helpers/text-utils';
 import { LiveCollectionNames } from '../../core/const';
 import { getCollectionByFilter } from '../../core/helpers/live-collection-manager';
 import type { Category } from '../../core/models/category';
 import { defaultPaging } from '../../core/models/paging';
+import { trimEnd } from '../../core/helpers/text-utils';
 
 interface Props {
   parentSlug?: string;
@@ -24,7 +24,6 @@ var categories = await getCollectionByFilter<Category>(LiveCollectionNames.Categ
     return result.value as { id: string, data: Category }[] | undefined;
   }).catch(reason => console.error(reason));
 
-const textHandler = getTextHandler();
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
 console.log("🚀 ~ Categories component ~ blob storage url: %s", categoriesBlobStorageUrl)
 ---
@@ -43,11 +42,11 @@ console.log("🚀 ~ Categories component ~ blob storage url: %s", categoriesBlob
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">
                 <span class="card-title text-sm font-bold" title={item.title}>
-                  {textHandler.trimEnd(item.title, 21)}
+                  {trimEnd(item.title, 21)}
                 </span>
                 {item.description &&
                   <span class="text-sm" title={item.description}>
-                    {textHandler.trimEnd(item.description, 100)}
+                    {trimEnd(item.description, 100)}
                   </span>
                 }
               </div>

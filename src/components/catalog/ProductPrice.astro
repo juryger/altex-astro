@@ -1,14 +1,15 @@
 ---
+import { formatCurrency } from '../../core/helpers/text-utils';
 import { DiscountMetadata, type Discount } from '../../core/models/discount';
 
 interface Props {
   price: number,
-  whsPrice1?: number,
-  whsPrice2?: number,
-  isDetailed?: boolean
+  whsPrice1: number,
+  whsPrice2: number,
+  isDetailed: boolean
 }
 
-const { price, whsPrice1, whsPrice2, isDetailed } = Astro.props;
+const { price, whsPrice1, isDetailed } = Astro.props;
 
 const priceTitle = DiscountMetadata.length > 0 ? DiscountMetadata[0].title : "Розн. цена";
 const whsPriceTitle =  DiscountMetadata.length > 1 ? DiscountMetadata[1].title : "Опт. цена";
@@ -29,10 +30,10 @@ const textSize = isDetailed ? "text-base" : "text-sm";
 <div class="stats shadow">
   <div class=`stat place-items-center ${maxWidth}`>
     <div class="stat-title">{priceTitle}</div>
-    <div class=`stat-value ${textSize}`>{price} р.</div>              
+    <div class=`stat-value ${textSize}`>{formatCurrency(price)}</div>
   </div>
   <div class=`stat place-items-center ${maxWidth}`>
     <div class="stat-title">{whsPriceTitle}</div>
-    <div class=`stat-value ${textSize}`>{whsPrice1} р.</div>
+    <div class=`stat-value ${textSize}`>{formatCurrency(whsPrice1)}</div>
   </div>
 </div>

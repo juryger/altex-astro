@@ -1,6 +1,6 @@
 enum CartMessages {
   AddedToTheCart = "Товар добавлен в корзину",
-  UpdatedInTheCart = "Данные о товаре к приобретению обновлены",
+  UpdatedInTheCart = "Товар обновлен в корзине",
   RemovedFromTheCart = "Товар удален из корзины",
 }
 
