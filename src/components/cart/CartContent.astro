@@ -1,8 +1,8 @@
 ---
 interface Props {
-  checkout: boolean,
+  isCheckout: boolean,
 }
-const { checkout } = Astro.props;
+const { isCheckout } = Astro.props;
 
 const dataCartRootName = "data-cart-root";
 const dataDiscountedCostName = "data-discounted-cost";
@@ -15,8 +15,14 @@ const titleConfirmOrder = "Подтвердить заказ";
 const titleContinueShopping = "Вернутся в каталог";
 const titleSubtotal = "Итого:"; 
 const titleOr = "или";
----
 
+/*
+border-radius: .5rem;   > rounded-md
+border-width: 1px;      > border
+border-style: solid;    > border-solid
+border-color: gray-200  > border-gray-200
+*/
+---
 <cart-content 
   data-cart_root={dataCartRootName}
   data-discounted_cost={dataDiscountedCostName}
@@ -24,12 +30,12 @@ const titleOr = "или";
   data-cart_update={dataCartUpdateCommandName} 
   data-cart_remove={dataCartRemoveCommandName}
 >
-  <div class="flex h-full flex-col overflow-auto focus:outline-none">
+  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}]}>
     <!-- <Cart items /> -->
     <ul data-cart-root role="list" class="divide-y divide-gray-200">
     </ul>
     <!-- Cart summary -->
-    <div class="border-t border-gray-200 py-6">
+    <div class="border-t border-gray-200 p-4">
       <div class="flex justify-between text-base font-medium">
         <p>{titleSubtotal}</p>
         <div class="flex flex-row gap-1">
@@ -37,12 +43,12 @@ const titleOr = "или";
           <del data-full-cost class="text-info"></del>
         </div>
       </div>
-      {!checkout && <div class="mt-3">
+      {!isCheckout && <div class="mt-3">
         <a href="/cart" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
           {titleCheckout}
         </a>
       </div>}
-      {checkout && <div class="mt-3">
+      {isCheckout && <div class="mt-3">
         <a href="/submit" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
           {titleConfirmOrder}
         </a>
@@ -100,17 +106,17 @@ const titleOr = "или";
       const whsSum2 = $cartWhsCost2.get();
 
       if (sum >= DiscountMetadata[2]?.sum) {
-        console.log("~ CartContent ~ discount 2: ", sum);
+        console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
         this.discountIndex = 2;
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else if (sum >= DiscountMetadata[1]?.sum) {
-        console.log("~ CartContent ~ discount 1: ", sum);
+        console.log("~ CartContent ~ discount cost #1 applied:%i", sum);
         this.discountIndex = 1;
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
-        console.log("~ CartContent ~ no discounts: ", sum);
+        console.log("~ CartContent ~ no discounts applied:%i", sum);
         this.discountIndex = 0;
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
@@ -148,7 +154,7 @@ const titleOr = "или";
       
       cartItems.forEach(x => {
         const divAlert = document.createElement("li");
-        divAlert.classList.add("flex", "py-3");
+        divAlert.classList.add("flex", "p-4");
         this.cartRootEl && this.cartRootEl.appendChild(divAlert);
         if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
           divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.updateCartCommandName, this.removeCartCommandName);
@@ -179,7 +185,7 @@ const titleOr = "или";
       if (!this.discountedCostEl || !this.fullCostEl) return; 
 
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        console.log("~ CartContent ~ no discounts: ", value);
+        console.log("~ CartContent ~ full cost: ", value);
         this.discountIndex = 0;
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
@@ -191,7 +197,7 @@ const titleOr = "или";
 
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
         if (value >= DiscountMetadata[1]?.sum) {
-          console.log("~ CartContent ~ discount #1: ", value);
+          console.log("~ CartContent ~ discount cost #1: ", value);
           this.discountIndex = 1;
           if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
           if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
@@ -204,7 +210,7 @@ const titleOr = "или";
       
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
         if (value >= DiscountMetadata[2]?.sum) {
-          console.log("~ CartContent ~ discount #2: ", value);
+          console.log("~ CartContent ~ discount cost #2: ", value);
           this.discountIndex = 2;
           if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
           if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());

@@ -81,15 +81,15 @@ const dataCartFullCostName = "data-cartmenu-full-cost";
       const whsSum2 = $cartWhsCost2.get();
 
       if (sum >= DiscountMetadata[2]?.sum) {
-        console.log("~ CartMenu ~ discount 2: ", sum);
+        console.log("~ CartMenu ~ discount cost #2 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else if (sum >= DiscountMetadata[1]?.sum) {
-        console.log("~ CartMenu ~ discount 1: ", sum);
+        console.log("~ CartMenu ~ discount cost #1 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
-        console.log("~ CartMenu ~ no discounts: ", sum);
+        console.log("~ CartMenu ~ no discounts applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
@@ -107,7 +107,7 @@ const dataCartFullCostName = "data-cartmenu-full-cost";
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
         if (!this.discountedCostEl || !this.fullCostEl) return;
 
-        console.log("~ CartMenu ~ no discounts: ", value);
+        console.log("~ CartMenu ~ full cost:%i", value);
         this.discountedCostEl.innerHTML = formatCurrency(value);
         this.fullCostEl.innerHTML = "";
       });
@@ -118,7 +118,7 @@ const dataCartFullCostName = "data-cartmenu-full-cost";
         if (!this.discountedCostEl || !this.fullCostEl) return;
 
         if (value >= DiscountMetadata[1]?.sum) {
-          console.log("~ CartMenu ~ discount #1: ", value);
+          console.log("~ CartMenu ~ discount cost #1:%i", value);
           this.discountedCostEl.innerHTML = formatCurrency(value);
           this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
@@ -130,7 +130,7 @@ const dataCartFullCostName = "data-cartmenu-full-cost";
         if (!this.discountedCostEl || !this.fullCostEl) return;
 
         if (value >= DiscountMetadata[2]?.sum) {
-          console.log("~ CartMenu ~ discount #2: ", value);
+          console.log("~ CartMenu ~ discount cost #2:%i", value);
           this.discountedCostEl.innerHTML = formatCurrency(value);
           this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
