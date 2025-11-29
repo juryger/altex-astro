@@ -17,9 +17,8 @@ const { item } = Astro.props;
 const titleAddToCart = "В корзину";
 const btnAddToCardName = "pc-add-to-card";
 
-const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
 const unitItem = item.unit ? UnitOfMeasurementDictionary[item.unit] : UnitOfMeasurementDictionary[0];
-console.log("🚀 ~ ProductCard component ~ blob storage url %s, unitOfMeasurement: %s", productsBlobStorageUrl, unitItem.title)
+console.log("🚀 ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.title)
 ---
 
 <product-card 

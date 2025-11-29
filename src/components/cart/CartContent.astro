@@ -9,19 +9,14 @@ const dataDiscountedCostName = "data-discounted-cost";
 const dataFullCostName = "data-full-cost";
 const dataCartUpdateCommandName = "update-cart";
 const dataCartRemoveCommandName = "remove-cart";
+const dataCartCheckoutCommandName = "checkout-cart"
+const dataOrderConfirmCommandName = "confirm-order"
 
 const titleCheckout = "Перейти к оформлению";
 const titleConfirmOrder = "Подтвердить заказ";
 const titleContinueShopping = "Вернутся в каталог";
 const titleSubtotal = "Итого:"; 
 const titleOr = "или";
-
-/*
-border-radius: .5rem;   > rounded-md
-border-width: 1px;      > border
-border-style: solid;    > border-solid
-border-color: gray-200  > border-gray-200
-*/
 ---
 <cart-content 
   data-cart_root={dataCartRootName}
@@ -29,11 +24,13 @@ border-color: gray-200  > border-gray-200
   data-full_cost={dataFullCostName}
   data-cart_update={dataCartUpdateCommandName} 
   data-cart_remove={dataCartRemoveCommandName}
+  data-cart_checkout={dataCartCheckoutCommandName}
+  data-order_confirm={dataOrderConfirmCommandName}
 >
-  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}]}>
+  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}, {'h-[30rem]': isCheckout}]}>
     <!-- <Cart items /> -->
-    <ul data-cart-root role="list" class="divide-y divide-gray-200">
-    </ul>
+      <ul data-cart-root role="list" class="divide-y divide-gray-200">
+      </ul>
     <!-- Cart summary -->
     <div class="border-t border-gray-200 p-4">
       <div class="flex justify-between text-base font-medium">
@@ -44,14 +41,10 @@ border-color: gray-200  > border-gray-200
         </div>
       </div>
       {!isCheckout && <div class="mt-3">
-        <a href="/cart" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
-          {titleCheckout}
-        </a>
+        <button name="checkout-cart" class="btn btn-primary w-full rounded-md border border-transparent">{titleCheckout}</button>
       </div>}
       {isCheckout && <div class="mt-3">
-        <a href="/submit" class="btn btn-primary flex items-center justify-center rounded-md border border-transparent">
-          {titleConfirmOrder}
-        </a>
+        <button name="confirm-order" class="btn btn-primary w-full rounded-md border border-transparent">{titleConfirmOrder}</button>
       </div>}
       <div class="mt-3 flex justify-center text-center text-sm">
         <p>
@@ -67,6 +60,7 @@ border-color: gray-200  > border-gray-200
 </cart-content>
 
 <script>
+  import { navigate } from 'astro:transitions/client';
   import { CartMessages } from "../../core/const/messages";
   import { AlertKind } from "../../core/models/alert";
   import { addAlert } from "../../core/stores/alert-store";
@@ -81,12 +75,16 @@ border-color: gray-200  > border-gray-200
     private discountedCostEl: Element | null = null;
     private fullCostEl: Element | null = null;
     private cartRootEl: Element | null = null;
+    private orderConfirmEl: Element | null = null;
+    private cartCheckoutEl: Element | null = null;
     private updateCartCommandName: string | undefined;
     private removeCartCommandName: string | undefined;
     private storeCartUnsubscribe?: () => void;
     private storeCostUnsubscribe?: () => void;
     private storeWhsCost1Unsubscribe?: () => void;
     private storeWhsCost2Unsubscribe?: () => void;
+    private cartCheckoutHandler: any;
+    private orderConfirmHandler: any;
 
     private updateHandlers: {
       [key: number]: (e: Event) => any;
@@ -100,26 +98,19 @@ border-color: gray-200  > border-gray-200
       super();
     }
 
-    private syncCartCostFromStore(): void {
-      const sum = $cartCost.get();
-      const whsSum1 = $cartWhsCost1.get();
-      const whsSum2 = $cartWhsCost2.get();
+    private onCartCheckoutClick = () => {
+      return (e: Event) => {
+        e.preventDefault();
+        navigate('/cart');
+      }
+    }
 
-      if (sum >= DiscountMetadata[2]?.sum) {
-        console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
-        this.discountIndex = 2;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
-        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
-      } else if (sum >= DiscountMetadata[1]?.sum) {
-        console.log("~ CartContent ~ discount cost #1 applied:%i", sum);
-        this.discountIndex = 1;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
-        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
-      } else {
-        console.log("~ CartContent ~ no discounts applied:%i", sum);
-        this.discountIndex = 0;
-        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
-        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
+    private onOrderConfirmClick = () => {
+      return (e: Event) => {
+        e.preventDefault();
+        // TODO: send request to API Endpoint   
+        // TODO: if failed, stay at the current page + notification, otherwise clean the cart and redirect to confirmation page     
+        navigate('/cart/confirmed?order=123');
       }
     }
 
@@ -137,6 +128,32 @@ border-color: gray-200  > border-gray-200
       );
 
       this.cartRootEl.replaceChildren();
+    }
+
+    private syncCartCostFromStore(): void {
+      const sum = $cartCost.get();
+      const whsSum1 = $cartWhsCost1.get();
+      const whsSum2 = $cartWhsCost2.get();
+
+      if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (sum === 0);
+      if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (sum === 0);
+
+      if (sum >= DiscountMetadata[2]?.sum) {
+        console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
+        this.discountIndex = 2;
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
+      } else if (sum >= DiscountMetadata[1]?.sum) {
+        console.log("~ CartContent ~ discount cost #1 applied:%i", sum);
+        this.discountIndex = 1;
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
+      } else {
+        console.log("~ CartContent ~ no discounts applied:%i", sum);
+        this.discountIndex = 0;
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
+      }
     }
 
     private syncCartContentFromStore() {
@@ -173,11 +190,14 @@ border-color: gray-200  > border-gray-200
     }
 
     private subscribeToCartStore() {
-      this.storeCartUnsubscribe = $cart.listen(() => {
+      this.storeCartUnsubscribe = $cart.listen((items) => {
         console.log("~ CartContent ~ cart store changed");
+        if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (!items || items.length === 0);
+        if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (!items || items.length === 0);
+        
         setTimeout(() => {
-            this.syncCartContentFromStore();
-          }, 300)
+          this.syncCartContentFromStore();
+        }, 300)
       });
     }
 
@@ -298,6 +318,26 @@ border-color: gray-200  > border-gray-200
       console.assert(result !== undefined, "Cannot find element [%s]", result);
       return result;
     }
+    
+    private getCartCheckoutElement = (): Element | null => {
+      const dataCartCheckoutCommandName = this.dataset.cart_checkout;
+      const result = this.querySelector(`button[name='${dataCartCheckoutCommandName}']`);
+      
+      this.cartCheckoutHandler = this.onCartCheckoutClick();
+      result?.addEventListener('click', this.cartCheckoutHandler);
+      
+      return result;
+    }
+
+    private getOrderConfirmElement = (): Element | null => {
+      const dataOrderConfirmCommandName = this.dataset.order_confirm;
+      const result = this.querySelector(`button[name='${dataOrderConfirmCommandName}']`);
+
+      this.orderConfirmHandler = this.onOrderConfirmClick();
+      result?.addEventListener('click', this.orderConfirmHandler);
+
+      return result;
+    }
 
     connectedCallback() {
       this.cartRootEl = this.getCartRootElement();
@@ -305,6 +345,12 @@ border-color: gray-200  > border-gray-200
       this.removeCartCommandName = this.getRemoveCartCommandName();
       this.discountedCostEl = this.getDiscountedCostElement();
       this.fullCostEl = this.getFullCostElement();
+      this.cartCheckoutEl = this.getCartCheckoutElement();
+      this.orderConfirmEl = this.getOrderConfirmElement();
+
+      if (!this.orderConfirmEl && !this.cartCheckoutEl) {
+        console.warn("Cannot find any of these elements: '%s' or '%s'", this.dataset.cart_confirm, this.dataset.cart_checkout);
+      }
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
@@ -321,6 +367,9 @@ border-color: gray-200  > border-gray-200
       this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()
       this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
       
+      this.cartCheckoutEl?.removeEventListener('click', this.cartCheckoutHandler);
+      this.orderConfirmEl?.removeEventListener('click', this.orderConfirmHandler);
+
       this.cleanupCartRoot();
     }
   }
