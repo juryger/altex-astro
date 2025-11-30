@@ -3,10 +3,10 @@ export const prerender = false;
 
 import { Image } from 'astro:assets';
 import { LiveCollectionNames } from '../../core/const';
-import { getCollectionByFilter } from '../../core/helpers/live-collection-manager';
+import { getCollectionByFilter } from '../../core/utils/live-collection-manager';
 import type { Category } from '../../core/models/category';
 import { defaultPaging } from '../../core/models/paging';
-import { trimEnd } from '../../core/helpers/text-utils';
+import { trimEnd } from '../../core/utils/text-utils';
 
 interface Props {
   parentSlug?: string;
@@ -35,9 +35,9 @@ console.log("🚀 ~ Categories component ~ blob storage url: %s", categoriesBlob
       {categories.map(x => {
         const item = x.data;
         return (
-          <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
+          <div class="card bg-base-300 hadow-sm px-2 py-2">
             <a class="group no-underline" href={"/catalog/categories/".concat(item.slug)}>     
-              <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto min-h-[150px]">
+              <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto h-[150px]">
                 <Image src={categoriesBlobStorageUrl.concat("/", item.image)} alt={item.title} width="150" height="150" class="rounded-xl"/>
               </figure>
               <div class="card-body items-center text-center !px-1 !py-1">

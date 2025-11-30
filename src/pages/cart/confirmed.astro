@@ -3,8 +3,8 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
-import verfiyLogo from '../../assets/verify.png';
-import { extractUrlParamValue } from '../../core/helpers/url-utils';
+import successLogo from '../../assets/success.png';
+import { extractUrlParamValue } from '../../core/utils/url-utils';
 
 const order = extractUrlParamValue(new URL(Astro.request.url), "order", "string"); 
 console.log("🚀 ~ Cart checkout confirmation page ~ request: %s", order);
@@ -13,7 +13,7 @@ console.log("🚀 ~ Cart checkout confirmation page ~ request: %s", order);
 <BaseLayout title="Подтверждение заказа">
   <div class="flex gap-2">
     <div class="grow-0 content-center">
-      <Image src={verfiyLogo}
+      <Image src={successLogo}
           class="w-32"
           alt="Confirmation logo"
         />

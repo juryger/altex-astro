@@ -7,17 +7,14 @@ const { isCheckout } = Astro.props;
 const dataCartRootName = "data-cart-root";
 const dataDiscountedCostName = "data-discounted-cost";
 const dataFullCostName = "data-full-cost";
-const dataCartUpdateCommandName = "update-cart";
-const dataCartRemoveCommandName = "remove-cart";
-const dataCartCheckoutCommandName = "checkout-cart"
-const dataOrderConfirmCommandName = "confirm-order"
+const dataCartUpdateCommandName = "cart-update";
+const dataCartRemoveCommandName = "cart-remove";
+const dataCartCheckoutCommandName = "cart-checkout"
 
 const titleCheckout = "Перейти к оформлению";
-const titleConfirmOrder = "Подтвердить заказ";
-const titleContinueShopping = "Вернутся в каталог";
 const titleSubtotal = "Итого:"; 
-const titleOr = "или";
 ---
+
 <cart-content 
   data-cart_root={dataCartRootName}
   data-discounted_cost={dataDiscountedCostName}
@@ -25,14 +22,11 @@ const titleOr = "или";
   data-cart_update={dataCartUpdateCommandName} 
   data-cart_remove={dataCartRemoveCommandName}
   data-cart_checkout={dataCartCheckoutCommandName}
-  data-order_confirm={dataOrderConfirmCommandName}
+  data-is_checkout={isCheckout}
 >
-  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}, {'h-[30rem]': isCheckout}]}>
-    <!-- <Cart items /> -->
-      <ul data-cart-root role="list" class="divide-y divide-gray-200">
-      </ul>
-    <!-- Cart summary -->
-    <div class="border-t border-gray-200 p-4">
+  <!-- Cart summary -->
+  <div class="navbar sticky top-0 z-60 bg-base-300 rounded-md min-h-1">
+    <div class="flex flex-col w-full">
       <div class="flex justify-between text-base font-medium">
         <p>{titleSubtotal}</p>
         <div class="flex flex-row gap-1">
@@ -40,22 +34,17 @@ const titleOr = "или";
           <del data-full-cost class="text-info"></del>
         </div>
       </div>
-      {!isCheckout && <div class="mt-3">
-        <button name="checkout-cart" class="btn btn-primary w-full rounded-md border border-transparent">{titleCheckout}</button>
-      </div>}
-      {isCheckout && <div class="mt-3">
-        <button name="confirm-order" class="btn btn-primary w-full rounded-md border border-transparent">{titleConfirmOrder}</button>
-      </div>}
-      <div class="mt-3 flex justify-center text-center text-sm">
-        <p>
-          {titleOr}
-          <a href="/catalog" class="text-primary">
-            {titleContinueShopping}
-            <span class="ml-0.5" aria-hidden="true">→</span>
-          </a>
-        </p>
-      </div>
+      {!isCheckout && 
+        <div class="mt-1">
+          <button name={dataCartCheckoutCommandName} class="btn btn-primary w-full rounded-md border border-transparent">{titleCheckout}</button>
+        </div>
+      }
     </div>
+  </div>
+  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}, {'h-[28rem]': isCheckout}, {'mt-2': isCheckout}]}>
+    <!-- <Cart items /> -->
+    <ul data-cart-root role="list" class="divide-y divide-gray-200">
+    </ul>    
   </div>
 </cart-content>
 
@@ -67,15 +56,15 @@ const titleOr = "или";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "../../core/stores/cart-store";
   import { DiscountMetadata } from "../../core/models/discount";
   import type { CartItem } from "../../core/models/cart";
-  import { createCartItemMarkup } from "../../core/helpers/cart-manager";
-  import { formatCurrency } from "../../core/helpers/text-utils";
+  import { createCartItemMarkup } from "../../core/utils/cart-manager";
+  import { formatCurrency } from "../../core/utils/text-utils";
+  import { regexTruePattern } from '../../core/utils/regex';
 
   class CartContent extends HTMLElement {
     private discountIndex: number = 0;
     private discountedCostEl: Element | null = null;
     private fullCostEl: Element | null = null;
     private cartRootEl: Element | null = null;
-    private orderConfirmEl: Element | null = null;
     private cartCheckoutEl: Element | null = null;
     private updateCartCommandName: string | undefined;
     private removeCartCommandName: string | undefined;
@@ -84,7 +73,6 @@ const titleOr = "или";
     private storeWhsCost1Unsubscribe?: () => void;
     private storeWhsCost2Unsubscribe?: () => void;
     private cartCheckoutHandler: any;
-    private orderConfirmHandler: any;
 
     private updateHandlers: {
       [key: number]: (e: Event) => any;
@@ -102,15 +90,6 @@ const titleOr = "или";
       return (e: Event) => {
         e.preventDefault();
         navigate('/cart');
-      }
-    }
-
-    private onOrderConfirmClick = () => {
-      return (e: Event) => {
-        e.preventDefault();
-        // TODO: send request to API Endpoint   
-        // TODO: if failed, stay at the current page + notification, otherwise clean the cart and redirect to confirmation page     
-        navigate('/cart/confirmed?order=123');
       }
     }
 
@@ -133,10 +112,7 @@ const titleOr = "или";
     private syncCartCostFromStore(): void {
       const sum = $cartCost.get();
       const whsSum1 = $cartWhsCost1.get();
-      const whsSum2 = $cartWhsCost2.get();
-
-      if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (sum === 0);
-      if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (sum === 0);
+      const whsSum2 = $cartWhsCost2.get(); 
 
       if (sum >= DiscountMetadata[2]?.sum) {
         console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
@@ -169,9 +145,11 @@ const titleOr = "или";
         return 0;
       });
       
+      if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (cartItems.length === 0);     
+
       cartItems.forEach(x => {
         const divAlert = document.createElement("li");
-        divAlert.classList.add("flex", "p-4");
+        divAlert.classList.add("flex", "p-2");
         this.cartRootEl && this.cartRootEl.appendChild(divAlert);
         if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
           divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.updateCartCommandName, this.removeCartCommandName);
@@ -192,9 +170,7 @@ const titleOr = "или";
     private subscribeToCartStore() {
       this.storeCartUnsubscribe = $cart.listen((items) => {
         console.log("~ CartContent ~ cart store changed");
-        if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (!items || items.length === 0);
-        if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (!items || items.length === 0);
-        
+        if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (items.length === 0);
         setTimeout(() => {
           this.syncCartContentFromStore();
         }, 300)
@@ -320,22 +296,16 @@ const titleOr = "или";
     }
     
     private getCartCheckoutElement = (): Element | null => {
+      const isCheckout = this.dataset.is_checkout?.match(regexTruePattern);
+      if (isCheckout) return null;
+
       const dataCartCheckoutCommandName = this.dataset.cart_checkout;
       const result = this.querySelector(`button[name='${dataCartCheckoutCommandName}']`);
+      console.assert(result !== null, "Cannot find element [%s]", dataCartCheckoutCommandName);
       
       this.cartCheckoutHandler = this.onCartCheckoutClick();
       result?.addEventListener('click', this.cartCheckoutHandler);
       
-      return result;
-    }
-
-    private getOrderConfirmElement = (): Element | null => {
-      const dataOrderConfirmCommandName = this.dataset.order_confirm;
-      const result = this.querySelector(`button[name='${dataOrderConfirmCommandName}']`);
-
-      this.orderConfirmHandler = this.onOrderConfirmClick();
-      result?.addEventListener('click', this.orderConfirmHandler);
-
       return result;
     }
 
@@ -346,11 +316,6 @@ const titleOr = "или";
       this.discountedCostEl = this.getDiscountedCostElement();
       this.fullCostEl = this.getFullCostElement();
       this.cartCheckoutEl = this.getCartCheckoutElement();
-      this.orderConfirmEl = this.getOrderConfirmElement();
-
-      if (!this.orderConfirmEl && !this.cartCheckoutEl) {
-        console.warn("Cannot find any of these elements: '%s' or '%s'", this.dataset.cart_confirm, this.dataset.cart_checkout);
-      }
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
@@ -368,7 +333,6 @@ const titleOr = "или";
       this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
       
       this.cartCheckoutEl?.removeEventListener('click', this.cartCheckoutHandler);
-      this.orderConfirmEl?.removeEventListener('click', this.orderConfirmHandler);
 
       this.cleanupCartRoot();
     }

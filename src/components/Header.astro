@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
-import { getNavPathManager } from '../core/helpers/nav-path-manager';
+import { getNavPathManager } from '../core/utils/nav-path-manager';
 import CartMenu from './cart/CartMenu.astro';
 
 const allPaths = getNavPathManager().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
@@ -10,7 +10,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
 ---
 
 <script>
-  import { applyThemeToggle } from "../core/helpers/theme-toggle";
+  import { applyThemeToggle } from "../core/utils/theme-toggle";
 
   console.log("🚀 ~ Header ~ Apply them toggler");
 

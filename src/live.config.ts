@@ -1,4 +1,4 @@
-import { defineLiveCollection, z, reference } from "astro:content";
+import { defineLiveCollection } from "astro:content";
 import {
   createCategoriesLoader,
   type CategoryCollectionFilter,

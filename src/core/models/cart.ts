@@ -23,8 +23,22 @@ export const CartSchema = z
         : data.productId.toString(),
   }));
 
-export type CartItem = z.infer<typeof CartSchema>;
+export const CartCheckoutGuestUserSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  compnay: z.string(),
+  address: z.string(),
+  city: z.string(),
+  postCode: z.string(),
+});
 
-export type CartDictionary = {
-  [key: string]: CartItem | undefined;
-};
+export const CartCheckoutSchema = z.object({
+  userId: z.number().optional(),
+  guestUser: CartCheckoutGuestUserSchema.optional(),
+  cart: z.array(CartSchema),
+});
+
+export type CartItem = z.infer<typeof CartSchema>;
+export type CartCheckoutGuestUser = z.infer<typeof CartCheckoutGuestUserSchema>;

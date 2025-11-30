@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import type { Product } from "../../core/models/product";
 import { defaultPaging, type Pagable } from "../../core/models/paging";
 import { APISearchParamNames } from "../../core/const";
-import { extractUrlParamValue } from "../../core/helpers/url-utils";
+import { extractUrlParamValue } from "../../core/utils/url-utils";
 
 export const prerender = false;
 

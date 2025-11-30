@@ -1,0 +1,195 @@
+---
+import CartContent from "./CartContent.astro"
+
+const titleContactInfo = "Контактная информация";
+const titleOrderDetails = "Детали заказа";
+const titleFirstName = "Имя*";
+const titleLastName = "Фамилия*";
+const titleEmailName = "E-mail*";
+const titlePhonetName = "Телефон";
+const titleOrgName = "Организация";
+const titleAddressName = "Адрес";
+const titleCityName = "Город";
+const titlePostCode = "Почтовый код";
+const titleIncorrectValue = "Введите корректное значение поля";
+const titleIncorrectPhone = "Номер должен состоять из 11 цифр и начинаться с 8";
+const titleIncorrectPostCode = "Почтовый индеск должен состоять из 6 цифр";
+const titleConfirmOrder = "Подтвердить заказ";
+
+const dataFormCheckoutName = "form-checkout"
+const dataOrderConfirmCommandName = "order-confirm";
+---
+
+<cart-checkout 
+  data-form_checkout={dataFormCheckoutName}
+  data-order_confirm={dataOrderConfirmCommandName}
+>
+  <div class="fieldset flex flex-col md:flex-row gap-4">
+    <div class="grow-1">
+      <form name={dataFormCheckoutName}>  
+        <h2 class="text-lg font-bold">{titleContactInfo}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titleFirstName}</legend>
+            <input type="text" name="firstName" class="input w-full validator" required placeholder="" />
+            <p class="validator-hint hidden">{titleIncorrectValue}</p>
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titleLastName}</legend>
+            <input type="text" name="lastName" class="input w-full validator" required placeholder="" />
+            <p class="validator-hint hidden">{titleIncorrectValue}</p>
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titleEmailName}</legend>
+            <input type="email" name="email" class="input w-full validator" required placeholder="mail@site.ru" />
+            <p class="validator-hint hidden">{titleIncorrectValue}</p>
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titlePhonetName}</legend>
+            <input type="tel" name="phone" class="input w-full validator" placeholder="8..."
+              pattern="8[0-9]*"
+              minlength="11"
+              maxlength="11" />
+            <p class="validator-hint hidden">{titleIncorrectPhone}</p>
+          </fieldset>
+          <fieldset class="fieldset col-span-2">
+            <legend class="fieldset-legend">{titleOrgName}</legend>
+            <input type="text" name="company" class="input w-full validator" placeholder="" />
+          </fieldset>
+          <fieldset class="fieldset col-span-2">
+            <legend class="fieldset-legend">{titleAddressName}</legend>
+            <input type="text" name="address" class="input w-full validator" placeholder="" />
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titleCityName}</legend>
+            <input type="text" name="city" class="input w-full validator" placeholder="" />
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titlePostCode}</legend>
+            <input type="text" name="postCode" class="input w-full validator" placeholder="125466" 
+              pattern="[0-9]*"
+              minlength="6"
+              maxlength="6"/>
+            <p class="validator-hint hidden">{titleIncorrectPostCode}</p>
+          </fieldset>
+          <div class="col-span-2 flex justify-center">
+            <button name={dataOrderConfirmCommandName} class="btn btn-primary w-1/2 sm:w-1/3 rounded-md border border-transparent">{titleConfirmOrder}</button>
+          </div>
+        </div>      
+      </form>
+    </div>
+    <div class="grow-0 min-w-85 sm:min-w-90">
+      <h2 class="text-lg font-bold">{titleOrderDetails}</h2>
+      <CartContent isCheckout={true} />
+    </div>
+  </div>
+</cart-checkout> 
+
+<script>
+  import { actions } from 'astro:actions';
+  import { navigate } from 'astro:transitions/client';
+  import { $cart, $cartCount } from "../../core/stores/cart-store";
+  import { type CartCheckoutGuestUser } from '../../core/models/cart';
+
+  class CartCheckout extends HTMLElement {
+    private storeCountUnsubscribe?: () => void;
+    private formCartCheckoutEl: Element | null = null;
+    private orderConfirmEl: Element | null = null;
+    private orderConfirmHandler: any;
+
+    constructor() {
+      super();
+    }
+
+    private createOrder = async (): Promise<string | undefined> => {
+      const formData = new FormData(this.formCartCheckoutEl as HTMLFormElement);
+      
+      const user = (Object.fromEntries(formData?.entries()) as CartCheckoutGuestUser);
+      const cartItems = $cart.get();
+
+      const { data, error } = await actions.cartActions.checkout({ 
+        guestUser: user,
+        cart: cartItems,
+      });
+
+      var err = error as Error;
+      if (err !== undefined) throw err;      
+      return data;
+    }
+
+    private resetCart = () => {
+      $cart.set([]);
+    }
+
+    private onOrderConfirmClick = () => {
+      return async (e: Event) => {
+        e.preventDefault();
+
+        const formEl = this.formCartCheckoutEl as HTMLFormElement;
+        formEl?.reportValidity();
+        if (!formEl || !formEl.checkValidity()) return;
+
+        await this.createOrder()
+          .then((result) => {
+            if (!result) {
+              console.error("Failed to create order.");
+              return;
+            }
+            this.resetCart();
+            navigate(`/cart/confirmed?order=${result}`);
+          })
+          .catch((reason) => {
+            console.error(reason as Error);
+          });
+      }
+    }
+
+    private getFormCheckoutElement = (): Element | null => {
+      const dataFormCheckoutName = this.dataset.form_checkout;
+      const result = this.querySelector(`form[name='${dataFormCheckoutName}']`);
+      console.assert(result !== null, "Cannot find element [%s]", dataFormCheckoutName);
+      return result;
+    }
+
+    private getOrderConfirmElement = (): Element | null => {
+      const dataOrderConfirmCommandName = this.dataset.order_confirm;
+      const result = this.querySelector(`button[name='${dataOrderConfirmCommandName}']`);
+      console.assert(result !== null, "Cannot find element [%s]", dataOrderConfirmCommandName);
+      
+      this.orderConfirmHandler = this.onOrderConfirmClick();
+      result?.addEventListener('click', this.orderConfirmHandler);
+
+      return result;
+    }
+
+    private syncCartCountFromStore(): void {
+      if (!this.orderConfirmEl) return;
+
+      const totalCount = $cartCount.get();
+      if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (totalCount === 0);
+    }
+
+    private subscribeToCountStore() {
+      if (!this.orderConfirmEl) return; 
+
+      this.storeCountUnsubscribe = $cartCount.listen((value) => {
+        if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (value === 0);
+      });
+    }
+
+    connectedCallback() {
+      this.formCartCheckoutEl = this.getFormCheckoutElement();
+      this.orderConfirmEl = this.getOrderConfirmElement();
+      this.subscribeToCountStore();
+      this.syncCartCountFromStore();
+    }
+
+    disconnectedCallback() {
+      this.storeCountUnsubscribe && this.storeCountUnsubscribe();
+      this.orderConfirmEl?.removeEventListener('click', this.orderConfirmHandler);
+    }
+
+  }
+
+  customElements.define('cart-checkout', CartCheckout);
+</script>

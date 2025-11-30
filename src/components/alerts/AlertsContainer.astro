@@ -1,12 +1,12 @@
 ---
-import { AlertKind } from "../../core/models/alert";
+
 ---
 
 <alerts-container class="toast toast-top toast-center top-20 z-10 m-2 min-w-lg" >
 </alerts-container>
 
 <script>
-  import { createAlertMarkup } from "../../core/helpers/alerts-manager";
+  import { createAlertMarkup } from "../../core/utils/alerts-manager";
   import { $alerts } from "../../core/stores/alert-store";
   
   class AlertsContainer extends HTMLElement {

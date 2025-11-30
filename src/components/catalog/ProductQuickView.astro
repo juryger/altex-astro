@@ -15,8 +15,8 @@ const productDialogId = `product_preview_${item.id}`;
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
 ---
 
-<figure class="aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto min-h-[200px]">
-  <Image src={productsBlobStorageUrl.concat("/", item.image)} alt={item.title} width="200" height="200" class="rounded-xl" />
+<figure class="aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto h-[150px]">
+  <Image src={productsBlobStorageUrl.concat("/", item.image)} alt={item.title} width="150" height="150" class="rounded-xl" />
   <div class="absolute start-10 end-10 flex items-start p-4">
     <button type="button" class="flex flex-row gap-1 justify-center cursor-pointer outline-none relative z-10 w-full rounded-md bg-white/75 px-4 py-2 text-sm text-gray-900 opacity-0 group-hover:opacity-100 focus:opacity-100"
       onclick=`${productDialogId}.showModal()`>

@@ -25,7 +25,6 @@ export const getWorkerFactory = (workers: WorkerInfo): WorkerFactory => {
         );
         return workers[name];
       }
-
       console.log(
         "🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ prepare new instance of worker:",
         name

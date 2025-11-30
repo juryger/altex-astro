@@ -1,75 +1,10 @@
 ---
-import CartContent from "../../components/cart/CartContent.astro";
+import CartCheckout from "../../components/cart/CartCheckout.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const pageTitle = "Оформление заявки на заказ";
-const titleContactInfo = "Контактная информация";
-const titleOrderDetails = "Детали заказа";
-const titleFirstName = "Имя*";
-const titleLastName = "Фамилия*";
-const titleEmailName = "E-mail*";
-const titlePhonetName = "Телефон";
-const titleOrgName = "Организация";
-const titleAddressName = "Адрес";
-const titleCityName = "Город";
-const titlePostCode = "Почтовый код";
-const titleIncorrectValue = "Введите корректное значение поля";
-const titleIncorrectPhone = "Номер должен состоять из 11 цифр и начинаться с 8"
-const titleIncorrectPostCode = "Почтовый индеск должен состоять из 6 цифр"
+const pageTitle = "Оформление заказа";
 ---
 
 <BaseLayout title={pageTitle}>
-  <form class="fieldset flex flex-col md:flex-row gap-4">  
-    <div class="grow-1">
-      <h2 class="text-lg font-bold">{titleContactInfo}</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titleFirstName}</legend>
-          <input type="text" class="input w-full validator" required placeholder="" />
-          <p class="validator-hint hidden">{titleIncorrectValue}</p>
-        </fieldset>
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titleLastName}</legend>
-          <input type="text" class="input w-full validator" required placeholder="" />
-          <p class="validator-hint hidden">{titleIncorrectValue}</p>
-        </fieldset>
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titleEmailName}</legend>
-          <input type="email" class="input w-full validator" required placeholder="mail@site.ru" />
-          <p class="validator-hint hidden">{titleIncorrectValue}</p>
-        </fieldset>
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titlePhonetName}</legend>
-          <input type="tel" class="input w-full validator" placeholder="890..."
-            pattern="8[0-9]*"
-            minlength="11"
-            maxlength="11" />
-          <p class="validator-hint hidden">{titleIncorrectPhone}</p>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">{titleOrgName}</legend>
-          <input type="text" class="input w-full validator" placeholder="" />
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">{titleAddressName}</legend>
-          <input type="text" class="input w-full validator" placeholder="" />
-        </fieldset>
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titleCityName}</legend>
-          <input type="text" class="input w-full validator" placeholder="" />
-        </fieldset>
-        <fieldset class="fieldset col-span-2 sm:col-span-1">
-          <legend class="fieldset-legend">{titlePostCode}</legend>
-          <input type="number" class="input w-full validator" placeholder="125466" 
-            min="6"
-            max="6"/>
-          <p class="validator-hint hidden">{titleIncorrectPostCode}</p>
-        </fieldset>
-      </div>
-    </div>
-    <div class="grow-0 min-w-85 sm:min-w-90">
-      <h2 class="text-lg font-bold mb-2">{titleOrderDetails}</h2>
-      <CartContent isCheckout={true} />
-    </div>
-  </form>
+  <CartCheckout />  
 </BaseLayout>

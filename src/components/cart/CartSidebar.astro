@@ -16,7 +16,6 @@ const titleCloseCart = "Закрыть корзину";
     <div class="drawer-side">
       <label for={id} aria-label="close sidebar" class="drawer-overlay"></label>
       <ul class="flex flex-col bg-base-200 min-h-full w-85 sm:w-90 p-4">
-        <!-- Sidebar title -->
         <div class="flex items-start justify-between">
           <h2 id="drawer-title" class="text-lg font-bold">{titleCart}</h2>
           <div class="ml-3 flex h-7 items-center">
@@ -28,7 +27,6 @@ const titleCloseCart = "Закрыть корзину";
             </label>
           </div>
         </div>
-        <!-- Sidebar content -->
         <CartContent isCheckout={false} />
       </ul>
     </div>

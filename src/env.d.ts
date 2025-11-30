@@ -1,4 +1,3 @@
-import { CartDictionary, CartItem } from "./core/models/cart";
 declare namespace App {
   interface SessionData {
     user?: {
@@ -10,6 +9,5 @@ declare namespace App {
       activeCategorySlug?: string;
       activeParentCategorySlug?: string;
     };
-    cart: CartDictionary;
   }
 }

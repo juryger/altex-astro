@@ -7,7 +7,7 @@ import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
-import { trimEnd } from '../../core/helpers/text-utils';
+import { trimEnd } from '../../core/utils/text-utils';
 
 interface Props {
   item: Product,
@@ -35,7 +35,7 @@ console.log("🚀 ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.tit
     </div>
     <div class="card-body !px-1 !py-1">
       {/* Product code */}
-      <div class="flex flex-row justify-end">
+      <div class="flex flex-row justify-center">
         <span class="text-xs italic \">Артикул:</span>
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
@@ -64,7 +64,7 @@ console.log("🚀 ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.tit
 
 <script>
   import type { Product } from "../../core/models/product";
-  import { parseProduct } from "../../core/helpers/data-attributes-parser";
+  import { parseProduct } from "../../core/utils/data-attributes-parser";
   import type { CartItem } from "../../core/models/cart";
   import { addAlert } from "../../core/stores/alert-store";
   import { AlertKind } from "../../core/models/alert";
