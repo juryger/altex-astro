@@ -27,11 +27,11 @@ export const CartCheckoutGuestUserSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.string(),
-  phone: z.string(),
-  compnay: z.string(),
-  address: z.string(),
-  city: z.string(),
-  postCode: z.string(),
+  phone: z.string().optional(),
+  compnay: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  postCode: z.string().optional(),
 });
 
 export const CartCheckoutSchema = z.object({

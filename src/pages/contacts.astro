@@ -2,9 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import contactLogo from '../assets/contact-logo.png';
+
+const pageTitle = "Контакты";
 ---
 
-<BaseLayout title="Контакты">
+<BaseLayout title={pageTitle}>
 	<div class="hero bg-base-100">
 		<div class="hero-content flex-col lg:flex-row">
 			<Image src={contactLogo}

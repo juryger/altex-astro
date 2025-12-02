@@ -5,25 +5,28 @@ import AstroLogo from '../assets/astro.svg';
 interface Props {
   error: unknown;
 }
-
 const { error } = Astro.props;
+
+const titleErrorHeader = "Техническая неисправность";
+const titleErrorDetailsHeader = "Технические детали";
+const titleErrorDetails = "У нас возникли техническая неисправность. Просим прощение за неудобства, скоро мы это исправим."
 ---
 
-<BaseLayout title="Техническая неисправность">
+<BaseLayout title={titleErrorHeader}>
   <div class="flex flex-col min-h-[24rem] items-center justify-center bg-cover bg-center bg-[url(/public/background.svg)]">
     <img src={AstroLogo.src} class="w-10 h-10"/>
     <div>
       <span class="text-error font-bold text-xl">500: </span>
-      <span class="font-bold text-xl">Техническая неисправность</span>
+      <span class="font-bold text-xl">{titleErrorHeader}</span>
     </div>
     <!-- <h1>
     </h1> -->
-    <span class="font-medium text-lg text-center">У нас возникли технические неисправности. Просим прощение за неудобства, скоро мы это исправим.</span>
+    <span class="font-medium text-lg text-center">{titleErrorDetails}</span>
     <div class="max-w-[32rem] mx-5 my-5">
       <div tabindex="0" class="collapse collapse-arrow bg-primary/10 border-base-300 border">
-        <div class="collapse-title font-semibold after:start-5 after:end-auto pe-4 ps-12">Технические детали</div>
+        <div class="collapse-title font-semibold after:start-5 after:end-auto pe-4 ps-12">{titleErrorDetailsHeader}</div>
         <div class="collapse-content text-sm">
-          {error instanceof Error ? error.message : "Непредвиденная ситуация, мы работает над выяснением причин."}
+          {error instanceof Error ? error.message : {titleErrorDetails}}
         </div>
       </div>
     </div>

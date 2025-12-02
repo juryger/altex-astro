@@ -7,12 +7,12 @@ import ProductDetails from './ProductDetails.astro';
 interface Props {
   item: Product
 }
-
 const { item } = Astro.props;
 
-const quickViewTitle = "Просмотр";
-const productDialogId = `product_preview_${item.id}`;
+const productDialogId = `product-preview-${item.id}`;
 const productsBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL}/thumbnails`;
+
+const quickViewTitle = "Просмотр";
 ---
 
 <figure class="aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto h-[150px]">
