@@ -1,0 +1,31 @@
+{
+  "name": "altex-dal",
+  "type": "module",
+  "version": "0.0.1",
+  "exports": "./src/index.ts",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "npx tsc -p .",
+    "dev": "node --env-file=.env.development ./dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "drizzle-orm": "^0.44.7",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^24.10.1",
+    "drizzle-kit": "^0.31.7"
+  },
+  "description": "Data Access Layer (DAL) package based on Sqlite and Drizzle ORM",
+  "keywords": [
+    "sqlite",
+    "drizzle",
+    "orm",
+    "nodejs"
+  ],
+  "author": "Iurii Gerasimov",
+  "license": "ISC"
+}

@@ -1,5 +1,5 @@
 {
-  "name": "interstellar-inclination",
+  "name": "altex-web-astro",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -27,5 +27,14 @@
   },
   "devDependencies": {
     "vite": "^6.3.5"
-  }
+  },
+  "description": "Altex website based on Astro Framework and NodeJS server adapter",
+  "keywords": [
+    "astro",
+    "js",
+    "typescript",
+    "nodejs"
+  ],
+  "author": "Iurii Gerasimov",
+  "license": "ISC"
 }
