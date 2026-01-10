@@ -7,17 +7,21 @@
   "scripts": {
     "build": "npx tsc -p .",
     "dev": "node --env-file=.env.development ./dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-catalog": "drizzle-kit generate --name=catalog --config=drizzle-catalog.config.ts",
+    "generate-operations": "drizzle-kit generate --name=operations --config=drizzle-operations.config.ts",
+    "migrate-catalog": "drizzle-kit migrate --config=drizzle-catalog.config.ts",
+    "migrate-operations": "drizzle-kit migrate --config=drizzle-operations.config.ts"
   },
   "dependencies": {
-    "better-sqlite3": "^12.5.0",
-    "drizzle-orm": "^0.44.7",
-    "typescript": "^5.9.2"
+    "better-sqlite3": "^12.6.0",
+    "drizzle-orm": "^0.45.1",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^24.10.1",
-    "drizzle-kit": "^0.31.7"
+    "@types/node": "^25.0.5",
+    "drizzle-kit": "^0.31.8"
   },
   "description": "Data Access Layer (DAL) package based on Sqlite and Drizzle ORM",
   "keywords": [

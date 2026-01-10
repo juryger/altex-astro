@@ -3,7 +3,49 @@ import {
   type AnySQLiteColumn,
 } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
-import type { InferSelectModel } from "drizzle-orm/table";
+
+export const units = table(
+  "units",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    title: t.text().notNull(),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_units_uid").on(table.uid)]
+);
+
+export const colors = table(
+  "colors",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    code: t.text().notNull(),
+    title: t.text().notNull(),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_colors_uid").on(table.uid)]
+);
+
+export const countryMake = table(
+  "country-make",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    code: t.text().notNull(),
+    title: t.text().notNull(),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_country_make_uid").on(table.uid)]
+);
+
+export const discounts = table(
+  "discounts",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    sum: t.real().notNull(),
+    title: t.text().notNull(),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_discounts_uid").on(table.uid)]
+);
 
 export const categories = table(
   "categories",
@@ -17,7 +59,7 @@ export const categories = table(
     parentSlug: t.text("parent_slug"),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("uid_idx").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)]
 );
 
 export const products = table(
@@ -38,15 +80,41 @@ export const products = table(
       .notNull()
       .references(() => categories.id),
     categorySlug: t.text("category_slug").notNull(),
-    colors: t.text(),
     image: t.text().notNull(),
     slug: t.text().notNull(),
-    parentId: t.int("parent_id"),
-    parentSlug: t.text("parent_slug"),
-    relatedProducts: t.text("related_products"),
+    countryMakeId: t.int("country_make_id").references(() => countryMake.id),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("uid_idx").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)]
 );
 
-export type Category = InferSelectModel<typeof categories>;
+export const relatedProducts = table(
+  "related-products",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    productId: t.int("product_id").notNull(),
+    relatedProductId: t
+      .int("related_product_id")
+      .notNull()
+      .references(() => products.id),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)]
+);
+
+export const productColors = table(
+  "product-colors",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    productId: t
+      .int("product_id")
+      .notNull()
+      .references(() => products.id),
+    colorId: t
+      .int("color_id")
+      .notNull()
+      .references(() => colors.id),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)]
+);
