@@ -7,7 +7,7 @@ import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
-import { trimEnd } from '../../core/utils/text-utils';
+import { trimEnd } from '../../core/utils/text-formatter';
 
 interface Props {
   item: Product,
@@ -18,7 +18,7 @@ const titleAddToCart = "В корзину";
 const btnAddToCardName = "pc-add-to-card";
 
 const unitItem = item.unit ? UnitOfMeasurementDictionary[item.unit] : UnitOfMeasurementDictionary[0];
-console.log("🚀 ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.title)
+console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.title)
 ---
 
 <product-card 

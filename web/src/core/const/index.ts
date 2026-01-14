@@ -3,6 +3,11 @@ enum LiveCollectionNames {
   Products = "products",
 }
 
+enum SessionNames {
+  Catalog = "catalog",
+  User = "user",
+}
+
 enum APIEndpointNames {
   Categories = "categories",
   Products = "products",
@@ -11,9 +16,13 @@ enum APIEndpointNames {
 enum APISearchParamNames {
   Category = "category",
   Parent = "parent",
-  IgnoreParent = "ignoreParent",
-  Page = "page",
-  PageSize = "pageSize",
+  SkipFilters = "skipFilters",
+  PageOffset = "pageOffset",
+  PageLimit = "pageLimit",
+  SortField = "sortFiled",
+  SortOrder = "sortOrder",
+  Filter = "filter",
+  FilterFieldAndValue = "filterValue",
 }
 
 enum NavPathNames {
@@ -29,9 +38,24 @@ enum NavPathNames {
   ServerError = "500",
 }
 
+enum SortOrder {
+  Ascending = "acs",
+  Descending = "desc",
+}
+
+enum TextSeparators {
+  Comma = ",",
+  Dot = ".",
+  Colon = ":",
+  Semicolon = ";",
+}
+
 export {
   LiveCollectionNames,
+  SessionNames,
   NavPathNames,
   APIEndpointNames,
   APISearchParamNames,
+  SortOrder,
+  TextSeparators,
 };

@@ -1,5 +1,5 @@
 ---
-import { formatCurrency } from '../../core/utils/text-utils';
+import { formatCurrency } from '../../core/utils/text-formatter';
 import { DiscountMetadata, type Discount } from '../../core/models/discount';
 
 interface Props {
@@ -27,7 +27,7 @@ const textSize = isDetailed ? "text-base" : "text-sm";
     </svg>
   </div>
 </div>
-<div class="stats shadow">
+<div class="stats bg-base-100 border-base-300 border">
   <div class=`stat place-items-center ${maxWidth}`>
     <div class="stat-title">{priceTitle}</div>
     <div class=`stat-value ${textSize}`>{formatCurrency(price)}</div>

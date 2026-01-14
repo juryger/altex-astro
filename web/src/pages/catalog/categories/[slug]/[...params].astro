@@ -1,0 +1,67 @@
+---
+export const prerender = false;
+
+import BaseLayout from '@/web/src/layouts/BaseLayout.astro';
+import { type Category } from '@/web/src/core/models/category';
+import { getCategory } from '@/web/src/core/utils/live-collection-manager';
+import Categories from '@/web/src/components/catalog/Categories.astro';
+import Products from '@/web/src/components/catalog/Products.astro';
+import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
+import getRouteParser from '@/web/src/core/utils/route-parser';
+import { getSessionManager } from '@/web/src/core/utils/session-manager';
+import type { Sorting } from '@/web/src/core/models/sorting';
+import type { Paging } from '@/web/src/core/models/paging';
+import type { Filtering } from '@/web/src/core/models/filtering';
+
+const { slug, params } = Astro.params;
+
+const parseRouteParams = (): { sorting: Sorting | undefined, paging: Paging | undefined, filtering: Filtering[] } => {
+  console.log("👉 parseRouteParams");
+  const routeParser = getRouteParser(params);
+  console.log("🌎 ~ Category page ~ slug %s, params: %o", slug, params);
+  const sorting = routeParser.getCatalogSorting();
+  console.log("🌎 ~ Categories page ~ parsed sort", sorting);
+  const paging = routeParser.getCatalogPaging();
+  console.log("🌎 ~ Category page ~ parse paging", paging);
+  const filtering = routeParser.getCatalogFiltering();
+  console.log("🌎 ~ Category page ~ parsed filters", filtering);
+  return { sorting, paging, filtering };
+}
+
+let categorySlug = "";
+let category: Category | undefined;
+const sessionManager = getSessionManager(Astro.session);
+
+try {
+  if (slug !== undefined) category = await getCategory(slug);
+} catch(error) {
+  console.error("🛑 ~ Category page ~ failed to fetch category", error);
+}
+
+if (category === undefined)
+{
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/404");
+}
+categorySlug = category.slug;
+sessionManager.setActiveCatalogItem(undefined, category.slug, category.parentSlug);
+
+console.log("👉 parseRouteParams");
+const { sorting, paging, filtering } = parseRouteParams();
+
+const subTitleCategories = "Список подкатегорий";
+const subTitleProducts = "Список товаров";
+---
+
+<BaseLayout title=`Каталог - ${category?.title}`>
+  <Categories parentSlug={categorySlug} title={subTitleCategories} server:defer>
+		<div slot="fallback" class="mx-3.5">
+			<CollectionFallback title={subTitleCategories} />
+		</div>
+	</Categories>
+	<Products categorySlug={categorySlug} sorting={sorting} paging={paging} filtering={filtering} server:defer>
+		<div slot="fallback" class="mx-3.5">
+			<CollectionFallback title={subTitleProducts} />
+		</div>
+	</Products>
+</BaseLayout>

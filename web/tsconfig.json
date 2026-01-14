@@ -5,5 +5,11 @@
   "compilerOptions": {
     // not needed as already enabled by astro/tsconfigs/strict
     //"strictNullChecks": true
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["*"], // This maps "@/" to the "/" folder
+      "@/web/*": ["web/*"],
+      "@/lib/*": ["lib/*"]
+    }
   }
 }

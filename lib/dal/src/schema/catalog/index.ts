@@ -4,8 +4,8 @@ import {
 } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 
-export const units = table(
-  "units",
+export const measurementUnits = table(
+  "measurement_units",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     title: t.text().notNull(),
@@ -25,8 +25,18 @@ export const colors = table(
   (table) => [t.uniqueIndex("idx_colors_uid").on(table.uid)]
 );
 
+export const maker = table(
+  "maker",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    title: t.text().notNull(),
+    uid: t.text().notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_maker_uid").on(table.uid)]
+);
+
 export const countryMake = table(
-  "country-make",
+  "country_make",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     code: t.text().notNull(),
@@ -57,6 +67,12 @@ export const categories = table(
       .int("parent_id")
       .references((): AnySQLiteColumn => categories.id),
     parentSlug: t.text("parent_slug"),
+    createdAt: t
+      .int("created_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date()),
+    modifiedAt: t
+      .int("created_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date()),
     uid: t.text().notNull(),
   },
   (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)]
@@ -79,17 +95,23 @@ export const products = table(
       .numeric("category_id")
       .notNull()
       .references(() => categories.id),
-    categorySlug: t.text("category_slug").notNull(),
     image: t.text().notNull(),
     slug: t.text().notNull(),
+    makerId: t.int("maker_id").references(() => maker.id),
     countryMakeId: t.int("country_make_id").references(() => countryMake.id),
+    createdAt: t
+      .int("created_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date()),
+    modifiedAt: t
+      .int("modified_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date()),
     uid: t.text().notNull(),
   },
   (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)]
 );
 
 export const relatedProducts = table(
-  "related-products",
+  "related_products",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     productId: t.int("product_id").notNull(),
@@ -103,7 +125,7 @@ export const relatedProducts = table(
 );
 
 export const productColors = table(
-  "product-colors",
+  "product_colors",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     productId: t

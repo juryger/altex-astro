@@ -6,7 +6,7 @@ export const userActions = {
     input: undefined,
     handler: async (input, context) => {
       const result = await context.session?.get("lastVisit");
-      console.log("🚀 ~ userActions ~ get user last visit date:", result);
+      console.log("🛠️ ~ userActions ~ get user last visit date:", result);
       return result;
     },
   }),
@@ -15,7 +15,7 @@ export const userActions = {
       value: z.date(),
     }),
     handler: async (input, context) => {
-      console.log("🚀 ~ userActions ~ set user last visit date:", input.value);
+      console.log("🛠️ ~ userActions ~ set user last visit date:", input.value);
       context.session?.set("lastVisit", input.value);
       return input.value;
     },

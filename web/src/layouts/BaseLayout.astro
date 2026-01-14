@@ -9,7 +9,7 @@ const { title } = Astro.props;
 const currentPath = Astro.url.pathname;
 const MainTitle = `АЛТЕХ - ${title}`;
 
-console.log("🚀 ~ BaseLayout ~ current path:", currentPath);
+console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 ---
 
 <script>
@@ -26,10 +26,10 @@ console.log("🚀 ~ BaseLayout ~ current path:", currentPath);
 	const processWorkerMessage = (msg: MessageEvent<any>, factory: WorkerFactory, workerName: string): void => {
 		const syncStatus = msg.data as CatalogSyncStatus;
 			if (!msg.data || !syncStatus) {
-				console.error("🚀 ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported type:", msg.data);
+				console.error("🌎⚙️ ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported type:", msg.data);
 				return;
 			}
-			console.log("🚀 ~ BaseLayout ~ catalog sync status updated:", syncStatus);
+			console.log("🌎⚙️ ~ BaseLayout ~ catalog sync status updated:", syncStatus);
 			switch (syncStatus.syncType)
 			{
 				case CatalogSyncType.Sync:
@@ -41,20 +41,20 @@ console.log("🚀 ~ BaseLayout ~ current path:", currentPath);
 					localStorageManager.setCatalogSyncPostponed(true);
 					break;
 				default:
-					console.error("🚀 ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported sync type:", syncStatus);
+					console.error("🌎⚙️ ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported sync type:", syncStatus);
 					break;
 			}
 			factory.terminateWorker(window.workers, workerName);
 	}
 
 	const processWorkerError = (err: ErrorEvent, factory: WorkerFactory, workerName: string): void => {
-		console.error("🚀 ~ BaseLayout ~ Failed to sync catalog data:", err.message);
+		console.error("🌎⚙️ ~ BaseLayout ~ Failed to sync catalog data:", err.message);
 		localStorageManager.setCatalogSyncInProgress(false);
 		factory.terminateWorker(window.workers, workerName);
 	}
 
 	if (localStorageManager.checkCataloSyncRequired(7)) {
-		console.log("🚀 ~ BaseLayout ~ Catalog data is outdated, preaparing for syncing.");
+		console.log("🌎⚙️ ~ BaseLayout ~ Catalog data is outdated, preaparing for syncing.");
 		window.workers = window.workers ?? {} as WorkerInfo;
 		const factory = getWorkerFactory(window.workers);
 		
@@ -67,7 +67,7 @@ console.log("🚀 ~ BaseLayout ~ current path:", currentPath);
 		localStorageManager.setCatalogSyncPostponed(false);
 		catalogSyncWorker.postMessage(CatalogSyncType.Sync); // use CatalogSyncType.CleanUpCache if syncing not required
 	} else {
-		console.log("🚀 ~ BaseLayout ~ Catalog data is up to date, syncing is not required.");
+		console.log("🌎⚙️ ~ BaseLayout ~ Catalog data is up to date, syncing is not required.");
 	}
 	*/
 </script>

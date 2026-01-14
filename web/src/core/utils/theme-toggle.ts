@@ -39,7 +39,7 @@ export const applyThemeToggle = async (
   var newTheme: string | undefined;
   var currentTheme = localStorageManager.getUserThemePreference();
   console.log(
-    "🚀 ~ Header ~ user preferred theme from localStorage:",
+    "🌎 ~ Header ~ user preferred theme from localStorage:",
     currentTheme
   );
 
@@ -48,7 +48,7 @@ export const applyThemeToggle = async (
     // On theme switch, saves user preference to localStorage
     if (!newTheme || newTheme === currentTheme) {
       console.warn(
-        "🚀 ~ Header ~ userPreferredTheme ~ theme change will not be saved as new theme '%s' is either not set or same as current '%s'",
+        "🌎 ~ Header ~ userPreferredTheme ~ theme change will not be saved as new theme '%s' is either not set or same as current '%s'",
         newTheme,
         currentTheme
       );
@@ -60,7 +60,7 @@ export const applyThemeToggle = async (
     currentTheme = newTheme;
 
     console.log(
-      "🚀 ~ Header ~ userPreferredTheme ~ current theme switched to new theme:",
+      "🌎 ~ Header ~ userPreferredTheme ~ current theme switched to new theme:",
       newTheme
     );
   });

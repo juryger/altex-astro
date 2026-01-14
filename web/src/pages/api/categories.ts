@@ -1,13 +1,12 @@
 import type { APIRoute } from "astro";
 import type { Category } from "../../core/models/category";
-import { type Pagable, defaultPaging } from "../../core/models/paging";
 import { APISearchParamNames } from "../../core/const";
-import { extractUrlParamValue } from "../../core/utils/url-utils";
+import { extractUrlPaging, extractUrlParam } from "../../core/utils/url-parser";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  //console.log("🚀 ~ GET ~ request:", URL.parse(request.url));
+  console.log("📍 ~ API-GET ~ categories list ~ URL:", URL.parse(request.url));
 
   // TODO: query database for Categories
   const allItems: Category[] = [
@@ -64,36 +63,20 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   ];
 
   const url = URL.parse(request.url);
-  const parentSlug = extractUrlParamValue(
-    url,
-    APISearchParamNames.Parent,
-    "string"
-  );
+  const parentSlug = extractUrlParam(url, APISearchParamNames.Parent, "string");
 
-  const ignoreParent = extractUrlParamValue(
+  const skipFilters = extractUrlParam(
     url,
-    APISearchParamNames.IgnoreParent,
+    APISearchParamNames.SkipFilters,
     "boolean"
   );
 
-  const paging: Pagable = { current: 0, limit: 100 };
-  const pageNumber = extractUrlParamValue(
-    url,
-    APISearchParamNames.Page,
-    "number"
-  );
-  paging.current = pageNumber !== -1 ? pageNumber : defaultPaging.current;
-
-  const pageSize = extractUrlParamValue(
-    url,
-    APISearchParamNames.PageSize,
-    "number"
-  );
-  paging.limit = pageSize !== -1 ? pageSize : defaultPaging.limit;
+  // TODO: apply paging
+  const paging = extractUrlPaging(url);
 
   return new Response(
     JSON.stringify(
-      ignoreParent
+      skipFilters
         ? allItems
         : !parentSlug
         ? allItems.filter((x) => !x.parentId)

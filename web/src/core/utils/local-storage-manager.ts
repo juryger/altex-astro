@@ -1,5 +1,5 @@
-import { getDateHandler } from "./date-utils";
-import { regexTruePattern } from "./regex";
+import { getDateHandler } from "./date-handler";
+import { regexTrue } from "./regex";
 
 type StateManagerFeatures = {
   checkCataloSyncRequired(expireDays: number): boolean;
@@ -27,12 +27,12 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       const isSyncing = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS
       );
-      if (isSyncing !== null && regexTruePattern.test(isSyncing)) return false;
+      if (isSyncing !== null && regexTrue.test(isSyncing)) return false;
 
       const isSyncPosponed = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_POSTPONED
       );
-      if (isSyncPosponed !== null && regexTruePattern.test(isSyncPosponed))
+      if (isSyncPosponed !== null && regexTrue.test(isSyncPosponed))
         return false;
 
       const lastSyncDate = localStorage.getItem(
@@ -49,7 +49,7 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       const isSyncing = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS
       );
-      return isSyncing !== null && regexTruePattern.test(isSyncing);
+      return isSyncing !== null && regexTrue.test(isSyncing);
     },
     setLastSyncDate: (value: Date): void => {
       localStorage.setItem(

@@ -20,8 +20,14 @@ export const guests = table(
     id: t.int().primaryKey({ autoIncrement: true }),
     name: t.text().notNull(),
     email: t.text().notNull(),
-    contatctPhone: t.text("contact_phone").notNull(),
-    deliveryAddress: t.text("delivery_address").notNull(),
+    phone: t.text(),
+    compnayName: t.text("company_name"),
+    address: t.text(),
+    city: t.text(),
+    postCode: t.text("post_code"),
+    createdAt: t
+      .int("created_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date()),
   },
   (table) => [
     t.uniqueIndex("idx_guests_name").on(table.name),
@@ -40,7 +46,7 @@ export const cart = table("cart", {
     .notNull(),
 });
 
-export const cartItems = table("cart-items", {
+export const cartItems = table("cart_items", {
   id: t.int().primaryKey({ autoIncrement: true }),
   cartId: t
     .int("cart_id")
@@ -62,14 +68,14 @@ export const notifications = table("notifications", {
     .$defaultFn(() => new Date()),
 });
 
-export const notificationAdressees = table("notification-addresses", {
+export const notificationAddressees = table("notification_addresses", {
   id: t.int().primaryKey({ autoIncrement: true }),
   notificationId: t
     .int("notification_id")
     .notNull()
     .references(() => notifications.id),
   type: t
-    .text({ enum: ["email", "in-app", "sms"] })
+    .text({ enum: ["email", "inapp", "sms"] })
     .notNull()
     .default("email"),
   guestId: t.int("guest_id"),

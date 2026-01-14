@@ -1,45 +1,29 @@
 ---
 export const prerender = false;
 
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { LiveCollectionNames } from '../../../core/const';
-import { getEntryBySlug } from '../../../core/utils/live-collection-manager';
-import type { Product } from '../../../core/models/product';
-import ProductDetails from '../../../components/catalog/ProductDetails.astro';
+import BaseLayout from '@/web/src/layouts/BaseLayout.astro';
+import { getProduct } from '@/web/src/core/utils/live-collection-manager';
+import type { Product } from '@/web/src/core/models/product';
+import ProductDetails from '@/web/src/components/catalog/ProductDetails.astro';
+import { getSessionManager } from '@/web/src/core/utils/session-manager';
 
 const { slug } = Astro.params;
-console.log("🚀 ~ Product page ~ slug:", slug);
 
-const getProduct = async (slug: string): Promise<Product | undefined>  => {
-  return await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
-    .then(result => {
-      if (!result.value) console.log("🚀 ~ Product page ~ product not found by slug:", result.slug);
-      return result.value;
-    })
-    .catch(reason => {
-      console.error((reason as Error).message);
-      return undefined;
-    });
+let product: Product | undefined;
+const sessionManager = getSessionManager(Astro.session);
+
+try {
+  if (slug !== undefined) product = await getProduct(slug);
+} catch(error) {
+  console.error("🛑 ~ Product page ~ failed to fetch product", error);
 }
 
-var product: Product | undefined;
-if (slug) {
-  product = await getProduct(slug);
-  if (!product) {
-    Astro.session?.set("catalog", { 
-      activeProductSlug: undefined,
-      activeCategorySlug: undefined,
-      activeParentCategorySlug: undefined 
-    });
-    return Astro.redirect("/404");
-  }
-
-  Astro.session?.set("catalog", { 
-    activeProductSlug: product.slug, 
-    activeCategorySlug: product.categorySlug, 
-    activeParentCategorySlug: undefined 
-  });
+if (product === undefined)
+{
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/404");
 }
+sessionManager.setActiveCatalogItem(product.slug, product.categorySlug, undefined);
 ---
 
 <BaseLayout title=`Каталог - ${product?.title}`>

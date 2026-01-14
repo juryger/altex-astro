@@ -1,13 +1,12 @@
 import type { APIRoute } from "astro";
 import type { Product } from "../../core/models/product";
-import { defaultPaging, type Pagable } from "../../core/models/paging";
 import { APISearchParamNames } from "../../core/const";
-import { extractUrlParamValue } from "../../core/utils/url-utils";
+import { extractUrlPaging, extractUrlParam } from "../../core/utils/url-parser";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  //console.log("🚀 ~ GET ~ products ~ request:", URL.parse(request.url));
+  console.log("📍 ~ API-GET ~ products list ~ URL:", URL.parse(request.url));
 
   // TODO: query database for Categories
   var allItems: Array<Product> = [
@@ -61,26 +60,11 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   ];
 
   const url = URL.parse(request.url);
-  const categorySlug = extractUrlParamValue(
+  const categorySlug = extractUrlParam(
     url,
     APISearchParamNames.Category,
     "string"
   );
-
-  var paging: Pagable = { current: 0, limit: 100 };
-  const pageNumber = extractUrlParamValue(
-    url,
-    APISearchParamNames.Page,
-    "number"
-  );
-  paging.current = pageNumber !== -1 ? pageNumber : defaultPaging.current;
-
-  const pageSize = extractUrlParamValue(
-    url,
-    APISearchParamNames.PageSize,
-    "number"
-  );
-  paging.limit = pageSize !== -1 ? pageSize : defaultPaging.limit;
 
   if (!categorySlug) {
     return new Response(null, {
@@ -88,6 +72,8 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       statusText: "Not found",
     });
   }
+
+  const paging = extractUrlPaging(url);
 
   return new Response(
     JSON.stringify(allItems.filter((x) => x.categorySlug === categorySlug)),

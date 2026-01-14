@@ -8,7 +8,7 @@ self.onmessage = async (e) => {
   const command = e.data as CatalogSyncType;
   if (!e.data || !command) {
     console.error(
-      "🚀 ~ catalog-sync-worker ~ received unsupported command:",
+      "🛠️ ~ catalog-sync-worker ~ received unsupported command:",
       e
     );
     return;
@@ -41,13 +41,13 @@ self.onmessage = async (e) => {
       default:
         syncStatus.resultMessage = `recieved unsupported command ${command}.`;
         console.error(
-          "🚀 ~ catalog-sync-worker ~ %s",
+          "🛠️ ~ catalog-sync-worker ~ %s",
           syncStatus.resultMessage
         );
         break;
     }
   } catch (error: any) {
-    console.error("🚀 ~ catalog-sync-worker ~ failed to sync catalog", error);
+    console.error("🛠️ ~ catalog-sync-worker ~ failed to sync catalog", error);
     throw new Error(`Failed to sync catalog: ${(error as Error).message}`);
   }
 

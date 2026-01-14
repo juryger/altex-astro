@@ -12,7 +12,7 @@ export const server = {
 
   // 1 . Get data by calling server action
   const { data, error } = await actions.userActions.getLastVisitDate();
-  console.log("🚀 ~ Header ~ user preferred theme from session:", data);
+  console.log("🛠️ ~ Header ~ user preferred theme from session:", data);
   const value = data;
   if (error) {
     console.error(

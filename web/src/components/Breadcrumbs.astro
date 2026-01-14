@@ -1,62 +1,52 @@
 ---
 export const prerender = false;
 
-import { LiveCollectionNames, NavPathNames } from '../core/const';
+import { NavPathNames } from '../core/const';
 import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/utils/breadcrubms-manager';
-import { getEntryBySlug } from '../core/utils/live-collection-manager';
-import { trimEnd } from '../core/utils/text-utils';
+import { trimEnd } from '../core/utils/text-formatter';
 import type { Category } from '../core/models/category';
 import type { Product } from '../core/models/product';
+import { getCategory, getProduct } from '../core/utils/live-collection-manager';
 
 const { currentPath } = Astro.props;
-const maxLabelLength = 20;
+const maxLabelLength = import.meta.env.BREADCRUMB_TITLE_MAX_LENGTH;
 
-const getProduct = async (slug: string): Promise<Product | undefined> => {
-  return await getEntryBySlug<Product>(LiveCollectionNames.Products, slug)
-    .then((result) => {
-      if (!result.value)
-        console.error(
-          "🚀 ~ Breadcrumbs ~ product not found by slug:",
-          result.slug
-        );
-      return result.value;
-    })
-    .catch((reason) => {
-      console.error((reason as Error).message);
-      return undefined;
-    });
-};
+const getSessionActiveProduct = async (): Promise<Product | undefined> => {
+  const catalog = await Astro.session?.get('catalog');
+  const productSlug = catalog?.activeProductSlug;
+  if (productSlug === undefined) return undefined;
+  try {
+    return await getProduct(productSlug);
+  } catch (error) {
+    console.error("🛑 ~ Breadcrumbs ~ failed to fetch current product", error);
+  }
+}
 
-const getCategory = async (slug: string): Promise<Category | undefined> => {
-  return await getEntryBySlug<Category>(LiveCollectionNames.Categories, slug)
-    .then((result) => {
-      if (!result.value)
-        console.error(
-          "🚀 ~ Breadcrumbs ~ category not found by slug:",
-          result.slug
-        );
-      return result.value;
-    })
-    .catch((reason) => {
-      console.error((reason as Error).message);
-      return undefined;
-    });
-};
+const getSessionActiveCategory = async (): Promise<Category | undefined> => {
+  const catalog = await Astro.session?.get('catalog');
+  const categorySlug = catalog?.activeCategorySlug;
+  if (categorySlug === undefined) return undefined;
+  try {
+    return await getCategory(categorySlug);
+  } catch(error) {
+    console.error("🛑 ~ Breadcrumbs ~ failed to fetch current category", error);
+  }
+}
 
-const catalogSessionValue = await Astro.session?.get('catalog');
+const getSessionActiveParentCategory = async (): Promise<Category | undefined> => {
+  const catalog = await Astro.session?.get('catalog');
+  const parentCategorySlug = catalog?.activeParentCategorySlug;
+  if (parentCategorySlug === undefined) return undefined;
+  try {
+    return await getCategory(parentCategorySlug);
+  } catch(error) {
+    console.error("🛑 ~ Breadcrumbs ~ failed to fetch master category", error);
+  }
+}
 
-const activeProduct: Product | undefined = 
-  catalogSessionValue?.activeProductSlug 
-    ? await getProduct(catalogSessionValue.activeProductSlug) 
-    : undefined;
-const activeCategory: Category | undefined = 
-  catalogSessionValue?.activeCategorySlug 
-    ? await getCategory(catalogSessionValue.activeCategorySlug) 
-    : undefined;
-const activeParentCategory: Category | undefined = 
-  catalogSessionValue?.activeParentCategorySlug 
-    ? await getCategory(catalogSessionValue.activeParentCategorySlug) 
-    : undefined;
+const activeProduct = await getSessionActiveProduct();
+const activeCategory = await getSessionActiveCategory();
+const activeParentCategory = await getSessionActiveParentCategory();
 
 const breadcrumbs = getBreadcrumbsFromPath(currentPath, activeProduct, activeCategory, activeParentCategory);
 ---
@@ -67,7 +57,7 @@ const breadcrumbs = getBreadcrumbsFromPath(currentPath, activeProduct, activeCat
   import { db } from "../core/db/client-db";
   const categories = db.categories.filter(obj => obj.slug === "locks");
   const lockCategory = await categories.first();
-  console.log("🚀 ~  Breadcrumbs ~ lock category:", lockCategory)
+  console.log("🛠️ ~  Breadcrumbs ~ lock category:", lockCategory)
   */
 </script>
 

@@ -1,6 +1,6 @@
 import type { CartItem } from "../models/cart";
 import { ColorDictionary } from "../models/color";
-import { formatCurrency, trimEnd } from "./text-utils";
+import { formatCurrency, trimEnd } from "./text-formatter";
 
 const titleProductColor = "Цвет:";
 const titleProductQuantity = "Количество:";

@@ -7,7 +7,7 @@ CREATE TABLE `cart` (
 	FOREIGN KEY (`guest_id`) REFERENCES `guests`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `cart-items` (
+CREATE TABLE `cart_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`cart_id` integer NOT NULL,
 	`product_id` integer NOT NULL,
@@ -20,13 +20,17 @@ CREATE TABLE `guests` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`email` text NOT NULL,
-	`contact_phone` text NOT NULL,
-	`delivery_address` text NOT NULL
+	`phone` text,
+	`company_name` text,
+	`address` text,
+	`city` text,
+	`post_code` text,
+	`created_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_guests_name` ON `guests` (`name`);--> statement-breakpoint
 CREATE UNIQUE INDEX `idx_guests_email` ON `guests` (`email`);--> statement-breakpoint
-CREATE TABLE `notification-addresses` (
+CREATE TABLE `notification_addresses` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`notification_id` integer NOT NULL,
 	`type` text DEFAULT 'email' NOT NULL,

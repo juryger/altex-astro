@@ -45,7 +45,7 @@ const mapNavPathItemToBreadcrumb = (
       }
     } else {
       console.warn(
-        "🚀 ~ getBreadcrumbsFromPath ~ path item is marked as excluded from the breadcrumbs and will be skipped:",
+        "🛠️ ~ getBreadcrumbsFromPath ~ path item is marked as excluded from the breadcrumbs and will be skipped:",
         item
       );
     }
@@ -72,7 +72,7 @@ const getBreadcrumbsFromPath = (
     : fullPath.split("/").reverse();
 
   console.log(
-    "🚀 ~ getBreadcrumbsFromPath ~ path: %s, parsed: %o",
+    "🛠️ ~ getBreadcrumbsFromPath ~ path: %s, parsed: %o",
     fullPath,
     pathCollection
   );
@@ -88,7 +88,7 @@ const getBreadcrumbsFromPath = (
     const navPathItem = navPathManager.resolvePathElement(item);
     if (!navPathItem) {
       console.warn(
-        "🚀 ~ getBreadcrumbsFromPath ~ could not resolve path element:",
+        "🛠️ ~ getBreadcrumbsFromPath ~ could not resolve path element:",
         item
       );
       continue;
@@ -104,7 +104,7 @@ const getBreadcrumbsFromPath = (
     result.push(...values);
   }
 
-  console.log("🚀 ~ getBreadcrumbsFromPath ~ result:", result);
+  console.log("🛠️ ~ getBreadcrumbsFromPath ~ result:", result);
   return result;
 };
 

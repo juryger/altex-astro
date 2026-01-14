@@ -5,13 +5,14 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
+    "generate": "npm run generate:catalog && npm run generate:operations",
+    "generate:catalog": "drizzle-kit generate --name=catalog --config=drizzle-catalog.config.ts",
+    "generate:operations": "drizzle-kit generate --name=operations --config=drizzle-operations.config.ts",
+    "migrate": "npm run migrate:catalog && npm run migrate:operations",
+    "migrate:catalog": "drizzle-kit migrate --config=drizzle-catalog.config.ts",
+    "migrate:operations": "drizzle-kit migrate --config=drizzle-operations.config.ts",
     "build": "npx tsc -p .",
-    "dev": "node --env-file=.env.development ./dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-catalog": "drizzle-kit generate --name=catalog --config=drizzle-catalog.config.ts",
-    "generate-operations": "drizzle-kit generate --name=operations --config=drizzle-operations.config.ts",
-    "migrate-catalog": "drizzle-kit migrate --config=drizzle-catalog.config.ts",
-    "migrate-operations": "drizzle-kit migrate --config=drizzle-operations.config.ts"
+    "preview": "node --env-file=.env.development ./dist/index.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.0",

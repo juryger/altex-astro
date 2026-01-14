@@ -1,19 +1,15 @@
 class NotFoundError extends Error {
-    constructor(m: string) {
-        super(m);
-
-        // Set the prototype explicitly.
-        Object.setPrototypeOf(this, NotFoundError.prototype);
-    }
+  constructor(m: string) {
+    super(m);
+    Object.setPrototypeOf(this, NotFoundError.prototype);
+  }
 }
 
 class ServerError extends Error {
-    constructor(m: string) {
-        super(m);
-
-        // Set the prototype explicitly.
-        Object.setPrototypeOf(this, ServerError.prototype);
-    }
+  constructor(m: string) {
+    super(m);
+    Object.setPrototypeOf(this, ServerError.prototype);
+  }
 }
 
-export { NotFoundError, ServerError }
+export { NotFoundError, ServerError };

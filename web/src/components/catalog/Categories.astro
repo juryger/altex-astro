@@ -2,11 +2,9 @@
 export const prerender = false;
 
 import { Image } from 'astro:assets';
-import { LiveCollectionNames } from '../../core/const';
-import { getCollectionByFilter } from '../../core/utils/live-collection-manager';
+import { getCategoriesList } from '../../core/utils/live-collection-manager';
 import type { Category } from '../../core/models/category';
-import { defaultPaging } from '../../core/models/paging';
-import { trimEnd } from '../../core/utils/text-utils';
+import { trimEnd } from '../../core/utils/text-formatter';
 
 interface Props {
   parentSlug?: string;
@@ -15,25 +13,25 @@ interface Props {
 
 const { parentSlug, title } = Astro.props;
 
-var categories = await getCollectionByFilter<Category>(LiveCollectionNames.Categories, {
-    parentSlug,
-    ignoreParent: false,
-    paging: defaultPaging
-  }).then(result => {
-    if (!result.value) console.log("🚀 ~ Categories component ~ collection not found");
-    return result.value as { id: string, data: Category }[] | undefined;
-  }).catch(reason => console.error(reason));
+let categories: Category[] | undefined;
+try {
+  categories = await getCategoriesList({
+      skipFilters: false,
+      parentSlug
+    });
+} catch(error) {
+  console.error("🛑 ~ Categories component ~ failed to fetch categoreis list", error);
+}
 
 const categoriesBlobStorageUrl = `${import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL}`
-console.log("🚀 ~ Categories component ~ blob storage url: %s", categoriesBlobStorageUrl)
+console.log("🛠️ ~ Categories component ~ blob storage url: %s", categoriesBlobStorageUrl)
 ---
 
 {(categories && categories.length > 0) &&
   <div class="mx-4 mb-2 bg-base-100">
     <h3 class="text-lg font-bold text-center sm:text-left py-2">{title}</h3>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {categories.map(x => {
-        const item = x.data;
+      {categories.map(item => {
         return (
           <div class="card bg-base-300 hadow-sm px-2 py-2">
             <a class="group no-underline" href={"/catalog/categories/".concat(item.slug)}>     

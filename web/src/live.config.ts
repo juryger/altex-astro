@@ -14,7 +14,7 @@ import { type LiveLoader } from "astro/loaders";
 import { ProductSchema, type Product } from "./core/models/product";
 
 const apiBaseUrl = `${import.meta.env.PUBLIC_API_BASE_URL}`;
-console.log("🚀 ~ live.config ~ API url:", apiBaseUrl);
+console.log("🛠️ ~ live.config ~ API url:", apiBaseUrl);
 
 const categories = defineLiveCollection<
   LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter>,

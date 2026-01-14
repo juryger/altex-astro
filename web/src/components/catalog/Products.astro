@@ -1,35 +1,46 @@
 ---
 export const prerender = false;
 
-import { LiveCollectionNames } from '../../core/const';
-import { getCollectionByFilter } from '../../core/utils/live-collection-manager';
+import { getProductsList } from '../../core/utils/live-collection-manager';
 import type { Product } from '../../core/models/product';
-import { defaultPaging } from '../../core/models/paging';
 import ProductCard from './ProductCard.astro';
+import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
+import type { Paging } from '@/web/src/core/models/paging';
+import type { Filtering } from '@/web/src/core/models/filtering';
+import { defaultPaging } from '@/web/src/core/models/paging';
+import type { ProductCollectionFilter } from '../../core/loaders/products-loader';
 
 interface Props {
-  categorySlug?: string;
+  categorySlug: string;
+  sorting: Sorting | undefined;
+  paging: Paging | undefined;
+  filtering: Filtering[];
 }
 
-const { categorySlug } = Astro.props;
+const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
 const subTitle = "Список товаров";
 const noProductsForCategory = "Товары не представлены в данной категории";
 
-var products = await getCollectionByFilter<Product>(LiveCollectionNames.Products, {
-    categorySlug,
-    paging: defaultPaging
-  }).then(result => {
-    if (!result.value) console.log("🚀 ~ Products component ~ collection not found");
-    return result.value as { id: string, data: Product }[] | undefined;
-  }).catch(reason => console.error(reason));
+const filter: ProductCollectionFilter = {
+  categorySlug,
+  sorting,
+  paging,
+  filtering
+};
 
-//console.log("🚀 ~ Products component ~ collection:", products)
+let products: Product[] | undefined;
+try {
+  products = await getProductsList(filter)
+} catch(error) {
+  console.error("🛑 ~ Products component ~ failed to fetch products list", error);
+} 
+//console.log("🛠️ ~ Products component ~ collection:", products)
 ---
 
 <div class="mx-4 mb-2 bg-base-100">
   <h3 class="text-lg font-bold text-center sm:text-left py-2">{subTitle}</h3>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-    {products && products.map(x => <ProductCard item={x.data} />)}
+    {products && products.map(x => <ProductCard item={x} />)}
   </div>
   {(!products || products.length == 0) && <span>{noProductsForCategory}</span>}
 </div>

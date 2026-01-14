@@ -11,7 +11,7 @@ export type WorkerFactory = {
 };
 
 export const getWorkerFactory = (workers: WorkerInfo): WorkerFactory => {
-  console.log("🚀 ~ getWorkersactory ~ workers collection:", { ...workers });
+  console.log("⚙️ ~ getWorkersactory ~ workers collection:", { ...workers });
   return {
     findOrCreateCatalogSyncWorker: (
       onMessage: (msg: MessageEvent<any>, workerName: string) => void,
@@ -20,13 +20,13 @@ export const getWorkerFactory = (workers: WorkerInfo): WorkerFactory => {
       const name: string = "catalog-sync-worker";
       if (name in workers) {
         console.log(
-          "🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ using earlier created worker:",
+          "⚙️ ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ using earlier created worker:",
           name
         );
         return workers[name];
       }
       console.log(
-        "🚀 ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ prepare new instance of worker:",
+        "⚙️ ~ getWorkersFactory ~ findOrCreateCatalogSyncWorker ~ prepare new instance of worker:",
         name
       );
       const worker = new Worker(
@@ -47,7 +47,7 @@ export const getWorkerFactory = (workers: WorkerInfo): WorkerFactory => {
     },
     terminateWorker: (workers: WorkerInfo, name: string) => {
       if (name in workers) {
-        console.log("🚀 ~ getWorkersFactory ~ terminateWorker:", name);
+        console.log("⚙️ ~ getWorkersFactory ~ terminateWorker:", name);
         const worker = window.workers[name];
         worker.terminate();
         delete window.workers[name];

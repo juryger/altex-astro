@@ -16,6 +16,8 @@ export const ProductSchema = z.object({
   colors: z.array(z.number()).optional(),
   image: z.string(),
   slug: z.string(),
+  makerId: z.number().optional(),
+  countryMaker: z.number().optional(),
   relatedProdcuts: z.array(z.string()).optional(),
 });
 

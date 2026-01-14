@@ -1,11 +1,17 @@
-type Pagable = {
-  current: number;
+type Paging = {
+  offset: number;
   limit: number;
 };
 
-const defaultPaging: Pagable = {
-  current: 0,
-  limit: 100,
+type PagingResult = {
+  total: number;
+  nextOffset: number;
+  prevOffset: number;
 };
 
-export { type Pagable, defaultPaging };
+const defaultPaging: Paging = {
+  offset: 0,
+  limit: import.meta.env.DATA_RECORDS_ON_PAGE,
+};
+
+export { type Paging, type PagingResult, defaultPaging };
