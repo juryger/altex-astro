@@ -1,8 +1,8 @@
 import { getLiveEntry, getLiveCollection } from "astro:content";
 import { LiveCollectionNames as CollectionNames } from "../const";
 import type { LiveCollectionNames } from "../const";
-import type { CategoryCollectionFilter } from "../loaders/categories-loader";
-import type { ProductCollectionFilter } from "../loaders/products-loader";
+import type { CategoryCollectionFilter } from "../content-loaders/categories-loader";
+import type { ProductCollectionFilter } from "../content-loaders/products-loader";
 import type { Category } from "../models/category";
 import type { Product } from "../models/product";
 

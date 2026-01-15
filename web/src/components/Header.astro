@@ -9,15 +9,37 @@ const titleLightThemeSwitch = "Переключиться на светлую т
 const titleDarkThemeSwitch = "Переключиться на темную тему";
 ---
 
+
 <script>
-  import { applyThemeToggle } from "../core/utils/theme-toggle";
+  import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
 
-  console.log("🌎 ~ Header ~ Apply them toggler");
+  let controller: AbortController | undefined;
+  let themeToggleManager: ThemeToggleManager | undefined;
 
-  applyThemeToggle(document.querySelector('[data-theme-toggle]'),
-    document.querySelector('[data-theme-toggle-dark]'),
-    document.querySelector('[data-theme-toggle-light]')
-  );
+  document.addEventListener("astro:page-load", () => {
+    controller && controller.abort();
+    
+    themeToggleManager = getThemeToggleManager({
+      coreEl: document.querySelector('[data-theme-toggle]'),
+      darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
+      lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
+        
+    controller = new AbortController();
+    themeToggleManager.apply(controller.signal);
+  });
+
+  // To avoid glitch with current theme on page transitions.
+  document.addEventListener("astro:after-swap", () => {    
+    const currentTheme = themeToggleManager && themeToggleManager.getCurrentTheme();
+    if (currentTheme !== undefined) {
+     document.documentElement.setAttribute("data-theme", currentTheme);
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    // This instantly removes all listeners using 'signal' from themeToggleManager
+    controller && controller.abort(); 
+  });
 </script>
 
 <div class="navbar sticky top-0 z-50 bg-base-300 border-b-1 border-solid border-neutral-content">

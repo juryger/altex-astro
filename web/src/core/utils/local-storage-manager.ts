@@ -1,4 +1,4 @@
-import { getDateHandler } from "./date-handler";
+import { getDateHandler, type DateHelperOperations } from "./date-handler";
 import { regexTrue } from "./regex";
 
 type StateManagerFeatures = {
@@ -18,8 +18,19 @@ const LocalStorageKeys = {
   CATALOG_SYNC_IN_PROGRESS: "catalog-sync-in-progress",
   CATALOG_SYNC_POSTPONED: "catalog-sync-postponed",
   USER_THEME_PREFERENCE: "user-theme-preference",
-  USER_THEME_CHANGED: "user-theme-changed",
+  USER_THEME_CHANGED_DATE: "user-theme-changed-date",
 } as const;
+
+function IsValidCacheItem(lastChangedAt: Date) {
+  const dateHandler = getDateHandler();
+  return (
+    new Date() <=
+    dateHandler.addHours(
+      lastChangedAt,
+      import.meta.env.PUBLIC_CACHE_INVALIDATE_IN_HOURS
+    )
+  );
+}
 
 const getLocalStorageManager = (): StateManagerFeatures => {
   return {
@@ -70,29 +81,30 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       );
     },
     getUserThemePreference: (): string | undefined => {
-      var value = localStorage.getItem(LocalStorageKeys.USER_THEME_PREFERENCE);
+      const value = localStorage.getItem(
+        LocalStorageKeys.USER_THEME_PREFERENCE
+      );
       if (!value) return undefined;
 
-      // Check user's last visit date and if it was more than 4 hrs ago, reset Theme preference
-      const dateHandler = getDateHandler();
-      const lastChange = localStorage.getItem(
-        LocalStorageKeys.USER_THEME_CHANGED
+      const themeChangedDate = localStorage.getItem(
+        LocalStorageKeys.USER_THEME_CHANGED_DATE
       );
+      if (!themeChangedDate) return undefined;
+
       console.log(
-        "~ localStorageManger ~ theme last changed date:",
-        lastChange
+        "⚙️ ~ localStorageManger ~ Cache contains 'theme' with value '%s' and changed date '%s':",
+        value,
+        themeChangedDate
       );
 
-      if (
-        !lastChange ||
-        dateHandler.addHours(new Date(lastChange), 4) <= new Date()
-      ) {
+      const lastChangedAt = new Date(themeChangedDate);
+      if (!IsValidCacheItem(lastChangedAt)) {
         console.log(
-          "~ localStorageManger ~ removing theme selection based on last change date %s vs now %s",
-          lastChange ? dateHandler.addMinutes(new Date(lastChange), 1) : "none",
-          new Date()
+          "⚠️ ~ localStorageManger ~ removing theme as the value expired",
+          lastChangedAt.toString()
         );
         localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);
+        localStorage.removeItem(LocalStorageKeys.USER_THEME_CHANGED_DATE);
         return undefined;
       }
 
@@ -102,12 +114,14 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       localStorage.setItem(LocalStorageKeys.USER_THEME_PREFERENCE, value);
     },
     getUserThemeChangeDate: (): Date | undefined => {
-      const value = localStorage.getItem(LocalStorageKeys.USER_THEME_CHANGED);
+      const value = localStorage.getItem(
+        LocalStorageKeys.USER_THEME_CHANGED_DATE
+      );
       return value ? new Date(value) : undefined;
     },
     setUserThemeChangeDate: (value: Date): void => {
       localStorage.setItem(
-        LocalStorageKeys.USER_THEME_CHANGED,
+        LocalStorageKeys.USER_THEME_CHANGED_DATE,
         value.toISOString()
       );
     },

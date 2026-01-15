@@ -3,12 +3,12 @@ import {
   createCategoriesLoader,
   type CategoryCollectionFilter,
   type CategoryEntryFilter,
-} from "./core/loaders/categories-loader";
+} from "./core/content-loaders/categories-loader";
 import {
   createProductsLoader,
   type ProductCollectionFilter,
   type ProductEntryFilter,
-} from "./core/loaders/products-loader";
+} from "./core/content-loaders/products-loader";
 import { CategorySchema, type Category } from "./core/models/category";
 import { type LiveLoader } from "astro/loaders";
 import { ProductSchema, type Product } from "./core/models/product";
