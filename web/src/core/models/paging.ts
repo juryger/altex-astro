@@ -3,10 +3,14 @@ type Paging = {
   limit: number;
 };
 
-type PagingResult = {
-  total: number;
-  nextOffset: number;
-  prevOffset: number;
+type PageResult<T = any> = {
+  items: T[];
+  pageInfo: {
+    total: number;
+    hasMore: boolean;
+    offset: number;
+    limit: number;
+  };
 };
 
 const defaultPaging: Paging = {
@@ -14,4 +18,4 @@ const defaultPaging: Paging = {
   limit: import.meta.env.DATA_RECORDS_ON_PAGE,
 };
 
-export { type Paging, type PagingResult, defaultPaging };
+export { type Paging, type PageResult, defaultPaging };

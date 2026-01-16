@@ -52,9 +52,9 @@ const dataCartShowCommandName = "cartmenu-show";
 </cart-menu>
 
 <script>
-  import { formatCurrency } from "../../core/utils/text-formatter";
-  import { DiscountMetadata } from "../../core/models/discount";
-  import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "../../core/stores/cart-store";
+  import { formatCurrency } from "@/web/src/core/utils/text-formatter";
+  import { DiscountMetadata } from "@/web/src/core/models/discount";
+  import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/client/cart-store";
  
   class CartMenu extends HTMLElement {
     private cartIndicatorEl: Element | null = null;

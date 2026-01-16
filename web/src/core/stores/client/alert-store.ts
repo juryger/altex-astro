@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import type { Alert } from "../models/alert";
+import type { Alert } from "../../models/alert";
 
 export const $alerts = atom<Alert[]>([]);
 

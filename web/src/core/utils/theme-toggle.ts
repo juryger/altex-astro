@@ -12,6 +12,11 @@ type ThemToggleComponents = {
   lightThemeEl: Element | null;
 };
 
+interface ThemeToggleManager {
+  apply: (signal: AbortSignal) => void;
+  getCurrentTheme: () => string | undefined;
+}
+
 const assertInputElements = (inputElements: ThemToggleComponents) => {
   console.assert(
     inputElements.coreEl !== null,
@@ -52,16 +57,6 @@ const syncThemeToggleControls = (
   }
 };
 
-// const fallbackUILightTheme = (themeSelectorInput: HTMLInputElement): string => {
-//   themeSelectorInput?.click();
-//   return darkThemeName;
-// };
-
-// const fallbackUIDarkTheme = (themeSelectorInput: HTMLInputElement) => {
-//   themeSelectorInput?.click();
-//   return lightThemeName;
-// };
-
 const saveThemeToLocalStorage = (
   theme: string,
   localStorageManager: StateManagerFeatures
@@ -101,11 +96,6 @@ const handleThemeToggle = (
   setTheme(newTheme);
   themeToggled(newTheme);
 };
-
-interface ThemeToggleManager {
-  apply: (signal: AbortSignal) => void;
-  getCurrentTheme: () => string | undefined;
-}
 
 // Handle theme toggle logic with support of localStorage
 const getThemeToggleManager = (

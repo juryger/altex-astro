@@ -120,8 +120,8 @@ const titleCartCheckoutFailed = "При размещении заказа воз
 <script>
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
-  import { $cart, $cartCount } from "../../core/stores/cart-store";
-  import { type CartCheckoutGuestUser } from '../../core/models/cart';
+  import { $cart, $cartCount } from "@/web/src/core/stores/client/cart-store";
+  import { type CartCheckoutGuestUser } from '@/web/src/core/models/cart';
 
   class CartCheckout extends HTMLElement {
     private storeCountUnsubscribe?: () => void;

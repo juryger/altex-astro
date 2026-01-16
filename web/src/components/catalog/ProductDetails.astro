@@ -2,8 +2,8 @@
 export const prerender = false;
 
 import { Image } from 'astro:assets';
-import type { Product } from '../../core/models/product';
-import { UnitOfMeasurementDictionary } from '../../core/models/unit-of-measurement';
+import type { Product } from '@/web/src/core/models/product';
+import { UnitOfMeasurementDictionary } from '@/web/src/core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -68,13 +68,13 @@ const titleAddToCart = "В корзину";
 </product-details>
 
 <script>
-  import type { Product } from "../../core/models/product";
-  import { parseProduct } from "../../core/utils/data-attributes-parser";
-  import type { CartItem } from "../../core/models/cart";
-  import { addAlert } from "../../core/stores/alert-store";
-  import { AlertKind } from "../../core/models/alert";
-  import { addToCart } from "../../core/stores/cart-store";
-  import { CartMessages } from "../../core/const/messages";
+  import type { Product } from "@/web/src/core/models/product";
+  import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
+  import type { CartItem } from "@/web/src/core/models/cart";
+  import { addAlert } from "@/web/src/core/stores/client/alert-store";
+  import { AlertKind } from "@/web/src/core/models/alert";
+  import { addToCart } from "@/web/src/core/stores/client/cart-store";
+  import { CartMessages } from "@/web/src/core/const/messages";
 
   class ProductDetails extends HTMLElement {
     private value: Product | undefined;

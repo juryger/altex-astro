@@ -50,10 +50,10 @@ const titleSubtotal = "Итого:";
 
 <script>
   import { navigate } from 'astro:transitions/client';
-  import { CartMessages } from "../../core/const/messages";
-  import { AlertKind } from "../../core/models/alert";
-  import { addAlert } from "../../core/stores/alert-store";
-  import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "../../core/stores/cart-store";
+  import { CartMessages } from "@/web/src/core/const/messages";
+  import { AlertKind } from "@/web/src/core/models/alert";
+  import { addAlert } from "@/web/src/core/stores/client/alert-store";
+  import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/client/cart-store";
   import { DiscountMetadata } from "../../core/models/discount";
   import type { CartItem } from "../../core/models/cart";
   import { createCartItemMarkup } from "../../core/utils/cart-manager";

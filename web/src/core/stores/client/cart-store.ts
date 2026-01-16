@@ -1,6 +1,6 @@
 import { computed } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
-import { CartSchema, type CartItem } from "../models/cart";
+import { CartSchema, type CartItem } from "../../models/cart";
 
 export const $cart = persistentAtom<CartItem[]>("cart", [], {
   encode: JSON.stringify,
@@ -9,35 +9,33 @@ export const $cart = persistentAtom<CartItem[]>("cart", [], {
 
 // Computed stores for total count and prices
 export const $cartCount = computed([$cart], (items) => {
-  return items.reduce((acc: number, current: CartItem): number => {
-    return acc + current.quantity;
+  return items.reduce((accumulator: number, currentItem: CartItem): number => {
+    return accumulator + currentItem.quantity;
   }, 0);
 });
 
 export const $cartCost = computed([$cart], (items) => {
-  return items.reduce((acc: number, current: CartItem): number => {
-    return acc + current.quantity * current.price;
+  return items.reduce((accumulator: number, currentItem: CartItem): number => {
+    return accumulator + currentItem.quantity * currentItem.price;
   }, 0);
 });
 
 export const $cartWhsCost1 = computed([$cart], (items) => {
-  return items.reduce((acc: number, current: CartItem): number => {
-    return acc + current.quantity * current.whsPrice1;
+  return items.reduce((accumulator: number, currentItem: CartItem): number => {
+    return accumulator + currentItem.quantity * currentItem.whsPrice1;
   }, 0);
 });
 
 export const $cartWhsCost2 = computed([$cart], (items) => {
-  return items.reduce((acc: number, current: CartItem): number => {
-    return acc + current.quantity * current.whsPrice2;
+  return items.reduce((accumulator: number, currentItem: CartItem): number => {
+    return accumulator + currentItem.quantity * currentItem.whsPrice2;
   }, 0);
 });
 
 export function addToCart(value: CartItem): void {
+  // execute Tranformation for derived properites
   const item = CartSchema.parse(value);
-  console.log("~ cart-store ~ added new item:", item);
-
   const existingEntry = $cart.get().find((x) => x.id === item.id);
-  console.log("~ cart-store ~ existing item:", existingEntry);
 
   $cart.set(
     existingEntry !== undefined
@@ -53,13 +51,12 @@ export function addToCart(value: CartItem): void {
 }
 
 export function updateCart(value: CartItem): void {
+  // execute Tranformation for derived properites
   const item = CartSchema.parse(value);
-  console.log("~ cart-store ~ update cart item:", item);
-
   const existingEntry = $cart.get().find((x) => x.id === item.id);
   if (!existingEntry) {
     console.error(
-      "~ cart-store ~ Cannot update item in the cart, as it's not found by its ID:",
+      "❌ ~ cart-store ~ Cannot update item in the cart, as it's not found by its ID:",
       item.id
     );
     return;
@@ -72,12 +69,11 @@ export function updateCart(value: CartItem): void {
 }
 
 export function removeFromCart(id: string): void {
-  console.log("~ cart-store ~ remove cart item with ID:", id);
-
+  // execute Tranformation for derived properites
   const existingEntry = $cart.get().filter((x) => x.id === id);
   if (!existingEntry) {
     console.error(
-      "~ cart-store ~ Cannot remove item from the cart, as it's not found by its ID:",
+      "❌ ~ cart-store ~ Cannot remove item from the cart, as it's not found by its ID:",
       id
     );
     return;
