@@ -1,7 +1,7 @@
 enum UnitOfMeasurementKind {
   Piece = 0,
-  Pack = 1,
-  Set = 2,
+  Box = 1,
+  Pakage = 2,
   Ton = 3,
   Kilogram = 4,
   Gram = 5,

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c4b99338-9603-41c4-942d-bce0b37a5858",
+  "id": "45681e64-5740-42df-ba1e-b6319ae4d4f8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "cart": {
@@ -13,6 +13,13 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
@@ -301,8 +308,32 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "replicas": {
-      "name": "replicas",
+    "__version": {
+      "name": "__version",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "value": {
+          "name": "value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "read_replicas": {
+      "name": "read_replicas",
       "columns": {
         "id": {
           "name": "id",
@@ -328,8 +359,8 @@
         }
       },
       "indexes": {
-        "idx_replicas_name": {
-          "name": "idx_replicas_name",
+        "idx_read_replicas_name": {
+          "name": "idx_read_replicas_name",
           "columns": [
             "name"
           ],

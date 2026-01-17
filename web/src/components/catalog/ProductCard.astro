@@ -17,7 +17,7 @@ const { item } = Astro.props;
 const titleAddToCart = "В корзину";
 const btnAddToCardName = "pc-add-to-card";
 
-const unitItem = item.unit ? UnitOfMeasurementDictionary[item.unit] : UnitOfMeasurementDictionary[0];
+const unitItem = item.unitId ? UnitOfMeasurementDictionary[item.unitId] : UnitOfMeasurementDictionary[0];
 console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.title)
 ---
 
@@ -26,7 +26,7 @@ console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.
   data-id={item.id} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
-  data-image={item.image} data-slug={item.slug}
+  data-image={item.imageUrl} data-slug={item.slug}
 >
   <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
     {/* Product image with quick preivew */}
@@ -95,7 +95,7 @@ console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.
           price: this.value.price,
           whsPrice1: this.value.whsPrice1,
           whsPrice2: this.value.whsPrice2,
-          image: this.value.image,
+          image: this.value.imageUrl,
           slug: this.value.slug,
           color: color,
           quantity: quantity

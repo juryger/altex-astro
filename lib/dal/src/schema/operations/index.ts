@@ -1,8 +1,16 @@
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 
-export const replicas = table(
-  "replicas",
+export const operationsVersion = table("__version", {
+  id: t.int().primaryKey({ autoIncrement: true }),
+  value: t
+    .int({ mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const readReplicas = table(
+  "read_replicas",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
     name: t
@@ -11,7 +19,7 @@ export const replicas = table(
       .default("catalog"),
     fileName: t.text("file_name").notNull(),
   },
-  (table) => [t.uniqueIndex("idx_replicas_name").on(table.name)]
+  (table) => [t.uniqueIndex("idx_read_replicas_name").on(table.name)]
 );
 
 export const guests = table(
@@ -37,6 +45,7 @@ export const guests = table(
 
 export const cart = table("cart", {
   id: t.int().primaryKey({ autoIncrement: true }),
+  title: t.text().notNull(), // pre-order identifier, i.e. ONLINE-{ID} or STORE-{ID}
   userId: t.int("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
   guestId: t.int("guest_id").references(() => guests.id),
   discountId: t.int("discount_id"), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite

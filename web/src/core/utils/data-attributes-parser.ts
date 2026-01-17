@@ -106,7 +106,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     categoryId,
     categorySlug,
     colors,
-    image,
+    imageUrl: image,
     slug,
   } as Product;
 };

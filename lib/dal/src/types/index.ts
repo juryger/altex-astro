@@ -3,12 +3,13 @@ import type {
   categories,
   colors,
   discounts,
-  maker,
-  countryMake,
+  makers,
+  makeCountries,
   productColors,
   products,
   measurementUnits,
   relatedProducts,
+  catalogVersion,
 } from "../schema/catalog";
 import type {
   cart,
@@ -16,14 +17,16 @@ import type {
   guests,
   notificationAddressees,
   notifications,
-  replicas,
+  readReplicas,
+  operationsVersion,
 } from "../schema/operations";
 
 // Catalog
+export type CatalogVersion = InferSelectModel<typeof catalogVersion>;
 export type MeasurementUnit = InferSelectModel<typeof measurementUnits>;
 export type Color = InferSelectModel<typeof colors>;
-export type CountryMake = InferSelectModel<typeof countryMake>;
-export type Maker = InferSelectModel<typeof maker>;
+export type MakeCountry = InferSelectModel<typeof makeCountries>;
+export type Maker = InferSelectModel<typeof makers>;
 export type Discount = InferSelectModel<typeof discounts>;
 export type Category = InferSelectModel<typeof categories>;
 export type Product = InferSelectModel<typeof products>;
@@ -31,7 +34,8 @@ export type ProductColor = InferSelectModel<typeof productColors>;
 export type RelatedProduct = InferSelectModel<typeof relatedProducts>;
 
 // Operations
-export type Replica = InferSelectModel<typeof replicas>;
+export type OperationVersion = InferSelectModel<typeof operationsVersion>;
+export type ReadReplica = InferSelectModel<typeof readReplicas>;
 export type Guest = InferSelectModel<typeof guests>;
 export type Cart = InferSelectModel<typeof cart>;
 export type CartItem = InferSelectModel<typeof cartItems>;

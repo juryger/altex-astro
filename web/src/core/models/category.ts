@@ -12,7 +12,7 @@ export const CategorySchema = z.object({
   id: z.number(),
   title: z.string(),
   description: z.string().optional(),
-  image: z.string(),
+  imageUrl: z.string(),
   slug: z.string(),
   parentId: z.number().optional(),
   parentSlug: z.string().optional(),

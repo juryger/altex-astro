@@ -1,5 +1,6 @@
 CREATE TABLE `cart` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`title` text NOT NULL,
 	`user_id` integer,
 	`guest_id` integer,
 	`discount_id` integer,
@@ -45,10 +46,15 @@ CREATE TABLE `notifications` (
 	`created_at` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `replicas` (
+CREATE TABLE `__version` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`value` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `read_replicas` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text DEFAULT 'catalog' NOT NULL,
 	`file_name` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `idx_replicas_name` ON `replicas` (`name`);
+CREATE UNIQUE INDEX `idx_read_replicas_name` ON `read_replicas` (`name`);

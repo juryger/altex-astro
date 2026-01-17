@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
         id: 1,
         title: "Замочная фурнитура",
         description: "Замкки и прочее",
-        image: "locks.png",
+        imageUrl: "locks.png",
         slug: "locks",
       };
       break;
@@ -32,7 +32,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
         id: 2,
         title: "Инструменты",
         description: "Инструменты для сада и хоязяйства",
-        image: "tools.png",
+        imageUrl: "tools.png",
         slug: "tools",
       };
       break;
@@ -41,7 +41,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
         id: 3,
         title: "Навесные замки",
         description: "Навесные замки и прочее",
-        image: "padlocks.png",
+        imageUrl: "padlocks.png",
         slug: "padlocks",
         parentId: 1,
         parentSlug: "locks",
