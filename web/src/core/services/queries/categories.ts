@@ -34,17 +34,17 @@ export async function getCategories(
         slug: item.categories.slug,
         title: item.categories.title,
         description:
-          item.categories.description === null
-            ? undefined
-            : item.categories.description,
+          item.categories.description !== null
+            ? item.categories.description
+            : undefined,
         imageUrl: constractNavigationPaths(
           import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL,
           item.categories.uid.concat(".png"),
         ),
         parentId:
-          item.categories.parentId === null
-            ? undefined
-            : item.categories.parentId,
+          item.categories.parentId !== null
+            ? item.categories.parentId
+            : undefined,
         parentSlug: item.parent_sq?.slug,
       },
   );
@@ -63,15 +63,21 @@ export async function getCategoryBySlug(
     .limit(1);
 
   if (item.length === 0) return undefined;
-  const category = item[0];
+  const result = item[0];
 
   return <Category>{
-    id: category.categories.id,
-    slug: category.categories.slug,
-    title: category.categories.title,
-    description: category.categories.description,
-    imageUrl: "".concat(category.categories.uid, ".png"),
-    parentId: category.categories.parentId,
-    parentSlug: category.parent_sq?.slug,
+    id: result.categories.id,
+    slug: result.categories.slug,
+    title: result.categories.title,
+    description:
+      result.categories.description !== null
+        ? result.categories.description
+        : undefined,
+    imageUrl: "".concat(result.categories.uid, ".png"),
+    parentId:
+      result.categories.parentId !== null
+        ? result.categories.parentId
+        : undefined,
+    parentSlug: result.parent_sq?.slug,
   };
 }

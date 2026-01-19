@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import { getCategoriesList } from '../../core/utils/live-collection-manager';
 import type { Category } from '../../core/models/category';
 import { trimEnd } from '../../core/utils/text-formatter';
+import { defaultPaging, type Paging } from '../../core/models/paging';
 
 interface Props {
   parentSlug?: string;
@@ -13,11 +14,13 @@ interface Props {
 
 const { parentSlug, title } = Astro.props;
 
-let categories: Category[] | undefined;
+let categories: Category[] | undefined = [];
 try {
   categories = await getCategoriesList({
       skipParentMatch: false,
-      parentSlug
+      parentSlug,
+      page: defaultPaging.page,
+      pageSize: defaultPaging.pageSize
     });
 } catch(error) {
   console.error("🛑 ~ Categories component ~ failed to fetch categoreis list", error);

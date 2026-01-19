@@ -1,13 +1,12 @@
 import type { APIRoute } from "astro";
-import type { Category } from "../../../core/models/category";
+import { getCategoryBySlug } from "@/web/src/core/services/queries/categories";
+import type { Category } from "@/web/src/core/models/category";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
   console.log("📍 ~ API-GET ~ category ~ params:", params);
   const { slug } = params;
-
-  // TODO: query database for category by slug
 
   if (!slug) {
     return new Response(null, {
@@ -16,45 +15,19 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  var item: Category | undefined;
-  switch (slug) {
-    case "locks":
-      item = {
-        id: 1,
-        title: "Замочная фурнитура",
-        description: "Замкки и прочее",
-        imageUrl: "locks.png",
-        slug: "locks",
-      };
-      break;
-    case "tools":
-      item = {
-        id: 2,
-        title: "Инструменты",
-        description: "Инструменты для сада и хоязяйства",
-        imageUrl: "tools.png",
-        slug: "tools",
-      };
-      break;
-    case "padlocks":
-      item = {
-        id: 3,
-        title: "Навесные замки",
-        description: "Навесные замки и прочее",
-        imageUrl: "padlocks.png",
-        slug: "padlocks",
-        parentId: 1,
-        parentSlug: "locks",
-      };
-      break;
-    default:
-      return new Response(null, {
-        status: 404,
-        statusText: "Not found",
-      });
+  let result: Category | undefined = undefined;
+  try {
+    result = await getCategoryBySlug(slug);
+    console.log("🧪 category by slug '%s', %o", slug, result);
+  } catch (error) {
+    console.error(error);
+    return new Response(null, {
+      status: 404,
+      statusText: "Not found",
+    });
   }
 
-  return new Response(JSON.stringify(item), {
+  return new Response(JSON.stringify(result), {
     status: 200,
     headers: {
       "Content-Type": "application/json",

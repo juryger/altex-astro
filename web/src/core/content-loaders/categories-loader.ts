@@ -1,12 +1,13 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../utils/endpoint-error-parser";
 import type { Category } from "../models/category";
-import type { Paging } from "../models/paging";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 
 export type CategoryCollectionFilter = {
   skipParentMatch: boolean;
   parentSlug?: string;
+  page: number;
+  pageSize: number;
 };
 
 export type CategoryEntryFilter = {
@@ -26,18 +27,32 @@ export function createCategoriesLoader(config: {
           filter,
         );
 
-        const url = new URL(`${config.baseUrl}/${APIEndpointNames.Categories}`);
+        const apiUrl = new URL(
+          `${config.baseUrl}/${APIEndpointNames.Categories}`,
+        );
+
         if (filter !== undefined) {
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.SkipParentMatch,
             filter.skipParentMatch.toString(),
           );
           if (filter.parentSlug !== undefined) {
-            url.searchParams.set(APISearchParamNames.Parent, filter.parentSlug);
+            apiUrl.searchParams.set(
+              APISearchParamNames.Parent,
+              filter.parentSlug,
+            );
           }
+          apiUrl.searchParams.set(
+            APISearchParamNames.Page,
+            filter.page.toString(),
+          );
+          apiUrl.searchParams.set(
+            APISearchParamNames.PageSize,
+            filter.pageSize.toString(),
+          );
         }
 
-        const response = await fetch(url.toString());
+        const response = await fetch(apiUrl.toString());
         if (!response.ok) {
           return {
             error: new Error(
@@ -64,9 +79,11 @@ export function createCategoriesLoader(config: {
           filter,
         );
 
-        const response = await fetch(
-          `${config.baseUrl}/categories/${filter.slug}`,
+        const apiUrl = new URL(
+          `${config.baseUrl}/${APIEndpointNames.Categories}/${filter.slug}`,
         );
+
+        const response = await fetch(apiUrl);
         if (!response.ok) {
           return {
             error: new Error(

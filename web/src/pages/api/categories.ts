@@ -1,70 +1,16 @@
 import type { APIRoute } from "astro";
-import type { Category } from "../../core/models/category";
+import type { Category } from "@/web/src/core/models/category";
 import { APISearchParamNames } from "../../core/const";
-import { extractUrlPaging, extractUrlParam } from "../../core/utils/url-parser";
 import {
-  getCategories,
-  getCategoryBySlug,
-} from "../../core/services/queries/categories";
+  extractUrlPaging,
+  extractUrlParam,
+} from "@/web/src/core/utils/url-parser";
+import { getCategories } from "@/web/src/core/services/queries/categories";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
   console.log("📍 ~ API-GET ~ categories list ~ URL:", URL.parse(request.url));
-
-  // TODO: query database for Categories
-  // const allItems: Category[] = [
-  //   {
-  //     id: 1,
-  //     title: "Замочная фурнитура",
-  //     description: "Замкки и прочее",
-  //     imageUrl: "locks.png",
-  //     slug: "locks",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Инструменты",
-  //     description: "Инструменты для сада и хоязяйства",
-  //     imageUrl: "tools.png",
-  //     slug: "tools",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Навесные замки",
-  //     description: "Навесные замки и прочее",
-  //     imageUrl: "padlocks.png",
-  //     slug: "padlocks",
-  //     parentId: 1,
-  //     parentSlug: "locks",
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "Личинки",
-  //     description: "Заменяемые личинки для замков",
-  //     imageUrl: "lock-barrels.png",
-  //     slug: "lock-barrels",
-  //     parentId: 1,
-  //     parentSlug: "locks",
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "Проушины",
-  //     description: "Проушины для замков",
-  //     imageUrl: "padlock-eyes.png",
-  //     slug: "padlock-eyes",
-  //     parentId: 1,
-  //     parentSlug: "locks",
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "Отвертки",
-  //     description: "Отвертки и прочие товары",
-  //     imageUrl: "screwdrivers.png",
-  //     slug: "screwdrivers",
-  //     parentId: 2,
-  //     parentSlug: "tools",
-  //   },
-  // ];
 
   const url = URL.parse(request.url);
   const skipParentMatch =
@@ -72,30 +18,28 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     true;
   const parentSlug =
     extractUrlParam(url, APISearchParamNames.Parent, "string") ?? "";
-
   const paging = extractUrlPaging(url);
-  const categories = await getCategories(
-    paging.page,
-    paging.pageSize,
-    skipParentMatch,
-    parentSlug,
-  );
-  console.log("🧪 all categories", categories);
 
-  return new Response(
-    JSON.stringify(
-      categories,
-      // skipParentMatch
-      //   ? allItems
-      //   : parentSlug !== undefined
-      //     ? allItems.filter((x) => !x.parentId)
-      //     : allItems.filter((x) => x.parentSlug === parentSlug),
-    ),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+  let result: Category[];
+  try {
+    result = await getCategories(
+      paging.page,
+      paging.pageSize,
+      skipParentMatch,
+      parentSlug,
+    );
+  } catch (error) {
+    console.error(error);
+    return new Response(null, {
+      status: 404,
+      statusText: "Not found",
+    });
+  }
+
+  return new Response(JSON.stringify(result), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
 };
