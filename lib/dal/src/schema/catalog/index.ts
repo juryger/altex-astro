@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   sqliteTable as table,
   type AnySQLiteColumn,
@@ -5,10 +6,10 @@ import {
 import * as t from "drizzle-orm/sqlite-core";
 
 export const catalogVersion = table("__version", {
-  id: t.int().primaryKey({ autoIncrement: true }),
+  id: t.int().primaryKey(),
   value: t
     .int({ mode: "timestamp" })
-    .$defaultFn(() => new Date())
+    .default(sql`(current_timestamp)`)
     .notNull(),
 });
 
@@ -20,7 +21,7 @@ export const measurementUnits = table(
     title: t.text().notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_units_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_units_uid").on(table.uid)],
 );
 
 export const colors = table(
@@ -31,7 +32,7 @@ export const colors = table(
     title: t.text().notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_colors_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_colors_uid").on(table.uid)],
 );
 
 export const makers = table(
@@ -42,7 +43,7 @@ export const makers = table(
     title: t.text().notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_makers_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_makers_uid").on(table.uid)],
 );
 
 export const makeCountries = table(
@@ -53,7 +54,7 @@ export const makeCountries = table(
     title: t.text().notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_make_countries_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_make_countries_uid").on(table.uid)],
 );
 
 export const discounts = table(
@@ -65,7 +66,7 @@ export const discounts = table(
     title: t.text().notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_discounts_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_discounts_uid").on(table.uid)],
 );
 
 export const categories = table(
@@ -77,15 +78,18 @@ export const categories = table(
       .references((): AnySQLiteColumn => categories.id),
     slug: t.text().notNull(),
     title: t.text().notNull(),
+    description: t.text(),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .$defaultFn(() => new Date()),
+      .default(sql`(current_timestamp)`)
+      .notNull(),
     modifiedAt: t
-      .int("created_at", { mode: "timestamp" })
-      .$defaultFn(() => new Date()),
+      .int("modified_at", { mode: "timestamp" })
+      .default(sql`(current_timestamp)`)
+      .notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)],
 );
 
 export const products = table(
@@ -117,13 +121,15 @@ export const products = table(
     makeCountryId: t.int("make_country_id").references(() => makeCountries.id),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .$defaultFn(() => new Date()),
+      .default(sql`(current_timestamp)`)
+      .notNull(),
     modifiedAt: t
       .int("modified_at", { mode: "timestamp" })
-      .$defaultFn(() => new Date()),
+      .default(sql`(current_timestamp)`)
+      .notNull(),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)],
 );
 
 export const relatedProducts = table(
@@ -137,7 +143,7 @@ export const relatedProducts = table(
       .references(() => products.id),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)],
 );
 
 export const productColors = table(
@@ -154,5 +160,5 @@ export const productColors = table(
       .references(() => colors.id),
     uid: t.text().notNull(),
   },
-  (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)]
+  (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)],
 );

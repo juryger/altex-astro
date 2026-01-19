@@ -2,6 +2,10 @@ import type { APIRoute } from "astro";
 import type { Category } from "../../core/models/category";
 import { APISearchParamNames } from "../../core/const";
 import { extractUrlPaging, extractUrlParam } from "../../core/utils/url-parser";
+import {
+  getCategories,
+  getCategoryBySlug,
+} from "../../core/services/queries/categories";
 
 export const prerender = false;
 
@@ -68,25 +72,30 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const skipFilters = extractUrlParam(
     url,
     APISearchParamNames.SkipFilters,
-    "boolean"
+    "boolean",
   );
 
   // TODO: apply paging
   const paging = extractUrlPaging(url);
+
+  //const categories = await getCategories();
+  //console.log("🧪 all categories", categories);
+  //const category = await getCategoryBySlug("ZAMKFERR");
+  //console.log('🧪 category by slug="ZAMK"', category);
 
   return new Response(
     JSON.stringify(
       skipFilters
         ? allItems
         : !parentSlug
-        ? allItems.filter((x) => !x.parentId)
-        : allItems.filter((x) => x.parentSlug === parentSlug)
+          ? allItems.filter((x) => !x.parentId)
+          : allItems.filter((x) => x.parentSlug === parentSlug),
     ),
     {
       status: 200,
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 };

@@ -13,7 +13,9 @@ enum UnitOfMeasurementKind {
 
 type UnitOfMeasurement = {
   id: number;
-  name: string;
+  code: string;
+  title: string;
+  uid: string;
 };
 
 const UnitOfMeasurementDictionary: {

@@ -4,7 +4,7 @@ CREATE TABLE `cart` (
 	`user_id` integer,
 	`guest_id` integer,
 	`discount_id` integer,
-	`created_at` integer NOT NULL,
+	`created_at` integer DEFAULT (current_timestamp) NOT NULL,
 	FOREIGN KEY (`guest_id`) REFERENCES `guests`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -26,7 +26,7 @@ CREATE TABLE `guests` (
 	`address` text,
 	`city` text,
 	`post_code` text,
-	`created_at` integer
+	`created_at` integer DEFAULT (current_timestamp) NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_guests_name` ON `guests` (`name`);--> statement-breakpoint
@@ -43,12 +43,12 @@ CREATE TABLE `notification_addresses` (
 CREATE TABLE `notifications` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`message` text NOT NULL,
-	`created_at` integer NOT NULL
+	`created_at` integer DEFAULT (current_timestamp) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `__version` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`value` integer NOT NULL
+	`id` integer PRIMARY KEY NOT NULL,
+	`value` integer DEFAULT (current_timestamp) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `read_replicas` (

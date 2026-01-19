@@ -1,6 +1,6 @@
 CREATE TABLE `__version` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`value` integer NOT NULL
+	`id` integer PRIMARY KEY NOT NULL,
+	`value` integer DEFAULT (current_timestamp) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `categories` (
@@ -8,7 +8,9 @@ CREATE TABLE `categories` (
 	`parent_id` integer,
 	`slug` text NOT NULL,
 	`title` text NOT NULL,
-	`created_at` integer,
+	`description` text,
+	`created_at` integer DEFAULT (current_timestamp) NOT NULL,
+	`modified_at` integer DEFAULT (current_timestamp) NOT NULL,
 	`uid` text NOT NULL,
 	FOREIGN KEY (`parent_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -84,8 +86,8 @@ CREATE TABLE `products` (
 	`whs_price2` numeric NOT NULL,
 	`maker_id` integer,
 	`make_country_id` integer,
-	`created_at` integer,
-	`modified_at` integer,
+	`created_at` integer DEFAULT (current_timestamp) NOT NULL,
+	`modified_at` integer DEFAULT (current_timestamp) NOT NULL,
 	`uid` text NOT NULL,
 	FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`unit_id`) REFERENCES `measurement_units`(`id`) ON UPDATE no action ON DELETE no action,

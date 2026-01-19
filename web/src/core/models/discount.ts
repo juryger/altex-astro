@@ -6,7 +6,10 @@ enum DiscountKind {
 
 type Discount = {
   id: number;
-  sum: number;
+  code: string;
+  fromSum: number;
+  title: string;
+  uid: string;
 };
 
 const DiscountMetadata: Array<{ sum: number; title: string }> = [

@@ -1,11 +1,12 @@
+import { sql } from "drizzle-orm";
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 
 export const operationsVersion = table("__version", {
-  id: t.int().primaryKey({ autoIncrement: true }),
+  id: t.int().primaryKey(),
   value: t
     .int({ mode: "timestamp" })
-    .$defaultFn(() => new Date())
+    .default(sql`(current_timestamp)`)
     .notNull(),
 });
 
@@ -15,11 +16,11 @@ export const readReplicas = table(
     id: t.int().primaryKey({ autoIncrement: true }),
     name: t
       .text({ enum: ["catalog"] })
-      .notNull()
-      .default("catalog"),
+      .default("catalog")
+      .notNull(),
     fileName: t.text("file_name").notNull(),
   },
-  (table) => [t.uniqueIndex("idx_read_replicas_name").on(table.name)]
+  (table) => [t.uniqueIndex("idx_read_replicas_name").on(table.name)],
 );
 
 export const guests = table(
@@ -35,12 +36,13 @@ export const guests = table(
     postCode: t.text("post_code"),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .$defaultFn(() => new Date()),
+      .default(sql`(current_timestamp)`)
+      .notNull(),
   },
   (table) => [
     t.uniqueIndex("idx_guests_name").on(table.name),
     t.uniqueIndex("idx_guests_email").on(table.email),
-  ]
+  ],
 );
 
 export const cart = table("cart", {
@@ -51,7 +53,7 @@ export const cart = table("cart", {
   discountId: t.int("discount_id"), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite
   createdAt: t
     .int("created_at", { mode: "timestamp" })
-    .$defaultFn(() => new Date())
+    .default(sql`(current_timestamp)`)
     .notNull(),
 });
 
@@ -74,7 +76,7 @@ export const notifications = table("notifications", {
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .notNull()
-    .$defaultFn(() => new Date()),
+    .default(sql`(current_timestamp)`),
 });
 
 export const notificationAddressees = table("notification_addresses", {
@@ -85,8 +87,8 @@ export const notificationAddressees = table("notification_addresses", {
     .references(() => notifications.id),
   type: t
     .text({ enum: ["email", "inapp", "sms"] })
-    .notNull()
-    .default("email"),
+    .default("email")
+    .notNull(),
   guestId: t.int("guest_id"),
   userId: t.int("user_id"),
 });

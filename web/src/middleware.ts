@@ -9,7 +9,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // }
     return await next();
   } catch (e) {
-    console.log("⚙️ ~ middlewear ~ exception occured:", e);
+    console.error("⚙️ ~ middlewear ~ exception occured:", e);
     if (e instanceof NotFoundError) {
       return context.rewrite("/404");
     } else if (e instanceof ServerError) {

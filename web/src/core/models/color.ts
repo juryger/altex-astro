@@ -11,7 +11,9 @@ enum ColorKind {
 
 type Color = {
   id: number;
-  name: string;
+  code: string;
+  title: string;
+  uid: string;
 };
 
 // TODO: title should not be hardcoded and resolved based lookup in the IndexedDB

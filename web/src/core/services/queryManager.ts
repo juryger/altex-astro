@@ -2,14 +2,13 @@ type QueryResult<T = any> = {
   data?: T;
   isLoading: boolean;
   error?: Error;
-  isStale: boolean;
 };
 
 export interface QueryManager<T = any> {
   exec: (
     key: string,
     queryFn: () => Promise<T>,
-    staleTimeMs?: number
+    staleTimeMs?: number,
   ) => QueryResult<T>;
 }
 
@@ -20,7 +19,6 @@ export function queryManager<T = any>(): QueryManager<T> {
         data: undefined,
         isLoading: false,
         error: undefined,
-        isStale: false,
       };
 
       // TODO: Before executing queryFn, we need to check if there is a valid cache value.
