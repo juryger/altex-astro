@@ -31,49 +31,49 @@ export function createProductsLoader(config: {
       try {
         console.log(
           "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
-          filter
+          filter,
         );
 
         const url = new URL(`${config.baseUrl}/${APIEndpointNames.Products}`);
         if (filter !== undefined) {
           url.searchParams.set(
             APISearchParamNames.Category,
-            filter.categorySlug
+            filter.categorySlug,
           );
           url.searchParams.set(
             APISearchParamNames.SortField,
-            filter.sorting.field.toString()
+            filter.sorting.field.toString(),
           );
           url.searchParams.set(
             APISearchParamNames.SortOrder,
-            filter.sorting.order.toString()
+            filter.sorting.order.toString(),
           );
           url.searchParams.set(
-            APISearchParamNames.PageOffset,
-            filter.paging.offset.toString()
+            APISearchParamNames.Page,
+            filter.paging.page.toString(),
           );
           url.searchParams.set(
-            APISearchParamNames.PageLimit,
-            filter.paging.limit.toString()
+            APISearchParamNames.PageSize,
+            filter.paging.pageSize.toString(),
           );
           filter.filtering.forEach((item) => {
             url.searchParams.set(
               APISearchParamNames.Filter,
-              item.field.concat(TextSeparators.Comma).concat(item.value)
+              item.field.concat(TextSeparators.Comma).concat(item.value),
             );
           });
         }
 
         console.log(
           "🛠️ ~ createProductsLoader ~ fetching data via URL:",
-          url.toString()
+          url.toString(),
         );
 
         const response = await fetch(url.toString());
         if (!response.ok) {
           return {
             error: new Error(
-              `Failed to fetch products: ${response.statusText}`
+              `Failed to fetch products: ${response.statusText}`,
             ),
           };
         }
@@ -93,16 +93,16 @@ export function createProductsLoader(config: {
       try {
         console.log(
           "🛠️ ~ createProductsLoader ~ entry retrieving ~ filter:",
-          filter
+          filter,
         );
 
         const response = await fetch(
-          `${config.baseUrl}/products/${filter.slug}`
+          `${config.baseUrl}/products/${filter.slug}`,
         );
         if (!response.ok) {
           return {
             error: new Error(
-              `Failed to fetch products: ${response.statusText}`
+              `Failed to fetch products: ${response.statusText}`,
             ),
           };
         }

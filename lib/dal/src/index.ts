@@ -3,7 +3,7 @@ import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalog from "./schema/catalog/index.js";
 import * as operations from "./schema/operations/index.js";
 
-export { eq, lt, gte, ne } from "drizzle-orm";
+export { eq, lt, gte, ne, isNull } from "drizzle-orm";
 
 export type {
   MeasurementUnit,
@@ -23,20 +23,20 @@ export type {
 } from "./types/index.js";
 
 const createOperationsDb = (
-  path: string | undefined
+  path: string | undefined,
 ): BetterSQLite3Database<typeof operations> => {
   const clientOperations = new Database(
     path ?? process.env.DB_OPERATIONS_PATH,
     {
       fileMustExist: true,
-    }
+    },
   );
   clientOperations.pragma("journal_mode = WAL");
   return drizzle({ client: clientOperations, schema: operations });
 };
 
 const createCatalogDb = (
-  path: string | undefined
+  path: string | undefined,
 ): BetterSQLite3Database<typeof catalog> => {
   const clientCatalog = new Database(path ?? process.env.DB_CATALOG_PATH, {
     fileMustExist: true,

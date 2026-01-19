@@ -5,7 +5,7 @@ import type { Paging } from "../models/paging";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 
 export type CategoryCollectionFilter = {
-  skipFilters: boolean;
+  skipParentMatch: boolean;
   parentSlug?: string;
 };
 
@@ -23,20 +23,17 @@ export function createCategoriesLoader(config: {
       try {
         console.log(
           "🛠️ ~ createCategoriesLoader ~ collection retrieving ~ filter:",
-          filter
+          filter,
         );
 
         const url = new URL(`${config.baseUrl}/${APIEndpointNames.Categories}`);
         if (filter !== undefined) {
           url.searchParams.set(
-            APISearchParamNames.SkipFilters,
-            filter.skipFilters.toString()
+            APISearchParamNames.SkipParentMatch,
+            filter.skipParentMatch.toString(),
           );
-          if (!filter.skipFilters) {
-            url.searchParams.set(
-              APISearchParamNames.Parent,
-              filter.parentSlug ?? ""
-            );
+          if (filter.parentSlug !== undefined) {
+            url.searchParams.set(APISearchParamNames.Parent, filter.parentSlug);
           }
         }
 
@@ -44,7 +41,7 @@ export function createCategoriesLoader(config: {
         if (!response.ok) {
           return {
             error: new Error(
-              `Failed to fetch categories: ${response.statusText}`
+              `Failed to fetch categories: ${response.statusText}`,
             ),
           };
         }
@@ -64,16 +61,16 @@ export function createCategoriesLoader(config: {
       try {
         console.log(
           "🛠️ ~ createCategoriesLoader ~ entry retrieving ~ filter:",
-          filter
+          filter,
         );
 
         const response = await fetch(
-          `${config.baseUrl}/categories/${filter.slug}`
+          `${config.baseUrl}/categories/${filter.slug}`,
         );
         if (!response.ok) {
           return {
             error: new Error(
-              `Failed to fetch category: ${response.statusText}`
+              `Failed to fetch category: ${response.statusText}`,
             ),
           };
         }

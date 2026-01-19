@@ -16,9 +16,9 @@ enum APIEndpointNames {
 enum APISearchParamNames {
   Category = "category",
   Parent = "parent",
-  SkipFilters = "skipFilters",
-  PageOffset = "pageOffset",
-  PageLimit = "pageLimit",
+  SkipParentMatch = "skipParentMatch",
+  Page = "page",
+  PageSize = "pageSize",
   SortField = "sortFiled",
   SortOrder = "sortOrder",
   Filter = "filter",
@@ -50,6 +50,11 @@ enum TextSeparators {
   Semicolon = ";",
 }
 
+enum ImageContainers {
+  Thumbnails = "thumbnails",
+  Full = "full",
+}
+
 export {
   LiveCollectionNames,
   SessionNames,
@@ -58,4 +63,5 @@ export {
   APISearchParamNames,
   SortOrder,
   TextSeparators,
+  ImageContainers,
 };

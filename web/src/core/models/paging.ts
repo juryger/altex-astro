@@ -1,6 +1,6 @@
 type Paging = {
-  offset: number;
-  limit: number;
+  page: number;
+  pageSize: number;
 };
 
 type PageResult<T = any> = {
@@ -8,14 +8,14 @@ type PageResult<T = any> = {
   pageInfo: {
     total: number;
     hasMore: boolean;
-    offset: number;
-    limit: number;
+    page: number;
+    pageSize: number;
   };
 };
 
 const defaultPaging: Paging = {
-  offset: 0,
-  limit: import.meta.env.DATA_RECORDS_ON_PAGE,
+  page: 0,
+  pageSize: import.meta.env.DATA_RECORDS_ON_PAGE,
 };
 
 export { type Paging, type PageResult, defaultPaging };

@@ -17,7 +17,7 @@ export const getCatalogSyncHandler = (config: {
     async syncCategories() {
       // try to get all categories for caching (skip filters and up to 1000 entities)
       const url = new URL(
-        `${config.apiBaseUrl}/${APIEndpointNames.Categories}?&${APISearchParamNames.SkipFilters}=true&${APISearchParamNames.PageOffset}=0&${APISearchParamNames.PageLimit}=1000`
+        `${config.apiBaseUrl}/${APIEndpointNames.Categories}?&${APISearchParamNames.SkipParentMatch}=true&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=1000`,
       );
       const response = await fetch(url);
       if (!response.ok) {
@@ -25,10 +25,10 @@ export const getCatalogSyncHandler = (config: {
           console.error(
             "🛠️ ~ catalog-sync-handler ~ failed to get categories: %s - %s",
             response.status,
-            errorMessage
+            errorMessage,
           );
           throw new Error(
-            `Failed to get categories: ${response.status} - ${errorMessage}`
+            `Failed to get categories: ${response.status} - ${errorMessage}`,
           );
         });
       }
@@ -36,7 +36,7 @@ export const getCatalogSyncHandler = (config: {
       var data = await response.json();
       console.log(
         "🛠️ ~ catalog-sync-handler ~ obtained categories data: ",
-        data
+        data,
       );
 
       var dataCache = (data as Array<Category>).map(
@@ -47,13 +47,13 @@ export const getCatalogSyncHandler = (config: {
             slug: x.slug,
             parentId: x.parentId,
             parentSlug: x.parentSlug,
-          } as CategoryCache)
+          }) as CategoryCache,
       );
 
       return clientDb.categories.bulkAdd(dataCache).then((value) => {
         console.log(
           "🛠️ ~ catalog-sync-handler ~ Categories has been saved to IndexedDb:",
-          value
+          value,
         );
       });
     },

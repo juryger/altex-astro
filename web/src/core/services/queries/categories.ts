@@ -1,16 +1,29 @@
-import { createCatalogDb, eq } from "@/lib/dal";
+import { createCatalogDb, eq, isNull } from "@/lib/dal";
 import { categories } from "@/lib/dal/src/schema/catalog";
 import type { Category } from "@/web/src/core/models/category";
+import { constractNavigationPaths } from "../../utils/url-builder";
 
-export async function getCategories(): Promise<Category[]> {
+export async function getCategories(
+  page: number,
+  pageSize: number,
+  skipParentMatch: boolean = false,
+  parentSlug: string = "",
+): Promise<Category[]> {
   const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
   const parentSq = db.select().from(categories).as("parent_sq");
-  const result = await db
+  var result = await db
     .select()
     .from(categories)
     .leftJoin(parentSq, eq(categories.parentId, parentSq.id))
-    .limit(20)
-    .offset(0);
+    .limit(pageSize)
+    .offset(page)
+    .where(
+      !skipParentMatch
+        ? parentSlug === ""
+          ? isNull(parentSq.slug)
+          : eq(parentSq.slug, parentSlug)
+        : undefined,
+    );
 
   if (result.length === 0) return [];
 
@@ -20,9 +33,18 @@ export async function getCategories(): Promise<Category[]> {
         id: item.categories.id,
         slug: item.categories.slug,
         title: item.categories.title,
-        description: item.categories.description,
-        imageUrl: "".concat(item.categories.uid, ".png"),
-        parentId: item.categories.parentId,
+        description:
+          item.categories.description === null
+            ? undefined
+            : item.categories.description,
+        imageUrl: constractNavigationPaths(
+          import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL,
+          item.categories.uid.concat(".png"),
+        ),
+        parentId:
+          item.categories.parentId === null
+            ? undefined
+            : item.categories.parentId,
         parentSlug: item.parent_sq?.slug,
       },
   );

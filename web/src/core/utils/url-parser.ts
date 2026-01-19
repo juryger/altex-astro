@@ -5,32 +5,33 @@ import { regexTrue } from "./regex";
 function extractUrlParam(
   url: URL | null,
   paramName: string,
-  type: "string"
-): string;
+  type: "string",
+): string | undefined;
 function extractUrlParam(
   url: URL | null,
   paramName: string,
-  type: "number"
-): number;
+  type: "number",
+): number | undefined;
 function extractUrlParam(
   url: URL | null,
   paramName: string,
-  type: "boolean"
-): boolean;
+  type: "boolean",
+): boolean | undefined;
 function extractUrlParam(
   url: URL | null,
   paramName: string,
-  type: string
+  type: string,
 ): unknown {
-  if (!url || !url.search || !url.searchParams) {
+  if (
+    !url ||
+    !url.search ||
+    !url.searchParams ||
+    !url.searchParams.has(paramName)
+  ) {
     return undefined;
   }
 
-  let result: string = "";
-  if (url.searchParams.has(paramName)) {
-    result = url.searchParams.get(paramName) ?? "";
-  }
-
+  let result = url.searchParams.get(paramName) ?? "";
   switch (type) {
     case "string":
       return String(result);
@@ -46,12 +47,15 @@ function extractUrlParam(
 }
 
 function extractUrlPaging(url: URL | null): Paging {
-  const paging: Paging = { offset: 0, limit: 0 };
-  const offset = extractUrlParam(url, APISearchParamNames.PageOffset, "number");
-  paging.offset = offset !== -1 ? offset : defaultPaging.offset;
+  const paging: Paging = { page: 0, pageSize: 0 };
+  const page = extractUrlParam(url, APISearchParamNames.Page, "number");
+  paging.page = page !== undefined && page !== -1 ? page : defaultPaging.page;
 
-  const limit = extractUrlParam(url, APISearchParamNames.PageLimit, "number");
-  paging.limit = limit !== -1 ? limit : defaultPaging.limit;
+  const pageSize = extractUrlParam(url, APISearchParamNames.PageSize, "number");
+  paging.pageSize =
+    pageSize !== undefined && pageSize !== -1
+      ? pageSize
+      : defaultPaging.pageSize;
   return paging;
 }
 

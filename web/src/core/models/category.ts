@@ -2,18 +2,18 @@ import { z } from "astro/zod";
 
 export const CategorySchema = z.object({
   id: z.number(),
+  slug: z.string(),
   title: z.string(),
   description: z.string().optional(),
   imageUrl: z.string(),
-  slug: z.string(),
   parentId: z.number().optional(),
   parentSlug: z.string().optional(),
 });
 
 export const CategoryCacheSchema = z.object({
   id: z.number(),
-  title: z.string(),
   slug: z.string(),
+  title: z.string(),
   parentId: z.number().optional(),
   parentSlug: z.string().optional(),
 });

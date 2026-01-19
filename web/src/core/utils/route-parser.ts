@@ -25,8 +25,8 @@ export default function getRouteParser(route?: string): RouteParser {
       const match = route?.match(pagingExp);
       if (!match || !match.groups) return undefined;
       return {
-        offset: parseInt(match.groups.offset, 10),
-        limit: parseInt(match.groups.limit, 10),
+        page: parseInt(match.groups.offset, 10),
+        pageSize: parseInt(match.groups.limit, 10),
       } as Paging;
     },
     getCatalogFiltering: () => {

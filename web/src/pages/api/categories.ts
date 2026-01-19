@@ -13,83 +13,83 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   console.log("📍 ~ API-GET ~ categories list ~ URL:", URL.parse(request.url));
 
   // TODO: query database for Categories
-  const allItems: Category[] = [
-    {
-      id: 1,
-      title: "Замочная фурнитура",
-      description: "Замкки и прочее",
-      imageUrl: "locks.png",
-      slug: "locks",
-    },
-    {
-      id: 2,
-      title: "Инструменты",
-      description: "Инструменты для сада и хоязяйства",
-      imageUrl: "tools.png",
-      slug: "tools",
-    },
-    {
-      id: 3,
-      title: "Навесные замки",
-      description: "Навесные замки и прочее",
-      imageUrl: "padlocks.png",
-      slug: "padlocks",
-      parentId: 1,
-      parentSlug: "locks",
-    },
-    {
-      id: 4,
-      title: "Личинки",
-      description: "Заменяемые личинки для замков",
-      imageUrl: "lock-barrels.png",
-      slug: "lock-barrels",
-      parentId: 1,
-      parentSlug: "locks",
-    },
-    {
-      id: 5,
-      title: "Проушины",
-      description: "Проушины для замков",
-      imageUrl: "padlock-eyes.png",
-      slug: "padlock-eyes",
-      parentId: 1,
-      parentSlug: "locks",
-    },
-    {
-      id: 6,
-      title: "Отвертки",
-      description: "Отвертки и прочие товары",
-      imageUrl: "screwdrivers.png",
-      slug: "screwdrivers",
-      parentId: 2,
-      parentSlug: "tools",
-    },
-  ];
+  // const allItems: Category[] = [
+  //   {
+  //     id: 1,
+  //     title: "Замочная фурнитура",
+  //     description: "Замкки и прочее",
+  //     imageUrl: "locks.png",
+  //     slug: "locks",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Инструменты",
+  //     description: "Инструменты для сада и хоязяйства",
+  //     imageUrl: "tools.png",
+  //     slug: "tools",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Навесные замки",
+  //     description: "Навесные замки и прочее",
+  //     imageUrl: "padlocks.png",
+  //     slug: "padlocks",
+  //     parentId: 1,
+  //     parentSlug: "locks",
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Личинки",
+  //     description: "Заменяемые личинки для замков",
+  //     imageUrl: "lock-barrels.png",
+  //     slug: "lock-barrels",
+  //     parentId: 1,
+  //     parentSlug: "locks",
+  //   },
+  //   {
+  //     id: 5,
+  //     title: "Проушины",
+  //     description: "Проушины для замков",
+  //     imageUrl: "padlock-eyes.png",
+  //     slug: "padlock-eyes",
+  //     parentId: 1,
+  //     parentSlug: "locks",
+  //   },
+  //   {
+  //     id: 6,
+  //     title: "Отвертки",
+  //     description: "Отвертки и прочие товары",
+  //     imageUrl: "screwdrivers.png",
+  //     slug: "screwdrivers",
+  //     parentId: 2,
+  //     parentSlug: "tools",
+  //   },
+  // ];
 
   const url = URL.parse(request.url);
-  const parentSlug = extractUrlParam(url, APISearchParamNames.Parent, "string");
+  const skipParentMatch =
+    extractUrlParam(url, APISearchParamNames.SkipParentMatch, "boolean") ??
+    true;
+  const parentSlug =
+    extractUrlParam(url, APISearchParamNames.Parent, "string") ?? "";
 
-  const skipFilters = extractUrlParam(
-    url,
-    APISearchParamNames.SkipFilters,
-    "boolean",
-  );
-
-  // TODO: apply paging
   const paging = extractUrlPaging(url);
-
-  //const categories = await getCategories();
-  //console.log("🧪 all categories", categories);
-  //const category = await getCategoryBySlug("ZAMKFERR");
-  //console.log('🧪 category by slug="ZAMK"', category);
+  const categories = await getCategories(
+    paging.page,
+    paging.pageSize,
+    skipParentMatch,
+    parentSlug,
+  );
+  console.log("🧪 all categories", categories);
 
   return new Response(
     JSON.stringify(
-      skipFilters
-        ? allItems
-        : !parentSlug
-          ? allItems.filter((x) => !x.parentId)
-          : allItems.filter((x) => x.parentSlug === parentSlug),
+      categories,
+      // skipParentMatch
+      //   ? allItems
+      //   : parentSlug !== undefined
+      //     ? allItems.filter((x) => !x.parentId)
+      //     : allItems.filter((x) => x.parentSlug === parentSlug),
     ),
     {
       status: 200,
