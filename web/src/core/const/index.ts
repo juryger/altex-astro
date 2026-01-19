@@ -1,3 +1,5 @@
+const NO_IMAGE_FILE_NAME = "noimage.png";
+
 enum LiveCollectionNames {
   Categories = "categories",
   Products = "products",
@@ -56,6 +58,7 @@ enum ImageContainers {
 }
 
 export {
+  NO_IMAGE_FILE_NAME,
   LiveCollectionNames,
   SessionNames,
   NavPathNames,

@@ -79,6 +79,7 @@ export const categories = table(
     slug: t.text().notNull(),
     title: t.text().notNull(),
     description: t.text(),
+    hasImage: t.int("has_image").default(0),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
       .default(sql`(current_timestamp)`)
@@ -104,6 +105,7 @@ export const products = table(
       .references(() => categories.id),
     title: t.text().notNull(),
     description: t.text(),
+    hasImage: t.int("has_image").default(0),
     unitId: t
       .int("unit_id")
       .references(() => measurementUnits.id)

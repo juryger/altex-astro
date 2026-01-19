@@ -2,6 +2,7 @@ import { createCatalogDb, eq, isNull } from "@/lib/dal";
 import { categories } from "@/lib/dal/src/schema/catalog";
 import type { Category } from "@/web/src/core/models/category";
 import { constractNavigationPaths } from "../../utils/url-builder";
+import { NO_IMAGE_FILE_NAME } from "../../const";
 
 export async function getCategories(
   page: number,
@@ -39,7 +40,9 @@ export async function getCategories(
             : undefined,
         imageUrl: constractNavigationPaths(
           import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL,
-          item.categories.uid.concat(".png"),
+          item.categories.hasImage
+            ? item.categories.uid.concat(".png")
+            : NO_IMAGE_FILE_NAME,
         ),
         parentId:
           item.categories.parentId !== null
@@ -73,7 +76,9 @@ export async function getCategoryBySlug(
       result.categories.description !== null
         ? result.categories.description
         : undefined,
-    imageUrl: "".concat(result.categories.uid, ".png"),
+    imageUrl: result.categories.hasImage
+      ? result.categories.uid.concat(".png")
+      : NO_IMAGE_FILE_NAME,
     parentId:
       result.categories.parentId !== null
         ? result.categories.parentId

@@ -1,0 +1,1 @@
+ALTER TABLE `categories` ADD `has_image` integer DEFAULT 0;

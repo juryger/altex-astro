@@ -97,7 +97,7 @@ export function createProductsLoader(config: {
         );
 
         const response = await fetch(
-          `${config.baseUrl}/products/${filter.slug}`,
+          `${config.baseUrl}/${APIEndpointNames.Products}/${filter.slug}`,
         );
         if (!response.ok) {
           return {
@@ -108,11 +108,11 @@ export function createProductsLoader(config: {
         }
 
         const data = await response.json();
-        const value = data as Product;
+        const result = data as Product;
         //console.log("🛠️ ~ createProductsLoader ~ entry ~ value:", value);
 
-        return value !== undefined
-          ? { id: value.slug, data: value }
+        return result !== undefined
+          ? { id: result.slug, data: result }
           : { error: new Error(`No product found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

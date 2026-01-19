@@ -17,16 +17,15 @@ export type CategoryEntryFilter = {
 export function createCategoriesLoader(config: {
   baseUrl: string;
 }): LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter> {
-  console.log("🛠️ ~ createCategoriesLoader ~ config:", config);
+  //console.log("🛠️ ~ createCategoriesLoader ~ config:", config);
   return {
     name: "categories-loader",
     loadCollection: async ({ filter }) => {
       try {
-        console.log(
-          "🛠️ ~ createCategoriesLoader ~ collection retrieving ~ filter:",
-          filter,
-        );
-
+        // console.log(
+        //   "🛠️ ~ createCategoriesLoader ~ collection retrieving ~ filter:",
+        //   filter,
+        // );
         const apiUrl = new URL(
           `${config.baseUrl}/${APIEndpointNames.Categories}`,
         );
@@ -60,9 +59,8 @@ export function createCategoriesLoader(config: {
             ),
           };
         }
-        const data = await response.json();
-        //console.log("🛠️ ~ createCategoriesLoader ~ collection ~ data:", data);
 
+        const data = await response.json();
         return {
           entries: data.map((x: Category) => ({ id: x.slug, data: x })),
         };
@@ -74,11 +72,6 @@ export function createCategoriesLoader(config: {
     },
     loadEntry: async ({ filter }) => {
       try {
-        console.log(
-          "🛠️ ~ createCategoriesLoader ~ entry retrieving ~ filter:",
-          filter,
-        );
-
         const apiUrl = new URL(
           `${config.baseUrl}/${APIEndpointNames.Categories}/${filter.slug}`,
         );
@@ -93,11 +86,10 @@ export function createCategoriesLoader(config: {
         }
 
         const data = await response.json();
-        const value = data as Category;
-        //console.log("🛠️ ~ createCategoriesLoader ~ entry ~ value:", value);
+        const result = data as Category;
 
-        return value !== undefined
-          ? { id: value.slug, data: value }
+        return result !== undefined
+          ? { id: result.slug, data: result }
           : { error: new Error(`No category found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {

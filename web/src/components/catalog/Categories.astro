@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
 import { getCategoriesList } from '../../core/utils/live-collection-manager';
 import type { Category } from '../../core/models/category';
 import { trimEnd } from '../../core/utils/text-formatter';
-import { defaultPaging, type Paging } from '../../core/models/paging';
+import { defaultPaging } from '../../core/models/paging';
 
 interface Props {
   parentSlug?: string;
@@ -14,6 +14,7 @@ interface Props {
 
 const { parentSlug, title } = Astro.props;
 
+let hasDataLoadError = false;
 let categories: Category[] | undefined = [];
 try {
   categories = await getCategoriesList({
@@ -23,15 +24,26 @@ try {
       pageSize: defaultPaging.pageSize
     });
 } catch(error) {
+  hasDataLoadError = true;
   console.error("🛑 ~ Categories component ~ failed to fetch categoreis list", error);
 }
+
+const titleErrorMessage = "Не удалось загрузить список категорий, попробуйте снова позднее.";
 ---
 
+{hasDataLoadError && <div role="alert" class="alert mt-1 items-center">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-error h-10 w-10 shrink-0">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+  </svg>
+  <p>
+    <span class="text-error">{titleErrorMessage}</span>       
+  </p>
+</div>}
 {(categories && categories.length > 0) &&
   <div class="mx-4 mb-2 bg-base-100">
     <h3 class="text-lg font-bold text-center sm:text-left py-2">{title}</h3>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {categories.map(item => {
+      {categories && categories.map(item => {
         return (
           <div class="card bg-base-300 hadow-sm px-2 py-2">
             <a class="group no-underline" href={"/catalog/categories/".concat(item.slug)}>     

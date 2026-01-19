@@ -16,31 +16,41 @@ interface Props {
   paging: Paging | undefined;
   filtering: Filtering[];
 }
-
 const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
-const subTitle = "Список товаров";
-const noProductsForCategory = "Товары не представлены в данной категории";
 
-const filter: ProductCollectionFilter = {
-  categorySlug,
-  sorting,
-  paging,
-  filtering
-};
-
+let hasDataLoadError = false;
 let products: Product[] | undefined;
 try {
-  products = await getProductsList(filter)
+  products = await getProductsList({
+    categorySlug,
+    sorting,
+    paging,
+    filtering
+  } as ProductCollectionFilter)
 } catch(error) {
+  hasDataLoadError = true;
   console.error("🛑 ~ Products component ~ failed to fetch products list", error);
 } 
-//console.log("🛠️ ~ Products component ~ collection:", products)
+
+const titleProductsList = "Список товаров";
+const titleNoProductsForCategory = "Товары не представлены в данной категории";
+const titleErrorMessage = "Не удалось загрузить список товаров, попробуйте снова позднее.";
 ---
 
-<div class="mx-4 mb-2 bg-base-100">
-  <h3 class="text-lg font-bold text-center sm:text-left py-2">{subTitle}</h3>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-    {products && products.map(x => <ProductCard item={x} />)}
+{hasDataLoadError && <div role="alert" class="alert mt-1 items-center">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-error h-10 w-10 shrink-0">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+  </svg>
+  <p>
+    <span class="text-error">{titleErrorMessage}</span>       
+  </p>
+</div>}
+{(products && products.length > 0) &&
+  <div class="mx-4 mb-2 bg-base-100">
+    <h3 class="text-lg font-bold text-center sm:text-left py-2">{titleProductsList}</h3>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+      {products && products.map(x => <ProductCard item={x} />)}
+    </div>
+    {(!products || products.length == 0) && <span>{titleNoProductsForCategory}</span>}
   </div>
-  {(!products || products.length == 0) && <span>{noProductsForCategory}</span>}
-</div>
+}

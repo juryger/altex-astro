@@ -1,19 +1,19 @@
 /* 1. ZAMKI */
 INSERT INTO categories
-(slug, title, parent_id, uid)
-SELECT 'ZAMK', 'Замки', NULL, 'a514f2f2-7d2e-434a-97e3-f3b2637663c2'
+(slug, title, parent_id, has_image, uid)
+SELECT 'ZAMK', 'Замки', NULL, 1, 'a514f2f2-7d2e-434a-97e3-f3b2637663c2'
 WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'ZAMK');
 
 /* 2. ZAMKI FURNITURA */
 INSERT INTO categories
-(slug, title, parent_id, uid)
-SELECT 'ZAMKFURN', 'Замочная фурнитура', NULL, '5155a71f-9bdb-4bb8-992e-7c98f42e95fe'
+(slug, title, parent_id, has_image, uid)
+SELECT 'ZAMKFURN', 'Замочная фурнитура', NULL, 1, '5155a71f-9bdb-4bb8-992e-7c98f42e95fe'
 WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'ZAMKFURN');
 
 /* 3. INSTRUMENTI */
 INSERT INTO categories
-(slug, title, parent_id, uid)
-SELECT 'INST', 'Инструменты', NULL, '5292c9ef-3431-43fa-9f67-a8620d0f19b4'
+(slug, title, parent_id, has_image, uid)
+SELECT 'INST', 'Инструменты', NULL, 1, '5292c9ef-3431-43fa-9f67-a8620d0f19b4'
 WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'INST');
 
 /* 4. CARABINI */
@@ -137,8 +137,8 @@ WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'PROU');
 /* ---------------------------------------------------- */
 /* -> INSTRUMENTI: SUB-CATEGORIES */
 INSERT INTO categories
-(slug, title, parent_id, uid)
-SELECT 'OTVE', 'Отвертки', 3, '6da455ab-917b-4556-869d-2667d8b36847'
+(slug, title, parent_id, has_image, uid)
+SELECT 'OTVE', 'Отвертки', 3, 1, '6da455ab-917b-4556-869d-2667d8b36847'
 WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'OTVE');
 
 INSERT INTO categories
