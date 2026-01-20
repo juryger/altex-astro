@@ -1,11 +1,14 @@
 import type { APIRoute } from "astro";
-import type { Category } from "@/web/src/core/models/category";
-import { APISearchParamNames } from "../../core/const";
+import { APISearchParamNames } from "@/web/src/core/const";
 import {
   extractUrlPaging,
   extractUrlParam,
 } from "@/web/src/core/utils/url-parser";
 import { getCategories } from "@/web/src/core/services/queries/categories";
+import {
+  queryManager,
+  type QueryResult,
+} from "@/web/src/core/services/queryManager";
 
 export const prerender = false;
 
@@ -20,23 +23,21 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     extractUrlParam(url, APISearchParamNames.Parent, "string") ?? "";
   const paging = extractUrlPaging(url);
 
-  let result: Category[];
-  try {
-    result = await getCategories(
-      paging.page,
-      paging.pageSize,
-      skipParentMatch,
-      parentSlug,
-    );
-  } catch (error) {
-    console.error(error);
+  const result = await queryManager().fetch(() =>
+    getCategories(paging.page, paging.pageSize, skipParentMatch, parentSlug),
+  );
+
+  if (result.error) {
+    console.error(result.error);
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
 
-  return new Response(JSON.stringify(result), {
+  console.log("🧪 categories %o", result);
+
+  return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {
       "Content-Type": "application/json",

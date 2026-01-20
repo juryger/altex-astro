@@ -35,6 +35,7 @@ export function createProductsLoader(config: {
         );
 
         const url = new URL(`${config.baseUrl}/${APIEndpointNames.Products}`);
+
         if (filter !== undefined) {
           url.searchParams.set(
             APISearchParamNames.Category,
@@ -99,6 +100,7 @@ export function createProductsLoader(config: {
         const response = await fetch(
           `${config.baseUrl}/${APIEndpointNames.Products}/${filter.slug}`,
         );
+
         if (!response.ok) {
           return {
             error: new Error(

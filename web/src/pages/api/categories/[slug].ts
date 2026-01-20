@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCategoryBySlug } from "@/web/src/core/services/queries/categories";
 import type { Category } from "@/web/src/core/models/category";
+import { queryManager } from "@/web/src/core/services/queryManager";
 
 export const prerender = false;
 
@@ -15,19 +16,18 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  let result: Category | undefined = undefined;
-  try {
-    result = await getCategoryBySlug(slug);
-    console.log("🧪 category by slug '%s', %o", slug, result);
-  } catch (error) {
-    console.error(error);
+  const result = await queryManager().fetch(() => getCategoryBySlug(slug));
+
+  if (result.error) {
+    console.error(result.error);
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
 
-  return new Response(JSON.stringify(result), {
+  console.log("🧪 category by slug '%s', %o", slug, result);
+  return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
