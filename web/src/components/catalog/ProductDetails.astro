@@ -1,6 +1,4 @@
 ---
-export const prerender = false;
-
 import { Image } from 'astro:assets';
 import type { Product } from '@/web/src/core/models/product';
 import { UnitOfMeasurementDictionary } from '@/web/src/core/models/unit-of-measurement';
@@ -12,14 +10,15 @@ import { trimEnd } from '@/web/src/core/utils/text-formatter';
 
 interface Props {
   item: Product,
+  isPreview?: boolean,
 }
-const { item } = Astro.props;
+const { item, isPreview } = Astro.props;
 
 const btnAddToCartName = "pd-add-to-cart";
 const inputQuantityName = "pd-quantity-value"
 const unitItem = item.unitId ? UnitOfMeasurementDictionary[item.unitId] : UnitOfMeasurementDictionary[0];
 
-const noProductDescription = "Нет дополнительной информации о товаре";
+const titleNoProductDescription = "Нет дополнительной информации о товаре";
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
 ---
@@ -45,20 +44,27 @@ const titleProductCode = "Артикул";
     </div>
     <div class="px-2 py-2">
       <div class="h-12">
-        <a class="flex flex-row align-top" href=`/catalog/products/${item.slug}`>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-          </svg>
+        {isPreview && 
+          <a class="flex flex-row align-top" href=`/catalog/products/${item.slug}`>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+            </svg>
+            <h1 class="card-title text-lg font-bold" title={item.title}>
+              {trimEnd(item.title, 100)} 
+            </h1>          
+          </a>
+        }
+        {!isPreview &&
           <h1 class="card-title text-lg font-bold" title={item.title}>
             {trimEnd(item.title, 100)} 
-          </h1>          
-        </a>
+          </h1>
+        }
       </div>
       {/* Descirption */}
       <div class="py-2">
         {(item.description && item.description.length > 0) 
           ? <span>{item.description}</span>
-          : <span class="italic text-sm">{noProductDescription}</span>
+          : <span class="italic text-sm">{titleNoProductDescription}</span>
         }
       </div>
       {/* Prices */}

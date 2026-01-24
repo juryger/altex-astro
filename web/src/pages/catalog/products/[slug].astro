@@ -35,7 +35,7 @@ sessionManager.setActiveCatalogItem({
 <BaseLayout title=`Каталог - ${product?.title}`>
     <div id="product-container" class="px-4">
       {product && 
-        <ProductDetails item={product} />
+        <ProductDetails item={product} isPreview={false} />
       }
     </div>
 </BaseLayout>

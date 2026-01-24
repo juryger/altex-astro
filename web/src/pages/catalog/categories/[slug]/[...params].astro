@@ -12,6 +12,7 @@ import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import type { Sorting } from '@/web/src/core/models/sorting';
 import type { Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
+import CategoryCard from '@/web/src/components/catalog/CategoryCard.astro';
 
 const { slug, params } = Astro.params;
 
@@ -53,19 +54,20 @@ sessionManager.setActiveCatalogItem({
 
 const { sorting, paging, filtering } = parseRouteParams();
 
-const subTitleCategories = "Список подкатегорий";
-const subTitleProducts = "Список товаров";
+const titleSubCategories = "Список подкатегорий";
+const titleProducts = "Список товаров";
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>
-  <Categories parentSlug={category?.slug} title={subTitleCategories} server:defer>
+  <CategoryCard item={category} />
+  <Categories parentSlug={category?.slug} title={titleSubCategories} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={subTitleCategories} />
+			<CollectionFallback title={titleSubCategories} />
 		</div>
 	</Categories>
 	<Products categorySlug={category?.slug} sorting={sorting} paging={paging} filtering={filtering} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={subTitleProducts} />
+			<CollectionFallback title={titleProducts} />
 		</div>
 	</Products>
 </BaseLayout>
