@@ -8,6 +8,8 @@ interface Props {
 }
 
 const { productId, colors, isDetailed } = Astro.props;
+console.log("🌎 ~ ProductColors ~ colors", colors);
+
 const spanSelectedColorName = "data-selected-color";
 const titleColorOptions = "Цвет:";
 const noProductColors = "Нет информации о цвете";
@@ -20,7 +22,7 @@ const noProductColors = "Нет информации о цвете";
   </div>
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
-      {colors && colors.sort().map((key, index) => {
+      {colors.sort().map((key, index) => {
         const metadata = ColorDictionary[key];
         return <input type="radio" name={"radio-color".concat(productId.toString())}
           checked={index == 0 ? "checked" : undefined} title={metadata.title} value={key}
@@ -37,7 +39,7 @@ const noProductColors = "Нет информации о цвете";
   }
   {(!colors || colors?.length === 0) && 
     <div class:list={['flex', 'items-center', 'min-h-7', { 'justify-start': isDetailed }, {'justify-center': !isDetailed }]}>
-      <span class="italic">{noProductColors}</span>
+      <span class="italic text-sm">{noProductColors}</span>
     </div>
   }
 </product-colors>

@@ -1,5 +1,5 @@
 
-/* 1. Цвета: хром/зол/медь */
+/* 1. Цвета: хром/зол/медь, Product: "VESHALKA NA POLKE" */
 INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 1, 3, '61719448-5289-48d3-a4da-e26b65392377'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 1 AND color_id = 3);
@@ -12,7 +12,7 @@ INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 1, 2, 'dbc1dbb8-dc68-420f-b29f-d159ee82fa22'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 1 AND color_id = 2);
 
-/* 2. Цвета: AC/AB/CP/PB */
+/* 2. Цвета: AC/AB/CP/PB, Product: "VESHALKA NA PLANKE" */
 INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 2, 2, '68884329-01b1-4304-bed5-87e1c6296b8b'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 2  AND color_id = 2);
@@ -25,7 +25,7 @@ INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 2, 4, '18bf9ea3-08d3-461c-b65b-7c9dcff70df6'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 2  AND color_id = 4);
 
-/* 3. Цвета: ALL */
+/* 3. Цвета: ALL, Product : "ZAMOK FERRE" */
 INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 3, 1, 'cb5c70cc-5f11-4b3f-af11-0f1ea48a1cea'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 3 AND color_id = 1);
@@ -53,3 +53,5 @@ WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 3 AND color_id
 INSERT INTO product_colors (product_id, color_id, uid)
 SELECT 3, 7, '0e306d35-ac5a-4f43-a4bc-b227f264ae62'
 WHERE NOT EXISTS (SELECT * FROM product_colors WHERE product_id = 3 AND color_id = 7);
+
+/* 4. Цвета: -, Product : "ZAMOK APEKS" */

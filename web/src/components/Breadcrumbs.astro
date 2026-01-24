@@ -4,51 +4,15 @@ export const prerender = false;
 import { NavPathNames } from '../core/const';
 import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/utils/breadcrubms-manager';
 import { trimEnd } from '../core/utils/text-formatter';
-import type { Category } from '../core/models/category';
-import type { Product } from '../core/models/product';
-import { getCategory, getProduct } from '../core/utils/live-collection-manager';
+import { getSessionManager } from '../core/utils/session-manager';
 
 const { currentPath } = Astro.props;
 const maxLabelLength = import.meta.env.BREADCRUMB_TITLE_MAX_LENGTH;
 
-const getSessionActiveProduct = async (): Promise<Product | undefined> => {
-  const catalog = await Astro.session?.get('catalog');
-  const productSlug = catalog?.activeProductSlug;
-  if (productSlug === undefined) return undefined;
-  try {
-    return await getProduct(productSlug);
-  } catch (error) {
-    console.error("🛑 ~ Breadcrumbs ~ failed to fetch current product", error);
-  }
-}
+const sessionManager = getSessionManager(Astro.session);
+const catalogItem = await sessionManager.getActiveCatalogItem();
 
-const getSessionActiveCategory = async (): Promise<Category | undefined> => {
-  const catalog = await Astro.session?.get('catalog');
-  const categorySlug = catalog?.activeCategorySlug;
-  if (categorySlug === undefined) return undefined;
-  try {
-    return await getCategory(categorySlug);
-  } catch(error) {
-    console.error("🛑 ~ Breadcrumbs ~ failed to fetch current category", error);
-  }
-}
-
-const getSessionActiveParentCategory = async (): Promise<Category | undefined> => {
-  const catalog = await Astro.session?.get('catalog');
-  const parentCategorySlug = catalog?.activeParentCategorySlug;
-  if (parentCategorySlug === undefined) return undefined;
-  try {
-    return await getCategory(parentCategorySlug);
-  } catch(error) {
-    console.error("🛑 ~ Breadcrumbs ~ failed to fetch master category", error);
-  }
-}
-
-const activeProduct = await getSessionActiveProduct();
-const activeCategory = await getSessionActiveCategory();
-const activeParentCategory = await getSessionActiveParentCategory();
-
-const breadcrumbs = getBreadcrumbsFromPath(currentPath, activeProduct, activeCategory, activeParentCategory);
+const breadcrumbs = getBreadcrumbsFromPath(currentPath, catalogItem);
 ---
 
 <script>

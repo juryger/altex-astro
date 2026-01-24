@@ -86,6 +86,7 @@ export function createCategoriesLoader(config: {
         }
 
         const data = await response.json();
+        //console.log("🛠️ ~ categories-loader ~ entry:", data);
         const result = data as Category;
 
         return result !== undefined

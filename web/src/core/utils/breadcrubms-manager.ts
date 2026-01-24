@@ -1,7 +1,6 @@
 import { NavPathNames } from "../const";
-import type { Category } from "../models/category";
-import type { Product } from "../models/product";
 import { getNavPathManager, type NavPathItem } from "./nav-path-manager";
+import type { ActiveCatalogItem } from "./session-manager";
 
 type BreadcrumbItem = {
   path: string;
@@ -11,42 +10,40 @@ type BreadcrumbItem = {
 const mapNavPathItemToBreadcrumb = (
   item: NavPathItem,
   url: string,
-  activeProduct?: Product,
-  activeCategory?: Category,
-  activeParentCategory?: Category
+  catalogItem?: ActiveCatalogItem,
 ): BreadcrumbItem[] => {
   const result: BreadcrumbItem[] = [];
   if (!item.displayOptions.isBreadcrumbs) {
     if (url.indexOf(`/${NavPathNames.Categories}`) !== -1) {
-      if (activeParentCategory !== undefined) {
+      if (catalogItem && catalogItem.parentCategory) {
         result.push({
-          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeParentCategory.slug}`,
-          value: activeParentCategory.title,
+          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${catalogItem.parentCategory.slug}`,
+          value: catalogItem.parentCategory.title,
         });
       }
-      if (activeCategory !== undefined) {
+      if (catalogItem && catalogItem.category) {
         result.push({
-          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeCategory.slug}`,
-          value: activeCategory.title,
+          path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${catalogItem.category.slug}`,
+          value: catalogItem.category.title,
         });
       }
     } else if (url.indexOf(`/${NavPathNames.Products}`) !== -1) {
-      if (activeProduct !== undefined && activeCategory !== undefined) {
+      if (catalogItem && catalogItem.category && catalogItem.product) {
         result.push(
           {
-            path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${activeCategory.slug}`,
-            value: activeCategory.title,
+            path: `${NavPathNames.Catalog}/${NavPathNames.Categories}/${catalogItem.category.slug}`,
+            value: catalogItem.category.title,
           },
           {
-            path: `${NavPathNames.Catalog}/${NavPathNames.Products}/${activeProduct.slug}`,
-            value: activeProduct.title,
-          }
+            path: `${NavPathNames.Catalog}/${NavPathNames.Products}/${catalogItem.product.slug}`,
+            value: catalogItem.product.title,
+          },
         );
       }
     } else {
       console.warn(
         "🛠️ ~ getBreadcrumbsFromPath ~ path item is marked as excluded from the breadcrumbs and will be skipped:",
-        item
+        item,
       );
     }
   } else {
@@ -60,9 +57,7 @@ const mapNavPathItemToBreadcrumb = (
 
 const getBreadcrumbsFromPath = (
   fullPath: string,
-  activeProduct?: Product,
-  activeCategory?: Category,
-  activeParentCategory?: Category
+  catalogItem?: ActiveCatalogItem,
 ): Array<BreadcrumbItem> => {
   const pathCollection = fullPath.endsWith("/")
     ? fullPath
@@ -74,7 +69,7 @@ const getBreadcrumbsFromPath = (
   console.log(
     "🛠️ ~ getBreadcrumbsFromPath ~ path: %s, parsed: %o",
     fullPath,
-    pathCollection
+    pathCollection,
   );
 
   var overallNavUrl = "";
@@ -89,7 +84,7 @@ const getBreadcrumbsFromPath = (
     if (!navPathItem) {
       console.warn(
         "🛠️ ~ getBreadcrumbsFromPath ~ could not resolve path element:",
-        item
+        item,
       );
       continue;
     }
@@ -97,9 +92,7 @@ const getBreadcrumbsFromPath = (
     const values = mapNavPathItemToBreadcrumb(
       navPathItem,
       overallNavUrl,
-      activeProduct,
-      activeCategory,
-      activeParentCategory
+      catalogItem,
     );
     result.push(...values);
   }

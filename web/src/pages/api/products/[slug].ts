@@ -1,39 +1,30 @@
 import type { APIRoute } from "astro";
-import type { Product } from "../../../core/models/product";
+import { queryManager } from "@/web/src/core/services/queryManager";
+import { fetchProductBySlug } from "@/web/src/core/services/queries/products";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
   console.log("📍 ~ API-GET ~ product ~ params:", params);
   const { slug } = params;
-
-  // TODO: query database for category by slug
-
-  if (!slug || slug !== "padlock-master-vline") {
+  if (!slug) {
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
 
-  const item = {
-    id: 1,
-    title: "Замок АПЕКС PD-38 перфо-ключ",
-    productCode: "1234",
-    unitId: 0, //"шт",
-    quantityInPack: 1,
-    minQuantityToBuy: 1,
-    price: 97.3,
-    whsPrice1: 90.1,
-    whsPrice2: 80.03,
-    categoryId: 3,
-    categorySlug: "padlocks",
-    colors: [0, 2, 1, 3],
-    imageUrl: "padlock-master-vline.png",
-    slug: "padlock-master-vline",
-  } as Product;
+  const result = await queryManager().fetch(() => fetchProductBySlug(slug));
+  if (result.error) {
+    console.error(result.error);
+    return new Response(null, {
+      status: 404,
+      statusText: "Not found",
+    });
+  }
 
-  return new Response(JSON.stringify(item), {
+  //console.log("🧪 product by slug '%s', %o", slug, result);
+  return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {
       "Content-Type": "application/json",

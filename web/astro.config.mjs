@@ -14,6 +14,7 @@ export default defineConfig({
   }),
   image: {
     domains: ["altexweb.ru", "localhost:4321"],
+    responsiveStyles: true,
   },
   vite: {
     plugins: [tailwindcss()],

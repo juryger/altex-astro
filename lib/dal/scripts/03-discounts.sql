@@ -1,6 +1,6 @@
 INSERT INTO discounts
 (code, fromSum, title, uid)
-SELECT 'S0', 0, 'Розница', 'd6622c6c-81a3-4ccb-8728-d9dbcba41b94'
+SELECT 'S0', 1, 'Розница', 'd6622c6c-81a3-4ccb-8728-d9dbcba41b94'
 WHERE NOT EXISTS (SELECT * FROM discounts WHERE code = 'S0');
 
 INSERT INTO discounts

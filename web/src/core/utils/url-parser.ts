@@ -1,5 +1,7 @@
-import { APISearchParamNames } from "../const";
+import { APISearchParamNames, TextSeparators } from "../const";
+import type { Filtering } from "../models/filtering";
 import { defaultPaging, type Paging } from "../models/paging";
+import { defaultSorting, type Sorting } from "../models/sorting";
 import { regexTrue } from "./regex";
 
 function extractUrlParam(
@@ -46,17 +48,54 @@ function extractUrlParam(
   }
 }
 
+function extractUrlParamAll(url: URL | null, paramName: string): string[] {
+  return url?.searchParams.getAll(paramName) ?? [];
+}
+
 function extractUrlPaging(url: URL | null): Paging {
-  const paging: Paging = { page: 0, pageSize: 0 };
+  const result: Paging = { page: 0, pageSize: 0 };
   const page = extractUrlParam(url, APISearchParamNames.Page, "number");
-  paging.page = page !== undefined && page !== -1 ? page : defaultPaging.page;
+  result.page = page !== undefined && page !== -1 ? page : defaultPaging.page;
 
   const pageSize = extractUrlParam(url, APISearchParamNames.PageSize, "number");
-  paging.pageSize =
+  result.pageSize =
     pageSize !== undefined && pageSize !== -1
       ? pageSize
       : defaultPaging.pageSize;
-  return paging;
+
+  return result;
 }
 
-export { extractUrlParam, extractUrlPaging };
+function extractUrlSorting(url: URL | null): Sorting {
+  const result: Sorting = { field: "", order: "" };
+  const field = extractUrlParam(url, APISearchParamNames.SortField, "string");
+  result.field = field !== undefined ? field : defaultSorting.field;
+
+  const order = extractUrlParam(url, APISearchParamNames.SortOrder, "string");
+  result.order = order !== undefined ? order : defaultSorting.order;
+
+  return result;
+}
+
+function extractUrlFiltering(url: URL | null): Filtering[] {
+  const filterValues = extractUrlParamAll(url, APISearchParamNames.Filter);
+  const results = Array(filterValues.length);
+
+  filterValues.forEach((item, index) => {
+    const fieldAndValue = item.split(TextSeparators.Comma);
+    results[index] = <Filtering>{
+      field: fieldAndValue[0],
+      value: fieldAndValue[1],
+    };
+  });
+
+  return results;
+}
+
+export {
+  extractUrlParam,
+  extractUrlParamAll,
+  extractUrlPaging,
+  extractUrlSorting,
+  extractUrlFiltering,
+};

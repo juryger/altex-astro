@@ -24,7 +24,6 @@ enum APISearchParamNames {
   SortField = "sortFiled",
   SortOrder = "sortOrder",
   Filter = "filter",
-  FilterFieldAndValue = "filterValue",
 }
 
 enum NavPathNames {
@@ -41,7 +40,7 @@ enum NavPathNames {
 }
 
 enum SortOrder {
-  Ascending = "acs",
+  Ascending = "asc",
   Descending = "desc",
 }
 
@@ -54,7 +53,6 @@ enum TextSeparators {
 
 enum ImageContainers {
   Thumbnails = "thumbnails",
-  Full = "full",
 }
 
 export {

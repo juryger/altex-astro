@@ -124,6 +124,7 @@ WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'PROCZAMK');
 
 /* ---------------------------------------------------- */
 /* -> ZAMKI FURNITURA: SUB-CATEGORIES */
+-- 24. LICH
 INSERT INTO categories
 (slug, title, parent_id, uid)
 SELECT 'LICH', 'Личинки', 2, 'b9f6bd11-026d-4184-ad46-ca78d1f2f583'

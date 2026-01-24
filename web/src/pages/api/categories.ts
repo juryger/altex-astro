@@ -3,12 +3,10 @@ import { APISearchParamNames } from "@/web/src/core/const";
 import {
   extractUrlPaging,
   extractUrlParam,
+  extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
-import { getCategories } from "@/web/src/core/services/queries/categories";
-import {
-  queryManager,
-  type QueryResult,
-} from "@/web/src/core/services/queryManager";
+import { fetchCategories } from "@/web/src/core/services/queries/categories";
+import { queryManager } from "@/web/src/core/services/queryManager";
 
 export const prerender = false;
 
@@ -21,10 +19,11 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     true;
   const parentSlug =
     extractUrlParam(url, APISearchParamNames.Parent, "string") ?? "";
+  const sorting = extractUrlSorting(url);
   const paging = extractUrlPaging(url);
 
   const result = await queryManager().fetch(() =>
-    getCategories(paging.page, paging.pageSize, skipParentMatch, parentSlug),
+    fetchCategories(skipParentMatch, parentSlug, sorting, paging),
   );
 
   if (result.error) {
@@ -35,8 +34,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     });
   }
 
-  console.log("🧪 categories %o", result);
-
+  //console.log("🧪 categories %o", result);
   return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {

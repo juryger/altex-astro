@@ -1,14 +1,14 @@
 enum UnitOfMeasurementKind {
-  Piece = 0,
-  Box = 1,
-  Pakage = 2,
-  Ton = 3,
-  Kilogram = 4,
-  Gram = 5,
-  Liter = 6,
-  Meter = 7,
-  SqMiter = 8,
-  QbMiter = 9,
+  Piece = 1,
+  Box = 2,
+  Pakage = 3,
+  Ton = 4,
+  Kilogram = 5,
+  Gram = 6,
+  Liter = 7,
+  Meter = 8,
+  SqMiter = 9,
+  QbMiter = 10,
 }
 
 type UnitOfMeasurement = {
@@ -21,16 +21,16 @@ type UnitOfMeasurement = {
 const UnitOfMeasurementDictionary: {
   [key: number]: { title: string };
 } = {
-  0: { title: "шт" },
-  1: { title: "кор." },
-  2: { title: "уп." },
-  3: { title: "т" },
-  4: { title: "кг" },
-  5: { title: "гр" },
-  6: { title: "л" },
-  7: { title: "м" },
-  8: { title: "м2" },
-  9: { title: "м3" },
+  1: { title: "шт" },
+  2: { title: "кор." },
+  3: { title: "уп." },
+  4: { title: "т" },
+  5: { title: "кг" },
+  6: { title: "гр" },
+  7: { title: "л" },
+  8: { title: "м" },
+  9: { title: "м2" },
+  10: { title: "м3" },
 };
 
 export {

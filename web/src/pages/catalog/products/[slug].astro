@@ -23,7 +23,13 @@ if (product === undefined)
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }
-sessionManager.setActiveCatalogItem(product.slug, product.categorySlug, undefined);
+
+console.log("🌎 ~ Product page ~ product", product);
+sessionManager.setActiveCatalogItem({ 
+  parentCategory: undefined,
+  category: { slug: product.categorySlug, title: product.categoryTitle }, 
+  product: { slug: product.slug, title: product.title }
+});
 ---
 
 <BaseLayout title=`Каталог - ${product?.title}`>

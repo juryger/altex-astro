@@ -100,7 +100,7 @@ export const products = table(
     productCode: t.text("product_code").notNull(),
     slug: t.text().notNull(),
     categoryId: t
-      .numeric("category_id")
+      .int("category_id")
       .notNull()
       .references(() => categories.id),
     title: t.text().notNull(),
@@ -116,9 +116,9 @@ export const products = table(
     weightGr: t.int("weight_gr"),
     quantityInPack: t.int("quantity_in_pack").default(1).notNull(),
     minQuantityToBuy: t.int("min_quantity_to_buy").default(1).notNull(),
-    price: t.numeric().notNull(),
-    whsPrice1: t.numeric("whs_price1").notNull(),
-    whsPrice2: t.numeric("whs_price2").notNull(),
+    price: t.real().notNull(),
+    whsPrice1: t.real("whs_price1").notNull(),
+    whsPrice2: t.real("whs_price2").notNull(),
     makerId: t.int("maker_id").references(() => makers.id),
     makeCountryId: t.int("make_country_id").references(() => makeCountries.id),
     createdAt: t

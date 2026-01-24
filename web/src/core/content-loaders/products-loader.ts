@@ -24,16 +24,15 @@ export type ProductEntryFilter = {
 export function createProductsLoader(config: {
   baseUrl: string;
 }): LiveLoader<Product, ProductEntryFilter, ProductCollectionFilter> {
-  console.log("🛠️ ~ createProductsLoader ~ config:", config);
+  //console.log("🛠️ ~ createProductsLoader ~ config:", config);
   return {
     name: "product-loader",
     loadCollection: async ({ filter }) => {
       try {
-        console.log(
-          "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
-          filter,
-        );
-
+        // console.log(
+        //   "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
+        //   filter,
+        // );
         const url = new URL(`${config.baseUrl}/${APIEndpointNames.Products}`);
 
         if (filter !== undefined) {
@@ -60,15 +59,14 @@ export function createProductsLoader(config: {
           filter.filtering.forEach((item) => {
             url.searchParams.set(
               APISearchParamNames.Filter,
-              item.field.concat(TextSeparators.Comma).concat(item.value),
+              item.field.concat(TextSeparators.Comma, item.value),
             );
           });
         }
-
-        console.log(
-          "🛠️ ~ createProductsLoader ~ fetching data via URL:",
-          url.toString(),
-        );
+        // console.log(
+        //   "🛠️ ~ createProductsLoader ~ fetching data via URL:",
+        //   url.toString(),
+        // );
 
         const response = await fetch(url.toString());
         if (!response.ok) {
@@ -92,11 +90,10 @@ export function createProductsLoader(config: {
     },
     loadEntry: async ({ filter }) => {
       try {
-        console.log(
-          "🛠️ ~ createProductsLoader ~ entry retrieving ~ filter:",
-          filter,
-        );
-
+        // console.log(
+        //   "🛠️ ~ createProductsLoader ~ entry retrieving ~ filter:",
+        //   filter,
+        // );
         const response = await fetch(
           `${config.baseUrl}/${APIEndpointNames.Products}/${filter.slug}`,
         );
@@ -110,8 +107,8 @@ export function createProductsLoader(config: {
         }
 
         const data = await response.json();
+        //console.log("🛠️ ~ products-loader ~ entry:", data);
         const result = data as Product;
-        //console.log("🛠️ ~ createProductsLoader ~ entry ~ value:", value);
 
         return result !== undefined
           ? { id: result.slug, data: result }

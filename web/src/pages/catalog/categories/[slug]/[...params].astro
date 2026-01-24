@@ -28,7 +28,6 @@ const parseRouteParams = (): { sorting: Sorting | undefined, paging: Paging | un
   return { sorting, paging, filtering };
 }
 
-let categorySlug = "";
 let category: Category | undefined;
 const sessionManager = getSessionManager(Astro.session);
 
@@ -43,10 +42,15 @@ if (category === undefined)
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }
-categorySlug = category.slug;
-sessionManager.setActiveCatalogItem(undefined, category.slug, category.parentSlug);
 
-console.log("👉 parseRouteParams");
+sessionManager.setActiveCatalogItem({ 
+  parentCategory: category?.parentSlug && category?.parentTitle ? 
+    { slug: category?.parentSlug, title: category?.parentTitle } 
+    : undefined, 
+  category: { slug: category.slug, title: category.title }, 
+  product: undefined
+});
+
 const { sorting, paging, filtering } = parseRouteParams();
 
 const subTitleCategories = "Список подкатегорий";
@@ -54,12 +58,12 @@ const subTitleProducts = "Список товаров";
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>
-  <Categories parentSlug={categorySlug} title={subTitleCategories} server:defer>
+  <Categories parentSlug={category?.slug} title={subTitleCategories} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback title={subTitleCategories} />
 		</div>
 	</Categories>
-	<Products categorySlug={categorySlug} sorting={sorting} paging={paging} filtering={filtering} server:defer>
+	<Products categorySlug={category?.slug} sorting={sorting} paging={paging} filtering={filtering} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback title={subTitleProducts} />
 		</div>

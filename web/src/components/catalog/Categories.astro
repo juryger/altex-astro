@@ -50,13 +50,16 @@ const titleErrorMessage = "Не удалось загрузить список �
               <figure class="aspect-square w-full object-cover group-hover:opacity-75 lg:aspect-auto h-[150px]">
                 <Image src={item.imageUrl} alt={item.title} width="150" height="150" class="rounded-xl"/>
               </figure>
-              <div class="card-body items-center text-center !px-1 !py-1">
+              <div class="card-body items-center text-center !px-1 !py-1 h-18">
                 <span class="card-title text-sm font-bold" title={item.title}>
-                  {trimEnd(item.title, 21)}
+                  <span>{trimEnd(item.title, 21)}</span>
+                  {item.totalProducts > 0 && <div class="badge badge-sm badge-accent">
+                    {item.totalProducts}</div>
+                  }
                 </span>
                 {item.description &&
                   <span class="text-sm" title={item.description}>
-                    {trimEnd(item.description, 100)}
+                    {trimEnd(item.description, 75)}
                   </span>
                 }
               </div>

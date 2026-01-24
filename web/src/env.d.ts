@@ -5,9 +5,20 @@ declare namespace App {
       name: string;
     };
     catalog: {
-      activeProductSlug?: string;
-      activeCategorySlug?: string;
-      activeParentCategorySlug?: string;
+      activeItem: {
+        parentCategory?: {
+          slug: string;
+          title: string;
+        };
+        category?: {
+          slug: string;
+          title: string;
+        };
+        product?: {
+          slug: string;
+          title: string;
+        };
+      };
     };
   }
 }

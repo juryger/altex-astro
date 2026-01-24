@@ -1,16 +1,15 @@
 const trimEnd = (
   value: string,
   requiredLen: number,
-  trailingSymbol: string = "."
+  trailingSymbol: string = ".",
 ): string => {
   if (!value) return "";
 
-  const paddinLen = 3;
+  const paddingLength = 3;
   return value.length > requiredLen
     ? value
-        .substring(0, requiredLen - 2 * paddinLen)
-        .padEnd(requiredLen - paddinLen, trailingSymbol)
-        .concat(value.substring(value.length - paddinLen))
+        .substring(0, requiredLen - paddingLength * 2)
+        .padEnd(requiredLen - paddingLength, trailingSymbol)
     : value;
 };
 

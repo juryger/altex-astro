@@ -1,34 +1,49 @@
 import { type AstroSession } from "astro";
 import { SessionNames, type SessionNames as SessionKeyType } from "../const";
 
+type CatalogItem = {
+  slug: string;
+  title: string;
+};
+
+type ActiveCatalogItem = {
+  parentCategory?: CatalogItem;
+  category?: CatalogItem;
+  product?: CatalogItem;
+};
+
 interface SessionManager {
-  setActiveCatalogItem(
-    productSlug: string | undefined,
-    categorySlug: string | undefined,
-    parentCategorySlug: string | undefined
-  ): void;
+  getActiveCatalogItem(): Promise<ActiveCatalogItem | undefined>;
+  setActiveCatalogItem(value: ActiveCatalogItem): void;
   resetActiveCatalogItem(): void;
 }
 
-export function getSessionManager(session?: AstroSession<any>): SessionManager {
+function getSessionManager(session?: AstroSession<any>): SessionManager {
   return {
-    setActiveCatalogItem: (
-      productSlug: string | undefined,
-      categorySlug: string | undefined,
-      parentCategorySlug: string | undefined
-    ) => {
+    getActiveCatalogItem: async (): Promise<ActiveCatalogItem | undefined> => {
+      const catalog = await session?.get(SessionNames.Catalog);
+      if (catalog === undefined) return undefined;
+      return catalog?.activeItem;
+    },
+    setActiveCatalogItem: (value: ActiveCatalogItem) => {
       session?.set(SessionNames.Catalog, {
-        activeProductSlug: productSlug,
-        activeCategorySlug: categorySlug,
-        activeParentCategorySlug: parentCategorySlug,
+        activeItem: {
+          parentCategory: value.parentCategory,
+          category: value.category,
+          product: value.product,
+        },
       });
     },
     resetActiveCatalogItem: () => {
       session?.set(SessionNames.Catalog, {
-        activeProductSlug: undefined,
-        activeCategorySlug: undefined,
-        activeParentCategorySlug: undefined,
+        activeItem: {
+          parentCategory: undefined,
+          category: undefined,
+          product: undefined,
+        },
       });
     },
   };
 }
+
+export { type ActiveCatalogItem, type CatalogItem, getSessionManager };

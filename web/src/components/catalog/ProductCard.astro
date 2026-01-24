@@ -14,11 +14,13 @@ interface Props {
 }
 const { item } = Astro.props;
 
-const titleAddToCart = "В корзину";
-const btnAddToCardName = "pc-add-to-card";
+const unitItem = item.unitId ? 
+  UnitOfMeasurementDictionary[item.unitId] : 
+  UnitOfMeasurementDictionary[0];
 
-const unitItem = item.unitId ? UnitOfMeasurementDictionary[item.unitId] : UnitOfMeasurementDictionary[0];
-console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.title)
+const titleAddToCart = "В корзину";
+const titleProductCode = "Артикул";
+const btnAddToCardName = "pc-add-to-card";
 ---
 
 <product-card 
@@ -36,7 +38,7 @@ console.log("🛠️ ~ ProductCard component ~ unitOfMeasurement: %s", unitItem.
     <div class="card-body !px-1 !py-1">
       {/* Product code */}
       <div class="flex flex-row justify-center">
-        <span class="text-xs italic \">Артикул:</span>
+        <span class="text-xs italic \">{titleProductCode}:</span>
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
       {/* Ttitle */}
