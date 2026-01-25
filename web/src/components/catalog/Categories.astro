@@ -31,8 +31,81 @@ try {
 const titleViewMode = "Отображение";
 const titleCompactView = "Компактный";
 const titleFullView = "Подробный";
+const titleScrollToPrevious = "Показать предыдущую категорию";
+const titleScrollToNext = "Показать следующую категорию";
 const titleErrorMessage = "Не удалось загрузить список категорий, попробуйте снова позднее.";
 ---
+
+<style>
+  /* Main container */
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.non-slider-container {
+  width: 100%;
+}
+
+/* Horizontal scroll */
+.slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 20px;
+  width: 100%;
+}
+.non-slider {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 4) /* 1rem = 16px */;
+  @media (width >= 40rem /* 640px */) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (width >= 48rem /* 768px */) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+   @media (width >= 64rem /* 1024px */) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @media (width >= 64rem /* 1024px */) {
+    gap: calc(var(--spacing) * 5) /* 1.25rem = 20px */;
+  }
+}
+</style>
+
+<script>
+  //import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
+
+  let controller: AbortController | undefined;
+  //let themeToggleManager: ThemeToggleManager | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    controller && controller.abort();
+    
+    const categoriesContainer = document.querySelector('[data-categories-container]');
+    const categoriesViewModeEl = document.querySelector('[data-categories-view-mode]');
+    const categoriesScrollPrevEl = document.querySelector('[data-categories-scroll-prev]');
+    const categoriesScrollNextEl = document.querySelector('[data-categories-scroll-next]');
+
+    // themeToggleManager = getThemeToggleManager({
+    //   coreEl: document.querySelector('[data-theme-toggle]'),
+    //   darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
+    //   lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
+        
+    controller = new AbortController();
+    //themeToggleManager.apply(controller.signal);
+  });
+
+  window.addEventListener('pagehide', () => {
+    // This instantly removes all listeners using 'signal' from themeToggleManager
+    //controller && controller.abort(); 
+  });
+</script>
 
 {hasDataLoadError && <div role="alert" class="alert mt-1 items-center">
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-error h-10 w-10 shrink-0">
@@ -50,17 +123,17 @@ const titleErrorMessage = "Не удалось загрузить список �
       </h3>
       <div class="justify-self-center sm:justify-self-end flex flex-row">
         <span class="content-center text-nowrap mr-1">{titleViewMode}:</span>
-        <select name="select-categories-view" class="select w-32 mr-2">
+        <select data-categories-view-mode name="select-categories-view" class="select w-32 mr-2">
           <option value={CategoriesViewMode.Compact} selected>{titleCompactView}</option>
           <option value={CategoriesViewMode.Full}>{titleFullView}</option>
         </select>
         <div class="join grid grid-cols-2 content-center">
-          <button class="join-item btn btn-xs btn-ghost" title="Prev.">
+          <button data-categories-scroll-prev class="join-item btn btn-xs btn-ghost" title={titleScrollToPrevious}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>
-          <button class="join-item btn btn-xs btn-ghost" title="Next">
+          <button data-categories-scroll-next class="join-item btn btn-xs btn-ghost" title={titleScrollToNext}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
@@ -68,17 +141,16 @@ const titleErrorMessage = "Не удалось загрузить список �
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {categories && categories.map(item => <CategoryCard item={item} />)}
+    <div class="non-slider-container">
+      <div data-categories-container class="non-slider">
+        {categories && categories.map(item => <CategoryCard item={item} />)}
+      </div>
     </div>
   </div>
 }
 
-<!-- component -->
-<h1 class="flex py-5 lg:px-20 md:px-10 px-5 lg:mx-40 md:mx-20 mx-5 font-bold text-4xl text-gray-800">
-  Example
-</h1>
-<div class="flex overflow-x-scroll pb-10 hide-scroll-bar">
+<!-- Scroll View example -->
+<!-- <div class="flex overflow-x-scroll pb-10 hide-scroll-bar">
   <div class="flex flex-nowrap lg:ml-40 md:ml-20 ml-10">
     <div class="inline-block px-3">
       <div class="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
@@ -105,4 +177,4 @@ const titleErrorMessage = "Не удалось загрузить список �
       <div class="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
     </div>
   </div>
-</div>
+</div> -->

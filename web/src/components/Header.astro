@@ -5,10 +5,9 @@ import { getNavPathManager } from '../core/utils/nav-path-manager';
 import CartMenu from './cart/CartMenu.astro';
 
 const allPaths = getNavPathManager().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
-const titleLightThemeSwitch = "Переключиться на светлую тему";
-const titleDarkThemeSwitch = "Переключиться на темную тему";
+const titleLightThemeSwitch = "Переключиться тему на светлую";
+const titleDarkThemeSwitch = "Переключить тему на темную";
 ---
-
 
 <script>
   import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
@@ -118,7 +117,7 @@ const titleDarkThemeSwitch = "Переключиться на темную те�
     <div class="ml-1 mr-5">
       <label class="swap swap-rotate hover:text-gray-500">
         <!-- this hidden checkbox controls the state -->
-        <input type="checkbox" class="theme-controller" value="dark" data-theme-toggle />
+        <input data-theme-toggle type="checkbox" class="theme-controller" value="dark"  />
         <!-- sun icon -->
         <svg data-theme-toggle-light
             class="swap-off h-6 w-6 fill-current"
