@@ -9,6 +9,7 @@ import type { Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import { defaultPaging } from '@/web/src/core/models/paging';
 import type { ProductCollectionFilter } from '../../core/content-loaders/products-loader';
+import { ProductsSortFileds } from '../../core/const';
 
 interface Props {
   categorySlug: string;
@@ -17,6 +18,7 @@ interface Props {
   filtering: Filtering[];
 }
 const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
+const allRecords = 1000;
 
 let hasDataLoadError = false;
 let products: Product[] | undefined;
@@ -32,6 +34,13 @@ try {
   console.error("🛑 ~ Products component ~ failed to fetch products list", error);
 } 
 
+const titleSortBy = "Упорядочить по";
+const titlSortByTitle = "Наименованию";
+const titleSortByPrice = "Цене";
+const titleAscending = "По возрастанию";
+const titleDescending = "По убыванию";
+const titlePagingInfo = "Показано позиций";
+const titlePagingNofM = "из";
 const titleProductsList = "Список товаров";
 const titleNoProductsForCategory = "Товары не представлены в данной категории";
 const titleErrorMessage = "Не удалось загрузить список товаров, попробуйте снова позднее.";
@@ -47,10 +56,48 @@ const titleErrorMessage = "Не удалось загрузить список �
 </div>}
 {(products && products.length > 0) &&
   <div class="mx-4 mb-2 bg-base-100">
-    <h3 class="text-lg font-bold text-center sm:text-left py-2">{titleProductsList}</h3>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {products && products.map(x => <ProductCard item={x} />)}
+    <div class="grid grid-cols-1 sm:grid-cols-2 mb-2">
+      <h3 class="text-lg font-bold text-center sm:text-left py-2">
+        {titleProductsList}
+      </h3>      
+      <div class="justify-self-center sm:justify-self-end">
+        <span class="content-center text-nowrap mr-1">{titleSortBy}:</span>
+        <select name="category-view-select" class="select w-38 mr-2">
+          <option value={ProductsSortFileds.Title}>{titlSortByTitle}</option>
+          <option value={ProductsSortFileds.Price}>{titleSortByPrice}</option>
+        </select>
+        <label class="toggle toggle-xl" title={titleAscending}>
+          <input type="checkbox" checked="checked" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0-3.75-3.75M17.25 21 21 17.25" />
+          </svg>
+        </label>
+      </div>
     </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5 mb-4">
+      {products && products.map(x => <ProductCard item={x} />)}      
+    </div>
+    {products && products.length > 0 && 
+      <div class="flex flex-col sm:flex-row items-center justify-center">
+        <span class="content-center text-nowrap mr-2">{titlePagingInfo}:</span>
+        <div class="join">
+          <button class="join-item btn" title="Prev.">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>          
+          <button class="join-item btn">{`${paging.page}-${Math.abs(paging.page + paging.pageSize)} ${titlePagingNofM} ${allRecords}`}</button>
+          <button class="join-item btn" title="Next">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
     {(!products || products.length == 0) && <span>{titleNoProductsForCategory}</span>}
   </div>
 }

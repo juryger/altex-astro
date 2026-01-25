@@ -12,7 +12,7 @@ import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import type { Sorting } from '@/web/src/core/models/sorting';
 import type { Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
-import CategoryCard from '@/web/src/components/catalog/CategoryCard.astro';
+import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 
 const { slug, params } = Astro.params;
 
@@ -59,7 +59,7 @@ const titleProducts = "Список товаров";
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>
-  <CategoryCard item={category} />
+  <CategoryDetails item={category} />
   <Categories parentSlug={category?.slug} title={titleSubCategories} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback title={titleSubCategories} />

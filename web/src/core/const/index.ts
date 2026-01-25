@@ -55,6 +55,16 @@ enum ImageContainers {
   Thumbnails = "thumbnails",
 }
 
+enum CategoriesViewMode {
+  Compact = 0,
+  Full = 1,
+}
+
+enum ProductsSortFileds {
+  Title = 0,
+  Price = 1,
+}
+
 export {
   NO_IMAGE_FILE_NAME,
   LiveCollectionNames,
@@ -65,4 +75,6 @@ export {
   SortOrder,
   TextSeparators,
   ImageContainers,
+  CategoriesViewMode,
+  ProductsSortFileds,
 };

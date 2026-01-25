@@ -1,22 +1,10 @@
-enum UnitOfMeasurementKind {
-  Piece = 1,
-  Box = 2,
-  Pakage = 3,
-  Ton = 4,
-  Kilogram = 5,
-  Gram = 6,
-  Liter = 7,
-  Meter = 8,
-  SqMiter = 9,
-  QbMiter = 10,
-}
+import { z } from "astro/zod";
 
-type UnitOfMeasurement = {
-  id: number;
-  code: string;
-  title: string;
-  uid: string;
-};
+const UnitOfMeasurementSchema = z.object({
+  id: z.number(),
+  code: z.string(),
+  title: z.string(),
+});
 
 const UnitOfMeasurementDictionary: {
   [key: number]: { title: string };
@@ -33,8 +21,5 @@ const UnitOfMeasurementDictionary: {
   10: { title: "м3" },
 };
 
-export {
-  type UnitOfMeasurement,
-  UnitOfMeasurementKind,
-  UnitOfMeasurementDictionary,
-};
+export { UnitOfMeasurementDictionary };
+export type UnitOfMeasurement = z.infer<typeof UnitOfMeasurementSchema>;

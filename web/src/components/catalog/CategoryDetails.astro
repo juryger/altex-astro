@@ -1,0 +1,38 @@
+---
+import { Image } from 'astro:assets';
+import type { Category } from '@/web/src/core/models/category';
+import { trimEnd } from '@/web/src/core/utils/text-formatter';
+
+interface Props {
+  item: Category
+}
+const { item } = Astro.props;
+
+const titleCurrentCategory = "Текущая категория";
+const titleNoProductDescription = "Нет дополнительной информации о товаре";
+const titleOverallProductsNumber = "Всего товарных позиций";
+---
+
+<div class="mx-4 mb-2 bg-base-100">
+  <h3 class="text-lg font-bold text-center sm:text-left py-2">{titleCurrentCategory}</h3>
+  <div class="flex flex-col sm:flex-row gap-4 px-2 py-2">
+    <figure class="self-center bg-base-100 aspect-square object-cover lg:aspect-auto h-[150px] md:h-[200px]">
+      <Image src=`${item.imageUrl}` alt=`${item.title}` width="200" height="200" class="rounded-xl h-[150px] md:h-[200px] object-contain" />
+    </figure>
+    <div class="px-2 py-2 flex-1">
+      <h1 class="card-title text-lg font-bold" title={item.title}>
+        {trimEnd(item.title, 100)} 
+      </h1>
+      <div class="py-2">
+        {(item.description && item.description.length > 0) 
+          ? <span>{item.description}</span>
+          : <span class="italic text-sm">{titleNoProductDescription}</span>
+        }
+      </div>
+      <div class="flex flex-row gap-2 py-2">
+        <span class="text-sm">{titleOverallProductsNumber}:</span>
+        <div class="badge badge-sm badge-secondary">{item.totalProducts}</div>
+      </div>
+    </div>
+  </div>
+</div>

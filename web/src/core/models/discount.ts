@@ -1,16 +1,11 @@
-enum DiscountKind {
-  Default = 0,
-  WhsPrice = 1,
-  SpecialPrice = 2,
-}
+import { z } from "astro/zod";
 
-type Discount = {
-  id: number;
-  code: string;
-  fromSum: number;
-  title: string;
-  uid: string;
-};
+const DiscountSchema = z.object({
+  id: z.number(),
+  code: z.string(),
+  title: z.string(),
+  fromSum: z.number(),
+});
 
 const DiscountMetadata: Array<{ sum: number; title: string }> = [
   { sum: 1, title: "Розница" },
@@ -18,4 +13,5 @@ const DiscountMetadata: Array<{ sum: number; title: string }> = [
   { sum: 100000, title: "Специальная" },
 ];
 
-export { type Discount, DiscountKind, DiscountMetadata };
+export { DiscountMetadata };
+export type Discount = z.infer<typeof DiscountSchema>;

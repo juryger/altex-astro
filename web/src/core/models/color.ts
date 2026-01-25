@@ -1,22 +1,12 @@
-enum ColorKind {
-  // AB: bronze, AC: copper, CP: chromium, PB: brass, SN: mat chromium, WW: white, BB: black
-  AB = 1,
-  AC = 2,
-  CP = 3,
-  PB = 4,
-  SN = 5,
-  WW = 6,
-  BB = 7,
-}
+import { z } from "astro/zod";
 
-type Color = {
-  id: number;
-  code: string;
-  title: string;
-  uid: string;
-};
+const ColorSchema = z.object({
+  id: z.number(),
+  code: z.string(),
+  title: z.string(),
+});
 
-// TODO: title should not be hardcoded and resolved based lookup in the IndexedDB
+// TODO: title should not be hardcoded and resolved based on lookup in the IndexedDB
 const ColorDictionary: {
   [key: number]: { color: string; border: string; title: string };
 } = {
@@ -29,4 +19,5 @@ const ColorDictionary: {
   7: { color: "bg-black", border: "border-gray-600", title: "Черный" },
 };
 
-export { type Color, ColorKind, ColorDictionary };
+export { ColorDictionary };
+export type Color = z.infer<typeof ColorSchema>;

@@ -4,8 +4,11 @@ interface Props {
   minQuantityToBuy: number,
   unitOfMeasurementTitle: string
 }
-
-const { quantityInPack, minQuantityToBuy, unitOfMeasurementTitle } = Astro.props;
+const { 
+  quantityInPack, 
+  minQuantityToBuy,
+  unitOfMeasurementTitle 
+} = Astro.props;
 
 const titleQuantityInPack = "В упаковке:";
 const titleMinQuantityForOrder = "Мин. заказ:";
