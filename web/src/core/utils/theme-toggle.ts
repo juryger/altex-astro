@@ -18,22 +18,24 @@ interface ThemeToggleManager {
 }
 
 const assertInputElements = (inputElements: ThemToggleComponents) => {
+  const assertMessage = "⚠️ ~ theme-toggle-manager ~ '%s' is not defined";
+
   console.assert(
     inputElements.coreEl !== null,
-    "⚠️ ~ applyThemeToggle ~ '%s' is not defined",
-    Object.keys(inputElements)[0]
+    assertMessage,
+    Object.keys(inputElements)[0],
   );
 
   console.assert(
     inputElements.darkThemeEl !== null,
-    "⚠️ ~ applyThemeToggle ~ '%s' is not defined",
-    Object.keys(inputElements)[1]
+    assertMessage,
+    Object.keys(inputElements)[1],
   );
 
   console.assert(
     inputElements.lightThemeEl !== null,
-    "⚠️ ~ applyThemeToggle ~ '%s' is not defined",
-    Object.keys(inputElements)[2]
+    assertMessage,
+    Object.keys(inputElements)[2],
   );
 };
 
@@ -43,7 +45,7 @@ const setTheme = (value: string) => {
 
 const syncThemeToggleControls = (
   theme: string,
-  inputElements: ThemToggleComponents
+  inputElements: ThemToggleComponents,
 ): void => {
   setTheme(theme);
   if (theme === darkThemeName) {
@@ -59,7 +61,7 @@ const syncThemeToggleControls = (
 
 const saveThemeToLocalStorage = (
   theme: string,
-  localStorageManager: StateManagerFeatures
+  localStorageManager: StateManagerFeatures,
 ) => {
   // Saves user preference to localStorage
   localStorageManager.setUserThemePreference(theme);
@@ -70,7 +72,7 @@ const handleThemeToggle = (
   newTheme: string | undefined,
   currentTheme: string | undefined,
   localStorageManager: StateManagerFeatures,
-  themeToggled: (value: string) => void
+  themeToggled: (value: string) => void,
 ) => {
   if (newTheme === undefined || currentTheme === undefined) {
     console.warn("🌎 ~ theme-toggler ~ new and current are undefined");
@@ -81,7 +83,7 @@ const handleThemeToggle = (
     console.warn(
       "🌎 ~ theme-toggler ~ new theme %s is the same as current '%s'",
       newTheme,
-      currentTheme
+      currentTheme,
     );
     return;
   }
@@ -90,7 +92,7 @@ const handleThemeToggle = (
 
   console.log(
     "🌎 ~ theme-toggler ~ current theme switched to new theme:",
-    newTheme
+    newTheme,
   );
 
   setTheme(newTheme);
@@ -99,7 +101,7 @@ const handleThemeToggle = (
 
 // Handle theme toggle logic with support of localStorage
 const getThemeToggleManager = (
-  inputElements: ThemToggleComponents
+  inputElements: ThemToggleComponents,
 ): ThemeToggleManager => {
   assertInputElements(inputElements);
 
@@ -112,7 +114,7 @@ const getThemeToggleManager = (
   return {
     apply: (signal: AbortSignal) => {
       const isClientOSDarkThemeOn = window.matchMedia(
-        "(prefers-color-scheme: dark)"
+        "(prefers-color-scheme: dark)",
       ).matches;
 
       if (currentTheme === undefined) {
@@ -143,11 +145,11 @@ const getThemeToggleManager = (
             (value: string) => {
               newTheme = currentTheme;
               currentTheme = value;
-            }
+            },
           ),
         {
           signal,
-        }
+        },
       );
     },
     getCurrentTheme: (): string | undefined => {

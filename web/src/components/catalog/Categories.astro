@@ -37,7 +37,7 @@ const titleErrorMessage = "Не удалось загрузить список �
 ---
 
 <style>
-  /* Main container */
+/* Main container */
 .slider-container {
   position: relative;
   width: 100%;
@@ -56,7 +56,6 @@ const titleErrorMessage = "Не удалось загрузить список �
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 20px;
   width: 100%;
 }
 .non-slider {
@@ -76,34 +75,47 @@ const titleErrorMessage = "Не удалось загрузить список �
     gap: calc(var(--spacing) * 5) /* 1.25rem = 20px */;
   }
 }
+.hide-scroll-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scroll-bar::-webkit-scrollbar {
+  display: none;
+}
 </style>
 
 <script>
-  //import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
+  import { getCategoriesViewManager, type CategoriesViewManager } from "@/web/src/core/utils/categories-view-manager";  
+  
+  const VIEW_MODE_ACTIVATION_DELAY_MS = 300;
 
+  let timeoutId: NodeJS.Timeout | undefined;
   let controller: AbortController | undefined;
-  //let themeToggleManager: ThemeToggleManager | undefined;
+  let viewManager: CategoriesViewManager | undefined;
 
   document.addEventListener("astro:page-load", () => {
-    controller && controller.abort();
-    
-    const categoriesContainer = document.querySelector('[data-categories-container]');
-    const categoriesViewModeEl = document.querySelector('[data-categories-view-mode]');
-    const categoriesScrollPrevEl = document.querySelector('[data-categories-scroll-prev]');
-    const categoriesScrollNextEl = document.querySelector('[data-categories-scroll-next]');
+    console.log("🌎 ~ Categories component ~ page load");
 
-    // themeToggleManager = getThemeToggleManager({
-    //   coreEl: document.querySelector('[data-theme-toggle]'),
-    //   darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
-    //   lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
-        
-    controller = new AbortController();
-    //themeToggleManager.apply(controller.signal);
+    controller && controller.abort();
+  
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      viewManager = getCategoriesViewManager({
+        selectModeEl: document.querySelector('[data-categories-view-mode]'),
+        containerEl: document.querySelector('[data-categories-container]'),
+        sliderEl: document.querySelector('[data-categories-slider]'),
+        slidePrevEl: document.querySelector('[data-categories-slide-prev]'),
+        slideNextEl: document.querySelector('[data-categories-slide-next]')
+      });
+      
+      controller = new AbortController();
+      viewManager.apply(controller.signal);
+    }, VIEW_MODE_ACTIVATION_DELAY_MS)
   });
 
   window.addEventListener('pagehide', () => {
     // This instantly removes all listeners using 'signal' from themeToggleManager
-    //controller && controller.abort(); 
+    controller && controller.abort(); 
   });
 </script>
 
@@ -128,12 +140,12 @@ const titleErrorMessage = "Не удалось загрузить список �
           <option value={CategoriesViewMode.Full}>{titleFullView}</option>
         </select>
         <div class="join grid grid-cols-2 content-center">
-          <button data-categories-scroll-prev class="join-item btn btn-xs btn-ghost" title={titleScrollToPrevious}>
+          <button data-categories-slide-prev class="join-item btn btn-xs btn-ghost" title={titleScrollToPrevious}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>
-          <button data-categories-scroll-next class="join-item btn btn-xs btn-ghost" title={titleScrollToNext}>
+          <button data-categories-slide-next class="join-item btn btn-xs btn-ghost" title={titleScrollToNext}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
@@ -141,8 +153,8 @@ const titleErrorMessage = "Не удалось загрузить список �
         </div>
       </div>
     </div>
-    <div class="non-slider-container">
-      <div data-categories-container class="non-slider">
+    <div data-categories-container class="slider-container">
+      <div data-categories-slider class="slider hide-scroll-bar">
         {categories && categories.map(item => <CategoryCard item={item} />)}
       </div>
     </div>
