@@ -25,7 +25,7 @@ const titleSubtotal = "Итого:";
   data-is_checkout={isCheckout}
 >
   <!-- Cart summary -->
-  <div class="navbar sticky top-0 z-60 bg-base-300 rounded-md min-h-1">
+  <div class="navbar sticky top-0 z-1 bg-base-300 rounded-md min-h-1">
     <div class="flex flex-col w-full">
       <div class="flex justify-between text-base font-medium">
         <p>{titleSubtotal}</p>
@@ -54,11 +54,12 @@ const titleSubtotal = "Итого:";
   import { AlertKind } from "@/web/src/core/models/alert";
   import { addAlert } from "@/web/src/core/stores/client/alert-store";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/client/cart-store";
-  import { DiscountMetadata } from "../../core/models/discount";
-  import type { CartItem } from "../../core/models/cart";
-  import { createCartItemMarkup } from "../../core/utils/cart-manager";
-  import { formatCurrency } from "../../core/utils/text-formatter";
-  import { regexTrue } from '../../core/utils/regex';
+  import { DiscountMetadata } from "@/web/src/core/models/discount";
+  import type { CartItem } from "@/web/src/core/models/cart";
+  import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
+  import { formatCurrency } from "@/web/src/core/utils/text-formatter";
+  import { regexTrue } from '@/web/src/core/utils/regex';
+  import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
 
   class CartContent extends HTMLElement {
     private discountIndex: number = 0;
@@ -93,7 +94,7 @@ const titleSubtotal = "Итого:";
       }
     }
 
-    private cleanupCartRoot = () => {
+    private cleanupCartContent = () => {
       if (!this.cartRootEl) return [];
       if (!this.updateCartCommandName) return [];
       if (!this.removeCartCommandName) return [];
@@ -137,7 +138,7 @@ const titleSubtotal = "Итого:";
       if (!this.updateCartCommandName) return [];
       if (!this.removeCartCommandName) return [];
 
-      this.cleanupCartRoot();
+      this.cleanupCartContent();
 
       const cartItems = $cart.get().sort((a: CartItem, b: CartItem) => {
         if (a.title < b.title) return -1;
@@ -262,60 +263,24 @@ const titleSubtotal = "Итого:";
       }
     }
 
-    private getDiscountedCostElement = (): Element | null => {
-      const dataDiscountedCostName = this.dataset.discounted_cost;
-      const result = this.querySelector(`[${dataDiscountedCostName}]`);
-      console.assert(result !== null, "Cannot find element [%s]", dataDiscountedCostName);
-      return result;
-    }
-
-    private getFullCostElement = (): Element | null => {
-      const dataFullCostName = this.dataset.full_cost;
-      const result = this.querySelector(`[${dataFullCostName}]`);
-      console.assert(result !== null, "Cannot find element [%s]", dataFullCostName);
-      return result;
-    }
-
-    private getCartRootElement = (): Element | null => {
-      const dataCartRootName = this.dataset.cart_root;
-      const result = this.querySelector(`[${dataCartRootName}]`);
-      console.assert(result !== null, "Cannot find element [%s]", dataCartRootName);
-      return result;
-    } 
-
-    private getUpdateCartCommandName = (): string | undefined => {
-      const result = this.dataset.cart_update;
-      console.assert(result !== undefined, "Cannot find element [%s]", result);
-      return result;
-    }
-
-    private getRemoveCartCommandName = (): string | undefined => {
-      const result = this.dataset.cart_remove;
-      console.assert(result !== undefined, "Cannot find element [%s]", result);
-      return result;
-    }
-    
-    private getCartCheckoutElement = (): Element | null => {
-      const isCheckout = this.dataset.is_checkout?.match(regexTrue);
-      if (isCheckout) return null;
-
-      const dataCartCheckoutCommandName = this.dataset.cart_checkout;
-      const result = this.querySelector(`button[name='${dataCartCheckoutCommandName}']`);
-      console.assert(result !== null, "Cannot find element [%s]", dataCartCheckoutCommandName);
-      
-      this.cartCheckoutHandler = this.onCartCheckoutClick();
-      result?.addEventListener('click', this.cartCheckoutHandler);
-      
-      return result;
+    private assertDataAttributeValue = (attribute: string| undefined, name: string): string | undefined => {
+      console.assert(attribute !== undefined, "~ CartContent ~ Data attribute with name '[%s]' does not have value", name);
+      return attribute;
     }
 
     connectedCallback() {
-      this.cartRootEl = this.getCartRootElement();
-      this.updateCartCommandName = this.getUpdateCartCommandName();
-      this.removeCartCommandName = this.getRemoveCartCommandName();
-      this.discountedCostEl = this.getDiscountedCostElement();
-      this.fullCostEl = this.getFullCostElement();
-      this.cartCheckoutEl = this.getCartCheckoutElement();
+      this.cartRootEl = getElementByDataAttribute(this, this.dataset.cart_root);
+      this.discountedCostEl = getElementByDataAttribute(this, this.dataset.discounted_cost);
+      this.fullCostEl = getElementByDataAttribute(this, this.dataset.full_cost);
+      this.cartCheckoutEl = !this.dataset.is_checkout?.match(regexTrue) ? 
+        getButtonElementByName(this, this.dataset.cart_checkout) : 
+        null;
+
+      this.updateCartCommandName = this.assertDataAttributeValue(this.dataset.cart_update, "cart_update");
+      this.removeCartCommandName = this.assertDataAttributeValue(this.dataset.cart_remove, "cart_remove");
+
+      this.cartCheckoutHandler = this.onCartCheckoutClick();
+      this.cartCheckoutEl?.addEventListener('click', this.cartCheckoutHandler);
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
@@ -334,7 +299,7 @@ const titleSubtotal = "Итого:";
       
       this.cartCheckoutEl?.removeEventListener('click', this.cartCheckoutHandler);
 
-      this.cleanupCartRoot();
+      this.cleanupCartContent();
     }
   }
 

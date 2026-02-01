@@ -1,4 +1,4 @@
-import { APISearchParamNames, TextSeparators } from "../const";
+import { APISearchParamNames, SortOrder, TextSeparators } from "../const";
 import type { Filtering } from "../models/filtering";
 import { defaultPaging, type Paging } from "../models/paging";
 import { defaultSorting, type Sorting } from "../models/sorting";
@@ -67,11 +67,11 @@ function extractUrlPaging(url: URL | null): Paging {
 }
 
 function extractUrlSorting(url: URL | null): Sorting {
-  const result: Sorting = { field: "", order: "" };
+  const result: Sorting = { field: "", order: SortOrder.Ascending };
   const field = extractUrlParam(url, APISearchParamNames.SortField, "string");
   result.field = field !== undefined ? field : defaultSorting.field;
 
-  const order = extractUrlParam(url, APISearchParamNames.SortOrder, "string");
+  const order = extractUrlParam(url, APISearchParamNames.SortOrder, "number");
   result.order = order !== undefined ? order : defaultSorting.order;
 
   return result;

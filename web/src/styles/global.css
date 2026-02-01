@@ -20,3 +20,44 @@ input[type="number"] {
 .hide-scroll-bar::-webkit-scrollbar {
   display: none;
 }
+
+/* Slid main container */
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.non-slider-container {
+  width: 100%;
+}
+
+/* Horizontal scroll container */
+.slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  width: 100%;
+}
+
+.non-slider {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 4) /* 1rem = 16px */;
+  @media (width >= 40rem /* 640px */) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (width >= 48rem /* 768px */) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (width >= 64rem /* 1024px */) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @media (width >= 64rem /* 1024px */) {
+    gap: calc(var(--spacing) * 5) /* 1.25rem = 20px */;
+  }
+}

@@ -55,6 +55,7 @@ const dataCartShowCommandName = "cartmenu-show";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
   import { DiscountMetadata } from "@/web/src/core/models/discount";
   import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/client/cart-store";
+  import { getButtonElementByName, getElementByDataAttribute, getElementById } from "@/web/src/core/utils/dom-utils";
  
   class CartMenu extends HTMLElement {
     private cartIndicatorEl: Element | null = null;
@@ -151,60 +152,17 @@ const dataCartShowCommandName = "cartmenu-show";
         }
       });
     }
-
-    private getCartIndicatorElement = (): Element | null => {
-      const dataCartIndicatorName = this.dataset.cartmenu_indicator;
-      const result = this.querySelector(`[${dataCartIndicatorName}]`);
-      console.assert(result !== null, "~ CartMenu ~ Cannot find element: [%s]", dataCartIndicatorName);
-      return result;
-    }
-
-    private getCartCountElement = (): Element | null => {
-      const dataCartCountName = this.dataset.cartmenu_count;
-      const result = this.querySelector(`[${dataCartCountName}]`);
-      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataCartCountName);
-      return result;
-    }
-
-    private getDiscountedCostElement = (): Element | null => {
-      const dataDiscountedCostName = this.dataset.cartmenu_discounted_cost;
-      const result = this.querySelector(`[${dataDiscountedCostName}]`);
-      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataDiscountedCostName);
-      return result;
-    }
-
-    private getFullCostElement = (): Element | null => {
-      const dataFullCostName = this.dataset.cartmenu_full_cost;
-      const result = this.querySelector(`[${dataFullCostName}]`);
-      console.assert(result !== null, "~ CartMenu ~ Cannot find element [%s]", dataFullCostName);
-      return result;
-    }
-
-    private getCartShowElement = (): Element | null => {
-      const dataCartShowommandName = this.dataset.cartmenu_show;
-      const result = this.querySelector(`button[name='${dataCartShowommandName}']`);
-      console.assert(result !== null, "Cannot find element [%s]", dataCartShowommandName);
-      
-      this.cartShowHandler = this.onCartShowClick();
-      result?.addEventListener('click', this.cartShowHandler);
-      
-      return result;
-    }
-
-    private getSidebarElement = (): Element | null => {
-      const sidebarElementId = this.dataset.cartmenu_sidebar;
-      const result = this.querySelector(`#${sidebarElementId}`);
-      console.assert(result !== null, "Cannot find element with ID: [%s]", sidebarElementId);
-      return result;
-    }
     
     connectedCallback() {
-      this.cartIndicatorEl = this.getCartIndicatorElement();
-      this.cartCountEl = this.getCartCountElement();
-      this.discountedCostEl = this.getDiscountedCostElement();
-      this.fullCostEl = this.getFullCostElement();
-      this.cartShowEl = this.getCartShowElement();
-      this.sidebarEl = this.getSidebarElement();
+      this.cartIndicatorEl = getElementByDataAttribute(this, this.dataset.cartmenu_indicator);
+      this.cartCountEl = getElementByDataAttribute(this, this.dataset.cartmenu_count);
+      this.discountedCostEl = getElementByDataAttribute(this, this.dataset.cartmenu_discounted_cost);
+      this.fullCostEl = getElementByDataAttribute(this, this.dataset.cartmenu_full_cost);
+      this.cartShowEl = getButtonElementByName(this, this.dataset.cartmenu_show);
+      this.sidebarEl = getElementById(this, this.dataset.cartmenu_sidebar);
+
+      this.cartShowHandler = this.onCartShowClick();
+      this.cartShowEl?.addEventListener('click', this.cartShowHandler);
 
       this.syncCartCountFromStore();
       this.syncCartCostFromStore();

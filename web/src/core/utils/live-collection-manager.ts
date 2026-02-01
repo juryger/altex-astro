@@ -24,7 +24,7 @@ const getCollectionByFilter = async <T>(
   filter: ProductCollectionFilter | CategoryCollectionFilter,
 ): Promise<{ value: T[] | undefined }> => {
   const result = await getLiveCollection(collection, filter);
-  if (result.error) {
+  if (result?.error) {
     throw new Error(
       `Failed to retrieve collection '${collection}' with filter: ${JSON.stringify(
         filter,

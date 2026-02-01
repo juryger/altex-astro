@@ -15,7 +15,8 @@ const titleDarkThemeSwitch = "Переключить тему на темную"
   let controller: AbortController | undefined;
   let themeToggleManager: ThemeToggleManager | undefined;
 
-  document.addEventListener("astro:page-load", () => {
+  const applyThemeToggler = () => {
+    console.log("🌎 ~ Header component ~ apply theme toggler");
     controller && controller.abort();
     
     themeToggleManager = getThemeToggleManager({
@@ -25,6 +26,11 @@ const titleDarkThemeSwitch = "Переключить тему на темную"
         
     controller = new AbortController();
     themeToggleManager.apply(controller.signal);
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
+    applyThemeToggler();
   });
 
   // To avoid glitch with current theme on page transitions.

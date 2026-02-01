@@ -10,9 +10,9 @@ import {
 import { categories, products } from "@/lib/dal/src/schema/catalog";
 import type { Category as DbCategory } from "@/lib/dal/src/types";
 import type { Category } from "@/web/src/core/models/category";
-import { constractNavigationPaths } from "@/web/src/core/utils/url-builder";
+import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
 import { NO_IMAGE_FILE_NAME, SortOrder } from "@/web/src/core/const";
-import type { Paging } from "@/web/src/core/models/paging";
+import type { PageResult, Paging } from "@/web/src/core/models/paging";
 import type { Sorting } from "@/web/src/core/models/sorting";
 
 const columnId: SQLiteColumn = categories.id;
@@ -20,9 +20,7 @@ const columnTitle: SQLiteColumn = categories.title;
 
 const getSortCondition = (value: Sorting): SQL => {
   const column = value.field.toLowerCase() === "title" ? columnTitle : columnId;
-  return value.order.toLowerCase() === SortOrder.Ascending
-    ? asc(column)
-    : desc(column);
+  return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 
 type QueryResult = {
@@ -42,7 +40,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
       entity.categories.description !== null
         ? entity.categories.description
         : undefined,
-    imageUrl: constractNavigationPaths(
+    imageUrl: constructNavigationPaths(
       import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL,
       entity.categories.hasImage
         ? entity.categories.uid.concat(".png")
@@ -63,7 +61,7 @@ export async function fetchCategories(
   parentSlug: string = "",
   sorting: Sorting,
   paging: Paging,
-): Promise<Category[]> {
+): Promise<PageResult<Category>> {
   const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
 
   const parentSq = db.select().from(categories).as("parent_sq");
@@ -72,6 +70,7 @@ export async function fetchCategories(
     .from(categories)
     .innerJoin(products, eq(categories.id, products.categoryId))
     .as("child_sq");
+
   const queryResult = await db
     .select({
       categories: { ...categories },
@@ -99,9 +98,21 @@ export async function fetchCategories(
     .limit(paging.pageSize)
     .offset(paging.page);
 
-  if (queryResult.length === 0) return [];
+  const totalCount = await db.$count(
+    db
+      .select()
+      .from(categories)
+      .leftJoin(parentSq, eq(categories.parentId, parentSq.id)),
+  );
 
-  return queryResult.map((item) => mapQueryResultToDomainModel(item));
+  return {
+    items: queryResult.map((item) => mapQueryResultToDomainModel(item)),
+    pageInfo: {
+      total: totalCount,
+      page: paging.page,
+      hasMore: (paging.page + 1) * paging.pageSize < totalCount,
+    },
+  } as PageResult<Category>;
 }
 
 export async function fetchCategoryBySlug(

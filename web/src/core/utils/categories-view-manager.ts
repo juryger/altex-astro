@@ -1,6 +1,6 @@
 import { CategoriesViewMode } from "../const";
 
-const SLIDE_WIDTH = 300;
+const SCROLL_SHIFT_PX = 300;
 
 interface CategoriesViewManager {
   apply: (signal: AbortSignal) => void;
@@ -79,23 +79,18 @@ const handleViewModeChange = (
   }
 };
 
-const handleSlide = (
-  sliderEl: Element | null,
-  slideWidth: number = SLIDE_WIDTH,
-) => {
-  sliderEl?.scrollBy({ left: slideWidth, behavior: "smooth" });
+const handleScrollAction = (sliderEl: Element | null, scrollShift: number) => {
+  sliderEl?.scrollBy({ left: scrollShift, behavior: "smooth" });
 };
 
-// Handle categories view mode
+// Handle categories view mode change
 const getCategoriesViewManager = (
   inputElements: CategoriesViewComponents,
-  cardWidth: number = 300,
 ): CategoriesViewManager => {
   assertInputElements(inputElements);
   return {
     apply: (signal: AbortSignal) => {
-      const viewModeInput = inputElements.selectModeEl as HTMLInputElement;
-      viewModeInput?.addEventListener(
+      inputElements.selectModeEl?.addEventListener(
         "change",
         (e) =>
           handleViewModeChange(
@@ -107,17 +102,15 @@ const getCategoriesViewManager = (
 
       const sliderEl = inputElements.sliderEl as HTMLDivElement;
 
-      const btnSlideNext = inputElements.slideNextEl as HTMLButtonElement;
-      btnSlideNext.addEventListener(
+      inputElements.slideNextEl?.addEventListener(
         "click",
-        () => handleSlide(sliderEl, SLIDE_WIDTH),
+        () => handleScrollAction(sliderEl, SCROLL_SHIFT_PX),
         { signal },
       );
 
-      const btnSlidePrev = inputElements.slidePrevEl as HTMLButtonElement;
-      btnSlidePrev.addEventListener(
+      inputElements.slidePrevEl?.addEventListener(
         "click",
-        () => handleSlide(sliderEl, -1 * SLIDE_WIDTH),
+        () => handleScrollAction(sliderEl, -1 * SCROLL_SHIFT_PX),
         { signal },
       );
     },

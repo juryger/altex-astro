@@ -33,31 +33,33 @@ export function createProductsLoader(config: {
         //   "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
         //   filter,
         // );
-        const url = new URL(`${config.baseUrl}/${APIEndpointNames.Products}`);
+        const apiUrl = new URL(
+          `${config.baseUrl}/${APIEndpointNames.Products}`,
+        );
 
         if (filter !== undefined) {
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.Category,
             filter.categorySlug,
           );
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.SortField,
             filter.sorting.field.toString(),
           );
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.SortOrder,
             filter.sorting.order.toString(),
           );
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.Page,
             filter.paging.page.toString(),
           );
-          url.searchParams.set(
+          apiUrl.searchParams.set(
             APISearchParamNames.PageSize,
             filter.paging.pageSize.toString(),
           );
           filter.filtering.forEach((item) => {
-            url.searchParams.set(
+            apiUrl.searchParams.set(
               APISearchParamNames.Filter,
               item.field.concat(TextSeparators.Comma, item.value),
             );
@@ -68,7 +70,7 @@ export function createProductsLoader(config: {
         //   url.toString(),
         // );
 
-        const response = await fetch(url.toString());
+        const response = await fetch(apiUrl.toString());
         if (!response.ok) {
           return {
             error: new Error(

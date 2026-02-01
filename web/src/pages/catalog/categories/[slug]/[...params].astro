@@ -9,8 +9,8 @@ import Products from '@/web/src/components/catalog/Products.astro';
 import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
-import type { Sorting } from '@/web/src/core/models/sorting';
-import type { Paging } from '@/web/src/core/models/paging';
+import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
+import { type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 
@@ -30,14 +30,13 @@ const parseRouteParams = (): { sorting: Sorting | undefined, paging: Paging | un
 }
 
 let category: Category | undefined;
-const sessionManager = getSessionManager(Astro.session);
-
 try {
   if (slug !== undefined) category = await getCategory(slug);
 } catch(error) {
   console.error("🛑 ~ Category page ~ failed to fetch category", error);
 }
 
+const sessionManager = getSessionManager(Astro.session);
 if (category === undefined)
 {
   sessionManager.resetActiveCatalogItem();
@@ -53,6 +52,17 @@ sessionManager.setActiveCatalogItem({
 });
 
 const { sorting, paging, filtering } = parseRouteParams();
+const productsView = await sessionManager.getProductsView();
+const newProductsView = {
+    sorting: sorting !== undefined 
+    ? sorting 
+    : productsView?.sorting ?? defaultSorting, 
+  filtering: filtering !== undefined && filtering.length > 0 
+    ? filtering 
+    : productsView?.filtering,
+};
+sessionManager.setProductsView(newProductsView);
+console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsView);
 
 const titleSubCategories = "Список подкатегорий";
 const titleProducts = "Список товаров";
@@ -60,12 +70,12 @@ const titleProducts = "Список товаров";
 
 <BaseLayout title=`Каталог - ${category?.title}`>
   <CategoryDetails item={category} />
-  <Categories parentSlug={category?.slug} title={titleSubCategories} server:defer>
+  <Categories parentSlug={category?.slug} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback title={titleSubCategories} />
 		</div>
 	</Categories>
-	<Products categorySlug={category?.slug} sorting={sorting} paging={paging} filtering={filtering} server:defer>
+	<Products categorySlug={category?.slug} sorting={newProductsView.sorting} paging={paging} filtering={newProductsView.filtering} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback title={titleProducts} />
 		</div>

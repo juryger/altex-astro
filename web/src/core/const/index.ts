@@ -6,8 +6,11 @@ enum LiveCollectionNames {
 }
 
 enum SessionNames {
-  Catalog = "catalog",
   User = "user",
+  ActiveCatalogItem = "activeCatalogItem",
+  ProductsView = "productsView",
+  OrdersView = "ordersView",
+  OrderProductsView = "orderProductsView",
 }
 
 enum APIEndpointNames {
@@ -40,8 +43,19 @@ enum NavPathNames {
 }
 
 enum SortOrder {
-  Ascending = "asc",
-  Descending = "desc",
+  Ascending = 0,
+  Descending = 1,
+}
+
+enum FilterOperator {
+  Equals = 0,
+  NotEquals = 1,
+  Greater = 2,
+  Less = 3,
+  GreaterOrEqual = 4,
+  LessOrEqual = 5,
+  In = 6,
+  NotIn = 7,
 }
 
 enum TextSeparators {
@@ -61,8 +75,28 @@ enum CategoriesViewMode {
 }
 
 enum ProductsSortFileds {
-  Title = 0,
-  Price = 1,
+  Title = "title",
+  Price = "price",
+}
+
+enum DialogSize {
+  Small = 0,
+  Large = 1,
+}
+
+enum DialogActionButtons {
+  None = 0,
+  OK = 1,
+  YesNo = 2,
+  YesNoCancel = 3,
+}
+
+enum DialogActionResult {
+  None = 0,
+  OK = 1,
+  Yes = 2,
+  No = 3,
+  Cancel = 4,
 }
 
 export {
@@ -73,8 +107,12 @@ export {
   APIEndpointNames,
   APISearchParamNames,
   SortOrder,
+  FilterOperator,
   TextSeparators,
   ImageContainers,
   CategoriesViewMode,
   ProductsSortFileds,
+  DialogActionButtons,
+  DialogActionResult,
+  DialogSize,
 };

@@ -28,7 +28,7 @@ const titleProductCode = "Артикул";
   data-id={item.id} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
-  data-image={item.imageUrl} data-slug={item.slug}
+  data-image={item.imageUrl} data-thumbnail-image={item.thumbnailImageUrl} data-slug={item.slug}
 >
   <div class="grid grid-cols-1 gap-2 sm:gap-6 sm:grid-cols-2 px-2 py-2">
     <div>
@@ -90,8 +90,10 @@ const titleProductCode = "Артикул";
   import { AlertKind } from "@/web/src/core/models/alert";
   import { addToCart } from "@/web/src/core/stores/client/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
+  import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
 
   class ProductDetails extends HTMLElement {
+    private btnAddToCart: Element | null = null;
     private value: Product | undefined;
     private addToCartHandler: any | undefined;
 
@@ -125,7 +127,7 @@ const titleProductCode = "Артикул";
           price: this.value.price,
           whsPrice1: this.value.whsPrice1,
           whsPrice2: this.value.whsPrice2,
-          image: this.value.imageUrl,
+          image: this.value.thumbnailImageUrl,
           slug: this.value.slug,
           color: color,
           quantity: quantity
@@ -137,7 +139,7 @@ const titleProductCode = "Артикул";
         });
       }
     }
-    
+
     connectedCallback() {
       this.value = parseProduct(this.dataset);
       if (!this.value) {
@@ -145,19 +147,13 @@ const titleProductCode = "Артикул";
         return;
       }
       
+      this.btnAddToCart = getButtonElementByName(this, this.dataset.btn_add_to_cart);
       this.addToCartHandler = this.onAddToCart();
-
-      const btnAddToCartName = this.dataset.btn_add_to_cart;
-      const button = this.querySelector(`button[name='${btnAddToCartName}']`);
-      console.assert(button !== null, "~ ProductDetails ~ cannot find button element with name: %s", btnAddToCartName);
-
-      button?.addEventListener('click', this.addToCartHandler);
+      this.btnAddToCart?.addEventListener('click', this.addToCartHandler);
     }
 
     disconnectedCallback() {
-      const btnAddToCartName = this.dataset.btn_add_to_cart;
-      const button = this.querySelector(`button[name='${btnAddToCartName}']`);
-      this.addToCartHandler && button && button.removeEventListener('click', this.addToCartHandler);
+      this.addToCartHandler && this.btnAddToCart && this.btnAddToCart.removeEventListener('click', this.addToCartHandler);
     }
   }
   customElements.define('product-details', ProductDetails);

@@ -9,22 +9,18 @@ const titleProductPrice = "Цена:";
 const titleEdit = "Изменить";
 const titleRemove = "Удалить";
 
-const productsBlobStorageUrl = `${
-  import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL
-}`;
-
 const getPriceWithDiscount = (
   value: CartItem,
-  discountIndex: number
+  discountIndex: number,
 ): string => {
   if (discountIndex === 2) {
     return `<span class="text-xs text-info">${formatCurrency(
-      value.whsPrice2
+      value.whsPrice2,
     )}</span>
       <del class="text-xs text-info">${formatCurrency(value.price)}</del>`;
   } else if (discountIndex === 1) {
     return `<span class="text-xs text-info">${formatCurrency(
-      value.whsPrice1
+      value.whsPrice1,
     )}</span>
       <del class="text-xs text-info">${formatCurrency(value.price)}</del>`;
   }
@@ -43,7 +39,7 @@ const getColorSelectOptions = (value: CartItem): string => {
         `<option value="${key}"
           ${value.color !== undefined && value.color === key ? "selected" : ""}>
           ${metadata.title}
-        </option>`
+        </option>`,
       );
     });
   return result;
@@ -53,7 +49,7 @@ const createCartItemMarkup = (
   value: CartItem,
   discountIndex: number,
   updateCartCommandName: string,
-  removeCarCommandtName: string
+  removeCarCommandtName: string,
 ): string => {
   return `
     <div class="flex flex-row gap-3 items-start">
@@ -61,7 +57,7 @@ const createCartItemMarkup = (
       <div class="grow-0">
         <figure class="aspect-square lg:aspect-auto min-h-[80px]">
           <Image 
-            src=${productsBlobStorageUrl.concat("/", value.image)} 
+            src=${value.image} 
             alt=${value.title} 
             width="80" height="80" class="rounded-xl" />
         </figure>

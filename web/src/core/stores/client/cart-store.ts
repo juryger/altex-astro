@@ -1,6 +1,6 @@
 import { computed } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
-import { CartSchema, type CartItem } from "../../models/cart";
+import { CartSchema, type CartItem } from "@/web/src/core/models/cart";
 
 export const $cart = persistentAtom<CartItem[]>("cart", [], {
   encode: JSON.stringify,
@@ -46,7 +46,7 @@ export function addToCart(value: CartItem): void {
             quantity: existingEntry.quantity + item.quantity,
           },
         ]
-      : [...$cart.get(), { ...item }]
+      : [...$cart.get(), { ...item }],
   );
 }
 
@@ -57,7 +57,7 @@ export function updateCart(value: CartItem): void {
   if (!existingEntry) {
     console.error(
       "❌ ~ cart-store ~ Cannot update item in the cart, as it's not found by its ID:",
-      item.id
+      item.id,
     );
     return;
   }
@@ -74,7 +74,7 @@ export function removeFromCart(id: string): void {
   if (!existingEntry) {
     console.error(
       "❌ ~ cart-store ~ Cannot remove item from the cart, as it's not found by its ID:",
-      id
+      id,
     );
     return;
   }

@@ -7,9 +7,8 @@ type PageResult<T = any> = {
   items: T[];
   pageInfo: {
     total: number;
-    hasMore: boolean;
     page: number;
-    pageSize: number;
+    hasMore: boolean;
   };
 };
 

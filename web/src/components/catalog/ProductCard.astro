@@ -18,17 +18,18 @@ const unitItem = item.unitId ?
   UnitOfMeasurementDictionary[item.unitId] : 
   UnitOfMeasurementDictionary[0];
 
+const nameAddToCardAction = "pc-add-to-card";
+
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
-const btnAddToCardName = "pc-add-to-card";
 ---
 
 <product-card 
-  data-btn_add_to_cart={btnAddToCardName} 
+  data-btn_add_to_cart={nameAddToCardAction} 
   data-id={item.id} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
-  data-image={item.imageUrl} data-slug={item.slug}
+  data-image={item.imageUrl} data-thumbnail-image={item.thumbnailImageUrl} data-slug={item.slug}
 >
   <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
     {/* Product image with quick preivew */}
@@ -59,7 +60,7 @@ const btnAddToCardName = "pc-add-to-card";
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} />
       {/* Add to Shopping Cart */}
-      <button name={btnAddToCardName} class="btn btn-active btn-primary">{titleAddToCart}</button>
+      <button name={nameAddToCardAction} class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
   </div>
 </product-card>
@@ -72,10 +73,11 @@ const btnAddToCardName = "pc-add-to-card";
   import { AlertKind } from "@/web/src/core/models/alert";
   import { addToCart } from "@/web/src/core/stores/client/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
+  import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
 
   class ProductCard extends HTMLElement {
+    private btnAddToCard: Element | null = null;
     private value: Product | undefined;
-    private addToCartHandler: any | undefined;
 
     private onAddToCart = (): any => {
       return async (event: Event): Promise<void> => {
@@ -97,7 +99,7 @@ const btnAddToCardName = "pc-add-to-card";
           price: this.value.price,
           whsPrice1: this.value.whsPrice1,
           whsPrice2: this.value.whsPrice2,
-          image: this.value.imageUrl,
+          image: this.value.thumbnailImageUrl,
           slug: this.value.slug,
           color: color,
           quantity: quantity
@@ -117,19 +119,12 @@ const btnAddToCardName = "pc-add-to-card";
         return;
       }
       
-      this.addToCartHandler = this.onAddToCart();
-
-      const btnAddToCardName = this.dataset.btn_add_to_cart;
-      const button = this.querySelector(`button[name='${btnAddToCardName}']`);
-      console.assert(button !== null, "~ ProductCard ~ cannot find button element with name: %s", btnAddToCardName);
-      
-      button?.addEventListener('click', this.addToCartHandler);
+      this.btnAddToCard = getButtonElementByName(this, this.dataset.btn_add_to_cart);      
+      this.btnAddToCard?.addEventListener('click', this.onAddToCart);
     }
 
     disconnectedCallback() {
-      const btnAddToCardName = this.dataset.btn_add_to_cart;
-      const button = this.querySelector(`button[name='${btnAddToCardName}']`);
-      this.addToCartHandler && button && button.removeEventListener('click', this.addToCartHandler);
+      this.btnAddToCard?.removeEventListener('click', this.onAddToCart);
     }
   }
   customElements.define('product-card', ProductCard);

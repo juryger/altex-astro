@@ -2,6 +2,7 @@ import type { Sorting } from "@/web/src/core/models/sorting";
 import type { Paging } from "@/web/src/core/models/paging";
 import type { Filtering } from "@/web/src/core/models/filtering";
 import { regexFilterParams, regexPageParams, regexSortParams } from "./regex";
+import { FilterOperator } from "../const";
 
 interface RouteParser {
   getCatalogSorting(): Sorting | undefined;
@@ -17,7 +18,7 @@ export default function getRouteParser(route?: string): RouteParser {
       if (!match || !match.groups) return undefined;
       return {
         field: match.groups.field,
-        order: match.groups.direction,
+        order: Number.parseInt(match.groups.direction, 10),
       } as Sorting;
     },
     getCatalogPaging: () => {
@@ -34,7 +35,11 @@ export default function getRouteParser(route?: string): RouteParser {
       const filterExp = regexFilterParams;
       route?.matchAll(filterExp).forEach((match) => {
         if (match) {
-          const item: Filtering = { field: "", value: "" };
+          const item: Filtering = {
+            field: "",
+            value: "",
+            operator: FilterOperator.Equals,
+          };
           item.field = match.groups?.field ?? "";
           item.value = match.groups?.value ?? "";
           result.push(item);

@@ -4,21 +4,52 @@ declare namespace App {
       id: number;
       name: string;
     };
-    catalog: {
-      activeItem: {
-        parentCategory?: {
-          slug: string;
-          title: string;
-        };
-        category?: {
-          slug: string;
-          title: string;
-        };
-        product?: {
-          slug: string;
-          title: string;
-        };
+    activeCatalogItem: {
+      parentCategory?: {
+        slug: string;
+        title: string;
       };
+      category?: {
+        slug: string;
+        title: string;
+      };
+      product?: {
+        slug: string;
+        title: string;
+      };
+    };
+    productsView: {
+      sorting?: {
+        field: string;
+        order: number;
+      };
+      filtering?: Array<{
+        field: string;
+        value: string;
+        operator: number;
+      }>;
+    };
+    ordersView: {
+      sorting?: {
+        field: string;
+        order: number;
+      };
+      filtering?: Array<{
+        field: string;
+        value: string;
+        operator: number;
+      }>;
+    };
+    orderProductsView: {
+      sorting?: {
+        field: string;
+        order: number;
+      };
+      filtering?: Array<{
+        field: string;
+        value: string;
+        operator: number;
+      }>;
     };
   }
 }

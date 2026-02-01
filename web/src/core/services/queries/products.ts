@@ -19,7 +19,7 @@ import {
   productColors,
   products,
 } from "@/lib/dal/src/schema/catalog";
-import { constractNavigationPaths } from "@/web/src/core/utils/url-builder";
+import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
 import {
   ImageContainers,
   NO_IMAGE_FILE_NAME,
@@ -103,13 +103,13 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     categorySlug: entity.categories?.slug,
     categoryTitle: entity.categories?.title,
     colors: colorId !== undefined ? [colorId] : [],
-    imageUrl: constractNavigationPaths(
+    imageUrl: constructNavigationPaths(
       import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL,
       entity.main.products.hasImage
         ? entity.main.products.uid.concat(".png")
         : NO_IMAGE_FILE_NAME,
     ),
-    thumbnailImageUrl: constractNavigationPaths(
+    thumbnailImageUrl: constructNavigationPaths(
       import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL,
       ImageContainers.Thumbnails,
       entity.main.products.hasImage

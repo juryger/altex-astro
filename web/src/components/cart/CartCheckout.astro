@@ -1,5 +1,5 @@
 ---
-import Modal from "../Modal.astro";
+import Modal from "../ModalDialog.astro";
 import CartContent from "./CartContent.astro"
 import { Image } from 'astro:assets';
 import failLogo from '../../assets/fail.png';
@@ -94,7 +94,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       <CartContent isCheckout={true} />
     </div>
   </div>
-  <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader} outsideClickClose={true}>
+  <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader}>
     <div class="flex gap-2 mt-2">
       <div class="grow-0 content-start">
         <Image src={failLogo}
@@ -122,6 +122,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   import { navigate } from 'astro:transitions/client';
   import { $cart, $cartCount } from "@/web/src/core/stores/client/cart-store";
   import { type CartCheckoutGuestUser } from '@/web/src/core/models/cart';
+  import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 
   class CartCheckout extends HTMLElement {
     private storeCountUnsubscribe?: () => void;
@@ -182,24 +183,6 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       }
     }
 
-    private getFormCheckoutElement = (): Element | null => {
-      const dataFormCheckoutName = this.dataset.form_checkout;
-      const result = this.querySelector(`form[name='${dataFormCheckoutName}']`);
-      console.assert(result !== null, "Cannot find element [%s]", dataFormCheckoutName);
-      return result;
-    }
-
-    private getOrderConfirmElement = (): Element | null => {
-      const dataOrderConfirmCommandName = this.dataset.order_confirm;
-      const result = this.querySelector(`button[name='${dataOrderConfirmCommandName}']`);
-      console.assert(result !== null, "Cannot find element [%s]", dataOrderConfirmCommandName);
-      
-      this.orderConfirmHandler = this.onOrderConfirmClick();
-      result?.addEventListener('click', this.orderConfirmHandler);
-
-      return result;
-    }
-
     private syncCartCountFromStore(): void {
       if (!this.orderConfirmEl) return;
 
@@ -214,28 +197,17 @@ const titleCartCheckoutFailed = "При размещении заказа воз
         if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (value === 0);
       });
     }
-  
-    private getErrorPopupElement = (): Element | null => {
-      const dataErrorPopupID = this.dataset.error_popup_id;
-      const result = this.querySelector(`#${dataErrorPopupID}`);
-      console.assert(result !== null, "Cannot find element [%s]", dataErrorPopupID);
-      return result;
-    }
-
-    private getErrorDetailsElement = (): Element | null => {
-      const dataErrorDetailsID = this.dataset.error_details_id;
-      const result = this.querySelector(`#${dataErrorDetailsID}`);
-      console.assert(result !== null, "Cannot find element [%s]", dataErrorDetailsID);
-      return result;
-    }
 
     connectedCallback() {
-      this.formCartCheckoutEl = this.getFormCheckoutElement();
-      this.orderConfirmEl = this.getOrderConfirmElement();
-      this.errorPopupEl = this.getErrorPopupElement();
-      this.errorDetailsEl = this.getErrorDetailsElement();
+      this.formCartCheckoutEl = getFormElementByName(this, this.dataset.form_checkout);
+      this.orderConfirmEl = getButtonElementByName(this, this.dataset.order_confirm);
+      this.errorPopupEl = getElementById(this, this.dataset.error_popup_id);
+      this.errorDetailsEl = getElementById(this, this.dataset.error_details_id);
       this.subscribeToCountStore();
       this.syncCartCountFromStore();
+
+      this.orderConfirmHandler = this.onOrderConfirmClick();
+      this.orderConfirmEl?.addEventListener('click', this.orderConfirmHandler);
     }
 
     disconnectedCallback() {

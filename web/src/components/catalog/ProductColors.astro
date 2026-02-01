@@ -8,7 +8,6 @@ interface Props {
 }
 
 const { productId, colors, isDetailed } = Astro.props;
-//console.log("🌎 ~ ProductColors ~ colors", colors);
 
 const spanSelectedColorName = "data-selected-color";
 const titleColorOptions = "Цвет:";
@@ -45,7 +44,10 @@ const noProductColors = "Нет информации о цвете";
 </product-colors>
 
 <script>
+  import { getElementByDataAttribute } from "@/web/src/core/utils/dom-utils";
+
   class ProductColors extends HTMLElement {
+    selectedColorTitleEl: Element | null = null;
     colorHandlers: {
       [key: number]: (e: Event) => any;
     } = {};
@@ -55,19 +57,17 @@ const noProductColors = "Нет информации о цвете";
         if (el !== null) el.innerHTML = title;
       };
     }
-    
+
     connectedCallback() {
-      const spanSelectedColorName = this.dataset.selected_color;
-      const selectedColorTitleEl = this.querySelector(`[${spanSelectedColorName}]`);
-      console.assert(selectedColorTitleEl !== null, "Cannot find span element for selected color: %s", spanSelectedColorName);
+      this.selectedColorTitleEl = getElementByDataAttribute(this, this.dataset.selected_color);
 
       const radioboxes = this.querySelectorAll('input[type=radio]');
-      if (radioboxes.length > 0 && selectedColorTitleEl !== null) {
-        selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
+      if (radioboxes.length > 0 && this.selectedColorTitleEl !== null) {
+        this.selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
       }
       
       radioboxes.forEach((x: Element, index: number) => {
-        this.colorHandlers[index] = this.onColorSelect(selectedColorTitleEl, x.getAttribute('title') ?? "");
+        this.colorHandlers[index] = this.onColorSelect(this.selectedColorTitleEl, x.getAttribute('title') ?? "");
         x.addEventListener('click', this.colorHandlers[index]);
       });
     }

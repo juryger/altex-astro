@@ -1,0 +1,54 @@
+---
+import { DialogActionButtons, DialogActionResult, DialogSize } from '../core/const';
+
+export interface Props {
+  id: string,
+  title: string,
+  size: DialogSize,
+  actionButtons?: DialogActionButtons
+}
+const { id, title, size, actionButtons } = Astro.props;
+
+const actionClose = "action-close";
+const actionOk1 = "action-ok-1";
+const actionYes2 = "action-yes-2";
+const actionNo2 = "action-no-2";
+const actionYes3 = "action-yes-3";
+const actionNo3 = "action-no-3";
+const actionCancel3 = "action-cancel-3";
+
+const titleOKButton = "ОК";
+const titleYesButton = "Да";
+const titleNoButton = "Нет";
+const titleCancelButton = "Отменить";
+---
+
+<!-- You can open the modal using ID.showModal() method -->
+<!-- <button class="btn" onclick="my_modal_3.showModal()">open modal</button> -->
+<dialog id={id} class="modal">
+  <div class:list={['modal-box', {'max-w-5xl': size === DialogSize.Large }, {'max-w-xl': size === DialogSize.Small}]}>
+    <h3 class="text-lg font-bold">{title}</h3>
+    <main>
+      <slot />
+      <div class="modal-action">
+        <form method="dialog">
+          <button name={actionClose} value={DialogActionResult.None} class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-400">✕</button>
+          {actionButtons && actionButtons === DialogActionButtons.OK && 
+            <button name={actionOk1} class="btn" value={DialogActionResult.OK}>{titleOKButton}</button>
+          }
+          {actionButtons && actionButtons === DialogActionButtons.YesNo && 
+            <div>
+              <button name={actionYes2} class="btn" value={DialogActionResult.Yes}>{titleYesButton}</button>
+              <button name={actionNo2} class="btn" value={DialogActionResult.No}>{titleNoButton}</button>
+            </div>
+          }
+          {actionButtons && actionButtons === DialogActionButtons.YesNoCancel && 
+            <button name={actionYes3} class="btn" value={DialogActionResult.Yes}>{titleYesButton}</button>
+            <button name={actionNo3} class="btn" value={DialogActionResult.No}>{titleNoButton}</button>
+            <button name={actionCancel3} class="btn" value={DialogActionResult.Cancel}>{titleCancelButton}</button>
+          }
+        </form>
+      </div>
+    </main>
+  </div>
+</dialog>

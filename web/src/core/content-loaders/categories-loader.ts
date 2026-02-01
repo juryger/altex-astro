@@ -2,12 +2,14 @@ import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../utils/endpoint-error-parser";
 import type { Category } from "../models/category";
 import { APIEndpointNames, APISearchParamNames } from "../const";
+import type { Sorting } from "../models/sorting";
+import type { PageResult, Paging } from "../models/paging";
 
 export type CategoryCollectionFilter = {
   skipParentMatch: boolean;
   parentSlug?: string;
-  page: number;
-  pageSize: number;
+  sorting: Sorting;
+  paging: Paging;
 };
 
 export type CategoryEntryFilter = {
@@ -42,12 +44,20 @@ export function createCategoriesLoader(config: {
             );
           }
           apiUrl.searchParams.set(
+            APISearchParamNames.SortField,
+            filter.sorting.field.toString(),
+          );
+          apiUrl.searchParams.set(
+            APISearchParamNames.SortOrder,
+            filter.sorting.order.toString(),
+          );
+          apiUrl.searchParams.set(
             APISearchParamNames.Page,
-            filter.page.toString(),
+            filter.paging.page.toString(),
           );
           apiUrl.searchParams.set(
             APISearchParamNames.PageSize,
-            filter.pageSize.toString(),
+            filter.paging.pageSize.toString(),
           );
         }
 
@@ -100,3 +110,46 @@ export function createCategoriesLoader(config: {
     },
   };
 }
+
+const loadCategories = async (
+  baseUrl: string,
+  filter: CategoryCollectionFilter,
+): Promise<PageResult<Category>> => {
+  const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Categories}`);
+
+  if (filter !== undefined) {
+    apiUrl.searchParams.set(
+      APISearchParamNames.SkipParentMatch,
+      filter.skipParentMatch.toString(),
+    );
+    if (filter.parentSlug !== undefined) {
+      apiUrl.searchParams.set(APISearchParamNames.Parent, filter.parentSlug);
+    }
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortField,
+      filter.sorting.field.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortOrder,
+      filter.sorting.order.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.Page,
+      filter.paging.page.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.PageSize,
+      filter.paging.pageSize.toString(),
+    );
+  }
+
+  const response = await fetch(apiUrl.toString());
+  if (!response.ok) {
+    return Promise.reject(`Failed to fetch categories: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+export { loadCategories };

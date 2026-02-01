@@ -5,7 +5,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (isNaN(id)) {
     console.warn(
       `~ Product data attributes parser ~ value of ID is not a number:`,
-      dataset.id
+      dataset.id,
     );
     return undefined;
   }
@@ -13,7 +13,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const title = dataset.title;
   if (title === undefined) {
     console.warn(
-      `~ Product data attributes parser ~ value of Title is not defined`
+      `~ Product data attributes parser ~ value of Title is not defined`,
     );
     return undefined;
   }
@@ -21,7 +21,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const productCode = dataset.product_code;
   if (productCode === undefined) {
     console.warn(
-      `~ Product data attributes parser ~ value of Product Code is not defined`
+      `~ Product data attributes parser ~ value of Product Code is not defined`,
     );
     return undefined;
   }
@@ -34,7 +34,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (price === undefined || isNaN(price)) {
     console.warn(
       `~ Product data attributes parser ~ value of Price is not defined or valid:`,
-      dataset.price
+      dataset.price,
     );
     return undefined;
   }
@@ -45,7 +45,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (whsPrice1 === undefined || isNaN(whsPrice1)) {
     console.warn(
       `~ Product data attributes parser ~ value of WhsPrice1 is not defined or valid:`,
-      dataset.whs_price1
+      dataset.whs_price1,
     );
     return undefined;
   }
@@ -56,7 +56,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (whsPrice2 === undefined || isNaN(whsPrice2)) {
     console.warn(
       `~ Product data attributes parser ~ value of WhsPrice2 is not defined or valid:`,
-      dataset.whs_price2
+      dataset.whs_price2,
     );
     return undefined;
   }
@@ -64,7 +64,15 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const image = dataset.image;
   if (image === undefined) {
     console.warn(
-      `~ Product data attributes parser ~ value of Image is not defined`
+      `~ Product data attributes parser ~ value of Image is not defined`,
+    );
+    return undefined;
+  }
+
+  const thumbnailImage = dataset.thumbnailImage;
+  if (thumbnailImage === undefined) {
+    console.warn(
+      `~ Product data attributes parser ~ value of Thumbnail image is not defined`,
     );
     return undefined;
   }
@@ -72,7 +80,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const slug = dataset.slug;
   if (slug === undefined) {
     console.warn(
-      `~ Product data attributes parser ~ value of Slug is not defined`
+      `~ Product data attributes parser ~ value of Slug is not defined`,
     );
     return undefined;
   }
@@ -81,7 +89,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   if (isNaN(categoryId)) {
     console.warn(
       `~ Product data attributes parser ~ value of CategoryID is not a number:`,
-      dataset.id
+      dataset.id,
     );
     return undefined;
   }
@@ -89,7 +97,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const categorySlug = dataset.category_slug;
   if (categorySlug === undefined) {
     console.warn(
-      `~ Product data attributes parser ~ value of CategorySlug is not defined`
+      `~ Product data attributes parser ~ value of CategorySlug is not defined`,
     );
     return undefined;
   }
@@ -107,6 +115,7 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     categorySlug,
     colors,
     imageUrl: image,
+    thumbnailImageUrl: thumbnailImage,
     slug,
   } as Product;
 };

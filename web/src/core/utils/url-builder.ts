@@ -1,6 +1,6 @@
 const pathSeparator: string = "/";
 
-export function constractNavigationPaths(...args: Array<string>): string {
+export function constructNavigationPaths(...args: Array<string>): string {
   var result = "";
   args.forEach(
     (item, index) =>

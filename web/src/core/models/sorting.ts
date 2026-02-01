@@ -2,7 +2,7 @@ import { SortOrder } from "../const";
 
 type Sorting = {
   field: string;
-  order: string;
+  order: SortOrder;
 };
 
 const defaultSorting: Sorting = {

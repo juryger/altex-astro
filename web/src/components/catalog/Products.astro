@@ -1,23 +1,29 @@
 ---
 export const prerender = false;
 
-import { getProductsList } from '../../core/utils/live-collection-manager';
-import type { Product } from '../../core/models/product';
+import { getProductsList } from '@/web/src/core/utils/live-collection-manager';
+import type { Product } from '@/web/src/core/models/product';
 import ProductCard from './ProductCard.astro';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
 import type { Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import { defaultPaging } from '@/web/src/core/models/paging';
-import type { ProductCollectionFilter } from '../../core/content-loaders/products-loader';
-import { ProductsSortFileds } from '../../core/const';
+import type { ProductCollectionFilter } from '@/web/src/core/content-loaders/products-loader';
+import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
+import { getSessionManager } from '@/web/src/core/utils/session-manager';
+import ModalDialog from '../ModalDialog.astro';
 
 interface Props {
   categorySlug: string;
-  sorting: Sorting | undefined;
-  paging: Paging | undefined;
-  filtering: Filtering[];
+  sorting?: Sorting | undefined;
+  paging?: Paging | undefined;
+  filtering?: Filtering[];
 }
 const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
+
+const sessionManager = getSessionManager(Astro.session);
+const productsView = await sessionManager.getProductsView();
+
 const allRecords = 1000;
 
 let hasDataLoadError = false;
@@ -34,16 +40,22 @@ try {
   console.error("🛑 ~ Products component ~ failed to fetch products list", error);
 } 
 
+const nameSortDialog = "sort-dialog";
+const nameSortFieldSelect = "sort-field-select";
+const nameSortOrder = "sort-order";
+
 const titleSortBy = "Сортировка";
 const titlSortByTitle = "Наименование";
 const titleSortByPrice = "Цена";
-const titleAscending = "По возрастанию";
-const titleDescending = "По убыванию";
+const titleSortAscending = "По возрастанию";
+const titleSortDescending = "По убыванию";
 const titlePagingInfo = "Показано позиций";
 const titlePagingNofM = "из";
 const titleProductsList = "Список товаров";
 const titleNoProductsForCategory = "Товары не представлены в данной категории";
 const titleErrorMessage = "Не удалось загрузить список товаров, попробуйте снова позднее.";
+const titleDefaultSortDirection = "Определение порядка сортировки";
+const titleApplyDefatulSorting = "Для сортировки по возрастанию или в алфавитном порядке нажмите кнопку \"Да\", для сортировки по убыванию или в обратном алфавитном порядке нажмите кнопку \"Нет\".";
 ---
 
 {hasDataLoadError && <div role="alert" class="alert mt-1 items-center">
@@ -55,19 +67,19 @@ const titleErrorMessage = "Не удалось загрузить список �
   </p>
 </div>}
 {(products && products.length > 0) &&
-  <div class="mx-4 mb-2 bg-base-100">
+  <div data-products-root class="mx-4 mb-2 bg-base-100">
     <div class="grid grid-cols-1 sm:grid-cols-2 mb-2">
       <h3 class="text-lg font-bold text-center sm:text-left py-2">
         {titleProductsList}
       </h3>      
-      <div class="justify-self-center sm:justify-self-end">
+      <div class="items-center justify-self-center sm:justify-self-end flex flex-row flex-nowrap">
         <span class="content-center text-nowrap mr-1">{titleSortBy}:</span>
-        <select name="category-view-select" class="select w-38 mr-2">
-          <option value={ProductsSortFileds.Title}>{titlSortByTitle}</option>
-          <option value={ProductsSortFileds.Price}>{titleSortByPrice}</option>
+        <select name={nameSortFieldSelect} class="select w-38 mr-2">
+          <option value={ProductsSortFileds.Title} selected={productsView?.sorting?.field === ProductsSortFileds.Title}>{titlSortByTitle}</option>
+          <option value={ProductsSortFileds.Price} selected={productsView?.sorting?.field === ProductsSortFileds.Price}>{titleSortByPrice}</option>
         </select>
-        <label class="toggle toggle-xl" title={titleAscending}>
-          <input type="checkbox" checked="checked" />
+        <label class="toggle toggle-xl" title={productsView?.sorting?.order === SortOrder.Ascending ? titleSortAscending : titleSortDescending}>
+          <input name={nameSortOrder} type="checkbox" checked={productsView?.sorting?.order === SortOrder.Ascending} />
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
           </svg>
@@ -101,3 +113,49 @@ const titleErrorMessage = "Не удалось загрузить список �
     {(!products || products.length == 0) && <span>{titleNoProductsForCategory}</span>}
   </div>
 }
+<ModalDialog id={nameSortDialog} title={titleDefaultSortDirection} size={DialogSize.Small} actionButtons={DialogActionButtons.YesNo}>
+  <span class="text-lg">{titleApplyDefatulSorting}</span>
+</ModalDialog>
+
+<script>
+  import { getProductsViewManager, type ProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
+  
+  const VIEW_MODE_INIT_DELAY_MS = 300;
+
+  let timeoutId: NodeJS.Timeout | undefined;
+  let controller: AbortController | undefined;
+  let viewManager: ProductsViewManager | undefined;
+
+  const applyViewManager = ()=> {
+    console.log("🌎 ~ Products component ~ apply view manager");
+    controller && controller.abort();
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      const productsRootEl = document.querySelector('[data-products-root]');
+      if (productsRootEl === null) return;
+
+      viewManager = getProductsViewManager({
+        selectSortEl: document.querySelector('select[name="sort-field-select"]'),
+        sortOrderEl: document.querySelector('input[name="sort-order"]'),
+        sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
+      });
+      
+      controller = new AbortController();
+      viewManager.apply(controller.signal);
+    }, VIEW_MODE_INIT_DELAY_MS)
+  } 
+
+  // Need to call ViewManger to assing event handlers on initial page load
+  applyViewManager();
+
+  document.addEventListener("astro:page-load", () => {
+    // Need to re-apply view manager on Astro page transition as well
+    applyViewManager();
+  });
+
+  window.addEventListener('pagehide', () => {
+    // This instantly removes all listeners using 'signal' from themeToggleManager
+    controller && controller.abort(); 
+  });
+</script>
