@@ -1,7 +1,7 @@
 import type { LiveLoader } from "astro/loaders";
 import { parseEndpointError } from "../utils/endpoint-error-parser";
 import type { Product } from "../models/product";
-import type { Paging } from "../models/paging";
+import type { PageResult, Paging } from "../models/paging";
 import type { Sorting } from "../models/sorting";
 import type { Filtering } from "../models/filtering";
 import {
@@ -10,18 +10,57 @@ import {
   TextSeparators,
 } from "../const";
 
-export type ProductCollectionFilter = {
+type ProductCollectionFilter = {
   categorySlug: string;
   sorting: Sorting;
   paging: Paging;
   filtering: Filtering[];
 };
-
-export type ProductEntryFilter = {
+type ProductEntryFilter = {
   slug?: string;
 };
 
-export function createProductsLoader(config: {
+const loadProducts = async (
+  baseUrl: string,
+  filter: ProductCollectionFilter | undefined,
+): Promise<PageResult<Product>> => {
+  const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Products}`);
+  if (filter !== undefined) {
+    apiUrl.searchParams.set(APISearchParamNames.Category, filter.categorySlug);
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortField,
+      filter.sorting.field.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortOrder,
+      filter.sorting.order.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.Page,
+      filter.paging.page.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.PageSize,
+      filter.paging.pageSize.toString(),
+    );
+    filter.filtering.forEach((item) => {
+      apiUrl.searchParams.set(
+        APISearchParamNames.Filter,
+        item.field.concat(TextSeparators.Comma, item.value),
+      );
+    });
+  }
+
+  const response = await fetch(apiUrl.toString());
+  if (!response.ok) {
+    return Promise.reject(`Failed to fetch products: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+function createProductsLoader(config: {
   baseUrl: string;
 }): LiveLoader<Product, ProductEntryFilter, ProductCollectionFilter> {
   //console.log("🛠️ ~ createProductsLoader ~ config:", config);
@@ -33,56 +72,9 @@ export function createProductsLoader(config: {
         //   "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
         //   filter,
         // );
-        const apiUrl = new URL(
-          `${config.baseUrl}/${APIEndpointNames.Products}`,
-        );
-
-        if (filter !== undefined) {
-          apiUrl.searchParams.set(
-            APISearchParamNames.Category,
-            filter.categorySlug,
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.SortField,
-            filter.sorting.field.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.SortOrder,
-            filter.sorting.order.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.Page,
-            filter.paging.page.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.PageSize,
-            filter.paging.pageSize.toString(),
-          );
-          filter.filtering.forEach((item) => {
-            apiUrl.searchParams.set(
-              APISearchParamNames.Filter,
-              item.field.concat(TextSeparators.Comma, item.value),
-            );
-          });
-        }
-        // console.log(
-        //   "🛠️ ~ createProductsLoader ~ fetching data via URL:",
-        //   url.toString(),
-        // );
-
-        const response = await fetch(apiUrl.toString());
-        if (!response.ok) {
-          return {
-            error: new Error(
-              `Failed to fetch products: ${response.statusText}`,
-            ),
-          };
-        }
-        const data = await response.json();
-        //console.log("🛠️ ~ createProductsLoader ~ collection ~ data:", data);
-
+        const data = await loadProducts(config.baseUrl, filter);
         return {
-          entries: data.map((x: Product) => ({ id: x.slug, data: x })),
+          entries: data.items.map((x: Product) => ({ id: x.slug, data: x })),
         };
       } catch (error: unknown) {
         return {
@@ -123,3 +115,10 @@ export function createProductsLoader(config: {
     },
   };
 }
+
+export {
+  createProductsLoader,
+  loadProducts,
+  type ProductEntryFilter,
+  type ProductCollectionFilter,
+};

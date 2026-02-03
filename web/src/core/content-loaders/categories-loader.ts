@@ -5,18 +5,58 @@ import { APIEndpointNames, APISearchParamNames } from "../const";
 import type { Sorting } from "../models/sorting";
 import type { PageResult, Paging } from "../models/paging";
 
-export type CategoryCollectionFilter = {
+type CategoryCollectionFilter = {
   skipParentMatch: boolean;
   parentSlug?: string;
   sorting: Sorting;
   paging: Paging;
 };
 
-export type CategoryEntryFilter = {
+type CategoryEntryFilter = {
   slug?: string;
 };
 
-export function createCategoriesLoader(config: {
+const loadCategories = async (
+  baseUrl: string,
+  filter: CategoryCollectionFilter | undefined,
+): Promise<PageResult<Category>> => {
+  const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Categories}`);
+  if (filter !== undefined) {
+    apiUrl.searchParams.set(
+      APISearchParamNames.SkipParentMatch,
+      filter.skipParentMatch.toString(),
+    );
+    if (filter.parentSlug !== undefined) {
+      apiUrl.searchParams.set(APISearchParamNames.Parent, filter.parentSlug);
+    }
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortField,
+      filter.sorting.field.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.SortOrder,
+      filter.sorting.order.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.Page,
+      filter.paging.page.toString(),
+    );
+    apiUrl.searchParams.set(
+      APISearchParamNames.PageSize,
+      filter.paging.pageSize.toString(),
+    );
+  }
+
+  const response = await fetch(apiUrl.toString());
+  if (!response.ok) {
+    return Promise.reject(`Failed to fetch categories: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+function createCategoriesLoader(config: {
   baseUrl: string;
 }): LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter> {
   //console.log("🛠️ ~ createCategoriesLoader ~ config:", config);
@@ -28,51 +68,12 @@ export function createCategoriesLoader(config: {
         //   "🛠️ ~ createCategoriesLoader ~ collection retrieving ~ filter:",
         //   filter,
         // );
-        const apiUrl = new URL(
-          `${config.baseUrl}/${APIEndpointNames.Categories}`,
-        );
-
-        if (filter !== undefined) {
-          apiUrl.searchParams.set(
-            APISearchParamNames.SkipParentMatch,
-            filter.skipParentMatch.toString(),
-          );
-          if (filter.parentSlug !== undefined) {
-            apiUrl.searchParams.set(
-              APISearchParamNames.Parent,
-              filter.parentSlug,
-            );
-          }
-          apiUrl.searchParams.set(
-            APISearchParamNames.SortField,
-            filter.sorting.field.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.SortOrder,
-            filter.sorting.order.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.Page,
-            filter.paging.page.toString(),
-          );
-          apiUrl.searchParams.set(
-            APISearchParamNames.PageSize,
-            filter.paging.pageSize.toString(),
-          );
-        }
-
-        const response = await fetch(apiUrl.toString());
-        if (!response.ok) {
-          return {
-            error: new Error(
-              `Failed to fetch categories: ${response.statusText}`,
-            ),
-          };
-        }
-
-        const data = await response.json();
+        const data = await loadCategories(config.baseUrl, filter);
         return {
-          entries: data.map((x: Category) => ({ id: x.slug, data: x })),
+          entries: data.items.map((x: Category) => ({
+            id: x.slug,
+            data: x,
+          })),
         };
       } catch (error: unknown) {
         return {
@@ -111,45 +112,9 @@ export function createCategoriesLoader(config: {
   };
 }
 
-const loadCategories = async (
-  baseUrl: string,
-  filter: CategoryCollectionFilter,
-): Promise<PageResult<Category>> => {
-  const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Categories}`);
-
-  if (filter !== undefined) {
-    apiUrl.searchParams.set(
-      APISearchParamNames.SkipParentMatch,
-      filter.skipParentMatch.toString(),
-    );
-    if (filter.parentSlug !== undefined) {
-      apiUrl.searchParams.set(APISearchParamNames.Parent, filter.parentSlug);
-    }
-    apiUrl.searchParams.set(
-      APISearchParamNames.SortField,
-      filter.sorting.field.toString(),
-    );
-    apiUrl.searchParams.set(
-      APISearchParamNames.SortOrder,
-      filter.sorting.order.toString(),
-    );
-    apiUrl.searchParams.set(
-      APISearchParamNames.Page,
-      filter.paging.page.toString(),
-    );
-    apiUrl.searchParams.set(
-      APISearchParamNames.PageSize,
-      filter.paging.pageSize.toString(),
-    );
-  }
-
-  const response = await fetch(apiUrl.toString());
-  if (!response.ok) {
-    return Promise.reject(`Failed to fetch categories: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data;
+export {
+  type CategoryCollectionFilter,
+  type CategoryEntryFilter,
+  loadCategories,
+  createCategoriesLoader,
 };
-
-export { loadCategories };

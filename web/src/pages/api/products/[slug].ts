@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchProductBySlug } from "@/web/src/core/services/queries/products";
+import type { Product } from "@/web/src/core/models/product";
 
 export const prerender = false;
 
@@ -14,7 +15,9 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  const result = await queryManager().fetch(() => fetchProductBySlug(slug));
+  const result = await queryManager().fetch<Product | undefined>(() =>
+    fetchProductBySlug(slug),
+  );
   if (result.error) {
     console.error(result.error);
     return new Response(null, {

@@ -34,18 +34,12 @@ const getCollectionByFilter = async <T>(
   return { value: result.entries?.map((x) => x.data as T) };
 };
 
-const getProduct = async (slug: string): Promise<Product | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getProduct", slug);
-  const result = await getEntryBySlug<Product>(CollectionNames.Products, slug);
-  return result.value;
-};
-
-const getProductsList = async (
-  filter: ProductCollectionFilter,
-): Promise<Product[] | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getProductsList", filter);
-  const result = await getCollectionByFilter<Product>(
-    CollectionNames.Products,
+const getCategoriesList = async (
+  filter: CategoryCollectionFilter,
+): Promise<Category[] | undefined> => {
+  console.log("⚡️ ~ live-collection-manager ~ getCategoriesList", filter);
+  const result = await getCollectionByFilter<Category>(
+    CollectionNames.Categories,
     filter,
   );
   return result.value;
@@ -60,14 +54,20 @@ const getCategory = async (slug: string): Promise<Category | undefined> => {
   return result.value;
 };
 
-const getCategoriesList = async (
-  filter: CategoryCollectionFilter,
-): Promise<Category[] | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getCategoriesList", filter);
-  const result = await getCollectionByFilter<Category>(
-    CollectionNames.Categories,
+const getProductsList = async (
+  filter: ProductCollectionFilter,
+): Promise<Product[] | undefined> => {
+  console.log("⚡️ ~ live-collection-manager ~ getProductsList", filter);
+  const result = await getCollectionByFilter<Product>(
+    CollectionNames.Products,
     filter,
   );
+  return result.value;
+};
+
+const getProduct = async (slug: string): Promise<Product | undefined> => {
+  console.log("⚡️ ~ live-collection-manager ~ getProduct", slug);
+  const result = await getEntryBySlug<Product>(CollectionNames.Products, slug);
   return result.value;
 };
 

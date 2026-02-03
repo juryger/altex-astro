@@ -1,5 +1,9 @@
 import { ProductSchema, type Product } from "@/web/src/core/models/product";
-import type { Paging } from "@/web/src/core/models/paging";
+import {
+  initEmptyPageResult,
+  type PageResult,
+  type Paging,
+} from "@/web/src/core/models/paging";
 import type { Sorting } from "@/web/src/core/models/sorting";
 import {
   createCatalogDb,
@@ -133,7 +137,7 @@ export async function fetchProducts(
   categorySlug: string,
   sorting: Sorting,
   paging: Paging,
-): Promise<Product[]> {
+): Promise<PageResult<Product>> {
   const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
 
   const parentCategorySq = db
@@ -141,7 +145,7 @@ export async function fetchProducts(
     .from(categories)
     .as("parent_category_sq");
 
-  // NOTE: it's not a recursive CTE (just two levels), but can be manually implemented as mentioned here
+  // NOTE: it's not a recursive CTE (only two levels), but can be implemented as mentioned here
   // https://github.com/drizzle-team/drizzle-orm/issues/209#issuecomment-2634760423
   const productsSq = db
     .select()
@@ -156,7 +160,7 @@ export async function fetchProducts(
     )
     .orderBy(getSortCondition(sorting))
     .limit(paging.pageSize)
-    .offset(paging.page)
+    .offset(paging.page * paging.pageSize)
     .as("main");
 
   const queryResult = await db
@@ -177,7 +181,21 @@ export async function fetchProducts(
       eq(productsSq.products.makeCountryId, makeCountries.id),
     );
 
-  if (queryResult.length === 0) return [];
+  if (queryResult.length === 0) return initEmptyPageResult<Product>();
+
+  const totalCount = await db.$count(
+    db
+      .select()
+      .from(products)
+      .innerJoin(categories, eq(products.categoryId, categories.id))
+      .leftJoin(parentCategorySq, eq(categories.parentId, parentCategorySq.id))
+      .where(
+        or(
+          eq(categories.slug, categorySlug),
+          eq(parentCategorySq.slug, categorySlug),
+        ),
+      ),
+  );
 
   var resultIndex = 0;
   const result: Product[] = Array(paging.pageSize);
@@ -197,7 +215,14 @@ export async function fetchProducts(
     result[resultIndex++] = ProductSchema.parse(value);
   }
 
-  return result.filter((x) => x !== undefined);
+  return {
+    items: result.filter((x) => x !== undefined),
+    pageInfo: {
+      total: totalCount,
+      page: paging.page,
+      hasMore: (paging.page + 1) * paging.pageSize < totalCount,
+    },
+  } as PageResult<Product>;
 }
 
 export async function fetchProductBySlug(

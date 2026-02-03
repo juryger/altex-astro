@@ -6,16 +6,19 @@ type QueryResult<T = any> = {
   error?: Error;
 };
 
-interface QueryManager<T = any> {
-  fetch: (
+interface QueryManager {
+  fetch: <T = any>(
     queryFn: () => Promise<T>,
     cacheInfo?: CacheInfo,
   ) => Promise<QueryResult<T>>;
 }
 
-function queryManager<T = any>(): QueryManager<T> {
+function queryManager(): QueryManager {
   return {
-    fetch: async (queryFn: () => Promise<T>, cacheInfo?: CacheInfo) => {
+    fetch: async <T = any>(
+      queryFn: () => Promise<T>,
+      cacheInfo?: CacheInfo,
+    ) => {
       // TODO: Before executing queryFn, we need to check if there is a valid cache value (via cacheManager).
       //  If there is no cache value or it's invalid, execute queryFn and save result in cache, otherwise retun cache value.
       const result: QueryResult<T> = { isLoading: true };

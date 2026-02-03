@@ -1,13 +1,17 @@
 ---
 export const prerender = false;
 
-import { getCategoriesList } from '@/web/src/core/utils/live-collection-manager';
 import type { Category } from '@/web/src/core/models/category';
 import { defaultPaging, type PageResult, type Paging } from '@/web/src/core/models/paging';
 import CategoryCard from './CategoryCard.astro';
 import { CategoriesViewMode } from '@/web/src/core/const';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import { createCategoriesLoader, loadCategories } from '@/web/src/core/content-loaders/categories-loader';
+import { loadCategories } from '@/web/src/core/content-loaders/categories-loader';
+
+// Categories horizontal scrolling is based on
+// https://ryanmulligan.dev/blog/project-keyboard-navigation/
+// https://design2seo.com/blog/web-development/js/horizontal-scroll-slider/
+// https://www.creative-tim.com/twcomponents/component/horizontal-scroll-card-components
 
 interface Props {
   parentSlug?: string;

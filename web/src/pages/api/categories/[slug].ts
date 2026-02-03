@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { fetchCategoryBySlug } from "@/web/src/core/services/queries/categories";
 import { queryManager } from "@/web/src/core/services/queryManager";
+import type { Category } from "@/web/src/core/models/category";
 
 export const prerender = false;
 
@@ -14,7 +15,9 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  const result = await queryManager().fetch(() => fetchCategoryBySlug(slug));
+  const result = await queryManager().fetch<Category | undefined>(() =>
+    fetchCategoryBySlug(slug),
+  );
   if (result.error) {
     console.error(result.error);
     return new Response(null, {

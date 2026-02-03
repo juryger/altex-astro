@@ -1,6 +1,6 @@
 import { navigate } from "astro:transitions/client";
 import { DialogActionResult, ProductsSortFileds, SortOrder } from "../const";
-import { regexSortParams } from "./regex";
+import { regexPageParams, regexSortParams } from "./regex";
 import { constructNavigationPaths } from "./url-builder";
 
 interface ProductsViewManager {
@@ -11,6 +11,8 @@ type ProductsViewComponents = {
   selectSortEl: Element | null;
   sortOrderEl: Element | null;
   sortDialogEl: Element | null;
+  pageActionPrevEl: Element | null;
+  pageActionNextEl: Element | null;
 };
 
 const assertInputElements = (inputElements: ProductsViewComponents) => {
@@ -114,9 +116,33 @@ const handleDialogClose = (
   }
 };
 
+const handlePageNavigation = (pageQuery: string) => {
+  let url = window.location.toString();
+  url =
+    url.indexOf("/page:") !== -1
+      ? url.replace(regexPageParams, pageQuery)
+      : constructNavigationPaths(url, pageQuery);
+  navigate(url);
+};
+
+const handlePreviousPageNavigation = (pagePrev: number, pageSize: number) => {
+  if (pagePrev === -1) return;
+  const pageQuery = `page:${pagePrev}:${pageSize}`;
+  handlePageNavigation(pageQuery);
+};
+
+const handleNextPageNavigation = (pageNext: number, pageSize: number) => {
+  if (pageNext === -1) return;
+  const pageQuery = `page:${pageNext}:${pageSize}`;
+  handlePageNavigation(pageQuery);
+};
+
 // Handle products view and sort change
 const getProductsViewManager = (
   inputElements: ProductsViewComponents,
+  pagePrev: number = -1,
+  pageNext: number = -1,
+  pageSize: number = 0,
 ): ProductsViewManager => {
   assertInputElements(inputElements);
   return {
@@ -145,6 +171,18 @@ const getProductsViewManager = (
             (e.target as HTMLInputElement).checked,
             inputElements,
           ),
+        { signal },
+      );
+
+      inputElements.pageActionPrevEl?.addEventListener(
+        "click",
+        (e) => handlePreviousPageNavigation(pagePrev, pageSize),
+        { signal },
+      );
+
+      inputElements.pageActionNextEl?.addEventListener(
+        "click",
+        (e) => handleNextPageNavigation(pageNext, pageSize),
         { signal },
       );
     },

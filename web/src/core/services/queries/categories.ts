@@ -96,7 +96,7 @@ export async function fetchCategories(
     )
     .orderBy(getSortCondition(sorting))
     .limit(paging.pageSize)
-    .offset(paging.page);
+    .offset(paging.page * paging.pageSize);
 
   const totalCount = await db.$count(
     db

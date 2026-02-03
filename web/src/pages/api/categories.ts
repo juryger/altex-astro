@@ -7,6 +7,8 @@ import {
 } from "@/web/src/core/utils/url-parser";
 import { fetchCategories } from "@/web/src/core/services/queries/categories";
 import { queryManager } from "@/web/src/core/services/queryManager";
+import type { PageResult } from "@/web/src/core/models/paging";
+import type { Category } from "@/web/src/core/models/category";
 
 export const prerender = false;
 
@@ -22,7 +24,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const sorting = extractUrlSorting(url);
   const paging = extractUrlPaging(url);
 
-  const result = await queryManager().fetch(() =>
+  const result = await queryManager().fetch<PageResult<Category>>(() =>
     fetchCategories(skipParentMatch, parentSlug, sorting, paging),
   );
 

@@ -12,9 +12,20 @@ type PageResult<T = any> = {
   };
 };
 
+function initEmptyPageResult<T = any>(): PageResult<T> {
+  return {
+    items: [],
+    pageInfo: {
+      total: 0,
+      page: 0,
+      hasMore: false,
+    },
+  } as PageResult<T>;
+}
+
 const defaultPaging: Paging = {
   page: 0,
   pageSize: import.meta.env.DATA_RECORDS_ON_PAGE,
 };
 
-export { type Paging, type PageResult, defaultPaging };
+export { type Paging, type PageResult, defaultPaging, initEmptyPageResult };

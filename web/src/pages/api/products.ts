@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import type { Product } from "../../core/models/product";
-import { APISearchParamNames } from "../../core/const";
+import type { Product } from "@/web/src/core/models/product";
+import { APISearchParamNames } from "@/web/src/core/const";
 import {
   extractUrlFiltering,
   extractUrlPaging,
@@ -9,6 +9,7 @@ import {
 } from "../../core/utils/url-parser";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchProducts } from "@/web/src/core/services/queries/products";
+import type { PageResult } from "@/web/src/core/models/paging";
 
 export const prerender = false;
 
@@ -21,7 +22,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const paging = extractUrlPaging(url);
   const sorting = extractUrlSorting(url);
 
-  const result = await queryManager().fetch(() =>
+  const result = await queryManager().fetch<PageResult<Product>>(() =>
     fetchProducts(categorySlug, sorting, paging),
   );
 

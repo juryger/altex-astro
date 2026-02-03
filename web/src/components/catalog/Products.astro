@@ -1,14 +1,12 @@
 ---
 export const prerender = false;
 
-import { getProductsList } from '@/web/src/core/utils/live-collection-manager';
 import type { Product } from '@/web/src/core/models/product';
 import ProductCard from './ProductCard.astro';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import type { Paging } from '@/web/src/core/models/paging';
+import { defaultPaging, type PageResult, type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
-import { defaultPaging } from '@/web/src/core/models/paging';
-import type { ProductCollectionFilter } from '@/web/src/core/content-loaders/products-loader';
+import { loadProducts, type ProductCollectionFilter } from '@/web/src/core/content-loaders/products-loader';
 import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import ModalDialog from '../ModalDialog.astro';
@@ -24,12 +22,16 @@ const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filterin
 const sessionManager = getSessionManager(Astro.session);
 const productsView = await sessionManager.getProductsView();
 
-const allRecords = 1000;
-
 let hasDataLoadError = false;
-let products: Product[] | undefined;
+let products: PageResult<Product> | undefined = undefined;
 try {
-  products = await getProductsList({
+  // products = await getProductsList({
+  //   categorySlug,
+  //   sorting,
+  //   paging,
+  //   filtering
+  // } as ProductCollectionFilter)
+  products = await loadProducts(import.meta.env.PUBLIC_API_BASE_URL, {
     categorySlug,
     sorting,
     paging,
@@ -40,17 +42,30 @@ try {
   console.error("🛑 ~ Products component ~ failed to fetch products list", error);
 } 
 
+let rowStart = 0, rowEnd = 0, totalRows = 0;
+if (products !== undefined) {
+  totalRows = products.pageInfo.total;
+  rowStart = products.pageInfo.page * paging.pageSize + 1;
+  rowEnd = (products.pageInfo.page + 1) * paging.pageSize;
+  if (rowEnd > totalRows)
+    rowEnd = totalRows;
+}
+
 const nameSortDialog = "sort-dialog";
 const nameSortFieldSelect = "sort-field-select";
 const nameSortOrder = "sort-order";
+const namePageActionPrevious = "page-action-previous";
+const namePageActionNext = "page-action-next";
 
 const titleSortBy = "Сортировка";
 const titlSortByTitle = "Наименование";
 const titleSortByPrice = "Цена";
+const titlePagingNext = "След.";
+const titlePagingPrev = "Пред.";
 const titleSortAscending = "По возрастанию";
 const titleSortDescending = "По убыванию";
 const titlePagingInfo = "Показано позиций";
-const titlePagingNofM = "из";
+const titlePagingNumberOf = "из";
 const titleProductsList = "Список товаров";
 const titleNoProductsForCategory = "Товары не представлены в данной категории";
 const titleErrorMessage = "Не удалось загрузить список товаров, попробуйте снова позднее.";
@@ -66,8 +81,8 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
     <span class="text-error">{titleErrorMessage}</span>       
   </p>
 </div>}
-{(products && products.length > 0) &&
-  <div data-products-root class="mx-4 mb-2 bg-base-100">
+{(products && products.items.length > 0) &&
+  <div data-products-root data-page_prev={rowStart > 0 ? products.pageInfo.page - 1 : -1} data-page_next={rowEnd < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
     <div class="grid grid-cols-1 sm:grid-cols-2 mb-2">
       <h3 class="text-lg font-bold text-center sm:text-left py-2">
         {titleProductsList}
@@ -90,19 +105,19 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       </div>
     </div>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5 mb-4">
-      {products && products.map(x => <ProductCard item={x} />)}      
+      {products && products.items.map(x => <ProductCard item={x} />)}      
     </div>
-    {products && products.length > 0 && 
+    {products && products.items.length > 0 && 
       <div class="flex flex-col sm:flex-row items-center justify-center">
         <span class="content-center text-nowrap mr-2">{titlePagingInfo}:</span>
         <div class="join">
-          <button class="join-item btn" title="Prev.">
+          <button name={namePageActionPrevious} class="join-item btn btn-ghost" class:list={[{'btn-disabled': rowStart === 1}]} title={titlePagingPrev}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>          
-          <button class="join-item btn">{`${Number(paging.page) + 1}-${Number(paging.page + paging.pageSize) + 1} ${titlePagingNofM} ${allRecords}`}</button>
-          <button class="join-item btn" title="Next">
+          <button class="join-item btn btn-disabled btn-ghost">{`${rowStart}-${rowEnd} ${titlePagingNumberOf} ${totalRows}`}</button>
+          <button name={namePageActionNext} class="join-item btn btn-ghost" class:list={[{'btn-disabled': rowEnd === totalRows}]} title={titlePagingNext}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
@@ -110,7 +125,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
         </div>
       </div>
     }
-    {(!products || products.length == 0) && <span>{titleNoProductsForCategory}</span>}
+    {(!products || products.items.length == 0) && <span>{titleNoProductsForCategory}</span>}
   </div>
 }
 <ModalDialog id={nameSortDialog} title={titleDefaultSortDirection} size={DialogSize.Small} actionButtons={DialogActionButtons.YesNo}>
@@ -132,14 +147,20 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      const productsRootEl = document.querySelector('[data-products-root]');
+      const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
       if (productsRootEl === null) return;
+
+      const pagePrev = productsRootEl.dataset.page_prev ? Number.parseInt(productsRootEl.dataset.page_prev, 10) : -1;
+      const pageNext = productsRootEl.dataset.page_next ? Number.parseInt(productsRootEl.dataset.page_next, 10) : -1;
+      const pageSize = productsRootEl.dataset.page_size ? Number.parseInt(productsRootEl.dataset.page_size, 10) : 0;
 
       viewManager = getProductsViewManager({
         selectSortEl: document.querySelector('select[name="sort-field-select"]'),
         sortOrderEl: document.querySelector('input[name="sort-order"]'),
         sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
-      });
+        pageActionPrevEl: document.querySelector('button[name="page-action-previous"]'),
+        pageActionNextEl: document.querySelector('button[name="page-action-next"]'),
+      }, pagePrev, pageNext, pageSize);
       
       controller = new AbortController();
       viewManager.apply(controller.signal);
