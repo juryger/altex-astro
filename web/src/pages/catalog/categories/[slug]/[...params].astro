@@ -10,22 +10,29 @@ import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import { type Paging } from '@/web/src/core/models/paging';
+import { defaultPaging, type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 
 const { slug, params } = Astro.params;
 
-const parseRouteParams = (): { sorting: Sorting | undefined, paging: Paging | undefined, filtering: Filtering[] } => {
-  console.log("👉 parseRouteParams");
-  const routeParser = getRouteParser(params);
+const parseRouteParams = (): { 
+  sorting: Sorting | undefined, 
+  paging: Paging | undefined,
+  filtering: Filtering[]
+} => {
   console.log("🌎 ~ Category page ~ slug %s, params: %o", slug, params);
+  const routeParser = getRouteParser(params);
+  
   const sorting = routeParser.getCatalogSorting();
   console.log("🌎 ~ Categories page ~ parsed sort", sorting);
-  const paging = routeParser.getCatalogPaging();
+
+  let paging = routeParser.getCatalogPaging();
   console.log("🌎 ~ Category page ~ parse paging", paging);
-  const filtering = routeParser.getCatalogFiltering();
+
+  const filtering = routeParser.getCatalogFiltering();  
   console.log("🌎 ~ Category page ~ parsed filters", filtering);
+
   return { sorting, paging, filtering };
 }
 
@@ -37,8 +44,7 @@ try {
 }
 
 const sessionManager = getSessionManager(Astro.session);
-if (category === undefined)
-{
+if (category === undefined) {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }

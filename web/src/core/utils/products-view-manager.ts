@@ -54,6 +54,7 @@ const handleSortFieldChange = (inputElements: ProductsViewComponents): void => {
 
 const handleSortOrderChange = (
   isAscending: boolean,
+  pageSize: number,
   inputElements: ProductsViewComponents,
 ): void => {
   const sortField = getSelectedSortField(inputElements);
@@ -72,11 +73,17 @@ const handleSortOrderChange = (
     url.indexOf("/sort:") !== -1
       ? url.replace(regexSortParams, sortQuery)
       : constructNavigationPaths(url, sortQuery);
+
+  // reset paging on sort change
+  if (url.indexOf("/page:") !== -1)
+    url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
+
   navigate(url);
 };
 
 const handleDialogClose = (
   initialSortField: string,
+  pageSize: number,
   inputElements: ProductsViewComponents,
 ): void => {
   const sortField = getSelectedSortField(inputElements);
@@ -95,6 +102,11 @@ const handleDialogClose = (
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryAsc)
           : constructNavigationPaths(url, sortQueryAsc);
+
+      // reset paging on sort change
+      if (url.indexOf("/page:") !== -1)
+        url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
+
       navigate(url);
       break;
     case DialogActionResult.No:
@@ -103,6 +115,11 @@ const handleDialogClose = (
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryDesc)
           : constructNavigationPaths(url, sortQueryDesc);
+
+      // reset paging on sort change
+      if (url.indexOf("/page:") !== -1)
+        url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
+
       navigate(url);
       break;
     case DialogActionResult.None:
@@ -160,7 +177,7 @@ const getProductsViewManager = (
 
       inputElements.sortDialogEl?.addEventListener(
         "close",
-        (e) => handleDialogClose(initialSortField, inputElements),
+        (e) => handleDialogClose(initialSortField, pageSize, inputElements),
         { signal },
       );
 
@@ -169,6 +186,7 @@ const getProductsViewManager = (
         (e) =>
           handleSortOrderChange(
             (e.target as HTMLInputElement).checked,
+            pageSize,
             inputElements,
           ),
         { signal },
