@@ -8,6 +8,7 @@ import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
+import ProductMake from './ProductMake.astro';
 
 interface Props {
   item: Product,
@@ -43,20 +44,22 @@ const titleProductCode = "Артикул";
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
       {/* Ttitle */}
-      <div class="min-h-10">
-        <a class="flex flex-row" href=`/catalog/products/${item.slug}`>
+      <div >
+        <a class="flex flex-row items-center" href=`/catalog/products/${item.slug}`>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
           </svg>
-          <span class="card-title text-sm font-bold pl-2" title={item.title}>
-            {trimEnd(item.title, 50)} 
+          <span class="card-title text-sm font-bold" title={item.title}>
+            {trimEnd(item.title, 30)} 
           </span>
         </a>
       </div>
       {/* Prices block */}
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={false} />
       {/* Pack qunatity details */}
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurementTitle={unitItem.title} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} />
+      {/* Maker */}
+      <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} />
       {/* Add to Shopping Cart */}

@@ -7,6 +7,7 @@ import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
+import ProductMake from './ProductMake.astro';
 
 interface Props {
   item: Product,
@@ -43,7 +44,7 @@ const titleProductCode = "Артикул";
       </figure>
     </div>
     <div class="px-2 py-2">
-      <div class="h-12">
+      <div>
         {isPreview && 
           <a class="flex flex-row align-top" href=`/catalog/products/${item.slug}`>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
@@ -70,11 +71,13 @@ const titleProductCode = "Артикул";
       {/* Prices */}
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
       {/* Packaging info */}
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurementTitle={unitItem.title} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} isDetailed={true} />
+      {/* Maker */}
+      <ProductMake maker={item.maker} makeCountry={item.makeCountry} isDetailed={true} />
       {/* Available colors */}
       <ProductColors productId={item.id} colors={item.colors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
-      <div class="flex items-center mt-5">
+      <div class="flex items-center my-4">
         <QuantitySelector inputControlName={inputQuantityName} quantity={1} />
         <button name={btnAddToCartName} class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
       </div>

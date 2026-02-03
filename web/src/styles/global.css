@@ -13,13 +13,6 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-.hide-scroll-bar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.hide-scroll-bar::-webkit-scrollbar {
-  display: none;
-}
 
 /* Slid main container */
 .slider-container {
@@ -60,4 +53,13 @@ input[type="number"] {
   @media (width >= 64rem /* 1024px */) {
     gap: calc(var(--spacing) * 5) /* 1.25rem = 20px */;
   }
+}
+
+.hide-scroll-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scroll-bar::-webkit-scrollbar {
+  display: none;
 }

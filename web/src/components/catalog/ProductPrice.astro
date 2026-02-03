@@ -10,7 +10,6 @@ interface Props {
 }
 const { price, whsPrice1, isDetailed } = Astro.props;
 
-const maxWidth = isDetailed ? "max-w-50" : "max-w-34";
 const textSize = isDetailed ? "text-base" : "text-sm";
 
 const titlePrice = "Цена:";
@@ -36,12 +35,12 @@ const tooltipText = DiscountMetadata
     </svg>
   </div>
 </div>
-<div class="stats bg-base-100 border-base-300 border">
-  <div class=`stat place-items-center ${maxWidth}`>
+<div class="stats bg-base-100 border-base-300 border max-w-xs">
+  <div class=`stat place-items-center`>
     <div class="stat-title">{priceTitle}</div>
     <div class=`stat-value ${textSize}`>{formatCurrency(price)}</div>
   </div>
-  <div class=`stat place-items-center ${maxWidth}`>
+  <div class=`stat place-items-center`>
     <div class="stat-title">{whsPriceTitle}</div>
     <div class=`stat-value ${textSize}`>{formatCurrency(whsPrice1)}</div>
   </div>
