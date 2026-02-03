@@ -8,6 +8,7 @@ import ProductPackInfo from './ProductPackInfo.astro';
 import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
+import ProductDimensions from './ProductDimensions.astro';
 
 interface Props {
   item: Product,
@@ -68,13 +69,10 @@ const titleProductCode = "Артикул";
           : <span class="italic text-sm">{titleNoProductDescription}</span>
         }
       </div>
-      {/* Prices */}
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
-      {/* Packaging info */}
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} isDetailed={true} />
-      {/* Maker */}
-      <ProductMake maker={item.maker} makeCountry={item.makeCountry} isDetailed={true} />
-      {/* Available colors */}
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} />
+      <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
+      <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
       <ProductColors productId={item.id} colors={item.colors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
       <div class="flex items-center my-4">

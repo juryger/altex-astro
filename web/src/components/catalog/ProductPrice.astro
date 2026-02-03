@@ -24,7 +24,6 @@ const tooltipText = DiscountMetadata
   .reduce((accumulator: string, item: { sum: number, title: string }) => 
     accumulator + `'${item.title}' ${titleForOrderStartingFrom} ${item.sum.toLocaleString()} ${titleCurrency}, `, "")
   .slice(0, -2);
-
 ---
 
 <div class="flex flex-row gap-1 align-middle">
@@ -35,7 +34,7 @@ const tooltipText = DiscountMetadata
     </svg>
   </div>
 </div>
-<div class="stats bg-base-100 border-base-300 border max-w-xs">
+<div class="stats bg-base-100 border-base-300 border">
   <div class=`stat place-items-center`>
     <div class="stat-title">{priceTitle}</div>
     <div class=`stat-value ${textSize}`>{formatCurrency(price)}</div>

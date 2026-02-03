@@ -83,8 +83,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
         : undefined,
     unit: entity.measurement_units?.title,
     dimensionLengthMm:
-      entity.main.products.dimensionHeightMm !== null
-        ? entity.main.products.dimensionHeightMm
+      entity.main.products.dimensionLengthMm !== null
+        ? entity.main.products.dimensionLengthMm
         : undefined,
     dimensionWidthMm:
       entity.main.products.dimensionWidthMm !== null
