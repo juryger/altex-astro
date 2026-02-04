@@ -44,16 +44,18 @@ const titleProductCode = "Артикул";
         <Image src=`${item.imageUrl}` alt=`${item.title}` width="500" height="500" class="rounded-xl h-[150px] md:h-[500px] object-contain" />
       </figure>
     </div>
-    <div class="px-2 py-2">
+    <div class="flex flex-col gap-2">
       <div>
         {isPreview && 
-          <a class="flex flex-row align-top" href=`/catalog/products/${item.slug}`>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-            </svg>
-            <h1 class="card-title text-lg font-bold" title={item.title}>
-              {trimEnd(item.title, 100)} 
-            </h1>          
+          <a href=`/catalog/products/${item.slug}`>
+            <div class="flex flex-row align-top">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+              </svg>
+              <h1 class="card-title text-lg font-bold pl-1" title={item.title}>
+                {trimEnd(item.title, 100)} 
+              </h1>
+            </div>
           </a>
         }
         {!isPreview &&
@@ -91,70 +93,67 @@ const titleProductCode = "Артикул";
   import { AlertKind } from "@/web/src/core/models/alert";
   import { addToCart } from "@/web/src/core/stores/client/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
-  import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
+  import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
 
   class ProductDetails extends HTMLElement {
-    private btnAddToCart: Element | null = null;
+    private addToCartEl: Element | null = null;
     private value: Product | undefined;
-    private addToCartHandler: any | undefined;
+    private controller: AbortController | undefined;
 
-    private onAddToCart = (): any => {
-      return (e: Event): void => {
-        if (!this.value) {
-          console.warn("~ ProductDetails ~ cannot add product to the cart as it values was not parsed properly.")
-          return;
-        }
-
-        const selectedColorEl =  this.querySelector('input[type=radio]:checked');
-        var selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
-        
-        const radioboxes = this.querySelectorAll('input[type=radio]')
-        if (!selectedColor && radioboxes.length > 0) {
-          selectedColor = (radioboxes[0] as HTMLInputElement).value;
-        }
-        
-        const inputQuantityName = this.dataset.input_quatnity;
-        var quanityEl = this.querySelector(`input[name='${inputQuantityName}']`);
-        console.assert(quanityEl !== null, "~ ProductDetails ~ cannot find input element with name: %s", inputQuantityName);
-        
-        const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
-        const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
-
-         addToCart({
-          productId: this.value.id,
-          productCode: this.value.productCode,
-          title: this.value.title,
-          availableColors: this.value.colors,
-          price: this.value.price,
-          whsPrice1: this.value.whsPrice1,
-          whsPrice2: this.value.whsPrice2,
-          image: this.value.thumbnailImageUrl,
-          slug: this.value.slug,
-          color: color,
-          quantity: quantity
-        } as CartItem);
-
-        addAlert({ 
-          kind: AlertKind.Info, 
-          message: CartMessages.AddedToTheCart
-        });
+    private onAddToCart = (e: Event): any => {
+      if (!this.value) {
+        console.warn("~ ProductDetails ~ cannot add product to the cart as it values was not parsed properly.")
+        return;
       }
+
+      const selectedColorEl =  this.querySelector('input[type=radio]:checked');
+      var selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+      
+      const radioboxes = this.querySelectorAll('input[type=radio]')
+      if (!selectedColor && radioboxes.length > 0) {
+        selectedColor = (radioboxes[0] as HTMLInputElement).value;
+      }
+      
+      const quanityEl = getInputElementByName(this, this.dataset.input_quatnity);
+      
+      const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
+      const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
+
+        addToCart({
+        productId: this.value.id,
+        productCode: this.value.productCode,
+        title: this.value.title,
+        availableColors: this.value.colors,
+        price: this.value.price,
+        whsPrice1: this.value.whsPrice1,
+        whsPrice2: this.value.whsPrice2,
+        image: this.value.thumbnailImageUrl,
+        slug: this.value.slug,
+        color: color,
+        quantity: quantity
+      } as CartItem);
+
+      addAlert({ 
+        kind: AlertKind.Info, 
+        message: CartMessages.AddedToTheCart
+      });
     }
 
     connectedCallback() {
+      this.controller = new AbortController();
+
       this.value = parseProduct(this.dataset);
       if (!this.value) {
         console.warn(`~ ProductDetails ~ provided values of product via data attributes are not valid or complete.`);
         return;
       }
       
-      this.btnAddToCart = getButtonElementByName(this, this.dataset.btn_add_to_cart);
-      this.addToCartHandler = this.onAddToCart();
-      this.btnAddToCart?.addEventListener('click', this.addToCartHandler);
+      this.addToCartEl = getButtonElementByName(this, this.dataset.btn_add_to_cart);
+      this.addToCartEl?.addEventListener('click', this.onAddToCart, { signal: this.controller.signal });
     }
 
     disconnectedCallback() {
-      this.addToCartHandler && this.btnAddToCart && this.btnAddToCart.removeEventListener('click', this.addToCartHandler);
+      this.controller && this.controller.abort();
     }
   }
   customElements.define('product-details', ProductDetails);

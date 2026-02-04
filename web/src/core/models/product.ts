@@ -40,6 +40,8 @@ export const ProductSchema = z
     maker: z.string().optional(),
     makeCountryId: z.number().optional(),
     makeCountry: z.string().optional(),
+    createdAt: z.date(),
+    modifiedAt: z.date(),
     relatedProdcuts: z.array(z.string()).optional(),
   })
   .transform((data) => {

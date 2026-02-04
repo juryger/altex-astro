@@ -9,7 +9,7 @@ export const catalogVersion = table("__version", {
   id: t.int().primaryKey(),
   value: t
     .int({ mode: "timestamp" })
-    .default(sql`(current_timestamp)`)
+    .default(sql`(unixepoch())`)
     .notNull(),
 });
 
@@ -20,6 +20,7 @@ export const measurementUnits = table(
     code: t.text().notNull(),
     title: t.text().notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_units_uid").on(table.uid)],
 );
@@ -82,13 +83,14 @@ export const categories = table(
     hasImage: t.int("has_image").default(0),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .default(sql`(current_timestamp)`)
+      .default(sql`(unixepoch())`)
       .notNull(),
     modifiedAt: t
       .int("modified_at", { mode: "timestamp" })
-      .default(sql`(current_timestamp)`)
+      .default(sql`(unixepoch())`)
       .notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)],
 );
@@ -123,13 +125,14 @@ export const products = table(
     makeCountryId: t.int("make_country_id").references(() => makeCountries.id),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .default(sql`(current_timestamp)`)
+      .default(sql`(unixepoch())`)
       .notNull(),
     modifiedAt: t
       .int("modified_at", { mode: "timestamp" })
-      .default(sql`(current_timestamp)`)
+      .default(sql`(unixepoch())`)
       .notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)],
 );
@@ -144,6 +147,7 @@ export const relatedProducts = table(
       .notNull()
       .references(() => products.id),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)],
 );
@@ -161,6 +165,7 @@ export const productColors = table(
       .notNull()
       .references(() => colors.id),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)],
 );

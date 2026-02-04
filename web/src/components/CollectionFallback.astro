@@ -1,21 +1,23 @@
 ---
-const { title } = Astro.params;
 ---
-<h3 class="text-lg font-bold text-center lg:text-left py-2">{title}</h3>
-<div class="grid grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 lg:gap-5">
-  <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-    <div class="skeleton h-32 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
-  </div>
-  <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-    <div class="skeleton h-32 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
-  </div>
-  <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
-    <div class="skeleton h-32 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
-    <div class="skeleton h-4 w-full"></div>
+
+<div class="mx-4 mb-2 bg-base-100">
+  <div class="skeleton h-8 w-75 my-3"></div>
+  <div class="grid grid-cols-1 gap-4 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 lg:gap-5 min-h-56">
+    <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+      <div class="skeleton h-34 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+    </div>
+    <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+      <div class="skeleton h-34 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+    </div>
+    <div class="flex sm:min-w-40 min-w-75 flex-col gap-4">
+      <div class="skeleton h-34 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+      <div class="skeleton h-4 w-full"></div>
+    </div>
   </div>
 </div>

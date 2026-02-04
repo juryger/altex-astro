@@ -10,7 +10,7 @@ import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import { defaultPaging, type Paging } from '@/web/src/core/models/paging';
+import { type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 
@@ -69,21 +69,18 @@ const newProductsView = {
 };
 sessionManager.setProductsView(newProductsView);
 console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsView);
-
-const titleSubCategories = "Список подкатегорий";
-const titleProducts = "Список товаров";
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>
   <CategoryDetails item={category} />
   <Categories parentSlug={category?.slug} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={titleSubCategories} />
+			<CollectionFallback />
 		</div>
 	</Categories>
 	<Products categorySlug={category?.slug} sorting={newProductsView.sorting} paging={paging} filtering={newProductsView.filtering} server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={titleProducts} />
+			<CollectionFallback />
 		</div>
 	</Products>
 </BaseLayout>

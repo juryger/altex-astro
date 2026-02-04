@@ -1,6 +1,6 @@
 CREATE TABLE `__version` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`value` integer DEFAULT (current_timestamp) NOT NULL
+	`value` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `categories` (
@@ -10,9 +10,10 @@ CREATE TABLE `categories` (
 	`title` text NOT NULL,
 	`description` text,
 	`has_image` integer DEFAULT 0,
-	`created_at` integer DEFAULT (current_timestamp) NOT NULL,
-	`modified_at` integer DEFAULT (current_timestamp) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`modified_at` integer DEFAULT (unixepoch()) NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`parent_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -54,7 +55,8 @@ CREATE TABLE `measurement_units` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`title` text NOT NULL,
-	`uid` text NOT NULL
+	`uid` text NOT NULL,
+	`deleted_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_units_uid` ON `measurement_units` (`uid`);--> statement-breakpoint
@@ -63,6 +65,7 @@ CREATE TABLE `product_colors` (
 	`product_id` integer NOT NULL,
 	`color_id` integer NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`color_id`) REFERENCES `colors`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -88,9 +91,10 @@ CREATE TABLE `products` (
 	`whs_price2` real NOT NULL,
 	`maker_id` integer,
 	`make_country_id` integer,
-	`created_at` integer DEFAULT (current_timestamp) NOT NULL,
-	`modified_at` integer DEFAULT (current_timestamp) NOT NULL,
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`modified_at` integer DEFAULT (unixepoch()) NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`unit_id`) REFERENCES `measurement_units`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`maker_id`) REFERENCES `makers`(`id`) ON UPDATE no action ON DELETE no action,
@@ -103,6 +107,7 @@ CREATE TABLE `related_products` (
 	`product_id` integer NOT NULL,
 	`related_product_id` integer NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`related_product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

@@ -2,7 +2,7 @@
 import Modal from "../ModalDialog.astro";
 import CartContent from "./CartContent.astro"
 import { Image } from 'astro:assets';
-import failLogo from '../../assets/fail.png';
+import failLogo from '@/web/src/assets/fail.png';
 
 const dataFormCheckoutName = "form-checkout"
 const dataOrderConfirmCommandName = "order-confirm";
@@ -26,7 +26,7 @@ const titleConfirmOrder = "Подтвердить заказ";
 const titleErrorHeader = "Техническая неисправность";
 const titleErrorDetailsHeader = "Технические детали";
 const titleErrorDetails = "Мы работает над выяснением причин."
-const titleCartCheckoutFailed = "При размещении заказа возникла техническая неисправность. В ближайшее время мы свяжемся с Вами относительно заказа.";
+const titleCartCheckoutFailed = "При размещении заказа возникла техническая неисправность. В ближайшее время мы свяжемся с Вами относительно этого.";
 ---
 
 <cart-checkout 

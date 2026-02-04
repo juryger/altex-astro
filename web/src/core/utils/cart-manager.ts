@@ -61,7 +61,7 @@ const createCartItemMarkup = (
             alt=${value.title} 
             width="80" height="80" class="rounded-xl" />
         </figure>
-        <div class="flex flex-row justify-start">
+        <div class="flex flex-col items-center">
           <span class="text-xs italic">
             ${titleProductCode}
           </span>

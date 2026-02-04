@@ -6,7 +6,7 @@ export const operationsVersion = table("__version", {
   id: t.int().primaryKey(),
   value: t
     .int({ mode: "timestamp" })
-    .default(sql`(current_timestamp)`)
+    .default(sql`(unixepoch())`)
     .notNull(),
 });
 
@@ -36,7 +36,7 @@ export const guests = table(
     postCode: t.text("post_code"),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
-      .default(sql`(current_timestamp)`)
+      .default(sql`(unixepoch())`)
       .notNull(),
   },
   (table) => [
@@ -53,7 +53,7 @@ export const cart = table("cart", {
   discountId: t.int("discount_id"), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite
   createdAt: t
     .int("created_at", { mode: "timestamp" })
-    .default(sql`(current_timestamp)`)
+    .default(sql`(unixepoch())`)
     .notNull(),
 });
 
@@ -76,7 +76,7 @@ export const notifications = table("notifications", {
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`(unixepoch())`),
 });
 
 export const notificationAddressees = table("notification_addresses", {

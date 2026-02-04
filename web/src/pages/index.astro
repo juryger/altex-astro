@@ -5,14 +5,13 @@ import Welcome from '../components/Welcome.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const pageTitle = "Главная";
-const categoriesTitle = "Список категорий";
 ---
 
 <BaseLayout title={pageTitle}>
 	<Welcome />
   <Categories server:defer>
 		<div slot="fallback" class="mx-3.5">
-			<CollectionFallback title={categoriesTitle} />
-		</div>
+			<CollectionFallback />
+		</div>		
 	</Categories>
 </BaseLayout>

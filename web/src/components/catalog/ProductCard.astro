@@ -23,6 +23,8 @@ const nameAddToCardAction = "pc-add-to-card";
 
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
+
+console.log("🚩 ~ ProductCard ~ value", item);
 ---
 
 <product-card 
@@ -44,16 +46,16 @@ const titleProductCode = "Артикул";
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
       {/* Ttitle */}
-      <div >
-        <a class="flex flex-row items-center" href=`/catalog/products/${item.slug}`>
+      <a href=`/catalog/products/${item.slug}`>
+        <div class="flex flex-row items-center">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
           </svg>
           <span class="card-title text-sm font-bold" title={item.title}>
             {trimEnd(item.title, 30)} 
           </span>
-        </a>
-      </div>
+        </div>
+      </a>
       {/* Prices block */}
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={false} />
       {/* Pack qunatity details */}
@@ -79,55 +81,56 @@ const titleProductCode = "Артикул";
   import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
 
   class ProductCard extends HTMLElement {
-    private btnAddToCard: Element | null = null;
+    private addToCardEl: Element | null = null;
     private value: Product | undefined;
+    private controller: AbortController | undefined;
 
-    private onAddToCart = (): any => {
-      return async (event: Event): Promise<void> => {
-        if (!this.value) {
-          console.warn("~ ProductCard ~ cannot add product to the cart as it values was not parsed properly.")
-          return;
-        }
+    private onAddToCart = (event: Event): void => {
+      if (!this.value) {
+        console.warn("~ ProductCard ~ cannot add product to the cart as it values was not parsed properly.")
+        return;
+      }
 
-        const selectedColorEl =  this.querySelector('input[type=radio]:checked');
-        const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
-        const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
-        const quantity = 1;
+      const selectedColorEl =  this.querySelector('input[type=radio]:checked');
+      const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
+      const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
+      const quantity = 1;
 
-        addToCart({
-          productId: this.value.id,
-          productCode: this.value.productCode,
-          title: this.value.title,
-          availableColors: this.value.colors,
-          price: this.value.price,
-          whsPrice1: this.value.whsPrice1,
-          whsPrice2: this.value.whsPrice2,
-          image: this.value.thumbnailImageUrl,
-          slug: this.value.slug,
-          color: color,
-          quantity: quantity
-        } as CartItem);
-          
-        addAlert({ 
-          kind: AlertKind.Info, 
-          message: CartMessages.AddedToTheCart
-        });
-      };
+      addToCart({
+        productId: this.value.id,
+        productCode: this.value.productCode,
+        title: this.value.title,
+        availableColors: this.value.colors,
+        price: this.value.price,
+        whsPrice1: this.value.whsPrice1,
+        whsPrice2: this.value.whsPrice2,
+        image: this.value.thumbnailImageUrl,
+        slug: this.value.slug,
+        color: color,
+        quantity: quantity
+      } as CartItem);
+        
+      addAlert({ 
+        kind: AlertKind.Info, 
+        message: CartMessages.AddedToTheCart
+      });
     }
 
     connectedCallback() {
+      this.controller = new AbortController();
+
       this.value = parseProduct(this.dataset);
       if (!this.value) {
         console.warn(`~ ProductCard ~ provided values of product via data attributes are not valid or complete.`);
         return;
       }
       
-      this.btnAddToCard = getButtonElementByName(this, this.dataset.btn_add_to_cart);      
-      this.btnAddToCard?.addEventListener('click', this.onAddToCart);
+      this.addToCardEl = getButtonElementByName(this, this.dataset.btn_add_to_cart);
+      this.addToCardEl?.addEventListener('click', this.onAddToCart, { signal: this.controller.signal });
     }
 
     disconnectedCallback() {
-      this.btnAddToCard?.removeEventListener('click', this.onAddToCart);
+      this.controller && this.controller.abort();
     }
   }
   customElements.define('product-card', ProductCard);

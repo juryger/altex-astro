@@ -64,9 +64,9 @@ const titleErrorMessage = "Не удалось загрузить список �
 </div>}
 {categories && categories.items.length > 0 &&
   <div data-categories-root class="mx-4 mb-2 bg-base-100">
-    <div class="grid grid-cols-1 sm:grid-cols-2 mb-2">
-      <h3 class="text-lg font-bold text-center sm:text-left py-2">
-        {parentSlug ? titleCategories : titleSubCategories}
+    <div class="grid grid-cols-1 sm:grid-cols-2 my-2">
+      <h3 class="text-lg font-bold text-center sm:text-left">
+        {!parentSlug ? titleCategories : titleSubCategories}
       </h3>
       <div class="justify-self-center sm:justify-self-end flex flex-row flex-nowrap">
         <span class="content-center text-nowrap mr-1">{titleViewMode}:</span>

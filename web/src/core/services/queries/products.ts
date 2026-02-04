@@ -130,6 +130,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
         ? entity.main.products.makeCountryId
         : undefined,
     makeCountry: entity.make_countries?.title,
+    createdAt: entity.main.products.createdAt,
+    modifiedAt: entity.main.products.modifiedAt,
   };
 };
 
@@ -211,6 +213,11 @@ export async function fetchProducts(
       continue;
     }
 
+    console.log(
+      "🚩 ~ products-query ~ item.createdAt",
+      item.main.products.createdAt,
+    );
+
     const value = mapQueryResultToDomainModel(item);
     result[resultIndex++] = ProductSchema.parse(value);
   }
@@ -272,6 +279,10 @@ export async function fetchProductBySlug(
       continue;
     }
 
+    console.log(
+      "🚩 ~ products-query ~ item.createdAt",
+      item.main.products.createdAt,
+    );
     const value = mapQueryResultToDomainModel(item);
     result[resultIndex++] = ProductSchema.parse(value);
   }

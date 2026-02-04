@@ -4,10 +4,10 @@ import { DialogActionButtons, DialogActionResult, DialogSize } from '../core/con
 export interface Props {
   id: string,
   title: string,
-  size: DialogSize,
+  size?: DialogSize,
   actionButtons?: DialogActionButtons
 }
-const { id, title, size, actionButtons } = Astro.props;
+const { id, title, size = DialogSize.Small, actionButtons = DialogActionButtons.None } = Astro.props;
 
 const actionClose = "action-close";
 const actionOk1 = "action-ok-1";

@@ -1,10 +1,10 @@
 ---
 export const prerender = false;
 
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseLayout from '@/web/src/layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
-import successLogo from '../../assets/success.png';
-import { extractUrlParam } from '../../core/utils/url-parser';
+import successLogo from '@/web/src/assets/success.png';
+import { extractUrlParam } from '@/web/src/core/utils/url-parser';
 
 const order = extractUrlParam(new URL(Astro.request.url), "order", "string"); 
 console.log("🛠️ ~ Cart checkout confirmation page ~ request: %s", order);
