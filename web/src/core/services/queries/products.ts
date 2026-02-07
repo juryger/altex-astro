@@ -8,10 +8,11 @@ import type { Sorting } from "@/web/src/core/models/sorting";
 import {
   createCatalogDb,
   eq,
+  and,
   asc,
   desc,
   or,
-  isNotNull,
+  isNull,
   SQL,
   type SQLiteColumn,
 } from "@/lib/dal/src";
@@ -27,6 +28,7 @@ import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
 import {
   ImageContainers,
   NO_IMAGE_FILE_NAME,
+  SortFields,
   SortOrder,
 } from "@/web/src/core/const";
 import type {
@@ -45,10 +47,10 @@ const columnPrice: SQLiteColumn = products.price;
 const getSortCondition = (value: Sorting): SQL => {
   var column: SQLiteColumn | undefined;
   switch (value.field.toLowerCase()) {
-    case "title":
+    case SortFields.Title:
       column = columnTitle;
       break;
-    case "price":
+    case SortFields.Price:
       column = columnPrice;
       break;
     default:
@@ -57,7 +59,7 @@ const getSortCondition = (value: Sorting): SQL => {
   return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 
-type QueryResult = {
+type ProductsQueryResult = {
   main: { products: DbProduct; categories: DbCategory };
   categories: DbCategory;
   measurement_units: DbMeasurementUnit | null;
@@ -66,7 +68,7 @@ type QueryResult = {
   product_colors: DbProductColor | null;
 };
 
-const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
+const mapQueryResultToDomainModel = (entity: ProductsQueryResult): Product => {
   const colorId = entity.product_colors?.colorId;
   return <Product>{
     id: entity.main.products.id,
@@ -155,9 +157,12 @@ export async function fetchProducts(
     .innerJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(parentCategorySq, eq(categories.parentId, parentCategorySq.id))
     .where(
-      or(
-        eq(categories.slug, categorySlug),
-        eq(parentCategorySq.slug, categorySlug),
+      and(
+        isNull(categories.deletedAt),
+        or(
+          eq(categories.slug, categorySlug),
+          eq(parentCategorySq.slug, categorySlug),
+        ),
       ),
     )
     .orderBy(getSortCondition(sorting))
@@ -192,9 +197,12 @@ export async function fetchProducts(
       .innerJoin(categories, eq(products.categoryId, categories.id))
       .leftJoin(parentCategorySq, eq(categories.parentId, parentCategorySq.id))
       .where(
-        or(
-          eq(categories.slug, categorySlug),
-          eq(parentCategorySq.slug, categorySlug),
+        and(
+          isNull(categories.deletedAt),
+          or(
+            eq(categories.slug, categorySlug),
+            eq(parentCategorySq.slug, categorySlug),
+          ),
         ),
       ),
   );
@@ -213,11 +221,6 @@ export async function fetchProducts(
       continue;
     }
 
-    console.log(
-      "🚩 ~ products-query ~ item.createdAt",
-      item.main.products.createdAt,
-    );
-
     const value = mapQueryResultToDomainModel(item);
     result[resultIndex++] = ProductSchema.parse(value);
   }
@@ -227,6 +230,7 @@ export async function fetchProducts(
     pageInfo: {
       total: totalCount,
       page: paging.page,
+      pageSize: paging.pageSize,
       hasMore: (paging.page + 1) * paging.pageSize < totalCount,
     },
   } as PageResult<Product>;
@@ -241,7 +245,7 @@ export async function fetchProductBySlug(
     .select()
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
-    .where(eq(products.slug, slug))
+    .where(and(isNull(products.deletedAt), eq(products.slug, slug)))
     .limit(1)
     .as("main");
 
@@ -279,10 +283,6 @@ export async function fetchProductBySlug(
       continue;
     }
 
-    console.log(
-      "🚩 ~ products-query ~ item.createdAt",
-      item.main.products.createdAt,
-    );
     const value = mapQueryResultToDomainModel(item);
     result[resultIndex++] = ProductSchema.parse(value);
   }

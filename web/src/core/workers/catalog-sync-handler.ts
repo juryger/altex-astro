@@ -1,45 +1,43 @@
-import { APIEndpointNames, APISearchParamNames } from "../const";
+import {
+  APIEndpointNames,
+  APISearchParamNames,
+  SortFields,
+  SortOrder,
+} from "../const";
 import { clientDb } from "../db/indexed-db";
 import type { CategoryCache, Category } from "../models/category";
+import type { PageResult } from "../models/paging";
 
 type CatalogSyncHandler = {
-  syncCategories(): Promise<void>;
-  syncUnitOfMeasurements(): Promise<void>;
-  syncProductColors(): Promise<void>;
+  syncCategories(): Promise<number>;
+  syncDiscounts(): Promise<number>;
+  syncProductColors(): Promise<number>;
   cleanUpCache(): Promise<void>;
 };
 
+const CATEGORIES_PAGE_SIZE = 150;
+
 export const getCatalogSyncHandler = (config: {
-  apiBaseUrl: string;
+  baseUrl: string;
 }): CatalogSyncHandler => {
-  console.log("🛠️ ~ catalog-sync-handler ~ config: ", config);
+  //console.log("🛠️ ~ catalog-sync-handler ~ config: ", config);
   return {
     async syncCategories() {
-      // try to get all categories for caching (skip filters and up to 1000 entities)
-      const url = new URL(
-        `${config.apiBaseUrl}/${APIEndpointNames.Categories}?&${APISearchParamNames.SkipParentMatch}=true&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=1000`,
+      const response = await fetch(
+        new URL(
+          `${config.baseUrl}/${APIEndpointNames.Categories}?${APISearchParamNames.SortField}=${SortFields.Id}&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
+        ),
       );
-      const response = await fetch(url);
       if (!response.ok) {
         response.text().then((errorMessage) => {
-          console.error(
-            "🛠️ ~ catalog-sync-handler ~ failed to get categories: %s - %s",
-            response.status,
-            errorMessage,
-          );
           throw new Error(
-            `Failed to get categories: ${response.status} - ${errorMessage}`,
+            `Failed to get Categories: ${response.status} - ${errorMessage}`,
           );
         });
       }
 
       var data = await response.json();
-      console.log(
-        "🛠️ ~ catalog-sync-handler ~ obtained categories data: ",
-        data,
-      );
-
-      var dataCache = (data as Array<Category>).map(
+      var dataCache = (data as PageResult<Category>).items.map(
         (x) =>
           ({
             id: x.id,
@@ -50,24 +48,41 @@ export const getCatalogSyncHandler = (config: {
           }) as CategoryCache,
       );
 
-      return clientDb.categories.bulkAdd(dataCache).then((value) => {
-        console.log(
-          "🛠️ ~ catalog-sync-handler ~ Categories has been saved to IndexedDb:",
-          value,
-        );
-      });
+      clientDb.categories.clear();
+      return clientDb.categories.bulkAdd(dataCache);
     },
-    async syncUnitOfMeasurements() {
-      // TODO: save unitOfMeasurement to IndexDB
-      return;
+    async syncDiscounts() {
+      const response = await fetch(
+        new URL(`${config.baseUrl}/${APIEndpointNames.Discounts}`),
+      );
+      if (!response.ok) {
+        response.text().then((errorMessage) => {
+          throw new Error(
+            `Failed to get Discounts: ${response.status} - ${errorMessage}`,
+          );
+        });
+      }
+      var data = await response.json();
+      clientDb.discounts.clear();
+      return clientDb.discounts.bulkAdd(data);
     },
     async syncProductColors() {
-      // TODO: save productColors to IndexDB
-      return;
+      const response = await fetch(
+        new URL(`${config.baseUrl}/${APIEndpointNames.ProductColors}`),
+      );
+      if (!response.ok) {
+        response.text().then((errorMessage) => {
+          throw new Error(
+            `Failed to get Product colors: ${response.status} - ${errorMessage}`,
+          );
+        });
+      }
+      var data = await response.json();
+      clientDb.productColors.clear();
+      return clientDb.productColors.bulkAdd(data);
     },
     async cleanUpCache() {
       clientDb.categories.clear();
-      return;
     },
   };
 };

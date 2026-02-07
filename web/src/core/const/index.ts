@@ -16,16 +16,18 @@ enum SessionNames {
 enum APIEndpointNames {
   Categories = "categories",
   Products = "products",
+  Discounts = "discounts",
+  ProductColors = "product-colors",
 }
 
 enum APISearchParamNames {
   Category = "category",
   Parent = "parent",
-  SkipParentMatch = "skipParentMatch",
+  SkipParentMatch = "skip_parent_match",
   Page = "page",
-  PageSize = "pageSize",
-  SortField = "sortFiled",
-  SortOrder = "sortOrder",
+  PageSize = "page_size",
+  SortField = "sort_field",
+  SortOrder = "sort_order",
   Filter = "filter",
 }
 
@@ -99,6 +101,16 @@ enum DialogActionResult {
   Cancel = 4,
 }
 
+enum WorkerNames {
+  Catalog = "catalog-sync-worker",
+}
+
+enum SortFields {
+  Id = "id",
+  Title = "title",
+  Price = "price",
+}
+
 export {
   NO_IMAGE_FILE_NAME,
   LiveCollectionNames,
@@ -115,4 +127,6 @@ export {
   DialogActionButtons,
   DialogActionResult,
   DialogSize,
+  WorkerNames,
+  SortFields,
 };

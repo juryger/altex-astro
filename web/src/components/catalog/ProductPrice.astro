@@ -1,28 +1,31 @@
 ---
 import { formatCurrency } from '@/web/src/core/utils/text-formatter';
-import { DiscountMetadata } from '@/web/src/core/models/discount';
+import { type Discount } from '@/web/src/core/models/discount';
 
 interface Props {
   price: number,
   whsPrice1: number,
   whsPrice2: number,
-  isDetailed: boolean
+  discounts: Discount[],
+  isDetailed?: boolean
 }
-const { price, whsPrice1, isDetailed } = Astro.props;
+const { price, whsPrice1, discounts, isDetailed = false } = Astro.props;
 
 const textSize = isDetailed ? "text-base" : "text-sm";
 
 const titlePrice = "Цена:";
 const titleRetailPrice = "Розн. цена";
 const titleWholeSalePrice = "Опт. цена";
-const titleCurrency = "руб.";
 const titleForOrderStartingFrom = "от";
 
-const priceTitle = DiscountMetadata.length > 0 ? DiscountMetadata[0].title : titleRetailPrice;
-const whsPriceTitle =  DiscountMetadata.length > 1 ? DiscountMetadata[1].title : titleWholeSalePrice;
-const tooltipText = DiscountMetadata
-  .reduce((accumulator: string, item: { sum: number, title: string }) => 
-    accumulator + `'${item.title}' ${titleForOrderStartingFrom} ${item.sum.toLocaleString()} ${titleCurrency}, `, "")
+const standardPrice = discounts.find(x => x.fromSum === 1);
+const wholeSalePrice = discounts.find(x => x.fromSum > 1);
+
+const priceTitle = standardPrice !== undefined ? standardPrice.title : titleRetailPrice;
+const whsPriceTitle =  wholeSalePrice !== undefined ? wholeSalePrice.title : titleWholeSalePrice;
+const tooltipText = discounts
+  .reduce((acc, curr) => 
+    acc + `'${curr.title}' ${titleForOrderStartingFrom} ${formatCurrency(curr.fromSum)}, `, "")
   .slice(0, -2);
 ---
 

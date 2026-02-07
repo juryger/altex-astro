@@ -7,11 +7,4 @@ const DiscountSchema = z.object({
   fromSum: z.number(),
 });
 
-const DiscountMetadata: Array<{ sum: number; title: string }> = [
-  { sum: 1, title: "Розница" },
-  { sum: 30000, title: "Оптовая" },
-  { sum: 100000, title: "Специальная" },
-];
-
-export { DiscountMetadata };
 export type Discount = z.infer<typeof DiscountSchema>;

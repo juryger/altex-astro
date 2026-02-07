@@ -6,36 +6,71 @@ import { getProduct } from '@/web/src/core/utils/live-collection-manager';
 import type { Product } from '@/web/src/core/models/product';
 import ProductDetails from '@/web/src/components/catalog/ProductDetails.astro';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurementUnits';
+import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
+import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
+import { queryManager } from '@/web/src/core/services/queryManager';
 
 const { slug } = Astro.params;
 
-let product: Product | undefined;
-const sessionManager = getSessionManager(Astro.session);
-
-try {
-  if (slug !== undefined) product = await getProduct(slug);
-} catch(error) {
-  console.error("🛑 ~ Product page ~ failed to fetch product", error);
+const fetchCatalogReferences = async (): Promise<CatalogReferences | undefined> => {
+  return await Promise.all([
+    queryManager().fetch(() => fetchMeasurementUnits()), 
+    queryManager().fetch(() => fetchDiscounts()), 
+    queryManager().fetch(() => fetchProductColors()),
+  ]).then((data) => {        
+    if (data.some(x => x.error !== undefined)) {
+      const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
+      console.error("~ Product page ~", errorMessage);  
+      return undefined;
+    }
+    return {
+      measurementUnits: data[0].data ?? [],
+      discounts: data[1].data ?? [],
+      productColors: data[2].data ?? [],
+    }
+  }).catch((err) => { 
+    console.error("~ Product page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+    return undefined;
+  });
 }
 
+const fetchProduct = async (): Promise<Product | undefined> => {
+  let result: Product | undefined;
+  try {
+    if (slug !== undefined) result = await getProduct(slug);
+  } catch(error) {
+    console.error("🛑 ~ Product page ~ failed to fetch product", error);
+  }
+  return result;
+}
+
+const sessionManager = getSessionManager(Astro.session);
+const product = await fetchProduct();
 if (product === undefined)
 {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }
 
-console.log("🌎 ~ Product page ~ product", product);
+const references = await fetchCatalogReferences();
+if (references === undefined) {
+  return Astro.redirect("/500");
+}
+
 sessionManager.setActiveCatalogItem({ 
   parentCategory: undefined,
   category: { slug: product.categorySlug, title: product.categoryTitle }, 
   product: { slug: product.slug, title: product.title }
 });
+//console.log("🌎 ~ Product page ~ product", product);
 ---
 
 <BaseLayout title=`Каталог - ${product?.title}`>
     <div id="product-container" class="px-4">
       {product && 
-        <ProductDetails item={product} isPreview={false} />
+        <ProductDetails item={product} references={references} isPreview={false} />
       }
     </div>
 </BaseLayout>

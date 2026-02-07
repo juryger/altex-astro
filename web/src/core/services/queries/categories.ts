@@ -2,6 +2,7 @@ import {
   createCatalogDb,
   eq,
   isNull,
+  and,
   asc,
   desc,
   type SQLiteColumn,
@@ -11,7 +12,11 @@ import { categories, products } from "@/lib/dal/src/schema/catalog";
 import type { Category as DbCategory } from "@/lib/dal/src/types";
 import type { Category } from "@/web/src/core/models/category";
 import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
-import { NO_IMAGE_FILE_NAME, SortOrder } from "@/web/src/core/const";
+import {
+  NO_IMAGE_FILE_NAME,
+  SortFields,
+  SortOrder,
+} from "@/web/src/core/const";
 import type { PageResult, Paging } from "@/web/src/core/models/paging";
 import type { Sorting } from "@/web/src/core/models/sorting";
 
@@ -19,11 +24,12 @@ const columnId: SQLiteColumn = categories.id;
 const columnTitle: SQLiteColumn = categories.title;
 
 const getSortCondition = (value: Sorting): SQL => {
-  const column = value.field.toLowerCase() === "title" ? columnTitle : columnId;
+  const column =
+    value.field.toLowerCase() === SortFields.Title ? columnTitle : columnId;
   return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 
-type QueryResult = {
+type CategoryQueryResult = {
   categories: DbCategory;
   parentSlug?: string | null;
   parentTitle?: string | null;
@@ -31,7 +37,7 @@ type QueryResult = {
   totalProductsSub: number;
 };
 
-const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
+const mapQueryResultToDomainModel = (entity: CategoryQueryResult): Category => {
   return <Category>{
     id: entity.categories.id,
     slug: entity.categories.slug,
@@ -88,11 +94,14 @@ export async function fetchCategories(
     .from(categories)
     .leftJoin(parentSq, eq(categories.parentId, parentSq.id))
     .where(
-      !skipParentMatch
-        ? parentSlug === ""
-          ? isNull(parentSq.slug)
-          : eq(parentSq.slug, parentSlug)
-        : undefined,
+      and(
+        isNull(categories.deletedAt),
+        !skipParentMatch
+          ? parentSlug === ""
+            ? isNull(parentSq.slug)
+            : eq(parentSq.slug, parentSlug)
+          : undefined,
+      ),
     )
     .orderBy(getSortCondition(sorting))
     .limit(paging.pageSize)
@@ -102,7 +111,17 @@ export async function fetchCategories(
     db
       .select()
       .from(categories)
-      .leftJoin(parentSq, eq(categories.parentId, parentSq.id)),
+      .leftJoin(parentSq, eq(categories.parentId, parentSq.id))
+      .where(
+        and(
+          isNull(categories.deletedAt),
+          !skipParentMatch
+            ? parentSlug === ""
+              ? isNull(parentSq.slug)
+              : eq(parentSq.slug, parentSlug)
+            : undefined,
+        ),
+      ),
   );
 
   return {
@@ -110,6 +129,7 @@ export async function fetchCategories(
     pageInfo: {
       total: totalCount,
       page: paging.page,
+      pageSize: paging.pageSize,
       hasMore: (paging.page + 1) * paging.pageSize < totalCount,
     },
   } as PageResult<Category>;
@@ -142,7 +162,7 @@ export async function fetchCategoryBySlug(
     })
     .from(categories)
     .leftJoin(parentSq, eq(categories.parentId, parentSq.id))
-    .where(eq(categories.slug, slug))
+    .where(and(isNull(categories.deletedAt), eq(categories.slug, slug)))
     .limit(1);
 
   if (queryResult.length === 0) return undefined;

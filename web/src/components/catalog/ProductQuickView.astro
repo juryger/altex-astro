@@ -4,11 +4,13 @@ import type { Product } from '@/web/src/core/models/product';
 import ModalDialog from '../ModalDialog.astro';
 import ProductDetails from './ProductDetails.astro';
 import { DialogActionButtons, DialogSize } from '@/web/src/core/const';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
 
 interface Props {
-  item: Product
+  item: Product;
+  references: CatalogReferences;
 }
-const { item } = Astro.props;
+const { item, references } = Astro.props;
 
 const nameProductDialogId = `product-preview-${item.id}`;
 
@@ -28,6 +30,6 @@ const titleQuickView = "Просмотр";
   </div>
 </figure>
 <ModalDialog id={nameProductDialogId} title={item.title} size={DialogSize.Large} actionButtons={DialogActionButtons.OK}>
-  <ProductDetails item={item} isPreview={true} />
+  <ProductDetails item={item} references={references} isPreview={true} />
 </ModalDialog>
 

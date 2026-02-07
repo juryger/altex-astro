@@ -23,12 +23,6 @@ const { parentSlug, sorting = defaultSorting, paging = defaultPaging } = Astro.p
 let hasDataLoadError = false;
 let categories: PageResult<Category> | undefined = undefined;
 try {
-  // categories = await getCategoriesList({
-  //     skipParentMatch: false,
-  //     parentSlug,
-  //     sorting: sorting,
-  //     paging: paging,
-  //   });
   categories = await loadCategories(import.meta.env.PUBLIC_API_BASE_URL, {
     skipParentMatch: false,
     parentSlug,
@@ -64,7 +58,8 @@ const titleErrorMessage = "Не удалось загрузить список �
 </div>}
 {categories && categories.items.length > 0 &&
   <div data-categories-root class="mx-4 mb-2 bg-base-100">
-    <div class="grid grid-cols-1 sm:grid-cols-2 my-2">
+    {/* Header */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 my-2 items-center">
       <h3 class="text-lg font-bold text-center sm:text-left">
         {!parentSlug ? titleCategories : titleSubCategories}
       </h3>
@@ -88,6 +83,7 @@ const titleErrorMessage = "Не удалось загрузить список �
         </div>
       </div>
     </div>
+    {/* Content */}
     <div data-categories-container class="slider-container">
       <div data-categories-slider class="slider hide-scroll-bar">
         {categories && categories.items.map(item => <CategoryCard item={item} />)}
@@ -106,7 +102,7 @@ const titleErrorMessage = "Не удалось загрузить список �
   let viewManager: CategoriesViewManager | undefined;
 
   const applyViewManager = () => {
-    console.log("🌎 ~ Categories component ~ apply view manager");
+    //console.log("🌎 ~ Categories component ~ apply view manager");
     controller && controller.abort();
 
     clearTimeout(timeoutId);
@@ -137,6 +133,6 @@ const titleErrorMessage = "Не удалось загрузить список �
 
   window.addEventListener('pagehide', () => {
     // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller && controller.abort(); 
+    controller?.abort(); 
   });
 </script>

@@ -1,17 +1,18 @@
 ---
-import { ColorDictionary } from '@/web/src/core/models/color';
+import { type ProductColor } from '@/web/src/core/models/product-color';
 
 interface Props {
   productId: number,
   colors?: number[],
+  colorsReference: ProductColor[]
   isDetailed?: boolean
 }
-
-const { productId, colors, isDetailed } = Astro.props;
+const { productId, colors = [], colorsReference, isDetailed = false } = Astro.props;
 
 const spanSelectedColorName = "data-selected-color";
+
 const titleColorOptions = "Цвет:";
-const noProductColors = "Нет информации о цвете";
+const titleNoProductColors = "Нет информации о цвете";
 ---
 
 <product-colors data-selected_color={spanSelectedColorName}> 
@@ -22,13 +23,13 @@ const noProductColors = "Нет информации о цвете";
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
       {colors.sort().map((key, index) => {
-        const metadata = ColorDictionary[key];
-        return <input type="radio" name={"radio-color".concat(productId.toString())}
+        const metadata = colorsReference.find(x => x.id === key);
+        return metadata && <input type="radio" name={"radio-color".concat(productId.toString())}
           checked={index == 0 ? "checked" : undefined} title={metadata.title} value={key}
           class="appearance-none rounded-full border-1 checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
           class:list={[
-            metadata.color, 
-            metadata.border, 
+            metadata.fillColor, 
+            metadata.borderColor, 
             {'size-7': isDetailed}, 
             {'size-5' : !isDetailed}, 
           ]}
@@ -38,7 +39,7 @@ const noProductColors = "Нет информации о цвете";
   }
   {(!colors || colors?.length === 0) && 
     <div class:list={['flex', 'items-center', 'my-1', { 'justify-start': isDetailed }, {'justify-center': !isDetailed }]}>
-      <span class="italic text-sm">{noProductColors}</span>
+      <span class="italic text-sm">{titleNoProductColors}</span>
     </div>
   }
 </product-colors>

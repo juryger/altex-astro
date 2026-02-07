@@ -68,6 +68,7 @@ function extractUrlPaging(url: URL | null): Paging {
 
 function extractUrlSorting(url: URL | null): Sorting {
   const result: Sorting = { field: "", order: SortOrder.Ascending };
+
   const field = extractUrlParam(url, APISearchParamNames.SortField, "string");
   result.field = field !== undefined ? field : defaultSorting.field;
 

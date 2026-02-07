@@ -13,66 +13,6 @@ const MainTitle = `АЛТЕХ - ${title}`;
 console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 ---
 
-<script>
-	/*
-	import { getWorkerFactory, type WorkerFactory, type WorkerInfo } from "../core/factories/worker-factory";
-	import { getLocalStorageManager } from "../core/utils/local-storage-manager"; 
-	import { CatalogSyncType, type CatalogSyncStatus } from "../core/models/catalog-sync";
-	*/
-	
-	// Need to open API endpoint for public, postponed
-	/*
-	const localStorageManager = getLocalStorageManager();
-
-	const processWorkerMessage = (msg: MessageEvent<any>, factory: WorkerFactory, workerName: string): void => {
-		const syncStatus = msg.data as CatalogSyncStatus;
-			if (!msg.data || !syncStatus) {
-				console.error("🌎⚙️ ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported type:", msg.data);
-				return;
-			}
-			console.log("🌎⚙️ ~ BaseLayout ~ catalog sync status updated:", syncStatus);
-			switch (syncStatus.syncType)
-			{
-				case CatalogSyncType.Sync:
-					localStorageManager.setLastSyncDate(new Date());
-						localStorageManager.setCatalogSyncInProgress(false);
-					break;
-				case CatalogSyncType.CleanUpCache:
-					localStorageManager.setCatalogSyncInProgress(false);
-					localStorageManager.setCatalogSyncPostponed(true);
-					break;
-				default:
-					console.error("🌎⚙️ ~ BaseLayout ~ recieved message from the Catalog sync worker of unsupported sync type:", syncStatus);
-					break;
-			}
-			factory.terminateWorker(window.workers, workerName);
-	}
-
-	const processWorkerError = (err: ErrorEvent, factory: WorkerFactory, workerName: string): void => {
-		console.error("🌎⚙️ ~ BaseLayout ~ Failed to sync catalog data:", err.message);
-		localStorageManager.setCatalogSyncInProgress(false);
-		factory.terminateWorker(window.workers, workerName);
-	}
-
-	if (localStorageManager.checkCataloSyncRequired(7)) {
-		console.log("🌎⚙️ ~ BaseLayout ~ Catalog data is outdated, preaparing for syncing.");
-		window.workers = window.workers ?? {} as WorkerInfo;
-		const factory = getWorkerFactory(window.workers);
-		
-		const catalogSyncWorker = factory.findOrCreateCatalogSyncWorker(
-			(msg, workerName) => processWorkerMessage(msg, factory, workerName), 
-			(err, workerName) => processWorkerError(err, factory, workerName)
-		);
-		
-		localStorageManager.setCatalogSyncInProgress(true);
-		localStorageManager.setCatalogSyncPostponed(false);
-		catalogSyncWorker.postMessage(CatalogSyncType.Sync); // use CatalogSyncType.CleanUpCache if syncing not required
-	} else {
-		console.log("🌎⚙️ ~ BaseLayout ~ Catalog data is up to date, syncing is not required.");
-	}
-	*/
-</script>
-
 <!doctype html>
 <html lang="ru">
 	<head>
@@ -100,3 +40,88 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 		<Footer />
 	</body>
 </html>
+
+
+<script>
+	import { createWorker } from "../core/factories/worker-factory";
+	import { getLocalStorageManager } from "../core/utils/local-storage-manager"; 
+	import { CatalogSyncType, type CatalogSyncStatus } from "../core/models/catalog-sync";
+	import { WorkerNames } from "../core/const";
+	
+	let catalogSyncWorker: Worker | undefined;
+
+	// Need to open API endpoint to make request to WebAPI from script
+	const localStorageManager = getLocalStorageManager();
+
+	const terminateWorker = () => {
+		catalogSyncWorker && catalogSyncWorker.terminate();
+	}
+
+	const processWorkerMessage = (msg: MessageEvent<any>): void => {
+		const syncStatus = msg.data as CatalogSyncStatus;
+			if (!msg.data || !syncStatus) {
+				console.error("⚙️ ~ BaseLayout ~ CatalogSync worker, unsupported message", msg.data);
+				return;
+			}
+
+			console.log("⚙️ ~ BaseLayout ~ CatalogSync worker status update:", syncStatus);
+			switch (syncStatus.syncType)
+			{
+				case CatalogSyncType.Cache:
+					localStorageManager.setLastSyncDate(new Date());
+					localStorageManager.setCatalogSyncInProgress(false);
+					localStorageManager.setCatalogSyncPostponed(false);
+					break;
+				case CatalogSyncType.CleanUp:
+					localStorageManager.setCatalogSyncInProgress(false);
+					localStorageManager.setCatalogSyncPostponed(true);
+					break;
+				case CatalogSyncType.Failure:
+					console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
+					localStorageManager.setCatalogSyncInProgress(false);
+					localStorageManager.setCatalogSyncPostponed(true);
+					break;
+				default:
+					console.error("⚙️ ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
+					localStorageManager.setCatalogSyncInProgress(false);
+					localStorageManager.setCatalogSyncPostponed(true);
+					break;
+			}
+
+			// terminate worker, as next sync is part of another page load.
+			terminateWorker();
+	}
+
+	const processWorkerError = (err: ErrorEvent): void => {
+		console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", err.message);
+		localStorageManager.setCatalogSyncInProgress(false);
+		localStorageManager.setCatalogSyncPostponed(true);
+		
+		// clean up worker resource
+		terminateWorker();
+	}
+
+	if (localStorageManager.checkCataloSyncRequired(4)) {
+		console.log("⚙️ ~ BaseLayout ~ Catalog cache data is outdated, preaparing to revalidate cache.");	
+		try {
+			catalogSyncWorker = createWorker(
+				WorkerNames.Catalog,
+				(msg) => processWorkerMessage(msg), 
+				(err) => processWorkerError(err),
+			);
+			
+			// Performe sync process (pass CatalogSyncType.CleanUpCache if sync is not required and local store need to be cleaned)
+			catalogSyncWorker.postMessage(CatalogSyncType.Cache);
+			localStorageManager.setCatalogSyncInProgress(true);
+			localStorageManager.setCatalogSyncPostponed(false);
+		} catch(error) {
+			console.log("⚙️ ~ BaseLayout ~ Failed to create CatalogSync worker", error);	
+		}
+	} else {
+		console.log("⚙️ ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
+	}
+
+	window.addEventListener('pagehide', () => {
+    terminateWorker();
+  });
+</script>

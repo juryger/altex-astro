@@ -2,7 +2,7 @@ import { getDateHandler } from "./date-handler";
 import { regexTrue } from "./regex";
 
 type StateManagerFeatures = {
-  checkCataloSyncRequired(expireDays: number): boolean;
+  checkCataloSyncRequired(expireHours: number): boolean;
   checkCatalogSyncInProgress(): boolean;
   setLastSyncDate(value: Date): void;
   setCatalogSyncInProgress(value: boolean): void;
@@ -27,24 +27,33 @@ function IsValidCacheItem(lastChangedAt: Date) {
     new Date() <=
     dateHandler.addHours(
       lastChangedAt,
-      import.meta.env.PUBLIC_CACHE_INVALIDATE_IN_HOURS,
+      Number.parseInt(import.meta.env.PUBLIC_CACHE_INVALIDATE_IN_HOURS, 10),
     )
   );
 }
 
 const getLocalStorageManager = (): StateManagerFeatures => {
   return {
-    checkCataloSyncRequired: (expireDays: number): boolean => {
+    checkCataloSyncRequired: (expireHours: number): boolean => {
       const isSyncing = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS,
       );
-      if (isSyncing !== null && regexTrue.test(isSyncing)) return false;
+      if (isSyncing !== null && regexTrue.test(isSyncing)) {
+        console.warn(
+          "~ local-storage-manager ~ catalog caching is already in progress, cannot start another one while original is not finished.",
+        );
+        return false;
+      }
 
       const isSyncPosponed = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_POSTPONED,
       );
-      if (isSyncPosponed !== null && regexTrue.test(isSyncPosponed))
+      if (isSyncPosponed !== null && regexTrue.test(isSyncPosponed)) {
+        console.warn(
+          "~ local-storage-manager ~ catalog caching is postpone and not required.",
+        );
         return false;
+      }
 
       const lastSyncDate = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_DATE,
@@ -53,7 +62,7 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       const dateHandler = getDateHandler();
       return (
         lastSyncDate === null ||
-        dateHandler.addDays(new Date(lastSyncDate), expireDays) <= new Date()
+        dateHandler.addHours(new Date(lastSyncDate), expireHours) <= new Date()
       );
     },
     checkCatalogSyncInProgress: (): boolean => {
@@ -91,12 +100,11 @@ const getLocalStorageManager = (): StateManagerFeatures => {
       );
       if (!themeChangedDate) return undefined;
 
-      console.log(
-        "⚙️ ~ localStorageManger ~ Cache contains 'theme' with value '%s' and changed date '%s':",
-        value,
-        themeChangedDate,
-      );
-
+      // console.log(
+      //   "⚙️ ~ localStorageManger ~ Cache contains 'theme' with value '%s' and changed date '%s':",
+      //   value,
+      //   themeChangedDate,
+      // );
       const lastChangedAt = new Date(themeChangedDate);
       if (!IsValidCacheItem(lastChangedAt)) {
         console.log(

@@ -1,6 +1,7 @@
 enum CatalogSyncType {
-  Sync = "sync-catalog",
-  CleanUpCache = "clean-up-cache",
+  Cache = "catalog-cache",
+  CleanUp = "catalog-clean-up",
+  Failure = "catalog-failure",
 }
 
 type CatalogSyncStatus = {

@@ -1,10 +1,11 @@
 ---
 interface Props {
-  isCheckout: boolean,
+  scrollContainerName?: string,
+  isCheckout?: boolean,
 }
-const { isCheckout } = Astro.props;
+const { scrollContainerName = "", isCheckout = false } = Astro.props;
 
-const dataCartRootName = "data-cart-root";
+const dataCartContainerName = "data-cart-container";
 const dataDiscountedCostName = "data-discounted-cost";
 const dataFullCostName = "data-full-cost";
 const dataCartUpdateCommandName = "cart-update";
@@ -16,7 +17,8 @@ const titleSubtotal = "Итого:";
 ---
 
 <cart-content 
-  data-cart_root={dataCartRootName}
+  data-scroll_container={scrollContainerName}
+  data-cart_container={dataCartContainerName}
   data-discounted_cost={dataDiscountedCostName}
   data-full_cost={dataFullCostName}
   data-cart_update={dataCartUpdateCommandName} 
@@ -41,9 +43,9 @@ const titleSubtotal = "Итого:";
       }
     </div>
   </div>
+  <!-- <Cart content /> -->
   <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}, {'h-[28rem]': isCheckout}, {'mt-2': isCheckout}]}>
-    <!-- <Cart items /> -->
-    <ul data-cart-root role="list" class="divide-y divide-gray-200">
+    <ul data-cart-container role="list" class="divide-y divide-gray-200">
     </ul>    
   </div>
 </cart-content>
@@ -54,18 +56,25 @@ const titleSubtotal = "Итого:";
   import { AlertKind } from "@/web/src/core/models/alert";
   import { addAlert } from "@/web/src/core/stores/client/alert-store";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/client/cart-store";
-  import { DiscountMetadata } from "@/web/src/core/models/discount";
+  import { type Discount } from "@/web/src/core/models/discount";
   import type { CartItem } from "@/web/src/core/models/cart";
   import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
   import { regexTrue } from '@/web/src/core/utils/regex';
   import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
+  import { clientDb } from '@/web/src/core/db/indexed-db';
+  import type { ProductColor } from '@/web/src/core/models/product-color';
+
 
   class CartContent extends HTMLElement {
+    private controller: AbortController | undefined;
+    private discounts: Discount[] = [];
+    private productColors: ProductColor[] = [];
     private discountIndex: number = 0;
+    private scrollContainerEl: Element | null = null;
     private discountedCostEl: Element | null = null;
     private fullCostEl: Element | null = null;
-    private cartRootEl: Element | null = null;
+    private cartContainerEl: Element | null = null;
     private cartCheckoutEl: Element | null = null;
     private updateCartCommandName: string | undefined;
     private removeCartCommandName: string | undefined;
@@ -95,19 +104,17 @@ const titleSubtotal = "Итого:";
     }
 
     private cleanupCartContent = () => {
-      if (!this.cartRootEl) return [];
-      if (!this.updateCartCommandName) return [];
-      if (!this.removeCartCommandName) return [];
-
-      this.querySelectorAll(`button[name='${this.updateCartCommandName}']`).forEach((x, index) => 
-        this.updateHandlers[index] && x.removeEventListener('click', this.updateHandlers[index])
-      );
-
-      this.querySelectorAll(`button[name='${this.removeCartCommandName}']`).forEach((x, index) => 
-        this.removeHandlers[index] && x.removeEventListener('click', this.removeHandlers[index])
-      );
-
-      this.cartRootEl.replaceChildren();
+      if (this.updateCartCommandName) {
+        this.querySelectorAll(`button[name='${this.updateCartCommandName}']`).forEach((x, index) => 
+          this.updateHandlers[index] && x.removeEventListener('click', this.updateHandlers[index])
+        );
+      }
+      if (this.removeCartCommandName) {
+        this.querySelectorAll(`button[name='${this.removeCartCommandName}']`).forEach((x, index) => 
+          this.removeHandlers[index] && x.removeEventListener('click', this.removeHandlers[index])
+        );
+      }  
+      this.cartContainerEl?.replaceChildren();
     }
 
     private syncCartCostFromStore(): void {
@@ -115,47 +122,65 @@ const titleSubtotal = "Итого:";
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get(); 
 
-      if (sum >= DiscountMetadata[2]?.sum) {
-        console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
-        this.discountIndex = 2;
+      this.discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+      if (this.discountIndex === 2) {
+        //console.log("~ CartContent ~ discount cost #2 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
-      } else if (sum >= DiscountMetadata[1]?.sum) {
-        console.log("~ CartContent ~ discount cost #1 applied:%i", sum);
-        this.discountIndex = 1;
+      } else if (this.discountIndex === 1) {
+        //console.log("~ CartContent ~ discount cost #1 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
-        console.log("~ CartContent ~ no discounts applied:%i", sum);
-        this.discountIndex = 0;
+        //console.log("~ CartContent ~ no discounts applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
     }
 
-    private syncCartContentFromStore() {
-      if (!this.cartRootEl) return [];
-      if (!this.updateCartCommandName) return [];
-      if (!this.removeCartCommandName) return [];
-
-      this.cleanupCartContent();
-
-      const cartItems = $cart.get().sort((a: CartItem, b: CartItem) => {
+    private getCartItemsSorted = (): CartItem[] => {
+      return $cart.get().sort((a: CartItem, b: CartItem) => {
         if (a.title < b.title) return -1;
         if (a.title > b.title) return 1;
         return 0;
       });
-      
-      if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (cartItems.length === 0);     
+    }
 
+    private refreshCartCheckoutState = (itemsCount: number) => {
+      if (this.cartCheckoutEl) {
+        (this.cartCheckoutEl as HTMLInputElement).disabled = (itemsCount === 0);
+      }
+    }
+
+    private syncCartContentFromStore() {
+      if (this.cartContainerEl === null
+        || this.updateCartCommandName === null
+        || this.removeCartCommandName === null
+      ) {
+        return;
+      } 
+
+      const cartItems = this.getCartItemsSorted();
+      this.refreshCartCheckoutState(cartItems.length);
+      
+      // remember scroll position to restore after content repaint
+      const scrollTop = this.scrollContainerEl?.scrollTop;
+      //console.log("🚩 ~ CartContent ~ scroll position before repaint:", scrollTop);
+
+      this.cleanupCartContent();
       cartItems.forEach(x => {
         const divAlert = document.createElement("li");
         divAlert.classList.add("flex", "p-2");
-        this.cartRootEl && this.cartRootEl.appendChild(divAlert);
+        this.cartContainerEl && this.cartContainerEl.appendChild(divAlert);
         if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
-          divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.updateCartCommandName, this.removeCartCommandName);
+          divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.productColors, this.updateCartCommandName, this.removeCartCommandName);
         }
       });
+
+      // restore scroll position
+      if (scrollTop && this.scrollContainerEl) {
+        this.scrollContainerEl.scrollTop = scrollTop;
+      }
 
       // Assign event handlers to each cart item commands (UpdateCart, RemoveCart)
       this.querySelectorAll(`button[name='${this.updateCartCommandName}']`).forEach((x, index) => {
@@ -170,7 +195,7 @@ const titleSubtotal = "Итого:";
 
     private subscribeToCartStore() {
       this.storeCartUnsubscribe = $cart.listen((items) => {
-        console.log("~ CartContent ~ cart store changed");
+        //console.log("~ CartContent ~ cart store changed");
         if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (items.length === 0);
         setTimeout(() => {
           this.syncCartContentFromStore();
@@ -179,23 +204,20 @@ const titleSubtotal = "Итого:";
     }
 
     private subscribeToCostStore() {
-      if (!this.discountedCostEl || !this.fullCostEl) return; 
-
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        console.log("~ CartContent ~ full cost: ", value);
-        this.discountIndex = 0;
+        //console.log("~ CartContent ~ full cost: ", value);
+        this.discountIndex = this.discounts.findLastIndex(x => value >= x.fromSum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       });
     }
 
     private subscribeToWhsCost1Store() {
-      if (!this.discountedCostEl || !this.fullCostEl) return;
-
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
-        if (value >= DiscountMetadata[1]?.sum) {
-          console.log("~ CartContent ~ discount cost #1: ", value);
-          this.discountIndex = 1;
+        const sum = $cartCost.get();
+        this.discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+        if (this.discountIndex === 1) {
+          //console.log("~ CartContent ~ discount cost #1 applied:%i", value);
           if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
           if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
@@ -203,12 +225,11 @@ const titleSubtotal = "Итого:";
     }
 
     private subscribeToWhsCost2Store() {
-      if (!this.discountedCostEl || !this.fullCostEl) return;
-      
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
-        if (value >= DiscountMetadata[2]?.sum) {
-          console.log("~ CartContent ~ discount cost #2: ", value);
-          this.discountIndex = 2;
+        const sum = $cartCost.get();
+        this.discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+        if (this.discountIndex === 2) {
+          //console.log("~ CartContent ~ discount cost #2 applied:%i", value);
           if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
           if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
@@ -263,42 +284,67 @@ const titleSubtotal = "Итого:";
       }
     }
 
+    private getScrollContainerElement(): Element | null {
+      const scrollContainerName = this.dataset.scroll_container;
+      if (scrollContainerName !== undefined && scrollContainerName.trim().length > 0) {
+        const result = window.document.querySelector(`div[id=${scrollContainerName}]`);
+        return result;
+      }
+      if (this.cartContainerEl === null) console.warn("🚩 ~ CartContent ~ scrollContainerEl should not be null");
+      return this.cartContainerEl !== null ? this.cartContainerEl.parentElement : null;
+    }
+
     private assertDataAttributeValue = (attribute: string| undefined, name: string): string | undefined => {
       console.assert(attribute !== undefined, "~ CartContent ~ Data attribute with name '[%s]' does not have value", name);
       return attribute;
     }
 
     connectedCallback() {
-      this.cartRootEl = getElementByDataAttribute(this, this.dataset.cart_root);
+      this.controller = new AbortController();
+      this.cartContainerEl = getElementByDataAttribute(this, this.dataset.cart_container);
       this.discountedCostEl = getElementByDataAttribute(this, this.dataset.discounted_cost);
       this.fullCostEl = getElementByDataAttribute(this, this.dataset.full_cost);
+      this.scrollContainerEl = this.getScrollContainerElement();
       this.cartCheckoutEl = !this.dataset.is_checkout?.match(regexTrue) ? 
-        getButtonElementByName(this, this.dataset.cart_checkout) : 
-        null;
+      getButtonElementByName(this, this.dataset.cart_checkout) : 
+      null;
 
       this.updateCartCommandName = this.assertDataAttributeValue(this.dataset.cart_update, "cart_update");
       this.removeCartCommandName = this.assertDataAttributeValue(this.dataset.cart_remove, "cart_remove");
 
       this.cartCheckoutHandler = this.onCartCheckoutClick();
-      this.cartCheckoutEl?.addEventListener('click', this.cartCheckoutHandler);
+      this.cartCheckoutEl?.addEventListener('click', this.cartCheckoutHandler, { signal: this.controller.signal });
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
       this.subscribeToWhsCost1Store();
       this.subscribeToWhsCost2Store();
       
-      this.syncCartCostFromStore()
-      this.syncCartContentFromStore();
+      clientDb.discounts.toArray((data) => { 
+        if (data.length === 0) {
+          console.warn("~ CartContent ~ Discounts data are not available.");
+        }
+        this.discounts = data;
+        this.syncCartCostFromStore()
+      });
+
+      clientDb.productColors.toArray((data) => { 
+        if (data.length === 0) {
+          console.warn("~ CartContent ~ Product Colors data are not available.");
+        }
+        this.productColors = data;
+        this.syncCartContentFromStore();
+      }); 
     }
 
     disconnectedCallback() {
+      this.controller?.abort();
+      this.discounts.length = 0;
+      this.productColors.length = 0;
       this.storeCartUnsubscribe && this.storeCartUnsubscribe();
       this.storeCostUnsubscribe && this.storeCostUnsubscribe();
       this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()
-      this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()
-      
-      this.cartCheckoutEl?.removeEventListener('click', this.cartCheckoutHandler);
-
+      this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe()     
       this.cleanupCartContent();
     }
   }

@@ -52,12 +52,15 @@ const dataCartShowCommandName = "cartmenu-show";
 </cart-menu>
 
 <script>
+  import { clientDb } from "@/web/src/core/db/indexed-db";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
-  import { DiscountMetadata } from "@/web/src/core/models/discount";
+  import { type Discount } from "@/web/src/core/models/discount";
   import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/client/cart-store";
   import { getButtonElementByName, getElementByDataAttribute, getElementById } from "@/web/src/core/utils/dom-utils";
  
   class CartMenu extends HTMLElement {
+    private controller: AbortController | undefined;
+    private discounts: Discount[] = [];
     private cartIndicatorEl: Element | null = null;
     private cartCountEl: Element | null = null;
     private discountedCostEl: Element | null = null;
@@ -95,16 +98,17 @@ const dataCartShowCommandName = "cartmenu-show";
       const whsSum1 = $cartWhsCost1.get();
       const whsSum2 = $cartWhsCost2.get();
 
-      if (sum >= DiscountMetadata[2]?.sum) {
-        console.log("~ CartMenu ~ discount cost #2 applied:%i", sum);
+      const discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+      if (discountIndex === 2) {
+        //console.log("~ CartMenu ~ discount cost #2 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum2);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
-      } else if (sum >= DiscountMetadata[1]?.sum) {
-        console.log("~ CartMenu ~ discount cost #1 applied:%i", sum);
+      } else if (discountIndex === 1) {
+        //console.log("~ CartMenu ~ discount cost #1 applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(whsSum1);  
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency(sum);
       } else {
-        console.log("~ CartMenu ~ no discounts applied:%i", sum);
+        //console.log("~ CartMenu ~ no discounts applied:%i", sum);
         if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(sum);
         if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       }
@@ -112,7 +116,7 @@ const dataCartShowCommandName = "cartmenu-show";
 
     private subscribeToCountStore() {
       this.storeCountUnsubscribe = $cartCount.listen((value) => {
-        console.log("~ CartMenu component ~ total count has changed:", value);
+        //console.log("~ CartMenu component ~ total count has changed:", value);
         if (this.cartIndicatorEl !== null) this.cartIndicatorEl.innerHTML = value.toString();
         if (this.cartCountEl !== null) this.cartCountEl.innerHTML = value.toString();
         if (this.cartShowEl) (this.cartShowEl as HTMLInputElement).disabled = (value === 0); 
@@ -121,39 +125,38 @@ const dataCartShowCommandName = "cartmenu-show";
 
     private subscribeToCostStore() {
       this.storeCostUnsubscribe = $cartCost.listen((value) => {
-        if (!this.discountedCostEl || !this.fullCostEl) return;
-
-        console.log("~ CartMenu ~ full cost:%i", value);
-        this.discountedCostEl.innerHTML = formatCurrency(value);
-        this.fullCostEl.innerHTML = "";
+        //console.log("~ CartMenu ~ full cost:%i", value);
+        if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
+        if (this.fullCostEl !== null) this.fullCostEl.innerHTML = "";
       });
     }
 
     private subscribeToWhsCost1Store() {
       this.storeWhsCost1Unsubscribe = $cartWhsCost1.listen((value) => {
-        if (!this.discountedCostEl || !this.fullCostEl) return;
-
-        if (value >= DiscountMetadata[1]?.sum) {
-          console.log("~ CartMenu ~ discount cost #1:%i", value);
-          this.discountedCostEl.innerHTML = formatCurrency(value);
-          this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
+        const sum = $cartCost.get();
+        const discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+        if (discountIndex === 1) {
+          //console.log("~ CartMenu ~ discount cost #1:%i", value);
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }
 
     private subscribeToWhsCost2Store() {
       this.storeWhsCost2Unsubscribe = $cartWhsCost2.listen((value) => {
-        if (!this.discountedCostEl || !this.fullCostEl) return;
-
-        if (value >= DiscountMetadata[2]?.sum) {
-          console.log("~ CartMenu ~ discount cost #2:%i", value);
-          this.discountedCostEl.innerHTML = formatCurrency(value);
-          this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
+        const sum = $cartCost.get();
+        const discountIndex = this.discounts.findLastIndex(x => sum >= x.fromSum);
+        if (discountIndex === 2) {
+          //console.log("~ CartMenu ~ discount cost #2:%i", value);
+          if (this.discountedCostEl !== null) this.discountedCostEl.innerHTML = formatCurrency(value);
+          if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
     }
     
     connectedCallback() {
+      this.controller = new AbortController();
       this.cartIndicatorEl = getElementByDataAttribute(this, this.dataset.cartmenu_indicator);
       this.cartCountEl = getElementByDataAttribute(this, this.dataset.cartmenu_count);
       this.discountedCostEl = getElementByDataAttribute(this, this.dataset.cartmenu_discounted_cost);
@@ -162,24 +165,28 @@ const dataCartShowCommandName = "cartmenu-show";
       this.sidebarEl = getElementById(this, this.dataset.cartmenu_sidebar);
 
       this.cartShowHandler = this.onCartShowClick();
-      this.cartShowEl?.addEventListener('click', this.cartShowHandler);
-
-      this.syncCartCountFromStore();
-      this.syncCartCostFromStore();
+      this.cartShowEl?.addEventListener('click', this.cartShowHandler, { signal: this.controller.signal });
 
       this.subscribeToCountStore();
       this.subscribeToCostStore();
       this.subscribeToWhsCost1Store();
       this.subscribeToWhsCost2Store();
+
+      this.syncCartCountFromStore();
+      clientDb.discounts.toArray((data) => { 
+        if (!data || data.length === 0) console.error("~ CartMenu ~ Discounts data are not available.")
+        this.discounts = data;
+        this.syncCartCostFromStore()
+      });
     }
 
     disconnectedCallback() {
+      this.controller?.abort();
+      this.discounts.length = 0;
       this.storeCountUnsubscribe && this.storeCountUnsubscribe();
       this.storeCostUnsubscribe && this.storeCostUnsubscribe();
       this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe();
       this.storeWhsCost2Unsubscribe && this.storeWhsCost2Unsubscribe();
-
-      this.cartShowEl?.removeEventListener('click', this.cartShowHandler);
     }
   }
 

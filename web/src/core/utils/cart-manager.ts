@@ -1,5 +1,5 @@
 import type { CartItem } from "../models/cart";
-import { ColorDictionary } from "../models/color";
+import type { ProductColor } from "../models/product-color";
 import { formatCurrency, trimEnd } from "./text-formatter";
 
 const titleProductColor = "Цвет:";
@@ -8,6 +8,7 @@ const titleProductCode = "Артикул:";
 const titleProductPrice = "Цена:";
 const titleEdit = "Изменить";
 const titleRemove = "Удалить";
+const titleColorUnavailable = "---";
 
 const getPriceWithDiscount = (
   value: CartItem,
@@ -29,16 +30,19 @@ const getPriceWithDiscount = (
       <del class="text-xs text-info"></del>`;
 };
 
-const getColorSelectOptions = (value: CartItem): string => {
-  var result = "";
+const getColorSelectOptions = (
+  value: CartItem,
+  productColors: ProductColor[],
+): string => {
+  var result = `<option>${titleColorUnavailable}</option>`;
   value.availableColors
     ?.sort((a, b) => a - b)
     .forEach((key: number) => {
-      var metadata = ColorDictionary[key];
+      var metadata = productColors.find((x) => x.id === key);
       result = result.concat(
         `<option value="${key}"
           ${value.color !== undefined && value.color === key ? "selected" : ""}>
-          ${metadata.title}
+          ${metadata?.title}
         </option>`,
       );
     });
@@ -48,6 +52,7 @@ const getColorSelectOptions = (value: CartItem): string => {
 const createCartItemMarkup = (
   value: CartItem,
   discountIndex: number,
+  productColors: ProductColor[],
   updateCartCommandName: string,
   removeCarCommandtName: string,
 ): string => {
@@ -92,7 +97,7 @@ const createCartItemMarkup = (
                   : ""
               }
               class="select input-sm max-w-26">
-              ${getColorSelectOptions(value)}
+              ${getColorSelectOptions(value, productColors)}
             </select>
           </div>
           <!-- Quantity -->

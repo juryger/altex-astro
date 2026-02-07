@@ -13,6 +13,12 @@ import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
 import { type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
+import { queryManager } from '@/web/src/core/services/queryManager';
+import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurementUnits';
+import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
+import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import { reference } from 'astro:content';
 
 const { slug, params } = Astro.params;
 
@@ -36,17 +42,48 @@ const parseRouteParams = (): {
   return { sorting, paging, filtering };
 }
 
-let category: Category | undefined;
-try {
-  if (slug !== undefined) category = await getCategory(slug);
-} catch(error) {
-  console.error("🛑 ~ Category page ~ failed to fetch category", error);
+const fetchCatalogReferences = async (): Promise<CatalogReferences | undefined> => {
+  return await Promise.all([
+    queryManager().fetch(() => fetchMeasurementUnits()), 
+    queryManager().fetch(() => fetchDiscounts()), 
+    queryManager().fetch(() => fetchProductColors()),
+  ]).then((data) => {        
+    if (data.some(x => x.error !== undefined)) {
+      const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
+      console.error("~ Category page ~", errorMessage);  
+      return undefined;
+    }
+    return {
+      measurementUnits: data[0].data ?? [],
+      discounts: data[1].data ?? [],
+      productColors: data[2].data ?? [],
+    }
+  }).catch((err) => { 
+    console.error("~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+    return undefined;
+  });
+}
+
+const fetchCategory = async (): Promise<Category | undefined> => {
+  let result: Category | undefined;
+  try {
+    if (slug !== undefined) result = await getCategory(slug);
+  } catch(error) {
+    console.error("🛑 ~ Category page ~ failed to fetch category", error);
+  }
+  return result;
 }
 
 const sessionManager = getSessionManager(Astro.session);
+const category = await fetchCategory();
 if (category === undefined) {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
+}
+
+const references = await fetchCatalogReferences();
+if (references === undefined) {
+  return Astro.redirect("/500");
 }
 
 sessionManager.setActiveCatalogItem({ 
@@ -68,7 +105,7 @@ const newProductsView = {
     : productsView?.filtering,
 };
 sessionManager.setProductsView(newProductsView);
-console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsView);
+//console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsView);
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>
@@ -78,7 +115,7 @@ console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsV
 			<CollectionFallback />
 		</div>
 	</Categories>
-	<Products categorySlug={category?.slug} sorting={newProductsView.sorting} paging={paging} filtering={newProductsView.filtering} server:defer>
+	<Products categorySlug={category?.slug} references={references} sorting={newProductsView.sorting} paging={paging} filtering={newProductsView.filtering} server:defer>
 		<div slot="fallback" class="mx-3.5">
 			<CollectionFallback />
 		</div>

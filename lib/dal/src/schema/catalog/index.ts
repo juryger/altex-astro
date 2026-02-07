@@ -31,7 +31,10 @@ export const colors = table(
     id: t.int().primaryKey({ autoIncrement: true }),
     code: t.text().notNull(),
     title: t.text().notNull(),
+    fillColor: t.text("fill_color").notNull(),
+    borderColor: t.text("border_color").notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_colors_uid").on(table.uid)],
 );
@@ -43,6 +46,7 @@ export const makers = table(
     code: t.text().notNull(),
     title: t.text().notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_makers_uid").on(table.uid)],
 );
@@ -54,6 +58,7 @@ export const makeCountries = table(
     code: t.text().notNull(),
     title: t.text().notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_make_countries_uid").on(table.uid)],
 );
@@ -66,6 +71,7 @@ export const discounts = table(
     fromSum: t.real().notNull(),
     title: t.text().notNull(),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_discounts_uid").on(table.uid)],
 );
@@ -147,7 +153,6 @@ export const relatedProducts = table(
       .notNull()
       .references(() => products.id),
     uid: t.text().notNull(),
-    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)],
 );
@@ -165,7 +170,6 @@ export const productColors = table(
       .notNull()
       .references(() => colors.id),
     uid: t.text().notNull(),
-    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)],
 );

@@ -10,14 +10,17 @@ import { loadProducts, type ProductCollectionFilter } from '@/web/src/core/conte
 import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import ModalDialog from '../ModalDialog.astro';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import { reference } from 'astro:content';
 
 interface Props {
   categorySlug: string;
+  references: CatalogReferences;
   sorting?: Sorting | undefined;
   paging?: Paging | undefined;
   filtering?: Filtering[];
 }
-const { categorySlug, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
+const { categorySlug, references, sorting = defaultSorting, paging = defaultPaging, filtering = [] } = Astro.props;
 
 const sessionManager = getSessionManager(Astro.session);
 const productsView = await sessionManager.getProductsView();
@@ -25,12 +28,6 @@ const productsView = await sessionManager.getProductsView();
 let hasDataLoadError = false;
 let products: PageResult<Product> | undefined = undefined;
 try {
-  // products = await getProductsList({
-  //   categorySlug,
-  //   sorting,
-  //   paging,
-  //   filtering
-  // } as ProductCollectionFilter)
   products = await loadProducts(import.meta.env.PUBLIC_API_BASE_URL, {
     categorySlug,
     sorting,
@@ -83,7 +80,8 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 </div>}
 {(products && products.items.length > 0) &&
   <div data-products-root data-page_prev={rowStart > 0 ? products.pageInfo.page - 1 : -1} data-page_next={rowEnd < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
-    <div class="grid grid-cols-1 sm:grid-cols-2 mb-2">
+    {/* Header */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 mb-2 items-center">
       <h3 class="text-lg font-bold text-center sm:text-left py-2">
         {titleProductsList}
       </h3>
@@ -105,9 +103,9 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
         </label>
       </div>
     </div>
-    {/* Items grid/list */}
+    {/* Content */}
     <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {products && products.items.map(x => <ProductCard item={x} />)}      
+      {products && products.items.map(x => <ProductCard item={x} references={references} />)}      
     </div>
     {/* Paging */}
     {products && products.items.length > 0 && 
@@ -180,6 +178,6 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 
   window.addEventListener('pagehide', () => {
     // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller && controller.abort(); 
+    controller?.abort(); 
   });
 </script>

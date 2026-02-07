@@ -18,6 +18,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
   const result = await queryManager().fetch<Category | undefined>(() =>
     fetchCategoryBySlug(slug),
   );
+
   if (result.error) {
     console.error(result.error);
     return new Response(null, {

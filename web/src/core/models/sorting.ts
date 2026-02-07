@@ -1,4 +1,4 @@
-import { SortOrder } from "../const";
+import { SortFields, SortOrder } from "../const";
 
 type Sorting = {
   field: string;
@@ -6,7 +6,7 @@ type Sorting = {
 };
 
 const defaultSorting: Sorting = {
-  field: "title",
+  field: SortFields.Title,
   order: SortOrder.Ascending,
 };
 

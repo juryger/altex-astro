@@ -1,21 +1,21 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { CategoryCache } from "../models/category";
-import type { UnitOfMeasurement } from "../models/unit-of-measurement";
-import type { Color } from "../models/color";
+import type { ProductColor } from "../models/product-color";
+import type { Discount } from "../models/discount";
 
 const dbName = "Catalog";
 
 const db = new Dexie(dbName) as Dexie & {
   categories: EntityTable<CategoryCache, "id">;
-  unitOfMeasurements: EntityTable<UnitOfMeasurement, "id">;
-  productColors: EntityTable<Color, "id">;
+  discounts: EntityTable<Discount, "id">;
+  productColors: EntityTable<ProductColor, "id">;
 };
 
 // Schema declaration:
 db.version(1).stores({
-  categories: "++id, title, slug, parentId, parentSlug", // primary key "id" (for the runtime!)
-  unitOfMeasurements: "++id, name",
-  productColors: "++id, name",
+  categories: "id, slug, title, parentId, parentSlug", // primary key "id" (for the runtime!)
+  discounts: "id, code, title, fromSum",
+  productColors: "id, code, title, fillColor, borderColor",
 });
 
 export { db as clientDb };

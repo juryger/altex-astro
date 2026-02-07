@@ -2,29 +2,30 @@
 export const prerender = false;
 
 import type { Product } from '@/web/src/core/models/product';
-import { UnitOfMeasurementDictionary } from '@/web/src/core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
 
 interface Props {
-  item: Product,
+  item: Product;
+  references: CatalogReferences;
 }
-const { item } = Astro.props;
+const { item, references } = Astro.props;
 
-const unitItem = item.unitId ? 
-  UnitOfMeasurementDictionary[item.unitId] : 
-  UnitOfMeasurementDictionary[0];
+const unitItem = references.measurementUnits.find(x => x.id === item.unitId);
+if (unitItem === undefined) {
+  console.warn("~ ProductCard ~ unable to obtain reference of measurement unit with Id", item.unitId);
+}
 
 const nameAddToCardAction = "pc-add-to-card";
 
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
-
-console.log("🚩 ~ ProductCard ~ value", item);
+const titleUnknown = "(?)";
 ---
 
 <product-card 
@@ -37,7 +38,7 @@ console.log("🚩 ~ ProductCard ~ value", item);
   <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
     {/* Product image with quick preivew */}
     <div class="group">
-      <ProductQuickView item={item} />
+      <ProductQuickView item={item} references={references} />
     </div>
     <div class="card-body !px-1 !py-1">
       {/* Product code */}
@@ -57,13 +58,13 @@ console.log("🚩 ~ ProductCard ~ value", item);
         </div>
       </a>
       {/* Prices block */}
-      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={false} />
+      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} />
       {/* Pack qunatity details */}
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
       {/* Maker */}
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       {/* Available colors */}
-      <ProductColors productId={item.id} colors={item.colors} />
+      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors}/>
       {/* Add to Shopping Cart */}
       <button name={nameAddToCardAction} class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>

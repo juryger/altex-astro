@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import type { Product } from '@/web/src/core/models/product';
-import { UnitOfMeasurementDictionary } from '@/web/src/core/models/unit-of-measurement';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -9,20 +8,27 @@ import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
 import ProductDimensions from './ProductDimensions.astro';
+import type { CatalogReferences } from '@/web/src/core/models/catalog';
 
 interface Props {
-  item: Product,
-  isPreview?: boolean,
+  item: Product;
+  references: CatalogReferences;
+  isPreview?: boolean;
 }
-const { item, isPreview } = Astro.props;
+const { item, references, isPreview } = Astro.props;
+
+const unitItem = references.measurementUnits.find(x => x.id === item.unitId);
+if (unitItem === undefined) {
+  console.warn("~ ProductDetails ~ unable to obtain reference of measurement unit with Id", item.unitId);
+}
 
 const btnAddToCartName = "pd-add-to-cart";
 const inputQuantityName = "pd-quantity-value"
-const unitItem = item.unitId ? UnitOfMeasurementDictionary[item.unitId] : UnitOfMeasurementDictionary[0];
 
 const titleNoProductDescription = "Нет дополнительной информации о товаре";
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
+const titleUnknown = "(?)";
 ---
 
 <product-details 
@@ -71,11 +77,11 @@ const titleProductCode = "Артикул";
           : <span class="italic text-sm">{titleNoProductDescription}</span>
         }
       </div>
-      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} isDetailed={true} />
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem.title} />
+      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} isDetailed={true} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
-      <ProductColors productId={item.id} colors={item.colors} isDetailed={true} />  
+      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
       <div class="flex items-center my-4">
         <QuantitySelector inputControlName={inputQuantityName} quantity={1} />

@@ -98,7 +98,11 @@ function createCategoriesLoader(config: {
 
         const data = await response.json();
         //console.log("🛠️ ~ categories-loader ~ entry:", data);
-        const result = data as Category;
+        const result = {
+          ...data,
+          createdAt: new Date(data.createdAt),
+          modifiedAt: new Date(data.modifiedAt),
+        } as Category;
 
         return result !== undefined
           ? { id: result.slug, data: result }

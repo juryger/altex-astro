@@ -9,26 +9,26 @@ export const $cart = persistentAtom<CartItem[]>("cart", [], {
 
 // Computed stores for total count and prices
 export const $cartCount = computed([$cart], (items) => {
-  return items.reduce((accumulator: number, currentItem: CartItem): number => {
-    return accumulator + currentItem.quantity;
+  return items.reduce((acc: number, curr: CartItem): number => {
+    return acc + curr.quantity;
   }, 0);
 });
 
 export const $cartCost = computed([$cart], (items) => {
-  return items.reduce((accumulator: number, currentItem: CartItem): number => {
-    return accumulator + currentItem.quantity * currentItem.price;
+  return items.reduce((acc: number, curr: CartItem): number => {
+    return acc + curr.quantity * curr.price;
   }, 0);
 });
 
 export const $cartWhsCost1 = computed([$cart], (items) => {
-  return items.reduce((accumulator: number, currentItem: CartItem): number => {
-    return accumulator + currentItem.quantity * currentItem.whsPrice1;
+  return items.reduce((acc: number, curr: CartItem): number => {
+    return acc + curr.quantity * curr.whsPrice1;
   }, 0);
 });
 
 export const $cartWhsCost2 = computed([$cart], (items) => {
-  return items.reduce((accumulator: number, currentItem: CartItem): number => {
-    return accumulator + currentItem.quantity * currentItem.whsPrice2;
+  return items.reduce((acc: number, curr: CartItem): number => {
+    return acc + curr.quantity * curr.whsPrice2;
   }, 0);
 });
 

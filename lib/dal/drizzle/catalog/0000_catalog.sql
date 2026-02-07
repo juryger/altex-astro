@@ -22,6 +22,8 @@ CREATE TABLE `colors` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`title` text NOT NULL,
+	`fill_color` text NOT NULL,
+	`border_color` text NOT NULL,
 	`uid` text NOT NULL
 );
 --> statement-breakpoint
