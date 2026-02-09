@@ -56,7 +56,7 @@ export function updateCart(value: CartItem): void {
   const existingEntry = $cart.get().find((x) => x.id === item.id);
   if (!existingEntry) {
     console.error(
-      "❌ ~ cart-store ~ Cannot update item in the cart, as it's not found by its ID:",
+      "~ cart-store ~ Cannot update item in the cart, as it's not found by its ID:",
       item.id,
     );
     return;
@@ -73,7 +73,7 @@ export function removeFromCart(id: string): void {
   const existingEntry = $cart.get().filter((x) => x.id === id);
   if (!existingEntry) {
     console.error(
-      "❌ ~ cart-store ~ Cannot remove item from the cart, as it's not found by its ID:",
+      "~ cart-store ~ Cannot remove item from the cart, as it's not found by its ID:",
       id,
     );
     return;

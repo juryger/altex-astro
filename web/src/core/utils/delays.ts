@@ -1,27 +1,30 @@
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const delay = (delayMs: number): Promise<void> => {
+  return new Promise((r) => {
+    setTimeout(() => r(), delayMs);
+  });
+};
 
-const delayWithRetry = (
-  ms: number,
+const delayWithRetry = async (
+  delayMs: number,
+  retries: number,
   validateFn: () => boolean,
-  attemps: number
-) => {
-  let retries = attemps;
+): Promise<boolean> => {
+  let retriesCounter = retries;
   let isValidated = false;
 
-  while (!isValidated || retries-- >= 0) {
-    delay(ms);
+  while (!isValidated || retriesCounter-- >= 0) {
+    await delay(delayMs);
     isValidated = validateFn();
   }
 
   if (!isValidated) {
     console.warn(
-      "~ delayWithRetry ~ unable to validate function after %i attemps",
-      attemps
-    );
-  } else {
-    console.log(
-      "~ delayWithRetry ~ provided function has been validated after %i attemps",
-      attemps - retries
+      "~ delayWithRetry ~ validate function is not fullfiled in %i attemp(s)",
+      retries,
     );
   }
+
+  return isValidated;
 };
+
+export { delay, delayWithRetry };

@@ -8,7 +8,8 @@
     "copy": "cp package.json dist/server && cp pnpm-lock.yaml dist/server && cp pnpm-workspace.yaml dist/server && cp .deploy/astro-nodejs-run.sh dist && cp .deploy/website-deploy.sh dist",
     "copy:win": "copy \"package.json\" \"dist/server\" && copy \"pnpm-lock.yaml\" \"dist/server\" && copy \"pnpm-workspace.yaml\" \"dist/server\" && copy \".deploy/astro-nodejs-run.sh\" \"dist\" && copy \".deploy/website-deploy.sh\" \"dist\"",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -17,13 +18,16 @@
     "@nanostores/logger": "^1.0.0",
     "@nanostores/persistent": "^1.2.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@vitest/browser": "^4.0.18",
     "astro": "^5.14.1",
     "daisyui": "^5.5.5",
     "dexie": "^4.2.1",
     "nanostores": "^1.0.1",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^4.0.18",
+    "vitest-browser-astro": "^0.1.0"
   },
   "devDependencies": {
     "vite": "^6.3.5"

@@ -4,10 +4,14 @@ type CacheInfo = {
 };
 
 interface CacheEntry<T = any> {
-  data: T | undefined;
-  timestamp: number;
+  data?: T;
   isLoading: boolean;
-  error: Error | undefined;
+  acquireTimestamp?: number;
+  staleTimestamp?: number;
 }
 
-export { type CacheInfo, type CacheEntry };
+interface CacheEvictionStrategy {
+  findKey: <T = any>(cache: Map<string, CacheEntry<T>>) => string | undefined;
+}
+
+export { type CacheInfo, type CacheEntry, type CacheEvictionStrategy };
