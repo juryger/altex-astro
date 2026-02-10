@@ -25,12 +25,12 @@
     "nanostores": "^1.0.1",
     "sharp": "^0.34.4",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
-    "vitest": "^4.0.18",
-    "vitest-browser-astro": "^0.1.0"
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^4.0.18",
+    "vitest-browser-astro": "^0.1.0"
   },
   "description": "Altex website based on Astro Framework and NodeJS server adapter",
   "keywords": [

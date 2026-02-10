@@ -2,8 +2,8 @@ import type {
   CacheEntry,
   CacheEvictionStrategy,
 } from "@/web/src/core/models/cache";
-import { delayWithRetry } from "../../utils/delays";
 import { getLeasRecentEvictionStrategy } from "./eviction/leastRecentEviction";
+import { delayWithRetry } from "@/web/src/core/utils/delays";
 
 const LOAD_RETRY_ATTEMPS = 1;
 const LOAD_RETRY_DELAY_MS = 300;
@@ -114,7 +114,7 @@ class CacheManager implements BaseCacheManager {
     );
   }
 
-  async get<T = any>(key: string): Promise<CacheGetResult> {
+  async get<T = any>(key: string): Promise<CacheGetResult<T>> {
     if (!this.cache.has(key)) return { status: "NotAvailable" };
 
     const cacheEntry = this.cache.get(key) as CacheEntry<T> | undefined;
@@ -126,7 +126,7 @@ class CacheManager implements BaseCacheManager {
     if (cacheEntry && !cacheEntry.isLoading)
       return {
         status: "Retrieved",
-        value: cacheEntry,
+        value: cacheEntry.data,
       };
 
     if (cacheEntry && !this.validateLoading(key, cacheEntry)) {
@@ -140,7 +140,7 @@ class CacheManager implements BaseCacheManager {
 
     return {
       status: "Retrieved",
-      value: this.cache.get(key),
+      value: (this.cache.get(key) as CacheEntry<T>).data,
     };
   }
 

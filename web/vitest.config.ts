@@ -3,14 +3,22 @@ import { getViteConfig } from "astro/config";
 
 export default getViteConfig({
   test: {
-    globals: true, // Makes describe, it, expect available globally
-    //qenvironment: "jsdom",
-    // setupFiles: ['./src/test-setup.ts'],
-    exclude: ["**/node_modules/**", "**/dist/**"],
+    globals: true,
+    environment: "node",
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/e2e/**",
+      "**/.{idea,git,cache,output,temp}/**",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      exclude: ["node_modules/", "test/"],
+      exclude: ["node_modules/", "src/test/", "e2e/"],
+    },
+    alias: {
+      "@/": new URL("..", import.meta.url).pathname,
+      "@/web": new URL("../web", import.meta.url).pathname,
     },
   },
 });
