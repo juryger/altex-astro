@@ -17,7 +17,7 @@ type CacheGetResult<T = any> = {
 };
 
 type CacheAcquireSetResult<T = any> = {
-  status: "Failed" | "Retrieved" | "Acquired";
+  status: "Failed" | "Acquired" | "Retrieved";
   value?: T;
   failedReason?: string;
   set?: (value: T, staleTimeMs: number) => void;
@@ -25,23 +25,31 @@ type CacheAcquireSetResult<T = any> = {
 
 export interface BaseCacheManager {
   get: <T = any>(key: string) => Promise<CacheGetResult<T>>;
+  //getOrSet: <T = any>(key: string, queryFn: () => Promise<T>, staleTimeMs: number) => Promise<T>;
   acquireSet: <T = any>(key: string) => Promise<CacheAcquireSetResult<T>>;
+  size: () => number;
   finalize: () => void;
 }
 
 class CacheManager implements BaseCacheManager {
   private static __instance: CacheManager;
+  private withTracing: boolean;
   private cache: Map<string, CacheEntry<any>> = new Map();
   private evictionStrategy: CacheEvictionStrategy | undefined;
 
-  constructor(evictionStrategy: CacheEvictionStrategy) {
+  constructor(
+    evictionStrategy: CacheEvictionStrategy,
+    withTracing: boolean = false,
+  ) {
     this.evictionStrategy = evictionStrategy;
+    this.withTracing = withTracing;
   }
 
-  static instance() {
+  static instance(withTracing: boolean = false) {
     if (!CacheManager.__instance) {
       CacheManager.__instance = new CacheManager(
         getLeasRecentEvictionStrategy(),
+        withTracing,
       );
     }
     return CacheManager.__instance;
@@ -55,22 +63,36 @@ class CacheManager implements BaseCacheManager {
       acquireTimestamp: undefined,
       staleTimestamp: currDate.getTime() + staleTimeMs,
     } as CacheEntry<T>);
+
+    if (this.withTracing) {
+      console.log("🐾 ~ cacheManager ~ set key '%s' with value %o", key, value);
+    }
   }
 
   private isExpired<T = any>(value: CacheEntry<T>): boolean {
     const currDate = new Date();
-    return (
+    const result =
       value.staleTimestamp !== undefined &&
-      value.staleTimestamp >= currDate.getTime()
-    );
+      value.staleTimestamp <= currDate.getTime();
+
+    if (this.withTracing) {
+      console.log("🐾 ~ cacheManager ~ isExpired:", result);
+    }
+
+    return result;
   }
 
   private isAcquireExpired<T = any>(value: CacheEntry<T>): boolean {
     const currDate = new Date();
-    return (
+    const result =
       value.acquireTimestamp !== undefined &&
-      value.acquireTimestamp >= currDate.getTime()
-    );
+      value.acquireTimestamp <= currDate.getTime();
+
+    if (this.withTracing) {
+      console.log("🐾 ~ cacheManager ~ isAcquireExpired:", result);
+    }
+
+    return result;
   }
 
   private isValid<T = any>(value: CacheEntry<T>): boolean {
@@ -80,6 +102,11 @@ class CacheManager implements BaseCacheManager {
   private invalidate(key: string) {
     const entry = this.cache.get(key);
     if (entry === undefined) return;
+
+    if (this.withTracing) {
+      console.log("🐾 ~ cacheManager ~ invalidating the item with key:", key);
+    }
+
     this.cache.delete(key);
   }
 
@@ -123,11 +150,22 @@ class CacheManager implements BaseCacheManager {
       return { status: "NotAvailable" };
     }
 
-    if (cacheEntry && !cacheEntry.isLoading)
+    if (cacheEntry && !cacheEntry.isLoading) {
+      if (this.withTracing) {
+        console.log(
+          "🐾 ~ cacheManager ~ get key '%s' value %o, expire on '%s'",
+          key,
+          cacheEntry.data,
+          cacheEntry.staleTimestamp
+            ? new Date(cacheEntry.staleTimestamp).toLocaleString()
+            : "NA",
+        );
+      }
       return {
         status: "Retrieved",
         value: cacheEntry.data,
       };
+    }
 
     if (cacheEntry && !this.validateLoading(key, cacheEntry)) {
       const message = `Failed to get cache item with the key '${key}' because it has been locked for retrieval by another request and not resolved in expected time.`;
@@ -192,9 +230,13 @@ class CacheManager implements BaseCacheManager {
     }
   }
 
+  size() {
+    return this.cache.size;
+  }
+
   finalize() {
     this.cache.clear();
   }
 }
 
-export { CacheManager };
+export { CacheManager, type CacheAcquireSetResult, type CacheGetResult };
