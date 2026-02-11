@@ -1,5 +1,5 @@
 import type { LiveLoader } from "astro/loaders";
-import { parseEndpointError } from "../utils/endpoint-error-parser";
+import { getErrorMessage } from "../utils/error-parser";
 import type { Product } from "../models/product";
 import type { PageResult, Paging } from "../models/paging";
 import type { Sorting } from "../models/sorting";
@@ -78,7 +78,7 @@ function createProductsLoader(config: {
         };
       } catch (error: unknown) {
         return {
-          error: parseEndpointError(error, "products"),
+          error: new Error(getErrorMessage(error)),
         };
       }
     },
@@ -113,7 +113,7 @@ function createProductsLoader(config: {
           : { error: new Error(`No product found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {
-          error: parseEndpointError(error, "product"),
+          error: new Error(getErrorMessage(error)),
         };
       }
     },

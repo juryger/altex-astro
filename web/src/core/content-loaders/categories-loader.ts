@@ -1,5 +1,5 @@
 import type { LiveLoader } from "astro/loaders";
-import { parseEndpointError } from "../utils/endpoint-error-parser";
+import { getErrorMessage } from "../utils/error-parser";
 import type { Category } from "../models/category";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 import type { Sorting } from "../models/sorting";
@@ -77,7 +77,7 @@ function createCategoriesLoader(config: {
         };
       } catch (error: unknown) {
         return {
-          error: parseEndpointError(error, "categories"),
+          error: new Error(getErrorMessage(error)),
         };
       }
     },
@@ -109,7 +109,7 @@ function createCategoriesLoader(config: {
           : { error: new Error(`No category found for slug ${filter.slug}`) };
       } catch (error: unknown) {
         return {
-          error: parseEndpointError(error, "category"),
+          error: new Error(getErrorMessage(error)),
         };
       }
     },
