@@ -1,6 +1,6 @@
 const delay = (delayMs: number): Promise<void> => {
-  return new Promise((r) => {
-    setTimeout(() => r(), delayMs);
+  return new Promise((res) => {
+    setTimeout(res, delayMs);
   });
 };
 
@@ -12,7 +12,7 @@ const delayWithRetry = async (
   let retriesCounter = retries;
   let isValidated = false;
 
-  while (!isValidated || retriesCounter-- >= 0) {
+  while (!isValidated && retriesCounter-- > 0) {
     await delay(delayMs);
     isValidated = validateFn();
   }

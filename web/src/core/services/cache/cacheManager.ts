@@ -5,11 +5,12 @@ import type {
 import { getLeasRecentEvictionStrategy } from "./eviction/leastRecentEviction";
 import { delayWithRetry } from "@/web/src/core/utils/delays";
 import { getErrorMessage } from "@/web/src/core/utils/error-parser";
-
-const LOAD_RETRY_ATTEMPS = 1;
-const LOAD_RETRY_DELAY_MS = 300;
-const ACQUIRE_SET_TIMEOUT_MS = 60000;
-const CACHE_ITEMS_COUNT_LIMIT = 20;
+import {
+  CACHE_ITEMS_LIMIT,
+  CACHE_LOAD_RETRY_ATTEMPS,
+  CACHE_LOAD_RETRY_DELAY_MS,
+  CACHE_ITEM_LOCK_TIMEOUT_MS,
+} from "@/web/src/core/const/cache";
 
 type CacheGetResult<T = any> = {
   value?: T;
@@ -27,21 +28,28 @@ export interface BaseCacheManager {
 class CacheManager implements BaseCacheManager {
   private static __instance: CacheManager;
   private withTracing: boolean;
+  private sizeLimit: number;
   private cache: Map<string, CacheEntry<any>> = new Map();
   private evictionStrategy: CacheEvictionStrategy | undefined;
 
   constructor(
     evictionStrategy: CacheEvictionStrategy,
-    withTracing: boolean = false,
+    sizeLimit: number,
+    withTracing: boolean,
   ) {
     this.evictionStrategy = evictionStrategy;
+    this.sizeLimit = sizeLimit;
     this.withTracing = withTracing;
   }
 
-  static instance(withTracing: boolean = false) {
+  static instance(
+    sizeLimit: number = CACHE_ITEMS_LIMIT,
+    withTracing: boolean = false,
+  ) {
     if (!CacheManager.__instance) {
       CacheManager.__instance = new CacheManager(
         getLeasRecentEvictionStrategy(),
+        sizeLimit,
         withTracing,
       );
     }
@@ -105,7 +113,7 @@ class CacheManager implements BaseCacheManager {
   }
 
   private evict(): boolean {
-    if (this.cache.size < CACHE_ITEMS_COUNT_LIMIT) return true;
+    if (this.cache.size < this.sizeLimit) return true;
 
     const evictionKey = this.evictionStrategy?.findKey(this.cache);
     if (evictionKey === undefined) {
@@ -124,15 +132,24 @@ class CacheManager implements BaseCacheManager {
     value: CacheEntry<T>,
   ): Promise<boolean> {
     if (!value.isLoading) return true;
-    return await delayWithRetry(
-      LOAD_RETRY_DELAY_MS,
-      LOAD_RETRY_ATTEMPS,
+    const result = await delayWithRetry(
+      CACHE_LOAD_RETRY_DELAY_MS,
+      CACHE_LOAD_RETRY_ATTEMPS,
       () => (this.cache.get(key) as CacheEntry<T>).isLoading === false,
     );
+
+    if (this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ validate that loading of cache item with key '%s' is finished: %s",
+        key,
+        result,
+      );
+    }
+    return result;
   }
 
   private aqcuireLock(key: string): Error | undefined {
-    if (this.cache.size >= CACHE_ITEMS_COUNT_LIMIT && !this.evict()) {
+    if (this.cache.size >= this.sizeLimit && !this.evict()) {
       const errorMessage = `Failed to acquire lock for cache item with key '${key}' because cache is full and eviction strategy failed`;
       console.error("~ cacheManager ~ %s", errorMessage);
       return new Error(errorMessage);
@@ -142,7 +159,7 @@ class CacheManager implements BaseCacheManager {
       const currDate = new Date();
       this.cache.set(key, {
         isLoading: true,
-        acquireTimestamp: currDate.getTime() + ACQUIRE_SET_TIMEOUT_MS,
+        acquireTimestamp: currDate.getTime() + CACHE_ITEM_LOCK_TIMEOUT_MS,
       });
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -154,6 +171,13 @@ class CacheManager implements BaseCacheManager {
   }
 
   async get<T = any>(key: string): Promise<CacheGetResult<T>> {
+    if (this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ obtaining cache item with key '%s'",
+        key,
+      );
+    }
+
     const cacheEntry = this.cache.has(key)
       ? (this.cache.get(key) as CacheEntry<T>)
       : undefined;
@@ -204,6 +228,12 @@ class CacheManager implements BaseCacheManager {
   }
 
   contains(key: string): boolean {
+    if (this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ checking that cache contains item with key '%s'",
+        key,
+      );
+    }
     let item = this.cache.has(key) ? this.cache.get(key) : undefined;
     if (item !== undefined && !this.isValid(item)) {
       this.invalidate(key);
