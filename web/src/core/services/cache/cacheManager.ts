@@ -9,10 +9,11 @@ import {
   CACHE_ITEMS_LIMIT,
   CACHE_LOAD_RETRY_ATTEMPS,
   CACHE_LOAD_RETRY_DELAY_MS,
-  CACHE_ITEM_LOCK_TIMEOUT_MS,
+  CACHE_ITEM_LOCK_TIMEOUT_1MN,
 } from "@/web/src/core/const/cache";
+import { getMostRecentEvictionStrategy } from "./eviction/mostRecentEviction";
 
-type CacheGetResult<T = any> = {
+type CacheResult<T = any> = {
   value?: T;
   error?: Error;
   set?: (value: T, staleTimeMs: number) => void;
@@ -20,7 +21,7 @@ type CacheGetResult<T = any> = {
 
 export interface BaseCacheManager {
   contains: (key: string) => boolean;
-  get: <T = any>(key: string) => Promise<CacheGetResult<T>>;
+  get: <T = any>(key: string) => Promise<CacheResult<T>>;
   getSize: () => number;
   terminate: () => void;
 }
@@ -42,13 +43,18 @@ class CacheManager implements BaseCacheManager {
     this.withTracing = withTracing;
   }
 
-  static instance(
-    sizeLimit: number = CACHE_ITEMS_LIMIT,
-    withTracing: boolean = false,
-  ) {
+  static instance({
+    evictionStrategy = getMostRecentEvictionStrategy(),
+    sizeLimit = CACHE_ITEMS_LIMIT,
+    withTracing = false,
+  }: {
+    evictionStrategy?: CacheEvictionStrategy;
+    sizeLimit?: number;
+    withTracing?: boolean;
+  }) {
     if (!CacheManager.__instance) {
       CacheManager.__instance = new CacheManager(
-        getLeasRecentEvictionStrategy(),
+        evictionStrategy,
         sizeLimit,
         withTracing,
       );
@@ -115,6 +121,13 @@ class CacheManager implements BaseCacheManager {
   private evict(): boolean {
     if (this.cache.size < this.sizeLimit) return true;
 
+    if (this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ evicting cache as cache size limit achieved %i, %o",
+        this.sizeLimit,
+        this.cache.entries().toArray(),
+      );
+    }
     const evictionKey = this.evictionStrategy?.findKey(this.cache);
     if (evictionKey === undefined) {
       console.warn(
@@ -159,7 +172,7 @@ class CacheManager implements BaseCacheManager {
       const currDate = new Date();
       this.cache.set(key, {
         isLoading: true,
-        acquireTimestamp: currDate.getTime() + CACHE_ITEM_LOCK_TIMEOUT_MS,
+        acquireTimestamp: currDate.getTime() + CACHE_ITEM_LOCK_TIMEOUT_1MN,
       });
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -170,14 +183,13 @@ class CacheManager implements BaseCacheManager {
     }
   }
 
-  async get<T = any>(key: string): Promise<CacheGetResult<T>> {
+  async get<T = any>(key: string): Promise<CacheResult<T>> {
     if (this.withTracing) {
       console.log(
         "🐾 ~ cacheManager ~ obtaining cache item with key '%s'",
         key,
       );
     }
-
     const cacheEntry = this.cache.has(key)
       ? (this.cache.get(key) as CacheEntry<T>)
       : undefined;
@@ -195,7 +207,7 @@ class CacheManager implements BaseCacheManager {
             ? (value: T, staleTimeMs: number) =>
                 this.set<T>(key, value, staleTimeMs)
             : undefined,
-      } as CacheGetResult<T>;
+      } as CacheResult<T>;
     }
 
     if (
@@ -206,7 +218,7 @@ class CacheManager implements BaseCacheManager {
       console.error("~ cacheManager ~ %s", errorMessage);
       return {
         error: new Error(errorMessage),
-      } as CacheGetResult<T>;
+      } as CacheResult<T>;
     }
 
     if (this.withTracing) {
@@ -220,7 +232,7 @@ class CacheManager implements BaseCacheManager {
     }
     return {
       value: cacheEntry.data,
-    } as CacheGetResult<T>;
+    } as CacheResult<T>;
   }
 
   getSize(): number {
@@ -247,4 +259,4 @@ class CacheManager implements BaseCacheManager {
   }
 }
 
-export { CacheManager, type CacheGetResult };
+export { CacheManager, type CacheResult };

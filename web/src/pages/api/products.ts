@@ -2,14 +2,15 @@ import type { APIRoute } from "astro";
 import type { Product } from "@/web/src/core/models/product";
 import { APISearchParamNames } from "@/web/src/core/const";
 import {
-  extractUrlFiltering,
   extractUrlPaging,
   extractUrlParam,
   extractUrlSorting,
-} from "../../core/utils/url-parser";
+} from "@/web/src/core/utils/url-parser";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchProducts } from "@/web/src/core/services/queries/products";
 import type { PageResult } from "@/web/src/core/models/paging";
+import { CACHE_STALE_TIMEOUT_5MN, CacheKeys } from "@/web/src/core/const/cache";
+import { getCacheInfo } from "@/web/src/core/models/cache";
 
 export const prerender = false;
 
@@ -22,8 +23,10 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const paging = extractUrlPaging(url);
   const sorting = extractUrlSorting(url);
 
-  const result = await queryManager().fetch<PageResult<Product>>(() =>
-    fetchProducts(categorySlug, sorting, paging),
+  const cacheKey = `${CacheKeys.Products}:parent:${categorySlug}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
+  const result = await queryManager().fetch<PageResult<Product>>(
+    () => fetchProducts(categorySlug, sorting, paging),
+    getCacheInfo(cacheKey, CACHE_STALE_TIMEOUT_5MN),
   );
 
   if (result.error) {

@@ -2,14 +2,17 @@ import type { APIRoute } from "astro";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchProductColors } from "@/web/src/core/services/queries/product-colors";
 import type { ProductColor } from "@/web/src/core/models/product-color";
+import { CacheKeys } from "@/web/src/core/const/cache";
+import { getCacheInfo } from "@/web/src/core/models/cache";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
   console.log("📍 ~ API-GET ~ discounts list ~ URL:", URL.parse(request.url));
 
-  const result = await queryManager().fetch<ProductColor[]>(() =>
-    fetchProductColors(),
+  const result = await queryManager().fetch<ProductColor[]>(
+    () => fetchProductColors(),
+    getCacheInfo(CacheKeys.ProductColors),
   );
 
   if (result.error) {

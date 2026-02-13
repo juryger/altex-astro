@@ -9,6 +9,12 @@ import { fetchCategories } from "@/web/src/core/services/queries/categories";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import type { PageResult } from "@/web/src/core/models/paging";
 import type { Category } from "@/web/src/core/models/category";
+import { getCacheInfo } from "@/web/src/core/models/cache";
+import {
+  CACHE_STALE_TIMEOUT_1HR,
+  CACHE_STALE_TIMEOUT_5MN,
+  CacheKeys,
+} from "@/web/src/core/const/cache";
 
 export const prerender = false;
 
@@ -24,8 +30,20 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const sorting = extractUrlSorting(url);
   const paging = extractUrlPaging(url);
 
-  const result = await queryManager().fetch<PageResult<Category>>(() =>
-    fetchCategories(skipParentMatch, parentSlug, sorting, paging),
+  let cacheKey = skipParentMatch
+    ? CacheKeys.CategoriesAll
+    : parentSlug === undefined
+      ? CacheKeys.CategoriesRoot
+      : `${CacheKeys.CategoriesParent}:${parentSlug}`;
+  cacheKey = `${cacheKey}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
+  const result = await queryManager().fetch<PageResult<Category>>(
+    () => fetchCategories(skipParentMatch, parentSlug, sorting, paging),
+    getCacheInfo(
+      cacheKey,
+      parentSlug !== undefined
+        ? CACHE_STALE_TIMEOUT_5MN
+        : CACHE_STALE_TIMEOUT_1HR,
+    ),
   );
 
   if (result.error) {

@@ -2,13 +2,18 @@ import type { APIRoute } from "astro";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchDiscounts } from "@/web/src/core/services/queries/discounts";
 import type { Discount } from "@/web/src/core/models/discount";
+import { CacheKeys } from "@/web/src/core/const/cache";
+import { getCacheInfo } from "@/web/src/core/models/cache";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
   console.log("📍 ~ API-GET ~ discounts list ~ URL:", URL.parse(request.url));
 
-  const result = await queryManager().fetch<Discount[]>(() => fetchDiscounts());
+  const result = await queryManager().fetch<Discount[]>(
+    () => fetchDiscounts(),
+    getCacheInfo(CacheKeys.Discounts),
+  );
 
   if (result.error) {
     console.error(result.error);

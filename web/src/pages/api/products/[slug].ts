@@ -2,6 +2,8 @@ import type { APIRoute } from "astro";
 import { queryManager } from "@/web/src/core/services/queryManager";
 import { fetchProductBySlug } from "@/web/src/core/services/queries/products";
 import type { Product } from "@/web/src/core/models/product";
+import { getCacheInfo } from "@/web/src/core/models/cache";
+import { CACHE_STALE_TIMEOUT_1MN, CacheKeys } from "@/web/src/core/const/cache";
 
 export const prerender = false;
 
@@ -15,8 +17,9 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  const result = await queryManager().fetch<Product | undefined>(() =>
-    fetchProductBySlug(slug),
+  const result = await queryManager().fetch<Product | undefined>(
+    () => fetchProductBySlug(slug),
+    getCacheInfo(`${CacheKeys.ProductItem}:${slug}`, CACHE_STALE_TIMEOUT_1MN),
   );
 
   if (result.error) {

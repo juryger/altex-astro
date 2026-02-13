@@ -18,7 +18,8 @@ import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measureme
 import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
 import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
 import type { CatalogReferences } from '@/web/src/core/models/catalog';
-import { reference } from 'astro:content';
+import { getCacheInfo } from '@/web/src/core/models/cache';
+import { CacheKeys } from '@/web/src/core/const/cache';
 
 const { slug, params } = Astro.params;
 
@@ -44,9 +45,18 @@ const parseRouteParams = (): {
 
 const fetchCatalogReferences = async (): Promise<CatalogReferences | undefined> => {
   return await Promise.all([
-    queryManager().fetch(() => fetchMeasurementUnits()), 
-    queryManager().fetch(() => fetchDiscounts()), 
-    queryManager().fetch(() => fetchProductColors()),
+    queryManager().fetch(
+      () => fetchMeasurementUnits(),
+      getCacheInfo(CacheKeys.MeasurementUnits),
+    ), 
+    queryManager().fetch(
+      () => fetchDiscounts(), 
+      getCacheInfo(CacheKeys.Discounts),
+    ), 
+    queryManager().fetch(
+      () => fetchProductColors(),
+      getCacheInfo(CacheKeys.ProductColors)
+    ),
   ]).then((data) => {        
     if (data.some(x => x.error !== undefined)) {
       const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
