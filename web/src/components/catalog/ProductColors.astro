@@ -26,7 +26,7 @@ const titleNoProductColors = "Нет информации о цвете";
         const metadata = colorsReference.find(x => x.id === key);
         return metadata && <input type="radio" name={"radio-color".concat(productId.toString())}
           checked={index == 0 ? "checked" : undefined} title={metadata.title} value={key}
-          class="appearance-none rounded-full border-1 checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
+          class="cursor-pointer appearance-none rounded-full border-1 checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
           class:list={[
             metadata.fillColor, 
             metadata.borderColor, 

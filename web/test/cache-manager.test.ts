@@ -143,7 +143,7 @@ describe("Cache manager", () => {
 
     let containsCheck = cacheManager.contains(CacheKeys.CategoriesRoot);
     expect(containsCheck).toBe(false);
-    containsCheck = cacheManager.contains(CacheKeys.CategoriesParent + "lich");
+    containsCheck = cacheManager.contains(CacheKeys.CategoriesParent + ":lich");
     expect(containsCheck).toBe(true);
   });
 });

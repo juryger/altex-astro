@@ -68,7 +68,7 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 			switch (syncStatus.syncType)
 			{
 				case CatalogSyncType.Cache:
-					localStorageManager.setLastSyncDate(new Date());
+					localStorageManager.setCatalogSyncDate(new Date());
 					localStorageManager.setCatalogSyncInProgress(false);
 					localStorageManager.setCatalogSyncPostponed(false);
 					break;

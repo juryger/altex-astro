@@ -90,7 +90,9 @@ const dataCartShowCommandName = "cartmenu-show";
       const totalCount = $cartCount.get();
       this.cartIndicatorEl.innerHTML = totalCount.toString();
       this.cartCountEl.innerHTML = totalCount.toString();
-      if (this.cartShowEl) (this.cartShowEl as HTMLInputElement).disabled = (totalCount === 0); 
+      if (this.cartShowEl) { 
+        (this.cartShowEl as HTMLInputElement).disabled = (totalCount === 0); 
+      }
     }
 
     private syncCartCostFromStore(): void {
@@ -114,12 +116,25 @@ const dataCartShowCommandName = "cartmenu-show";
       }
     }
 
+    private loadDiscountsFromIndexedDB(): void {
+      if (this.discounts.length > 0) return;
+      clientDb.discounts.toArray((data) => { 
+        if (!data || data.length === 0) {
+          console.warn("~ CartMenu ~ Discunts data are not available.")
+          return;
+        }
+        this.discounts = data;
+        this.syncCartCostFromStore()
+      });
+    }
+
     private subscribeToCountStore() {
       this.storeCountUnsubscribe = $cartCount.listen((value) => {
         //console.log("~ CartMenu component ~ total count has changed:", value);
-        if (this.cartIndicatorEl !== null) this.cartIndicatorEl.innerHTML = value.toString();
-        if (this.cartCountEl !== null) this.cartCountEl.innerHTML = value.toString();
-        if (this.cartShowEl) (this.cartShowEl as HTMLInputElement).disabled = (value === 0); 
+        this.syncCartCountFromStore();
+        if (this.discounts.length === 0) {
+          this.loadDiscountsFromIndexedDB();
+        }
       });
     }
 
@@ -153,7 +168,7 @@ const dataCartShowCommandName = "cartmenu-show";
           if (this.fullCostEl !== null) this.fullCostEl.innerHTML = formatCurrency($cartCost.get());
         }
       });
-    }
+    }    
     
     connectedCallback() {
       this.controller = new AbortController();
@@ -173,11 +188,7 @@ const dataCartShowCommandName = "cartmenu-show";
       this.subscribeToWhsCost2Store();
 
       this.syncCartCountFromStore();
-      clientDb.discounts.toArray((data) => { 
-        if (!data || data.length === 0) console.error("~ CartMenu ~ Discounts data are not available.")
-        this.discounts = data;
-        this.syncCartCostFromStore()
-      });
+      this.loadDiscountsFromIndexedDB();
     }
 
     disconnectedCallback() {

@@ -66,6 +66,8 @@ const titleSubtotal = "Итого:";
   import type { ProductColor } from '@/web/src/core/models/product-color';
 
 
+  const CART_VIEW_INIT_TIMEOUT_MS = 300;
+
   class CartContent extends HTMLElement {
     private controller: AbortController | undefined;
     private discounts: Discount[] = [];
@@ -193,13 +195,44 @@ const titleSubtotal = "Итого:";
       });
     }
 
+    private loadDiscountsFromIndexedDB(): void {
+      if (this.discounts.length > 0) return;
+      clientDb.discounts.toArray((data) => { 
+        if (!data || data.length === 0) {
+          console.warn("~ CartContent ~ Discunts data are not available.")
+          return;
+        }
+        this.discounts = data;
+        this.syncCartCostFromStore()
+      });    
+    }
+
+    private loadProductColorsFromIndexedDB(): void {
+      if (this.productColors.length > 0) return;
+
+      clientDb.productColors.toArray((data) => { 
+        if (data.length === 0) {
+          console.warn("~ CartContent ~ Product Colors data are not available.");
+          return;
+        }
+        this.productColors = data;
+        this.syncCartContentFromStore();
+      });
+    }
+
     private subscribeToCartStore() {
       this.storeCartUnsubscribe = $cart.listen((items) => {
         //console.log("~ CartContent ~ cart store changed");
         if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (items.length === 0);
         setTimeout(() => {
           this.syncCartContentFromStore();
-        }, 300)
+          if (this.discounts.length === 0) {
+            this.loadDiscountsFromIndexedDB();
+          }
+          if (this.productColors.length === 0) {
+            this.loadProductColorsFromIndexedDB();
+          }
+        }, CART_VIEW_INIT_TIMEOUT_MS)
       });
     }
 
@@ -320,21 +353,8 @@ const titleSubtotal = "Итого:";
       this.subscribeToWhsCost1Store();
       this.subscribeToWhsCost2Store();
       
-      clientDb.discounts.toArray((data) => { 
-        if (data.length === 0) {
-          console.warn("~ CartContent ~ Discounts data are not available.");
-        }
-        this.discounts = data;
-        this.syncCartCostFromStore()
-      });
-
-      clientDb.productColors.toArray((data) => { 
-        if (data.length === 0) {
-          console.warn("~ CartContent ~ Product Colors data are not available.");
-        }
-        this.productColors = data;
-        this.syncCartContentFromStore();
-      }); 
+      this.loadDiscountsFromIndexedDB();
+      this.loadProductColorsFromIndexedDB();
     }
 
     disconnectedCallback() {

@@ -1,4 +1,12 @@
 @import "tailwindcss";
+@source inline("bg-amber-{50,{100..900..100},950}");
+@source inline("bg-orange-{50,{100..900..100},950}");
+@source inline("bg-slate-{50,{100..900..100},950}");
+@source inline("bg-yellow-{50,{100..900..100},950}");
+@source inline("bg-gray-{50,{100..900..100},950}");
+@source inline("bg-white-{50,{100..900..100},950}");
+@source inline("bg-black-{50,{100..900..100},950}");
+@source inline("border-gray-{50,{100..900..100},950}");
 @plugin "daisyui" {
   themes:
     light --default,

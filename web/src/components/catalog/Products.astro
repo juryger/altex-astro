@@ -11,7 +11,6 @@ import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import ModalDialog from '../ModalDialog.astro';
 import type { CatalogReferences } from '@/web/src/core/models/catalog';
-import { reference } from 'astro:content';
 
 interface Props {
   categorySlug: string;
@@ -135,6 +134,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 
 <script>
   import { getProductsViewManager, type ProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
+  import { getLocalStorageManager } from "../../core/utils/local-storage-manager";
   
   const VIEW_MODE_INIT_DELAY_MS = 300;
 
@@ -151,9 +151,15 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
       if (productsRootEl === null) return;
 
-      const pagePrev = productsRootEl.dataset.page_prev ? Number.parseInt(productsRootEl.dataset.page_prev, 10) : -1;
-      const pageNext = productsRootEl.dataset.page_next ? Number.parseInt(productsRootEl.dataset.page_next, 10) : -1;
-      const pageSize = productsRootEl.dataset.page_size ? Number.parseInt(productsRootEl.dataset.page_size, 10) : 0;
+      const pagePrev = productsRootEl.dataset.page_prev 
+        ? Number.parseInt(productsRootEl.dataset.page_prev, 10) 
+        : -1;
+      const pageNext = productsRootEl.dataset.page_next 
+        ? Number.parseInt(productsRootEl.dataset.page_next, 10) 
+        : -1;
+      const pageSize = productsRootEl.dataset.page_size 
+        ? Number.parseInt(productsRootEl.dataset.page_size, 10) 
+        : 0;
 
       viewManager = getProductsViewManager({
         selectSortEl: document.querySelector('select[name="sort-field-select"]'),
@@ -176,7 +182,12 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
     applyViewManager();
   });
 
-  window.addEventListener('pagehide', () => {
+  window.addEventListener('beforeunload', (event) => { 
+    // This instantly removes all listeners using 'signal' from themeToggleManager
+    controller?.abort(); 
+  });
+
+  window.addEventListener('pagehide', () => {     
     // This instantly removes all listeners using 'signal' from themeToggleManager
     controller?.abort(); 
   });

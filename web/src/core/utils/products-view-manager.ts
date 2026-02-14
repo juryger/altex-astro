@@ -2,6 +2,7 @@ import { navigate } from "astro:transitions/client";
 import { DialogActionResult, ProductsSortFileds, SortOrder } from "../const";
 import { regexPageParams, regexSortParams } from "./regex";
 import { constructNavigationPaths } from "./url-builder";
+import { getLocalStorageManager } from "./local-storage-manager";
 
 interface ProductsViewManager {
   apply: (signal: AbortSignal) => void;
@@ -47,11 +48,6 @@ const getSelectedSortField = (
   return selectEl.value;
 };
 
-const handleSortFieldChange = (inputElements: ProductsViewComponents): void => {
-  const dialogEl = inputElements.sortDialogEl as HTMLDialogElement;
-  dialogEl.showModal();
-};
-
 const handleSortOrderChange = (
   isAscending: boolean,
   pageSize: number,
@@ -81,6 +77,11 @@ const handleSortOrderChange = (
   navigate(url);
 };
 
+const handleSortFieldChange = (inputElements: ProductsViewComponents): void => {
+  const dialogEl = inputElements.sortDialogEl as HTMLDialogElement;
+  dialogEl.showModal();
+};
+
 const handleDialogClose = (
   initialSortField: string,
   pageSize: number,
@@ -93,34 +94,30 @@ const handleDialogClose = (
     initialSortField,
   );
 
-  let url = window.location.toString();
+  let url: string | undefined = undefined;
   const dialog = inputElements.sortDialogEl as HTMLDialogElement;
   switch (Number.parseInt(dialog.returnValue, 10)) {
     case DialogActionResult.Yes:
       const sortQueryAsc = `sort:${sortField}:${SortOrder.Ascending}`;
+      url = window.location.toString();
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryAsc)
           : constructNavigationPaths(url, sortQueryAsc);
-
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
-
-      navigate(url);
       break;
     case DialogActionResult.No:
       const sortQueryDesc = `sort:${sortField}:${SortOrder.Descending}`;
+      url = window.location.toString();
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryDesc)
           : constructNavigationPaths(url, sortQueryDesc);
-
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
-
-      navigate(url);
       break;
     case DialogActionResult.None:
       // Restore initial sort field
@@ -131,6 +128,7 @@ const handleDialogClose = (
       console.error("Unsupported dialog result", dialog.returnValue);
       break;
   }
+  if (url !== undefined) navigate(url);
 };
 
 const handlePageNavigation = (pageQuery: string) => {
