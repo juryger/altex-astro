@@ -6,8 +6,11 @@ import { Image } from 'astro:assets';
 import successLogo from '@/web/src/assets/success.png';
 import { extractUrlParam } from '@/web/src/core/utils/url-parser';
 
-const order = extractUrlParam(new URL(Astro.request.url), "order", "string"); 
-console.log("🛠️ ~ Cart checkout confirmation page ~ request: %s", order);
+const orderNumber = extractUrlParam(new URL(Astro.request.url), "order", "string"); 
+console.log("🛠️ ~ Cart checkout confirmation page ~ request: %s", orderNumber);
+
+const titleOrderConfirmation = "Спасибо за раземещение заказа. В ближайшее время мы свяжимся с Вами по указанном email адресу для уточнения деталей.";
+const titleOrderReference = "Идентификатор заказа";
 ---
 
 <BaseLayout title="Подтверждение заказа">
@@ -20,7 +23,10 @@ console.log("🛠️ ~ Cart checkout confirmation page ~ request: %s", order);
     </div>
     <div class="grow-1 content-center">
       <p>
-        <span>Спасибо за раземещение заказа с номером <b>{order}</b>. В ближайшее время мы свяжимся с Вами по указанном email адресу для уточнения деталей.</span>
+        <span>{titleOrderConfirmation}</span>
+        <br/>
+        <span>{titleOrderReference}:</span>
+        <span class="font-bold text-accent">{orderNumber}</span>
       </p>
     </div>
   </div>

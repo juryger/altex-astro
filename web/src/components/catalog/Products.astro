@@ -10,11 +10,11 @@ import { loadProducts, type ProductCollectionFilter } from '@/web/src/core/conte
 import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import ModalDialog from '../ModalDialog.astro';
-import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/web/src/core/models/catalog';
 
 interface Props {
   categorySlug: string;
-  references: CatalogReferences;
+  references: Catalog;
   sorting?: Sorting | undefined;
   paging?: Paging | undefined;
   filtering?: Filtering[];

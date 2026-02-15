@@ -65,7 +65,6 @@ const titleSubtotal = "Итого:";
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import type { ProductColor } from '@/web/src/core/models/product-color';
 
-
   const CART_VIEW_INIT_TIMEOUT_MS = 300;
 
   class CartContent extends HTMLElement {
@@ -281,7 +280,7 @@ const titleSubtotal = "Итого:";
         const color = colorEl !== null ? parseInt((colorEl as HTMLInputElement).value) : undefined;
 
         const quantityEl = this.querySelector(`input[name='${id}-quantity']`);
-        const quantity = quantityEl ? parseInt((quantityEl as HTMLInputElement).value) : 1;
+        const quantity = quantityEl ? Math.abs(parseInt((quantityEl as HTMLInputElement).value)) : 1;
 
         if (item.color !== undefined && item.color !== color) {
           // color has changed

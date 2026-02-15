@@ -45,24 +45,24 @@ export const guests = table(
   ],
 );
 
-export const cart = table("cart", {
+export const cartCheckout = table("cart_checkout", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  title: t.text().notNull(), // pre-order identifier, i.e. ONLINE-{ID} or STORE-{ID}
+  name: t.text().notNull(), // ONLINE-{ID} vs STORE-{ID}
   userId: t.int("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
   guestId: t.int("guest_id").references(() => guests.id),
-  discountId: t.int("discount_id"), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite
+  discountId: t.int("discount_id").notNull(), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
 });
 
-export const cartItems = table("cart_items", {
+export const cartCheckoutItems = table("cart_checkout_items", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  cartId: t
-    .int("cart_id")
+  cartCheckoutId: t
+    .int("cart_checkout_id")
     .notNull()
-    .references(() => cart.id),
+    .references(() => cartCheckout.id),
   productId: t.int("product_id").notNull(), // .references(() => products.id), <- cannot reference external db-file, not supported by SQLite
   colorId: t.int("color_id"),
   quantity: t.int().notNull(),

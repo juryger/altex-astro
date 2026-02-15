@@ -8,11 +8,11 @@ import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
-import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/web/src/core/models/catalog';
 
 interface Props {
   item: Product;
-  references: CatalogReferences;
+  references: Catalog;
 }
 const { item, references } = Astro.props;
 

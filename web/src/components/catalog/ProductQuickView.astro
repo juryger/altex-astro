@@ -4,11 +4,11 @@ import type { Product } from '@/web/src/core/models/product';
 import ModalDialog from '../ModalDialog.astro';
 import ProductDetails from './ProductDetails.astro';
 import { DialogActionButtons, DialogSize } from '@/web/src/core/const';
-import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/web/src/core/models/catalog';
 
 interface Props {
   item: Product;
-  references: CatalogReferences;
+  references: Catalog;
 }
 const { item, references } = Astro.props;
 

@@ -1,13 +1,16 @@
 import { defineAction } from "astro:actions";
-import { CartCheckoutSchema } from "../core/models/cart";
-//import { dbCatalog, type Colors } from "@/lib/dal";
+import { CartCheckoutRequestSchema } from "../core/models/cart";
+import { getCartManager } from "../core/services/cart/cartManager";
 
 export const cartActions = {
   checkout: defineAction({
-    input: CartCheckoutSchema,
+    input: CartCheckoutRequestSchema,
     handler: async (input) => {
-      //const colors = (await dbCatalog.query.colors.findMany()) as Colors[];
-      return "ONLINE-123";
+      return await getCartManager().checkoutCart(
+        input.cartContent,
+        input.guestUser,
+        input.userId,
+      );
     },
   }),
 };

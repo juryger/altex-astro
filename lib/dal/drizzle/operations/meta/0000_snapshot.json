@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "2bca19a5-7ba5-4c89-8aef-c219df1b4cdf",
+  "id": "d5108d82-b17f-4150-9b34-5d7c12b85d68",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "cart": {
-      "name": "cart",
+    "cart_checkout": {
+      "name": "cart_checkout",
       "columns": {
         "id": {
           "name": "id",
@@ -14,8 +14,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "title": {
-          "name": "title",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -39,7 +39,7 @@
           "name": "discount_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -53,9 +53,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "cart_guest_id_guests_id_fk": {
-          "name": "cart_guest_id_guests_id_fk",
-          "tableFrom": "cart",
+        "cart_checkout_guest_id_guests_id_fk": {
+          "name": "cart_checkout_guest_id_guests_id_fk",
+          "tableFrom": "cart_checkout",
           "tableTo": "guests",
           "columnsFrom": [
             "guest_id"
@@ -71,8 +71,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "cart_items": {
-      "name": "cart_items",
+    "cart_checkout_items": {
+      "name": "cart_checkout_items",
       "columns": {
         "id": {
           "name": "id",
@@ -81,8 +81,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "cart_id": {
-          "name": "cart_id",
+        "cart_checkout_id": {
+          "name": "cart_checkout_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -112,12 +112,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "cart_items_cart_id_cart_id_fk": {
-          "name": "cart_items_cart_id_cart_id_fk",
-          "tableFrom": "cart_items",
-          "tableTo": "cart",
+        "cart_checkout_items_cart_checkout_id_cart_checkout_id_fk": {
+          "name": "cart_checkout_items_cart_checkout_id_cart_checkout_id_fk",
+          "tableFrom": "cart_checkout_items",
+          "tableTo": "cart_checkout",
           "columnsFrom": [
-            "cart_id"
+            "cart_checkout_id"
           ],
           "columnsTo": [
             "id"

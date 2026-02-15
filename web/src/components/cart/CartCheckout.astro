@@ -84,7 +84,9 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             <p class="validator-hint hidden">{titleIncorrectPostCode}</p>
           </fieldset>
           <div class="col-span-2 flex justify-center">
-            <button name={dataOrderConfirmCommandName} class="btn btn-primary w-1/2 sm:w-1/3 rounded-md border border-transparent">{titleConfirmOrder}</button>
+            <button name={dataOrderConfirmCommandName} class="btn btn-primary w-1/2 sm:w-1/3 rounded-md border border-transparent">
+              {titleConfirmOrder}
+            </button>
           </div>
         </div>      
       </form>
@@ -121,7 +123,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
   import { $cart, $cartCount } from "@/web/src/core/stores/client/cart-store";
-  import { type CartCheckoutGuestUser } from '@/web/src/core/models/cart';
+  import { type GuestUser } from '@/web/src/core/models/guest-user';
   import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 
   class CartCheckout extends HTMLElement {
@@ -138,18 +140,18 @@ const titleCartCheckoutFailed = "При размещении заказа воз
 
     private createOrder = async (): Promise<string | undefined> => {
       const formData = new FormData(this.formCartCheckoutEl as HTMLFormElement);
-      
-      const user = (Object.fromEntries(formData?.entries()) as CartCheckoutGuestUser);
+      const entries = formData?.entries();
+      const user = Object.fromEntries(entries) as GuestUser;
       const cartItems = $cart.get();
 
       const { data, error } = await actions.cartActions.checkout({ 
         guestUser: user,
-        cart: cartItems,
+        cartContent: cartItems,
       });
 
       var err = error as Error;
       if (err !== undefined) throw err;      
-      return data;
+      return data?.name;
     }
 
     private resetCart = () => {
@@ -185,16 +187,18 @@ const titleCartCheckoutFailed = "При размещении заказа воз
 
     private syncCartCountFromStore(): void {
       if (!this.orderConfirmEl) return;
-
       const totalCount = $cartCount.get();
-      if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (totalCount === 0);
+      if (this.orderConfirmEl) {
+        (this.orderConfirmEl as HTMLInputElement).disabled = (totalCount === 0);
+      }
     }
 
     private subscribeToCountStore() {
       if (!this.orderConfirmEl) return; 
-
       this.storeCountUnsubscribe = $cartCount.listen((value) => {
-        if (this.orderConfirmEl) (this.orderConfirmEl as HTMLInputElement).disabled = (value === 0);
+        if (this.orderConfirmEl) {
+          (this.orderConfirmEl as HTMLInputElement).disabled = (value === 0);
+        }
       });
     }
 

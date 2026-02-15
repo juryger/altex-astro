@@ -2,7 +2,6 @@ import type {
   CacheEntry,
   CacheEvictionStrategy,
 } from "@/web/src/core/models/cache";
-import { getLeasRecentEvictionStrategy } from "./eviction/leastRecentEviction";
 import { delayWithRetry } from "@/web/src/core/utils/delays";
 import { getErrorMessage } from "@/web/src/core/utils/error-parser";
 import {
@@ -19,7 +18,7 @@ type CacheResult<T = any> = {
   set?: (value: T, staleTimeMs: number) => void;
 };
 
-export interface BaseCacheManager {
+interface BaseCacheManager {
   contains: (key: string) => boolean;
   get: <T = any>(key: string) => Promise<CacheResult<T>>;
   getSize: () => number;

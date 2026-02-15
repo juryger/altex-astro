@@ -1,20 +1,20 @@
-CREATE TABLE `cart` (
+CREATE TABLE `cart_checkout` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`title` text NOT NULL,
+	`name` text NOT NULL,
 	`user_id` integer,
 	`guest_id` integer,
-	`discount_id` integer,
+	`discount_id` integer NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`guest_id`) REFERENCES `guests`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `cart_items` (
+CREATE TABLE `cart_checkout_items` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`cart_id` integer NOT NULL,
+	`cart_checkout_id` integer NOT NULL,
 	`product_id` integer NOT NULL,
 	`color_id` integer,
 	`quantity` integer NOT NULL,
-	FOREIGN KEY (`cart_id`) REFERENCES `cart`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`cart_checkout_id`) REFERENCES `cart_checkout`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `guests` (

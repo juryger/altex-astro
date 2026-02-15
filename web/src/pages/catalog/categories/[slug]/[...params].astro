@@ -17,7 +17,7 @@ import { queryManager } from '@/web/src/core/services/queryManager';
 import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurementUnits';
 import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
 import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
-import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/web/src/core/models/catalog';
 import { getCacheInfo } from '@/web/src/core/models/cache';
 import { CacheKeys } from '@/web/src/core/const/cache';
 
@@ -43,7 +43,7 @@ const parseRouteParams = (): {
   return { sorting, paging, filtering };
 }
 
-const fetchCatalogReferences = async (): Promise<CatalogReferences | undefined> => {
+const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
   return await Promise.all([
     queryManager().fetch(
       () => fetchMeasurementUnits(),

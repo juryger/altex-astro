@@ -1,4 +1,5 @@
 import { z } from "astro/zod";
+import { GuestUserSchema } from "./guest-user";
 
 export const CartSchema = z
   .object({
@@ -23,22 +24,11 @@ export const CartSchema = z
         : data.productId.toString(),
   }));
 
-export const CartCheckoutGuestUserSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  phone: z.string().optional(),
-  compnayName: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  postCode: z.string().optional(),
-});
-
-export const CartCheckoutSchema = z.object({
+export const CartCheckoutRequestSchema = z.object({
   userId: z.number().optional(),
-  guestUser: CartCheckoutGuestUserSchema.optional(),
-  cart: z.array(CartSchema),
+  guestUser: GuestUserSchema.optional(),
+  cartContent: z.array(CartSchema),
 });
 
 export type CartItem = z.infer<typeof CartSchema>;
-export type CartCheckoutGuestUser = z.infer<typeof CartCheckoutGuestUserSchema>;
+export type CartCheckoutRequest = z.infer<typeof CartCheckoutRequestSchema>;

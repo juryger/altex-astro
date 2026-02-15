@@ -8,11 +8,11 @@ import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
 import ProductDimensions from './ProductDimensions.astro';
-import type { CatalogReferences } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/web/src/core/models/catalog';
 
 interface Props {
   item: Product;
-  references: CatalogReferences;
+  references: Catalog;
   isPreview?: boolean;
 }
 const { item, references, isPreview } = Astro.props;

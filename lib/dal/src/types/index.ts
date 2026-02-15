@@ -12,8 +12,8 @@ import type {
   catalogVersion,
 } from "../schema/catalog";
 import type {
-  cart,
-  cartItems,
+  cartCheckout,
+  cartCheckoutItems,
   guests,
   notificationAddressees,
   notifications,
@@ -37,8 +37,8 @@ export type RelatedProduct = InferSelectModel<typeof relatedProducts>;
 export type OperationVersion = InferSelectModel<typeof operationsVersion>;
 export type ReadReplica = InferSelectModel<typeof readReplicas>;
 export type Guest = InferSelectModel<typeof guests>;
-export type Cart = InferSelectModel<typeof cart>;
-export type CartItem = InferSelectModel<typeof cartItems>;
+export type CartCheckout = InferSelectModel<typeof cartCheckout>;
+export type CartCheckoutItem = InferSelectModel<typeof cartCheckoutItems>;
 export type Notification = InferSelectModel<typeof notifications>;
 export type NotificationAddressee = InferSelectModel<
   typeof notificationAddressees
