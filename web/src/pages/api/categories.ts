@@ -6,7 +6,7 @@ import {
   extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
 import { fetchCategories } from "@/web/src/core/services/queries/categories";
-import { queryManager } from "@/web/src/core/services/queryManager";
+import { getQueryManager } from "@/web/src/core/services/queryManager";
 import type { PageResult } from "@/web/src/core/models/paging";
 import type { Category } from "@/web/src/core/models/category";
 import { getCacheInfo } from "@/web/src/core/models/cache";
@@ -36,7 +36,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       ? CacheKeys.CategoriesRoot
       : `${CacheKeys.CategoriesParent}:${parentSlug}`;
   cacheKey = `${cacheKey}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
-  const result = await queryManager().fetch<PageResult<Category>>(
+  const result = await getQueryManager().fetch<PageResult<Category>>(
     () => fetchCategories(skipParentMatch, parentSlug, sorting, paging),
     getCacheInfo(
       cacheKey,

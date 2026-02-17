@@ -30,8 +30,8 @@ export type {
   ProductColor,
   ReadReplica,
   Guest,
-  Cart,
-  CartItem,
+  CartCheckout,
+  CartCheckoutItem,
   Notification,
   NotificationAddressee,
 } from "./types/index.js";

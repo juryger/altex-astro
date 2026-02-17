@@ -3,11 +3,12 @@ import Modal from "../ModalDialog.astro";
 import CartContent from "./CartContent.astro"
 import { Image } from 'astro:assets';
 import failLogo from '@/web/src/assets/fail.png';
+import { DialogActionButtons } from "../../core/const";
 
 const dataFormCheckoutName = "form-checkout"
 const dataOrderConfirmCommandName = "order-confirm";
 const dataCheckoutErrorDialogID = "cart-checkout-error-popup";
-const dataCheckoutErrorDetailsID = "cart-checkout-error-details";
+const dataCheckoutErrorDetailsId = "cart-checkout-error-details";
 
 const titleContactInfo = "Контактная информация";
 const titleOrderDetails = "Детали заказа";
@@ -33,7 +34,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   data-form_checkout={dataFormCheckoutName}
   data-order_confirm={dataOrderConfirmCommandName}
   data-error_popup_id={dataCheckoutErrorDialogID}
-  data-error_details_id={dataCheckoutErrorDetailsID}
+  data-error_details_id={dataCheckoutErrorDetailsId}
 >
   <div class="fieldset flex flex-col md:flex-row gap-4">
     <div class="grow-1">
@@ -96,7 +97,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       <CartContent isCheckout={true} />
     </div>
   </div>
-  <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader}>
+  <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader} actionButtons={DialogActionButtons.OK}>
     <div class="flex gap-2 mt-2">
       <div class="grow-0 content-start">
         <Image src={failLogo}
@@ -107,10 +108,10 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       <div class="grow-1 content-center">
         <span>{titleCartCheckoutFailed}</span>
         <div class="m-2">
-          <div tabindex="0" class="collapse collapse-arrow bg-primary/10 border-base-300 border">
-            <div class="collapse-title font-semibold after:start-5 after:end-auto pe-4 ps-12">{titleErrorDetailsHeader}</div>
+          <div tabindex="0" class="collapse collapse-arrow bg-base-100 border-base-300 border">
+            <div class="collapse-title font-semibold">{titleErrorDetailsHeader}</div>
             <div class="collapse-content text-sm">
-              <span id={dataCheckoutErrorDetailsID}>{titleErrorDetails}</span>
+              <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
             </div>
           </div>
         </div>
@@ -144,14 +145,13 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       const user = Object.fromEntries(entries) as GuestUser;
       const cartItems = $cart.get();
 
-      const { data, error } = await actions.cartActions.checkout({ 
+      const result = await actions.cartActions.checkout({ 
         guestUser: user,
         cartContent: cartItems,
       });
 
-      var err = error as Error;
-      if (err !== undefined) throw err;      
-      return data?.name;
+      if (result.error !== undefined) throw result.error;
+      return result.data;
     }
 
     private resetCart = () => {

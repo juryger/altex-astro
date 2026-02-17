@@ -16,12 +16,12 @@ const titleNoProductColors = "Нет информации о цвете";
 ---
 
 <product-colors data-selected_color={spanSelectedColorName}> 
-  <div class:list={['flex', 'my-2', {'justify-start': isDetailed}, {'justify-center': !isDetailed}]}>
+  <div class:list={['flex', 'my-2', 'justify-center', {'justify-start' : isDetailed}]}>
     <span>{titleColorOptions}</span>
     <span data-selected-color class="pl-1"></span>
   </div>
   {colors && colors.length > 0 && 
-    <div class:list={['flex', 'items-center', 'gap-3', 'my-1', {'justify-start' : isDetailed} , {'justify-center': !isDetailed}]}>
+    <div class:list={['flex', 'items-center', 'gap-3', 'my-1', 'justify-center', {'justify-start': isDetailed}]}>
       {colors.sort().map((key, index) => {
         const metadata = colorsReference.find(x => x.id === key);
         return metadata && <input type="radio" name={"radio-color".concat(productId.toString())}

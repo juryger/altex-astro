@@ -38,7 +38,7 @@ const checkCache = async <T = any>(
   return result;
 };
 
-function queryManager(): QueryManager {
+function getQueryManager(): QueryManager {
   const cacheManager = CacheManager.instance({});
   return {
     fetch: async <T = any>(
@@ -64,4 +64,4 @@ function queryManager(): QueryManager {
   };
 }
 
-export { type QueryResult, type QueryManager, queryManager };
+export { type QueryResult, type QueryManager, getQueryManager };

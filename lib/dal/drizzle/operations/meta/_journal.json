@@ -8,6 +8,34 @@
       "when": 1771065529642,
       "tag": "0000_operations",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1771208104576,
+      "tag": "0001_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1771243906599,
+      "tag": "0002_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1771244501579,
+      "tag": "0003_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1771303331079,
+      "tag": "0004_operations",
+      "breakpoints": true
     }
   ]
 }

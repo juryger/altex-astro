@@ -10,23 +10,24 @@ import type { Catalog } from '@/web/src/core/models/catalog';
 import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurementUnits';
 import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
 import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
-import { queryManager } from '@/web/src/core/services/queryManager';
+import { getQueryManager } from '@/web/src/core/services/queryManager';
 import { getCacheInfo } from '@/web/src/core/models/cache';
 import { CacheKeys } from '@/web/src/core/const/cache';
 
 const { slug } = Astro.params;
 
 const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
+  const queryManager = getQueryManager();
   return await Promise.all([
-    queryManager().fetch(
+    queryManager.fetch(
       () => fetchMeasurementUnits(),
       getCacheInfo(CacheKeys.MeasurementUnits),
     ), 
-    queryManager().fetch(
+    queryManager.fetch(
       () => fetchDiscounts(),
       getCacheInfo(CacheKeys.Discounts),
     ), 
-    queryManager().fetch(
+    queryManager.fetch(
       () => fetchProductColors(),
       getCacheInfo(CacheKeys.ProductColors),
     ),

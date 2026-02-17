@@ -83,7 +83,7 @@ const titleUnknown = "(?)";
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
       <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
-      <div class="flex items-center my-4">
+      <div class="flex items-center justify-center md:justify-start my-4">
         <QuantitySelector inputControlName={inputQuantityName} quantity={1} />
         <button name={btnAddToCartName} class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
       </div>

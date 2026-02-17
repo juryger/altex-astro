@@ -1,0 +1,25 @@
+{
+  "name": "altex-email",
+  "type": "module",
+  "version": "0.0.1",
+  "exports": "./src/index.ts",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "preview": "node --env-file=.env.development ./dist/index.js"
+  },
+  "dependencies": {
+    "mjml": "^4.18.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.5"
+  },
+  "description": "Data Access Layer (DAL) package based on Sqlite and Drizzle ORM",
+  "keywords": [
+    "mjml",
+    "nodejs"
+  ],
+  "author": "Iurii Gerasimov",
+  "license": "ISC"
+}

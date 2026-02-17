@@ -27,7 +27,8 @@ export const guests = table(
   "guests",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    name: t.text().notNull(),
+    firstName: t.text().notNull(),
+    lastName: t.text().notNull(),
     email: t.text().notNull(),
     phone: t.text(),
     compnayName: t.text("company_name"),
@@ -39,18 +40,13 @@ export const guests = table(
       .default(sql`(unixepoch())`)
       .notNull(),
   },
-  (table) => [
-    t.uniqueIndex("idx_guests_name").on(table.name),
-    t.uniqueIndex("idx_guests_email").on(table.email),
-  ],
+  (table) => [t.uniqueIndex("idx_guests_email").on(table.email)],
 );
 
 export const cartCheckout = table("cart_checkout", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  name: t.text().notNull(), // ONLINE-{ID} vs STORE-{ID}
   userId: t.int("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
   guestId: t.int("guest_id").references(() => guests.id),
-  discountId: t.int("discount_id").notNull(), //.references(() => discounts.id), <- cannot reference external db-file, not supported by SQLite
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
@@ -66,6 +62,7 @@ export const cartCheckoutItems = table("cart_checkout_items", {
   productId: t.int("product_id").notNull(), // .references(() => products.id), <- cannot reference external db-file, not supported by SQLite
   colorId: t.int("color_id"),
   quantity: t.int().notNull(),
+  price: t.real().notNull(),
 });
 
 export const notifications = table("notifications", {

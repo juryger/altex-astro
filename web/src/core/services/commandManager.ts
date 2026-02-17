@@ -1,4 +1,3 @@
-import type { CacheInfo } from "@/web/src/core/models/cache";
 import { getErrorMessage } from "../utils/error-parser";
 
 type CommandResult<T = any> = {
@@ -6,11 +5,15 @@ type CommandResult<T = any> = {
   error?: Error;
 };
 
-export interface CommandManager {
-  mutate: <T = any>(commandFn: () => Promise<void>) => Promise<CommandResult>;
+interface CommandManager {
+  mutate: <T = any>(commandFn: () => Promise<T>) => Promise<CommandResult<T>>;
 }
+/*
+const cartCheckout = () => { db.update(cartItems: Array<CartItem>)}
+commandManager().mutate(cartCheckout);
 
-export function commandManager(): CommandManager {
+*/
+function getCommandManager(): CommandManager {
   return {
     mutate: async <T = any>(commandFn: () => Promise<T>) => {
       const result: CommandResult<T> = {};
@@ -25,3 +28,5 @@ export function commandManager(): CommandManager {
     },
   };
 }
+
+export { type CommandManager, type CommandResult, getCommandManager };

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { fetchCategoryBySlug } from "@/web/src/core/services/queries/categories";
-import { queryManager } from "@/web/src/core/services/queryManager";
+import { getQueryManager } from "@/web/src/core/services/queryManager";
 import type { Category } from "@/web/src/core/models/category";
 import { getCacheInfo } from "@/web/src/core/models/cache";
 import { CACHE_STALE_TIMEOUT_1MN, CacheKeys } from "@/web/src/core/const/cache";
@@ -17,7 +17,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
 
-  const result = await queryManager().fetch<Category | undefined>(
+  const result = await getQueryManager().fetch<Category | undefined>(
     () => fetchCategoryBySlug(slug),
     getCacheInfo(`${CacheKeys.CategoryItem}:${slug}`, CACHE_STALE_TIMEOUT_1MN),
   );

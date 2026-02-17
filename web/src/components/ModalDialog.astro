@@ -33,16 +33,16 @@ const titleCancelButton = "Отменить";
       <div class="modal-action">
         <form method="dialog">
           <button name={actionClose} value={DialogActionResult.None} class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-gray-400">✕</button>
-          {actionButtons && actionButtons === DialogActionButtons.OK && 
+          {actionButtons === DialogActionButtons.OK && 
             <button name={actionOk1} class="btn" value={DialogActionResult.OK}>{titleOKButton}</button>
           }
-          {actionButtons && actionButtons === DialogActionButtons.YesNo && 
+          {actionButtons === DialogActionButtons.YesNo && 
             <div>
               <button name={actionYes2} class="btn" value={DialogActionResult.Yes}>{titleYesButton}</button>
               <button name={actionNo2} class="btn" value={DialogActionResult.No}>{titleNoButton}</button>
             </div>
           }
-          {actionButtons && actionButtons === DialogActionButtons.YesNoCancel && 
+          {actionButtons === DialogActionButtons.YesNoCancel && 
             <button name={actionYes3} class="btn" value={DialogActionResult.Yes}>{titleYesButton}</button>
             <button name={actionNo3} class="btn" value={DialogActionResult.No}>{titleNoButton}</button>
             <button name={actionCancel3} class="btn" value={DialogActionResult.Cancel}>{titleCancelButton}</button>

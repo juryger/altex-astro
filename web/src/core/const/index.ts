@@ -111,6 +111,11 @@ enum SortFields {
   Price = "price",
 }
 
+enum OrderTypes {
+  Store = "STORE",
+  Web = "WEB",
+}
+
 export {
   NO_IMAGE_FILE_NAME,
   LiveCollectionNames,
@@ -129,4 +134,5 @@ export {
   DialogSize,
   WorkerNames,
   SortFields,
+  OrderTypes,
 };
