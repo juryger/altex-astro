@@ -34,7 +34,7 @@
         <mj-text align="left" padding="10px 0px 10px 0px"
           >Благодарим вас за размещение заказа на сайте
           <a href="https://www.altexweb.ru">↗АЛТЕХ</a>. В ближайшее время мы
-          свяжемся с вами для уточнения всех деталей.</mj-text
+          свяжемся с вами для уточнения деталей.</mj-text
         >
       </mj-column>
     </mj-section>
@@ -48,7 +48,7 @@
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
         <mj-text align="left" padding="0px 0px 0px 0px"
-          ><b>Детали заказа:</b></mj-text
+          ><b>Содержимое заказа:</b></mj-text
         >
       </mj-column>
     </mj-section>
@@ -57,7 +57,7 @@
       background-size="auto"
       border="none"
       direction="ltr"
-      padding="0px 20px 0px 20px"
+      padding="0px 20px 10px 20px"
     >
       <mj-section border-bottom="solid lightgrey">
         <mj-column
@@ -111,66 +111,6 @@
           <mj-text align="left" padding="0px 10px 0px 10px"
             >120.47 руб.</mj-text
           >
-        </mj-column>
-      </mj-section>
-    </mj-section>
-    <mj-section
-      background-repeat="repeat"
-      background-size="auto"
-      border="none"
-      direction="ltr"
-      padding="0px 20px 0px 20px"
-    >
-      <mj-section border-bottom="solid lightgrey">
-        <mj-column
-          border="none"
-          vertical-align="middle"
-          width="20%"
-          padding="0px 0px 0px 0px"
-        >
-          <mj-image
-            align="center"
-            src="http://localhost:4321/products/thumbnails/6416c021-2212-488b-90aa-edaa174258e0.png"
-            href="http://localhost:4321/catalog/products/ZAMOAPEKPD38PERFOKLUC"
-            alt="product image"
-            width="90px"
-            height="auto"
-            padding="0px 0px 0px 0px"
-            border="1px solid #e5e5e5"
-            border-radius="10px"
-          ></mj-image>
-        </mj-column>
-        <mj-column
-          border="none"
-          vertical-align="middle"
-          width="60%"
-          padding="0px 0px 0px 0px"
-        >
-          <mj-text align="left" padding="0px 0px 0px 0px" font-weight="bold"
-            >Замок АПЕКС PD-38 перфо-ключ</mj-text
-          >
-          <mj-text
-            align="left"
-            padding="0px 0px 0px 0px"
-            font-size="0.8rem"
-            color="grey"
-            >Количество: 2</mj-text
-          >
-          <mj-text
-            align="left"
-            padding="0px 0px 0px 0px"
-            font-size="0.8rem"
-            color="grey"
-            >Цвет: ---</mj-text
-          >
-        </mj-column>
-        <mj-column
-          border="none"
-          vertical-align="middle"
-          width="20%"
-          padding="0px 0px 0px 0px"
-        >
-          <mj-text align="left" padding="0px 10px 0px 10px">20.50 руб.</mj-text>
         </mj-column>
       </mj-section>
     </mj-section>
