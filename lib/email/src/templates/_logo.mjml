@@ -1,0 +1,30 @@
+<mjml>
+  <mj-body>
+    <mj-section
+      padding="20px 0px 10px 0px"
+      direction="ltr"
+      text-align="center"
+      background-repeat="repeat"
+      background-size="auto"
+      border="none"
+    >
+      <mj-column
+        border="none"
+        vertical-align="middle"
+        width="50%"
+        padding="0px 0px 0px 0px"
+      >
+        <mj-image
+          align="center"
+          src="http://localhost:4321/altex-logo.png"
+          href="http://localhost:4321"
+          title="АЛТЕХ"
+          alt="altex logo"
+          width="100px"
+          height="100px"
+          padding="0px 0px 0px 0px"
+        ></mj-image>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

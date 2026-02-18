@@ -1,0 +1,32 @@
+<mjml>
+  <mj-body>
+    <mj-section
+      background-repeat="repeat"
+      background-size="auto"
+      border="none"
+      direction="ltr"
+      text-align="left"
+      padding="30px 20px 30px 20px"
+    >
+      <mj-column
+        border="none"
+        vertical-align="top"
+        padding="10px"
+        border-top="solid lightgrey"
+        border-bottom="solid lightgrey"
+      >
+        <mj-text align="center" padding="0px 0px 0px 0px"
+          ><b>ИП Герасимов Алексей Владимирович</b><br
+        /></mj-text>
+        <mj-text align="center" padding="0px 0px 0px 0px"
+          >Для связи с нами напишите на почту
+          <a href="mailto:alextechnologies@gmail.com" target="_blank"
+            >alextechnologies@gmail.com</a
+          >
+          <br />или позвоните по телефону
+          <a href="tel:89109113877" target="_blank">+7(910)911-3877</a></mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
