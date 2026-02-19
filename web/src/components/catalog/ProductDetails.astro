@@ -100,13 +100,17 @@ const titleUnknown = "(?)";
   import { addToCart } from "@/web/src/core/stores/client/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
+  import type { ProductColor } from "@/web/src/core/models/product-color";
+  import { clientDb } from '@/web/src/core/db/indexed-db';
+  import { NO_VALUE_ASSIGNED } from "@/web/src/core/const";
 
   class ProductDetails extends HTMLElement {
     private addToCartEl: Element | null = null;
     private value: Product | undefined;
     private controller: AbortController | undefined;
+    private productColors: Array<ProductColor> = [];
 
-    private onAddToCart = (e: Event): any => {
+    private onAddToCart = (e: Event): void => {
       if (!this.value) {
         console.warn("~ ProductDetails ~ cannot add product to the cart as it values was not parsed properly.")
         return;
@@ -123,9 +127,10 @@ const titleUnknown = "(?)";
       const quanityEl = getInputElementByName(this, this.dataset.input_quatnity);
       
       const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
+      const colorTitle = this.productColors.find(x => x.id === color)?.title ?? NO_VALUE_ASSIGNED;
       const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
 
-        addToCart({
+      addToCart({
         productId: this.value.id,
         productCode: this.value.productCode,
         title: this.value.title,
@@ -135,8 +140,9 @@ const titleUnknown = "(?)";
         whsPrice2: this.value.whsPrice2,
         image: this.value.thumbnailImageUrl,
         slug: this.value.slug,
-        color: color,
-        quantity: quantity
+        color,
+        colorTitle,
+        quantity
       } as CartItem);
 
       addAlert({ 
@@ -145,8 +151,21 @@ const titleUnknown = "(?)";
       });
     }
 
+    private loadProductColorsFromIndexedDB(): void {
+      if (this.productColors.length > 0) return;
+
+      clientDb.productColors.toArray((data) => { 
+        if (data.length === 0) {
+          console.warn("~ ProductDetails ~ Product Colors data are not available.");
+          return;
+        }
+        this.productColors = data;
+      });
+    }
+
     connectedCallback() {
       this.controller = new AbortController();
+      this.loadProductColorsFromIndexedDB();
 
       this.value = parseProduct(this.dataset);
       if (!this.value) {

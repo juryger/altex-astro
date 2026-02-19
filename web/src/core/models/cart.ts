@@ -13,6 +13,7 @@ export const CartSchema = z
     image: z.string(),
     slug: z.string(),
     color: z.number().optional(),
+    colorTitle: z.string().optional(),
     quantity: z.number(),
   })
   .transform((data) => ({

@@ -12,10 +12,9 @@
       padding="0px 0px 0px 0px"
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
-        <mj-text align="middle" padding="10px 0px 10px 0px"
-          >Уведомление о технической неисправности на сайте
-          <a href="https://www.altexweb.ru">↗АЛТЕХ</a>.</mj-text
-        >
+        <mj-text align="center" padding="10px 0px 10px 0px">{{
+          titleFailure
+        }}</mj-text>
       </mj-column>
     </mj-section>
     <mj-section
@@ -25,34 +24,31 @@
       direction="ltr"
       padding="0px 0px 0px 0px"
     >
-      <mj-section>
-        <mj-column
-          border="none"
-          vertical-align="middle"
-          width="20%"
+      <mj-column
+        border="none"
+        vertical-align="middle"
+        width="20%"
+        padding="0px 0px 0px 0px"
+      >
+        <mj-image
+          align="center"
+          src="http://localhost:4321/fail.png"
+          alt="product image"
+          width="60px"
+          height="auto"
           padding="0px 0px 0px 0px"
-        >
-          <mj-image
-            align="center"
-            src="http://localhost:4321/fail.png"
-            alt="product image"
-            width="60px"
-            height="auto"
-            padding="0px 0px 0px 0px"
-          ></mj-image>
-        </mj-column>
-        <mj-column
-          border="none"
-          vertical-align="middle"
-          width="80%"
-          padding="0px 0px 0px 0px"
-        >
-          <mj-text align="left" padding="0px 0px 0px 0px"
-            >Описание технической неисправности во время выполнения той или иной
-            операции.</mj-text
-          >
-        </mj-column>
-      </mj-section>
+        ></mj-image>
+      </mj-column>
+      <mj-column
+        border="none"
+        vertical-align="middle"
+        width="80%"
+        padding="0px 0px 0px 0px"
+      >
+        <mj-text align="left" padding="0px 0px 0px 0px">{{
+          failureDescription
+        }}</mj-text>
+      </mj-column>
     </mj-section>
     <mj-include path="./_footer.mjml" />
   </mj-body>

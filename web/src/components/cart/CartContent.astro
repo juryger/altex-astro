@@ -64,6 +64,7 @@ const titleSubtotal = "Итого:";
   import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import type { ProductColor } from '@/web/src/core/models/product-color';
+  import { NO_VALUE_ASSIGNED } from '@/web/src/core/const';
 
   const CART_VIEW_INIT_TIMEOUT_MS = 300;
 
@@ -290,7 +291,8 @@ const titleSubtotal = "Итого:";
           if (existingItem) { 
             updateCart({ ...existingItem, quantity: existingItem.quantity + quantity })
           } else {
-            addToCart({ ...item, color, quantity})
+            const colorTitle = this.productColors.find(x => x.id === color)?.title ?? NO_VALUE_ASSIGNED;
+            addToCart({ ...item, color, colorTitle, quantity})
           }
         }
         else {

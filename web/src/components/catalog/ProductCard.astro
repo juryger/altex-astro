@@ -80,13 +80,17 @@ const titleUnknown = "(?)";
   import { addToCart } from "@/web/src/core/stores/client/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
+  import type { ProductColor } from "@/web/src/core/models/product-color";
+  import { clientDb } from '@/web/src/core/db/indexed-db';
+  import { NO_VALUE_ASSIGNED } from "@/web/src/core/const";
 
   class ProductCard extends HTMLElement {
     private addToCardEl: Element | null = null;
     private value: Product | undefined;
     private controller: AbortController | undefined;
+    private productColors: Array<ProductColor> = [];
 
-    private onAddToCart = (event: Event): void => {
+    private onAddToCart = (e: Event): void => {
       if (!this.value) {
         console.warn("~ ProductCard ~ cannot add product to the cart as it values was not parsed properly.")
         return;
@@ -95,6 +99,7 @@ const titleUnknown = "(?)";
       const selectedColorEl =  this.querySelector('input[type=radio]:checked');
       const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
       const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
+      const colorTitle = this.productColors.find(x => x.id === color)?.title ?? NO_VALUE_ASSIGNED;
       const quantity = 1;
 
       addToCart({
@@ -107,8 +112,9 @@ const titleUnknown = "(?)";
         whsPrice2: this.value.whsPrice2,
         image: this.value.thumbnailImageUrl,
         slug: this.value.slug,
-        color: color,
-        quantity: quantity
+        color,
+        colorTitle,
+        quantity
       } as CartItem);
         
       addAlert({ 
@@ -117,8 +123,21 @@ const titleUnknown = "(?)";
       });
     }
 
+    private loadProductColorsFromIndexedDB(): void {
+      if (this.productColors.length > 0) return;
+
+      clientDb.productColors.toArray((data) => { 
+        if (data.length === 0) {
+          console.warn("~ ProductCard ~ Product Colors data are not available.");
+          return;
+        }
+        this.productColors = data;
+      });
+    }
+
     connectedCallback() {
       this.controller = new AbortController();
+      this.loadProductColorsFromIndexedDB();
 
       this.value = parseProduct(this.dataset);
       if (!this.value) {

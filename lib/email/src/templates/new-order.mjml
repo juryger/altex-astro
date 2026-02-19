@@ -18,7 +18,7 @@
         padding="0px 0px 0px 0px"
       >
         <mj-text align="center" padding="0px 0px 0px 0px"
-          >№ заказа: <b>WEB-01</b></mj-text
+          >№ заказа: <b>{{ orderNo }}</b></mj-text
         >
       </mj-column>
     </mj-section>
@@ -31,11 +31,9 @@
       padding="0px 20px 0px 20px"
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
-        <mj-text align="left" padding="10px 0px 10px 0px"
-          >Благодарим вас за размещение заказа на сайте
-          <a href="https://www.altexweb.ru">↗АЛТЕХ</a>. В ближайшее время мы
-          свяжемся с вами для уточнения деталей.</mj-text
-        >
+        <mj-text align="left" padding="10px 0px 10px 0px">{{
+          titleGreetings
+        }}</mj-text>
       </mj-column>
     </mj-section>
     <mj-section
@@ -52,14 +50,15 @@
         >
       </mj-column>
     </mj-section>
-    <mj-section
-      background-repeat="repeat"
-      background-size="auto"
-      border="none"
-      direction="ltr"
-      padding="0px 20px 10px 20px"
-    >
-      <mj-section border-bottom="solid lightgrey">
+    <mj-wrapper padding="0px 20px 0px 20px">
+      {{#each items}}
+      <mj-section
+        background-repeat="repeat"
+        background-size="auto"
+        border="none"
+        direction="ltr"
+        border-bottom="solid lightgrey"
+      >
         <mj-column
           border="none"
           vertical-align="middle"
@@ -84,22 +83,22 @@
           width="60%"
           padding="0px 0px 0px 0px"
         >
-          <mj-text align="left" padding="0px 0px 0px 0px" font-weight="bold"
-            >Замок FERRE 1323 межос 80 мм</mj-text
+          <mj-text align="left" padding="0px 0px 0px 0px" font-weight="bold">{{
+            this.title
+          }}</mj-text>
+          <mj-text
+            align="left"
+            padding="0px 0px 0px 0px"
+            font-size="12px"
+            color="grey"
+            >Количество: {{ this.quantity }}</mj-text
           >
           <mj-text
             align="left"
             padding="0px 0px 0px 0px"
-            font-size="0.8rem"
+            font-size="12px"
             color="grey"
-            >Количество: 1</mj-text
-          >
-          <mj-text
-            align="left"
-            padding="0px 0px 0px 0px"
-            font-size="0.8rem"
-            color="grey"
-            >Цвет: Бронза</mj-text
+            >Цвет: {{ this.colorTitle }}</mj-text
           >
         </mj-column>
         <mj-column
@@ -109,11 +108,12 @@
           padding="0px 0px 0px 0px"
         >
           <mj-text align="left" padding="0px 10px 0px 10px"
-            >120.47 руб.</mj-text
+            >{{ this.price }} руб.</mj-text
           >
         </mj-column>
       </mj-section>
-    </mj-section>
+      {{/each}}
+    </mj-wrapper>
     <mj-section
       background-repeat="repeat"
       background-size="auto"
@@ -124,7 +124,7 @@
     >
       <mj-column border="none" vertical-align="top" padding="0px 20px 0px 20px">
         <mj-text align="right" padding="10px 0px 10px 0px"
-          >Итого: <b>120.47 руб.</b></mj-text
+          >Итого: <b>{{ orderSumValue }} руб.</b></mj-text
         >
       </mj-column>
     </mj-section>
@@ -157,15 +157,17 @@
         padding="0px 0px 0px 0px"
       >
         <mj-text align="left" padding="0px 0px 0px 0px"
-          >👤 Герасимов Юрий</mj-text
+          >👤 {{ client.name }}</mj-text
         >
         <mj-text align="left" padding="0px 0px 0px 0px"
-          >💼 (данные отсутсвуют)</mj-text
+          >💼 {{ client.company }}</mj-text
         >
         <mj-text align="left" padding="0px 0px 0px 0px"
-          >📩 juryger@gmail.com</mj-text
+          >📩 {{ client.email }}</mj-text
         >
-        <mj-text align="left" padding="0px 0px 0px 0px">📞 89035638639</mj-text>
+        <mj-text align="left" padding="0px 0px 0px 0px"
+          >📞 {{ client.phone }}</mj-text
+        >
       </mj-column>
       <mj-column
         border="none"
@@ -174,11 +176,11 @@
         padding="0px 0px 0px 0px"
       >
         <mj-text align="left" padding="0px 0px 0px 0px"
-          >📍 125466 Moscow</mj-text
+          >📍 {{ client.postCode }} {{ client.addressCity }}</mj-text
         >
-        <mj-text align="left" padding="0px 0px 0px 20px"
-          >Novokurkinskoe highway, build. 51, apart. 301</mj-text
-        >
+        <mj-text align="left" padding="0px 0px 0px 20px">{{
+          client.addressStreet
+        }}</mj-text>
       </mj-column>
     </mj-section>
     <mj-include path="./_footer.mjml" />
