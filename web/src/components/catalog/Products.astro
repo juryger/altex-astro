@@ -134,7 +134,6 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 
 <script>
   import { getProductsViewManager, type ProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
-  import { getLocalStorageManager } from "../../core/utils/local-storage-manager";
   
   const VIEW_MODE_INIT_DELAY_MS = 300;
 
@@ -182,7 +181,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
     applyViewManager();
   });
 
-  window.addEventListener('beforeunload', (event) => { 
+  window.addEventListener('beforeunload', () => { 
     // This instantly removes all listeners using 'signal' from themeToggleManager
     controller?.abort(); 
   });

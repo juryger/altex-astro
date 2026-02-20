@@ -19,6 +19,7 @@ export {
 } from "drizzle-orm";
 export type { SQLiteColumn } from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
+export { CompanyInfoKeys } from "./const/index.js";
 
 export type {
   CatalogVersion,

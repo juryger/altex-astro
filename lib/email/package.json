@@ -20,6 +20,7 @@
   "description": "Data Access Layer (DAL) package based on Sqlite and Drizzle ORM",
   "keywords": [
     "mjml",
+    "handlebars",
     "nodejs"
   ],
   "author": "Iurii Gerasimov",

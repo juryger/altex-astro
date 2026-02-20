@@ -54,7 +54,7 @@ const titleNoProductColors = "Нет информации о цвете";
     } = {};
 
     onColorSelect = (el: Element | null, title: string): any => {
-      return (event: Event): void => {
+      return (): void => {
         if (el !== null) el.innerHTML = title;
       };
     }

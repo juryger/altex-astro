@@ -24,6 +24,7 @@ export const info = table(
       .int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_info_name").on(table.name)],
 );

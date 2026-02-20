@@ -38,7 +38,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   data-error_details_id={dataCheckoutErrorDetailsId}
 >
   <div class="fieldset flex flex-col md:flex-row gap-4">
-    <div class="grow-1">
+    <div class="grow">
       <form name={dataFormCheckoutName}>  
         <h2 class="text-lg font-bold">{titleContactInfo}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -109,7 +109,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             alt="Fail logo"
           />
       </div>
-      <div class="grow-1 content-center">
+      <div class="grow content-center">
         <span>{titleCartCheckoutFailed}</span>
         <div class="m-2">
           <div tabindex="0" class="collapse collapse-arrow bg-base-100 border-base-300 border">
@@ -127,7 +127,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
 <script>
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
-  import { $cart, $cartCount } from "@/web/src/core/stores/client/cart-store";
+  import { $cart, $cartCount } from "@/web/src/core/stores/cart-store";
   import { type GuestUser } from '@/web/src/core/models/guest-user';
   import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 

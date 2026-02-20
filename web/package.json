@@ -25,11 +25,11 @@
     "html-entities": "^2.6.0",
     "nanostores": "^1.0.1",
     "sharp": "^0.34.4",
-    "tailwindcss": "^4.1.13",
+    "tailwindcss": "^4.2.0",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
-    "vite": "^7.3.1",
+    "vite": "^6.4.1",
     "vitest": "^4.0.18"
   },
   "description": "Altex website based on Astro Framework and NodeJS server adapter",

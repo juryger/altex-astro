@@ -44,7 +44,16 @@ const titleSubtotal = "Итого:";
     </div>
   </div>
   <!-- <Cart content /> -->
-  <div class="flex flex-col overflow-auto focus:outline-none" class:list={[{'rounded-md': isCheckout}, {'border': isCheckout}, {'border-solid': isCheckout}, {'border-gray-200': isCheckout}, {'h-[28rem]': isCheckout}, {'mt-2': isCheckout}]}>
+  <div class="flex flex-col overflow-auto focus:outline-none" 
+    class:list={[
+      {'rounded-md': isCheckout}, 
+      {'border': isCheckout}, 
+      {'border-solid': isCheckout}, 
+      {'border-gray-200': isCheckout}, 
+      {'h-[122]': isCheckout}, 
+      {'mt-2': isCheckout}
+    ]}
+  >
     <ul data-cart-container role="list" class="divide-y divide-gray-200">
     </ul>    
   </div>
@@ -54,8 +63,8 @@ const titleSubtotal = "Итого:";
   import { navigate } from 'astro:transitions/client';
   import { CartMessages } from "@/web/src/core/const/messages";
   import { AlertKind } from "@/web/src/core/models/alert";
-  import { addAlert } from "@/web/src/core/stores/client/alert-store";
-  import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/client/cart-store";
+  import { addAlert } from "@/web/src/core/stores/alert-store";
+  import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/cart-store";
   import { type Discount } from "@/web/src/core/models/discount";
   import type { CartItem } from "@/web/src/core/models/cart";
   import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
@@ -270,7 +279,7 @@ const titleSubtotal = "Итого:";
     }
 
     private onUpdateCart = (id: string): any => {
-      return (e: Event): void => {
+      return (): void => {
         var item = $cart.get().find(x => x.id === id);
         if (!item) {
           console.warn(`~ CartContent ~ cannot update cart as item with id:'%s' not found`, id);
@@ -308,7 +317,7 @@ const titleSubtotal = "Итого:";
     }
 
     private onRemoveFromCart = (id: string): any => {
-      return (e: Event): void => {        
+      return (): void => {        
         removeFromCart(id);
 
         addAlert({ 

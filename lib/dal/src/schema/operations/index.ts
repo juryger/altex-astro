@@ -24,6 +24,8 @@ export const readReplicas = table(
       .int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
+    isFailed: t.int("is_failed").default(0),
+    syncLog: t.text("sync_log"),
   },
   (table) => [t.uniqueIndex("idx_read_replicas_name").on(table.name)],
 );

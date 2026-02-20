@@ -40,7 +40,7 @@ const titleUnknown = "(?)";
     <div class="group">
       <ProductQuickView item={item} references={references} />
     </div>
-    <div class="card-body !px-1 !py-1">
+    <div class="card-body px-1! py-1!">
       {/* Product code */}
       <div class="flex flex-row justify-center">
         <span class="text-xs italic">{titleProductCode}:</span>
@@ -75,9 +75,9 @@ const titleUnknown = "(?)";
   import type { Product } from "@/web/src/core/models/product";
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
   import type { CartItem } from "@/web/src/core/models/cart";
-  import { addAlert } from "@/web/src/core/stores/client/alert-store";
+  import { addAlert } from "@/web/src/core/stores/alert-store";
   import { AlertKind } from "@/web/src/core/models/alert";
-  import { addToCart } from "@/web/src/core/stores/client/cart-store";
+  import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";
   import type { ProductColor } from "@/web/src/core/models/product-color";
@@ -90,7 +90,7 @@ const titleUnknown = "(?)";
     private controller: AbortController | undefined;
     private productColors: Array<ProductColor> = [];
 
-    private onAddToCart = (e: Event): void => {
+    private onAddToCart = (): void => {
       if (!this.value) {
         console.warn("~ ProductCard ~ cannot add product to the cart as it values was not parsed properly.")
         return;

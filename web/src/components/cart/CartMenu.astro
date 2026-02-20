@@ -55,7 +55,7 @@ const dataCartShowCommandName = "cartmenu-show";
   import { clientDb } from "@/web/src/core/db/indexed-db";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
   import { type Discount } from "@/web/src/core/models/discount";
-  import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/client/cart-store";
+  import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/cart-store";
   import { getButtonElementByName, getElementByDataAttribute, getElementById } from "@/web/src/core/utils/dom-utils";
  
   class CartMenu extends HTMLElement {
@@ -129,7 +129,7 @@ const dataCartShowCommandName = "cartmenu-show";
     }
 
     private subscribeToCountStore() {
-      this.storeCountUnsubscribe = $cartCount.listen((value) => {
+      this.storeCountUnsubscribe = $cartCount.listen((/*value*/) => {
         //console.log("~ CartMenu component ~ total count has changed:", value);
         this.syncCartCountFromStore();
         if (this.discounts.length === 0) {

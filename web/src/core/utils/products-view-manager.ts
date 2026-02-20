@@ -2,7 +2,6 @@ import { navigate } from "astro:transitions/client";
 import { DialogActionResult, ProductsSortFileds, SortOrder } from "../const";
 import { regexPageParams, regexSortParams } from "./regex";
 import { constructNavigationPaths } from "./url-builder";
-import { getLocalStorageManager } from "./local-storage-manager";
 
 interface ProductsViewManager {
   apply: (signal: AbortSignal) => void;
@@ -175,7 +174,7 @@ const getProductsViewManager = (
 
       inputElements.sortDialogEl?.addEventListener(
         "close",
-        (e) => handleDialogClose(initialSortField, pageSize, inputElements),
+        () => handleDialogClose(initialSortField, pageSize, inputElements),
         { signal },
       );
 
@@ -192,13 +191,13 @@ const getProductsViewManager = (
 
       inputElements.pageActionPrevEl?.addEventListener(
         "click",
-        (e) => handlePreviousPageNavigation(pagePrev, pageSize),
+        () => handlePreviousPageNavigation(pagePrev, pageSize),
         { signal },
       );
 
       inputElements.pageActionNextEl?.addEventListener(
         "click",
-        (e) => handleNextPageNavigation(pageNext, pageSize),
+        () => handleNextPageNavigation(pageNext, pageSize),
         { signal },
       );
     },

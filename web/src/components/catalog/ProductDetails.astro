@@ -46,8 +46,8 @@ const titleUnknown = "(?)";
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
       {/* Gallery */}
-      <figure class="bg-base-100 aspect-square w-full object-cover lg:aspect-auto h-[150px] md:h-[500px]">
-        <Image src=`${item.imageUrl}` alt=`${item.title}` width="500" height="500" class="rounded-xl h-[150px] md:h-[500px] object-contain" />
+      <figure class="bg-base-100 aspect-square w-full object-cover lg:aspect-auto h-[37.5] md:h-[125]">
+        <Image src=`${item.imageUrl}` alt=`${item.title}` width="500" height="500" class="rounded-xl h-[37.5] md:h-[125] object-contain" />
       </figure>
     </div>
     <div class="flex flex-col gap-2">
@@ -95,9 +95,9 @@ const titleUnknown = "(?)";
   import type { Product } from "@/web/src/core/models/product";
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
   import type { CartItem } from "@/web/src/core/models/cart";
-  import { addAlert } from "@/web/src/core/stores/client/alert-store";
+  import { addAlert } from "@/web/src/core/stores/alert-store";
   import { AlertKind } from "@/web/src/core/models/alert";
-  import { addToCart } from "@/web/src/core/stores/client/cart-store";
+  import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
   import type { ProductColor } from "@/web/src/core/models/product-color";
@@ -110,7 +110,7 @@ const titleUnknown = "(?)";
     private controller: AbortController | undefined;
     private productColors: Array<ProductColor> = [];
 
-    private onAddToCart = (e: Event): void => {
+    private onAddToCart = (): void => {
       if (!this.value) {
         console.warn("~ ProductDetails ~ cannot add product to the cart as it values was not parsed properly.")
         return;
