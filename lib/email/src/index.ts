@@ -147,20 +147,20 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
   };
 };
 
-const manager = getEmailManager({
-  rootPath: process.env.EMAIL_TEMPLATES_PATH ?? "",
-});
-manager.sendNewOrder({
-  toCustomer: "juryger@gmail.com",
-  toBackOffice: "alextechnologies@gmail.com",
-  subject: "Test email for new order",
-  templateParams: {
-    orderNo: "WEB-01",
-    companyName: "ИП Герасимов Алексей Владимирович",
-    companyWeb: "http://altexweb.ru",
-    companyEmail: "alextechnologies@gmail.com",
-    companyPhone: "+7(910)911-3877",
-  },
-});
+// const manager = getEmailManager({
+//   rootPath: process.env.EMAIL_TEMPLATES_PATH ?? "",
+// });
+// manager.sendNewOrder({
+//   toCustomer: "juryger@gmail.com",
+//   toBackOffice: "alextechnologies@gmail.com",
+//   subject: "Test email for new order",
+//   templateParams: {
+//     orderNo: "WEB-01",
+//     companyName: "ИП Герасимов Алексей Владимирович",
+//     companyWeb: "http://altexweb.ru",
+//     companyEmail: "alextechnologies@gmail.com",
+//     companyPhone: "+7(910)911-3877",
+//   },
+// });
 
 export { getEmailManager, type EmailManager };
