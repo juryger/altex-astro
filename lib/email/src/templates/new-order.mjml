@@ -31,9 +31,11 @@
       padding="0px 20px 0px 20px"
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
-        <mj-text align="left" padding="10px 0px 10px 0px">{{
-          titleGreetings
-        }}</mj-text>
+        <mj-text align="left" padding="10px 0px 10px 0px"
+          >Благодарим вас за размещение заказа на сайте
+          <a href="{{companyWeb}}">↗АЛТЕХ</a>. В ближайшее время мы свяжемся с
+          вами для уточнения деталей.</mj-text
+        >
       </mj-column>
     </mj-section>
     <mj-section

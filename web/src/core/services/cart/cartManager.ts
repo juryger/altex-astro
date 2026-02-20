@@ -9,45 +9,66 @@ import { UpsertGuestUser } from "../commands/guest-user";
 import { getErrorMessage } from "../../utils/error-parser";
 import { checkoutCart } from "../commands/cart-checkout";
 import { OrderTypes } from "@/web/src/core/const";
+import { getEmailManager, type EmailManager } from "@/lib/email/src";
 
 interface CartManager {
   checkoutCart: (
     items: Array<CartItem>,
     guest?: GuestUser,
-    userId?: number,
+    userId?: string,
   ) => Promise<CommandResult<string>>;
 }
 
 const saveGuestUser = async (
   commandManager: CommandManager,
   guest: GuestUser,
-): Promise<CommandResult<number>> => {
-  return await commandManager.mutate<number>(() => UpsertGuestUser(guest));
+): Promise<CommandResult<string>> => {
+  return await commandManager.mutate<string>(() => UpsertGuestUser(guest));
 };
 
 const saveCartCheckout = async (
   commandManager: CommandManager,
   items: Array<CartItem>,
-  userId?: number,
-  guestId?: number,
+  userId?: string,
+  guestId?: string,
 ): Promise<CommandResult<number>> => {
   return await commandManager.mutate<number>(() =>
     checkoutCart(items, userId, guestId),
   );
 };
 
+const sendNewOrderEmail = async (
+  emailManager: EmailManager,
+  checkoutId: number | undefined,
+): Promise<void> => {
+  if (checkoutId === undefined) return;
+  throw new Error("sendNewOrderEmail not implemented.");
+  //await emailManager.sendNewOrder();
+};
+
+const sendFailureEmail = async (
+  emailManager: EmailManager,
+  message: string,
+): Promise<void> => {
+  throw new Error("sendFailureEmail not implemented.");
+  //await emailManager.sendFailure();
+};
+
 function getCartManager(): CartManager {
   const commandManager = getCommandManager();
+  const emailManager = getEmailManager({
+    rootPath: import.meta.env.EMAIL_TEMPLATES_PATH,
+  });
   return {
     checkoutCart: async (
       items: Array<CartItem>,
       guest?: GuestUser,
-      userId?: number,
+      userId?: string,
     ): Promise<CommandResult<string>> => {
       const result: CommandResult<string> = {};
 
       try {
-        let guestId: number | undefined = undefined;
+        let guestId: string | undefined = undefined;
         if (guest) {
           const guestResult = await saveGuestUser(commandManager, guest);
           guestId = guestResult.data;
@@ -64,12 +85,18 @@ function getCartManager(): CartManager {
         result.error = cartCheckoutResult.error;
         if (result.error !== undefined) return result;
 
+        await sendNewOrderEmail(emailManager, cartCheckoutResult.data);
+
         result.data = `${OrderTypes.Web}-${cartCheckoutResult.data}`;
-        // * Generate email for Customer with order items and customer details
-        // * Generate email for Store with attached xml file containing order items and customer details
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         result.error = new Error(errorMessage);
+
+        await sendFailureEmail(
+          emailManager,
+          `Failed to create new order, see details below. ${errorMessage}`,
+        );
+
         console.error(
           "❌ ~ cartManager ~ failed to checkout cart: ",
           errorMessage,

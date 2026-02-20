@@ -20,6 +20,7 @@ import type {
   readReplicas,
   operationsVersion,
 } from "../schema/operations";
+import type { info, generalVersion } from "../schema/general";
 
 // Catalog
 export type CatalogVersion = InferSelectModel<typeof catalogVersion>;
@@ -43,3 +44,7 @@ export type Notification = InferSelectModel<typeof notifications>;
 export type NotificationAddressee = InferSelectModel<
   typeof notificationAddressees
 >;
+
+// General
+export type GeneralVersion = InferSelectModel<typeof generalVersion>;
+export type Info = InferSelectModel<typeof info>;

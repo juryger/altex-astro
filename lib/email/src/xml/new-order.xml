@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Order id="{{orderId}}" created="{{createdAt}}">
+  <Customer>
+    <Info name="id" value="{{client.uid}}" />
+    <Info name="company" value="{{client.company}}" />
+    <Info name="phone" value="{{client.phone}}" />
+    <Info name="email" value="{{client.email}}" />
+    <Info name="contactName" value="{{client.fullName}}" />
+    <Info name="address" value="{{clientPostCode}} {{clientCity}} {{clientAddress}}" />
+    <Info name="inn" value="{{clientTaxNumber}}" />
+  </Customer>
+  <Details>
+    {{#each items}}
+    <Item merchandiseId="{{productId}}" cost="{{price}}" quantity="{{quantity}}" color="{{color}}" />
+    {{items}}
+  </Details>
+</Order>

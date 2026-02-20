@@ -1,1 +1,0 @@
-ALTER TABLE `guests` RENAME COLUMN "lasttName" TO "lastName";

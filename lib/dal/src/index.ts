@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalog from "./schema/catalog/index.js";
 import * as operations from "./schema/operations/index.js";
+import * as general from "./schema/general/index.js";
 
 export {
   eq,
@@ -20,6 +21,7 @@ export type { SQLiteColumn } from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
 
 export type {
+  CatalogVersion,
   MeasurementUnit,
   Color,
   MakeCountry,
@@ -28,23 +30,33 @@ export type {
   Product,
   RelatedProduct,
   ProductColor,
+  OperationVersion,
   ReadReplica,
   Guest,
   CartCheckout,
   CartCheckoutItem,
   Notification,
   NotificationAddressee,
+  GeneralVersion,
+  Info,
 } from "./types/index.js";
+
+const createGeneralDb = (
+  path: string | undefined,
+): BetterSQLite3Database<typeof general> => {
+  const clientOperations = new Database(path, {
+    fileMustExist: true,
+  });
+  clientOperations.pragma("journal_mode = WAL");
+  return drizzle({ client: clientOperations, schema: general });
+};
 
 const createOperationsDb = (
   path: string | undefined,
 ): BetterSQLite3Database<typeof operations> => {
-  const clientOperations = new Database(
-    path ?? process.env.DB_OPERATIONS_PATH,
-    {
-      fileMustExist: true,
-    },
-  );
+  const clientOperations = new Database(path, {
+    fileMustExist: true,
+  });
   clientOperations.pragma("journal_mode = WAL");
   return drizzle({ client: clientOperations, schema: operations });
 };
@@ -52,11 +64,15 @@ const createOperationsDb = (
 const createCatalogDb = (
   path: string | undefined,
 ): BetterSQLite3Database<typeof catalog> => {
-  const clientCatalog = new Database(path ?? process.env.DB_CATALOG_PATH, {
+  const clientCatalog = new Database(path, {
     fileMustExist: true,
   });
   clientCatalog.pragma("journal_mode = WAL");
   return drizzle({ client: clientCatalog, schema: catalog, logger: true });
 };
 
-export { createOperationsDb, createCatalogDb };
+//createGeneralDb(process.env.DB_GENERAL_PATH);
+//createOperationsDb(process.env.DB_OPERATIONS_PATH);
+//createCatalogDb(process.env.DB_CATALOG_PATH);
+
+export { createGeneralDb, createOperationsDb, createCatalogDb };

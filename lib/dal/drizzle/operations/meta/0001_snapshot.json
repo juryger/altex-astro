@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3785e955-a6ba-4175-aec0-b3c13e2ca4ce",
-  "prevId": "d5108d82-b17f-4150-9b34-5d7c12b85d68",
+  "id": "b7c78c19-481e-4a44-9f6e-7b6ce9bf031b",
+  "prevId": "0f042a97-40a8-4444-92b7-1e8e5e8a7e39",
   "tables": {
     "cart_checkout": {
       "name": "cart_checkout",
@@ -16,23 +16,16 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "guest_id": {
           "name": "guest_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "discount_id": {
-          "name": "discount_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -140,8 +133,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "name": {
-          "name": "name",
+        "full_name": {
+          "name": "full_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -189,6 +182,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "tax_number": {
+          "name": "tax_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -196,16 +196,16 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
+        },
+        "uid": {
+          "name": "uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {
-        "idx_guests_name": {
-          "name": "idx_guests_name",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        },
         "idx_guests_email": {
           "name": "idx_guests_email",
           "columns": [
@@ -321,8 +321,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "value": {
-          "name": "value",
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -360,6 +367,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
         }
       },
       "indexes": {
@@ -382,7 +397,9 @@
   "_meta": {
     "schemas": {},
     "tables": {},
-    "columns": {}
+    "columns": {
+      "\"guests\".\"first_name\"": "\"guests\".\"full_name\""
+    }
   },
   "internal": {
     "indexes": {}

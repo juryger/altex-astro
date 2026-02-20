@@ -12,17 +12,18 @@ const dataCheckoutErrorDetailsId = "cart-checkout-error-details";
 
 const titleContactInfo = "Контактная информация";
 const titleOrderDetails = "Детали заказа";
-const titleFirstName = "Имя*";
-const titleLastName = "Фамилия*";
+const titleFullName = "ФИО*";
 const titleEmailName = "E-mail*";
 const titlePhonetName = "Телефон";
 const titleOrgName = "Организация";
 const titleAddressName = "Адрес";
 const titleCityName = "Город";
 const titlePostCode = "Почтовый код";
+const titleTaxNumber = "ИНН";
 const titleIncorrectValue = "Введите корректное значение поля";
 const titleIncorrectPhone = "Номер должен состоять из 11 цифр и начинаться с 8";
 const titleIncorrectPostCode = "Почтовый индеск должен состоять из 6 цифр";
+const titleIncorrectTaxNumber = "ИНН должен состоять из 12 цифр";
 const titleConfirmOrder = "Подтвердить заказ";
 const titleErrorHeader = "Техническая неисправность";
 const titleErrorDetailsHeader = "Технические детали";
@@ -41,32 +42,35 @@ const titleCartCheckoutFailed = "При размещении заказа воз
       <form name={dataFormCheckoutName}>  
         <h2 class="text-lg font-bold">{titleContactInfo}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <fieldset class="fieldset col-span-2 sm:col-span-1">
-            <legend class="fieldset-legend">{titleFirstName}</legend>
-            <input type="text" name="firstName" class="input w-full validator" required placeholder="" />
-            <p class="validator-hint hidden">{titleIncorrectValue}</p>
-          </fieldset>
-          <fieldset class="fieldset col-span-2 sm:col-span-1">
-            <legend class="fieldset-legend">{titleLastName}</legend>
-            <input type="text" name="lastName" class="input w-full validator" required placeholder="" />
+          <fieldset class="fieldset col-span-2">
+            <legend class="fieldset-legend">{titleFullName}</legend>
+            <input type="text" name="fullName" class="input w-full validator" required placeholder="" />
             <p class="validator-hint hidden">{titleIncorrectValue}</p>
           </fieldset>
           <fieldset class="fieldset col-span-2 sm:col-span-1">
             <legend class="fieldset-legend">{titleEmailName}</legend>
-            <input type="email" name="email" class="input w-full validator" required placeholder="mail@site.ru" />
+            <input type="email" name="email" class="input w-full validator" required placeholder="name@mail.ru" />
             <p class="validator-hint hidden">{titleIncorrectValue}</p>
           </fieldset>
           <fieldset class="fieldset col-span-2 sm:col-span-1">
             <legend class="fieldset-legend">{titlePhonetName}</legend>
             <input type="tel" name="phone" class="input w-full validator" placeholder="8..."
               pattern="8[0-9]*"
-              minlength="11"
+              minlength="1"
               maxlength="11" />
             <p class="validator-hint hidden">{titleIncorrectPhone}</p>
           </fieldset>
-          <fieldset class="fieldset col-span-2">
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
             <legend class="fieldset-legend">{titleOrgName}</legend>
             <input type="text" name="companyName" class="input w-full validator" placeholder="" />
+          </fieldset>
+          <fieldset class="fieldset col-span-2 sm:col-span-1">
+            <legend class="fieldset-legend">{titleTaxNumber}</legend>
+            <input type="number" name="taxNumber" class="input w-full validator" placeholder="" 
+              pattern="[0-9]*"
+              minlength="12"
+              maxlength="12" />
+            <p class="validator-hint hidden">{titleIncorrectTaxNumber}</p>
           </fieldset>
           <fieldset class="fieldset col-span-2">
             <legend class="fieldset-legend">{titleAddressName}</legend>
@@ -169,7 +173,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
         await this.createOrder()
           .then((result) => {
             if (!result) {
-              if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = "Server Error" ;
+              if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = "Failed to create new order." ;
               (this.errorPopupEl as HTMLDialogElement).showModal();
               return;
             }

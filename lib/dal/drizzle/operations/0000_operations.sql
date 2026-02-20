@@ -1,9 +1,7 @@
 CREATE TABLE `cart_checkout` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text NOT NULL,
-	`user_id` integer,
-	`guest_id` integer,
-	`discount_id` integer NOT NULL,
+	`user_id` text,
+	`guest_id` text,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
 	FOREIGN KEY (`guest_id`) REFERENCES `guests`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -14,22 +12,25 @@ CREATE TABLE `cart_checkout_items` (
 	`product_id` integer NOT NULL,
 	`color_id` integer,
 	`quantity` integer NOT NULL,
+	`price` real NOT NULL,
 	FOREIGN KEY (`cart_checkout_id`) REFERENCES `cart_checkout`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `guests` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text NOT NULL,
+	`first_name` text NOT NULL,
+	`last_name` text NOT NULL,
 	`email` text NOT NULL,
 	`phone` text,
 	`company_name` text,
 	`address` text,
 	`city` text,
 	`post_code` text,
-	`created_at` integer DEFAULT (unixepoch()) NOT NULL
+	`tax_number` text,
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`uid` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `idx_guests_name` ON `guests` (`name`);--> statement-breakpoint
 CREATE UNIQUE INDEX `idx_guests_email` ON `guests` (`email`);--> statement-breakpoint
 CREATE TABLE `notification_addresses` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -48,13 +49,15 @@ CREATE TABLE `notifications` (
 --> statement-breakpoint
 CREATE TABLE `__version` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`value` integer DEFAULT (unixepoch()) NOT NULL
+	`name` text NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `read_replicas` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text DEFAULT 'catalog' NOT NULL,
-	`file_name` text NOT NULL
+	`file_name` text NOT NULL,
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_read_replicas_name` ON `read_replicas` (`name`);

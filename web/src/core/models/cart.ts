@@ -26,7 +26,7 @@ export const CartSchema = z
   }));
 
 export const CartCheckoutRequestSchema = z.object({
-  userId: z.number().optional(),
+  userId: z.string().optional(),
   guestUser: GuestUserSchema.optional(),
   cartContent: z.array(CartSchema),
 });

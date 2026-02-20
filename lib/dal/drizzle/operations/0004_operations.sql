@@ -1,1 +1,0 @@
-ALTER TABLE `cart_checkout` DROP COLUMN `discount_id`;

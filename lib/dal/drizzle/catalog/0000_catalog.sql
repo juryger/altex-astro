@@ -1,6 +1,7 @@
 CREATE TABLE `__version` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`value` integer DEFAULT (unixepoch()) NOT NULL
+	`name` text NOT NULL,
+	`createdAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `categories` (
@@ -24,7 +25,8 @@ CREATE TABLE `colors` (
 	`title` text NOT NULL,
 	`fill_color` text NOT NULL,
 	`border_color` text NOT NULL,
-	`uid` text NOT NULL
+	`uid` text NOT NULL,
+	`deleted_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_colors_uid` ON `colors` (`uid`);--> statement-breakpoint
@@ -33,7 +35,8 @@ CREATE TABLE `discounts` (
 	`code` text NOT NULL,
 	`fromSum` real NOT NULL,
 	`title` text NOT NULL,
-	`uid` text NOT NULL
+	`uid` text NOT NULL,
+	`deleted_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_discounts_uid` ON `discounts` (`uid`);--> statement-breakpoint
@@ -41,7 +44,8 @@ CREATE TABLE `make_countries` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`title` text NOT NULL,
-	`uid` text NOT NULL
+	`uid` text NOT NULL,
+	`deleted_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_make_countries_uid` ON `make_countries` (`uid`);--> statement-breakpoint
@@ -49,7 +53,8 @@ CREATE TABLE `makers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`title` text NOT NULL,
-	`uid` text NOT NULL
+	`uid` text NOT NULL,
+	`deleted_at` integer
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `idx_makers_uid` ON `makers` (`uid`);--> statement-breakpoint
@@ -67,7 +72,6 @@ CREATE TABLE `product_colors` (
 	`product_id` integer NOT NULL,
 	`color_id` integer NOT NULL,
 	`uid` text NOT NULL,
-	`deleted_at` integer,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`color_id`) REFERENCES `colors`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -109,7 +113,6 @@ CREATE TABLE `related_products` (
 	`product_id` integer NOT NULL,
 	`related_product_id` integer NOT NULL,
 	`uid` text NOT NULL,
-	`deleted_at` integer,
 	FOREIGN KEY (`related_product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

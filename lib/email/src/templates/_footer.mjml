@@ -19,9 +19,16 @@
           ><b>{{ companyName }}</b
           ><br
         /></mj-text>
-        <mj-text align="center" padding="0px 0px 0px 0px">{{
-          contactDetails
-        }}</mj-text>
+        <mj-text align="center" padding="0px 0px 0px 0px"
+          >Для связи с нами напишите на почту
+          <a href="mailto:{{companyEmail}}" target="_blank">{{
+            companyEmail
+          }}</a
+          ><br />или позвоните по телефону
+          <a href="tel:{{companyPhone}}" target="_blank">{{
+            companyPhone
+          }}</a></mj-text
+        >
       </mj-column>
     </mj-section>
   </mj-body>

@@ -6,8 +6,7 @@ import { encode } from "html-entities";
 
 const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
   return {
-    firstName: encode(entity.firstName ?? "---"),
-    lastName: encode(entity.lastName ?? "---"),
+    fullName: encode(entity.fullName ?? "---"),
     email: encode(entity.email ?? "---"),
     phone: entity.phone !== undefined ? encode(entity.phone) : null,
     compnayName:
@@ -15,10 +14,12 @@ const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
     address: entity.address !== undefined ? encode(entity.address) : null,
     city: entity.city !== undefined ? encode(entity.city) : null,
     postCode: entity.postCode !== undefined ? encode(entity.postCode) : null,
+    taxNumber: entity.taxNumber !== undefined ? encode(entity.taxNumber) : null,
+    uid: entity.uid,
   } as Guest;
 };
 
-export async function UpsertGuestUser(guest: GuestUser): Promise<number> {
+export async function UpsertGuestUser(guest: GuestUser): Promise<string> {
   const db = createOperationsDb(import.meta.env.DB_OPERATIONS_PATH);
   const result = await db
     .insert(guests)
@@ -26,16 +27,16 @@ export async function UpsertGuestUser(guest: GuestUser): Promise<number> {
     .onConflictDoUpdate({
       target: guests.email,
       set: {
-        firstName: encode(guest.firstName),
-        lastName: encode(guest.lastName),
+        fullName: encode(guest.fullName),
         phone: encode(guest.phone),
         compnayName: encode(guest.compnayName),
         address: encode(guest.address),
         city: encode(guest.city),
         postCode: encode(guest.postCode),
+        taxNumber: encode(guest.taxNumber),
       },
     })
-    .returning({ id: guests.id });
+    .returning({ uid: guests.uid });
 
-  return result.at(0)?.id ?? 0;
+  return result.at(0)?.uid ?? "";
 }

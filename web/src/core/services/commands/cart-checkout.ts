@@ -11,8 +11,8 @@ import { createOperationsDb } from "@/lib/dal/src";
 
 export async function checkoutCart(
   items: Array<CartItem>,
-  userId?: number,
-  guestId?: number,
+  userId?: string,
+  guestId?: string,
 ): Promise<number> {
   const cartSum = items.reduce(
     (acc, curr) => acc + curr.price * curr.quantity,
@@ -31,8 +31,8 @@ export async function checkoutCart(
     const cart = tx
       .insert(cartCheckout)
       .values({
-        userId: userId,
-        guestId: guestId,
+        userId,
+        guestId,
       })
       .returning({ id: cartCheckout.id })
       .all();

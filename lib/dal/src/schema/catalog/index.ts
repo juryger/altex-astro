@@ -7,7 +7,8 @@ import * as t from "drizzle-orm/sqlite-core";
 
 export const catalogVersion = table("__version", {
   id: t.int().primaryKey(),
-  value: t
+  name: t.text().notNull(),
+  createdAt: t
     .int({ mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),

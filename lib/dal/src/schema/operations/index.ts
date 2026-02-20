@@ -4,7 +4,8 @@ import * as t from "drizzle-orm/sqlite-core";
 
 export const operationsVersion = table("__version", {
   id: t.int().primaryKey(),
-  value: t
+  name: t.text().notNull(),
+  createdAt: t
     .int({ mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -19,6 +20,10 @@ export const readReplicas = table(
       .default("catalog")
       .notNull(),
     fileName: t.text("file_name").notNull(),
+    createdAt: t
+      .int("created_at", { mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
   },
   (table) => [t.uniqueIndex("idx_read_replicas_name").on(table.name)],
 );
@@ -27,26 +32,27 @@ export const guests = table(
   "guests",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    firstName: t.text().notNull(),
-    lastName: t.text().notNull(),
+    fullName: t.text("full_name").notNull(),
     email: t.text().notNull(),
     phone: t.text(),
     compnayName: t.text("company_name"),
     address: t.text(),
     city: t.text(),
     postCode: t.text("post_code"),
+    taxNumber: t.text("tax_number"),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
+    uid: t.text().notNull(),
   },
   (table) => [t.uniqueIndex("idx_guests_email").on(table.email)],
 );
 
 export const cartCheckout = table("cart_checkout", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  userId: t.int("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
-  guestId: t.int("guest_id").references(() => guests.id),
+  userId: t.text("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
+  guestId: t.text("guest_id").references(() => guests.id),
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
