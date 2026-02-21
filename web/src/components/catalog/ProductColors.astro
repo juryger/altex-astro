@@ -8,6 +8,8 @@ interface Props {
   isDetailed?: boolean
 }
 const { productId, colors = [], colorsReference, isDetailed = false } = Astro.props;
+const sortedColors = colors.sort((a, b) => a - b);
+const defaultColorIndex = sortedColors.length > 0 ? sortedColors[0] : -1;
 
 const spanSelectedColorName = "data-selected-color";
 
@@ -22,10 +24,10 @@ const titleNoProductColors = "Нет информации о цвете";
   </div>
   {colors && colors.length > 0 && 
     <div class:list={['flex', 'items-center', 'gap-3', 'my-1', 'justify-center', {'justify-start': isDetailed}]}>
-      {colors.sort().map((key, index) => {
-        const metadata = colorsReference.find(x => x.id === key);
+      {sortedColors.map((item, index) => {
+        const metadata = colorsReference.find(ref => ref.id === item);        
         return metadata && <input type="radio" name={"radio-color".concat(productId.toString())}
-          checked={index == 0 ? "checked" : undefined} title={metadata.title} value={key}
+          checked={index === defaultColorIndex ? "checked" : undefined} title={metadata.title} value={metadata.id}
           class="cursor-pointer appearance-none rounded-full border checked:outline-2 checked:outline-offset-2 checked:outline-gray-400 focus-visible:outline-4 focus-visible:outline-offset-4"
           class:list={[
             metadata.fillColor, 
@@ -64,7 +66,8 @@ const titleNoProductColors = "Нет информации о цвете";
 
       const radioboxes = this.querySelectorAll('input[type=radio]');
       if (radioboxes.length > 0 && this.selectedColorTitleEl !== null) {
-        this.selectedColorTitleEl.innerHTML = radioboxes[0].getAttribute("title") ?? "";
+        const selectedColor = radioboxes.values().find(x => x.attributes.getNamedItem("checked") !== null);
+        this.selectedColorTitleEl.innerHTML = selectedColor ? selectedColor.getAttribute("title") ?? "" : "";
       }
       
       radioboxes.forEach((x: Element, index: number) => {

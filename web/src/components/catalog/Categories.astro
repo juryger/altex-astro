@@ -2,11 +2,12 @@
 export const prerender = false;
 
 import type { Category } from '@/web/src/core/models/category';
-import { defaultPaging, type PageResult, type Paging } from '@/web/src/core/models/paging';
 import CategoryCard from './CategoryCard.astro';
 import { CategoriesViewMode } from '@/web/src/core/const';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
 import { loadCategories } from '@/web/src/core/content-loaders/categories-loader';
+import type { PageResult, Paging } from '@/lib/domain/src';
+import { defaultPaging } from '@/web/src/core/utils/paging';
 
 // Categories horizontal scrolling is based on
 // https://ryanmulligan.dev/blog/project-keyboard-navigation/

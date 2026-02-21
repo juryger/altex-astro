@@ -1,8 +1,9 @@
+import type { Paging } from "@/lib/domain/src";
 import { APISearchParamNames, SortOrder, TextSeparators } from "../const";
 import type { Filtering } from "../models/filtering";
-import { defaultPaging, type Paging } from "../models/paging";
 import { defaultSorting, type Sorting } from "../models/sorting";
 import { regexTrue } from "./regex";
+import { defaultPaging } from "./paging";
 
 function extractUrlParam(
   url: URL | null,

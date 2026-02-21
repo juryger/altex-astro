@@ -117,6 +117,20 @@ enum OrderTypes {
   Web = "WEB",
 }
 
+enum AlertKind {
+  Default = "alert",
+  Info = "alert-info",
+  Success = "alert-success",
+  Warning = "alert-warning",
+  Error = "alert-error",
+}
+
+enum CatalogSyncType {
+  Cache = "catalog-cache",
+  CleanUp = "catalog-clean-up",
+  Failure = "catalog-failure",
+}
+
 export {
   NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
@@ -137,4 +151,6 @@ export {
   WorkerNames,
   SortFields,
   OrderTypes,
+  AlertKind,
+  CatalogSyncType,
 };

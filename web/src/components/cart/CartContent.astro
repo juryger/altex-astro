@@ -62,10 +62,10 @@ const titleSubtotal = "Итого:";
 <script>
   import { navigate } from 'astro:transitions/client';
   import { CartMessages } from "@/web/src/core/const/messages";
-  import { AlertKind } from "@/web/src/core/models/alert";
+  import { AlertKind } from "@/web/src/core/const";
   import { addAlert } from "@/web/src/core/stores/alert-store";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/cart-store";
-  import { type Discount } from "@/web/src/core/models/discount";
+  import { type Discount } from "@/lib/domain/";
   import type { CartItem } from "@/web/src/core/models/cart";
   import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
@@ -180,6 +180,7 @@ const titleSubtotal = "Итого:";
 
       this.cleanupCartContent();
       cartItems.forEach(x => {
+        console.log("~ CartContent ~ syncCartContentFromStore", x);
         const divAlert = document.createElement("li");
         divAlert.classList.add("flex", "p-2");
         this.cartContainerEl && this.cartContainerEl.appendChild(divAlert);

@@ -10,6 +10,7 @@ const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
     name: entity.name,
     value: entity.value,
     createdAt: entity.createdAt,
+    deletedAt: entity.deletedAt,
   };
 };
 

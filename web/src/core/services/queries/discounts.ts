@@ -1,8 +1,14 @@
-import { createCatalogDb } from "@/lib/dal/src";
+import { asc, createCatalogDb, SQL, type SQLiteColumn } from "@/lib/dal/src";
 import { discounts } from "@/lib/dal/src/schema/catalog";
-import type { Discount } from "@/web/src/core/models/discount";
+import { type Discount } from "@/lib/domain/";
 import type { Discount as DbDiscount } from "@/lib/dal/src/types";
 import { isNull } from "@/lib/dal";
+
+const columnFromSum: SQLiteColumn = discounts.fromSum;
+
+const getSortCondition = (): SQL => {
+  return asc(columnFromSum);
+};
 
 const mapQueryResultToDomainModel = (entity: DbDiscount): Discount => {
   return <Discount>{
@@ -19,7 +25,8 @@ export async function fetchDiscounts(): Promise<Discount[]> {
   const queryResult = await db
     .select()
     .from(discounts)
-    .where(isNull(discounts.deletedAt));
+    .where(isNull(discounts.deletedAt))
+    .orderBy(getSortCondition());
 
   return queryResult.map((item) => mapQueryResultToDomainModel(item));
 }

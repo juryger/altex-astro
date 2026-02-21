@@ -1,8 +1,5 @@
-import {
-  CatalogSyncType,
-  type CatalogSyncStatus,
-} from "../models/catalog-sync";
-import { getCatalogSyncHandler } from "./catalog-sync-handler";
+import { getCatalogSyncHandler, type CatalogSyncStatus } from ".";
+import { CatalogSyncType } from "../const";
 
 const SyncComplete = "Catalog data has been saved to IndexedDB.";
 const SyncFailed = "Failed to save catalog data to IndexedDB";

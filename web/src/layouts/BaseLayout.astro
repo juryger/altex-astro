@@ -44,9 +44,9 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 
 <script>
 	import { createWorker } from "../core/factories/worker-factory";
-	import { getLocalStorageManager } from "../core/utils/local-storage-manager"; 
-	import { CatalogSyncType, type CatalogSyncStatus } from "../core/models/catalog-sync";
-	import { WorkerNames } from "../core/const";
+	import { getLocalStorageManager } from "../core/utils/local-storage-manager";
+	import { CatalogSyncType, WorkerNames } from "../core/const";
+	import type { CatalogSyncStatus } from "../core/workers";
 	
 	let catalogSyncWorker: Worker | undefined;
 
@@ -79,12 +79,10 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 				case CatalogSyncType.Failure:
 					console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
 					localStorageManager.setCatalogSyncInProgress(false);
-					localStorageManager.setCatalogSyncPostponed(true);
 					break;
 				default:
 					console.error("⚙️ ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
 					localStorageManager.setCatalogSyncInProgress(false);
-					localStorageManager.setCatalogSyncPostponed(true);
 					break;
 			}
 
@@ -95,7 +93,6 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 	const processWorkerError = (err: ErrorEvent): void => {
 		console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", err.message);
 		localStorageManager.setCatalogSyncInProgress(false);
-		localStorageManager.setCatalogSyncPostponed(true);
 		
 		// clean up worker resource
 		terminateWorker();

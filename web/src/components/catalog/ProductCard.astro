@@ -8,7 +8,7 @@ import ProductPackInfo from './ProductPackInfo.astro';
 import ProductQuickView from './ProductQuickView.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
-import type { Catalog } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/lib/domain/';
 
 interface Props {
   item: Product;
@@ -76,7 +76,7 @@ const titleUnknown = "(?)";
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
   import type { CartItem } from "@/web/src/core/models/cart";
   import { addAlert } from "@/web/src/core/stores/alert-store";
-  import { AlertKind } from "@/web/src/core/models/alert";
+  import { AlertKind } from "@/web/src/core/const";
   import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName } from "@/web/src/core/utils/dom-utils";

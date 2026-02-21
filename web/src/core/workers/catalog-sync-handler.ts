@@ -1,3 +1,4 @@
+import type { PageResult } from "@/lib/domain/src";
 import {
   APIEndpointNames,
   APISearchParamNames,
@@ -6,7 +7,8 @@ import {
 } from "../const";
 import { clientDb } from "../db/indexed-db";
 import type { CategoryCache, Category } from "../models/category";
-import type { PageResult } from "../models/paging";
+
+const CATEGORIES_PAGE_SIZE = 150;
 
 type CatalogSyncHandler = {
   syncCategories(): Promise<number>;
@@ -15,9 +17,7 @@ type CatalogSyncHandler = {
   cleanUpCache(): Promise<void>;
 };
 
-const CATEGORIES_PAGE_SIZE = 150;
-
-export const getCatalogSyncHandler = (config: {
+const getCatalogSyncHandler = (config: {
   baseUrl: string;
 }): CatalogSyncHandler => {
   //console.log("🛠️ ~ catalog-sync-handler ~ config: ", config);
@@ -86,3 +86,5 @@ export const getCatalogSyncHandler = (config: {
     },
   };
 };
+
+export { getCatalogSyncHandler };

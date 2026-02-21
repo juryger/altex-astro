@@ -4,13 +4,13 @@ export const prerender = false;
 import type { Product } from '@/web/src/core/models/product';
 import ProductCard from './ProductCard.astro';
 import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import { defaultPaging, type PageResult, type Paging } from '@/web/src/core/models/paging';
 import type { Filtering } from '@/web/src/core/models/filtering';
 import { loadProducts, type ProductCollectionFilter } from '@/web/src/core/content-loaders/products-loader';
 import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import ModalDialog from '../ModalDialog.astro';
-import type { Catalog } from '@/web/src/core/models/catalog';
+import type { Catalog, PageResult, Paging } from '@/lib/domain/';
+import { defaultPaging } from '@/web/src/core/utils/paging';
 
 interface Props {
   categorySlug: string;

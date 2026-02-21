@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getQueryManager } from "@/web/src/core/services/queryManager";
 import { fetchDiscounts } from "@/web/src/core/services/queries/discounts";
-import type { Discount } from "@/web/src/core/models/discount";
+import { type Discount } from "@/lib/domain/";
 import { CacheKeys } from "@/web/src/core/const/cache";
 import { getCacheInfo } from "@/web/src/core/models/cache";
 

@@ -34,14 +34,19 @@ const getColorSelectOptions = (
   value: CartItem,
   productColors: ProductColor[],
 ): string => {
+  console.log(
+    "~ cartManager ~ colors: %o, all %o",
+    value.availableColors,
+    productColors,
+  );
   var result = `<option>${titleColorUnavailable}</option>`;
   value.availableColors
     ?.sort((a, b) => a - b)
-    .forEach((key: number) => {
-      var metadata = productColors.find((x) => x.id === key);
+    .forEach((item: number) => {
+      var metadata = productColors.find((x) => x.id === item);
       result = result.concat(
-        `<option value="${key}"
-          ${value.color !== undefined && value.color === key ? "selected" : ""}>
+        `<option value="${item}"
+          ${value.color !== undefined && value.color === item ? "selected" : ""}>
           ${metadata?.title}
         </option>`,
       );

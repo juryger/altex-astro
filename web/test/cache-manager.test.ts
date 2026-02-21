@@ -17,7 +17,7 @@ import {
 } from "../src/core/const/cache";
 import type { Category } from "../src/core/models/category";
 import type { MeasurementUnit } from "../src/core/models/measurement-unit";
-import type { Discount } from "../src/core/models/discount";
+import { type Discount } from "@/lib/domain/";
 
 const CACHE_STALTE_TIME_MS = 10000;
 const CACHE_SIZE_LIMIT = 5;

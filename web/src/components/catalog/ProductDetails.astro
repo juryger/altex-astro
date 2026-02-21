@@ -8,7 +8,7 @@ import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
 import ProductDimensions from './ProductDimensions.astro';
-import type { Catalog } from '@/web/src/core/models/catalog';
+import type { Catalog } from '@/lib/domain/';
 
 interface Props {
   item: Product;
@@ -96,7 +96,7 @@ const titleUnknown = "(?)";
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
   import type { CartItem } from "@/web/src/core/models/cart";
   import { addAlert } from "@/web/src/core/stores/alert-store";
-  import { AlertKind } from "@/web/src/core/models/alert";
+  import { AlertKind } from "@/web/src/core/const";
   import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
@@ -119,9 +119,9 @@ const titleUnknown = "(?)";
       const selectedColorEl =  this.querySelector('input[type=radio]:checked');
       var selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
       
-      const radioboxes = this.querySelectorAll('input[type=radio]')
-      if (!selectedColor && radioboxes.length > 0) {
-        selectedColor = (radioboxes[0] as HTMLInputElement).value;
+      if (selectedColor === null) {
+        const radioboxes = this.querySelectorAll('input[type=radio]')
+        selectedColor = radioboxes.length > 0 ? (radioboxes[0] as HTMLInputElement).value : null;
       }
       
       const quanityEl = getInputElementByName(this, this.dataset.input_quatnity);
