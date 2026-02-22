@@ -1,7 +1,8 @@
 import { navigate } from "astro:transitions/client";
-import { DialogActionResult, ProductsSortFileds, SortOrder } from "../const";
+import { DialogActionResult } from "../const";
 import { regexPageParams, regexSortParams } from "./regex";
 import { constructNavigationPaths } from "./url-builder";
+import { ProductsSortFields, SortOrder } from "@/lib/domain";
 
 interface ProductsViewManager {
   apply: (signal: AbortSignal) => void;
@@ -43,7 +44,7 @@ const getSelectedSortField = (
   const selectEl = inputElements.selectSortEl
     ? (inputElements.selectSortEl as HTMLSelectElement)
     : undefined;
-  if (!selectEl) return ProductsSortFileds.Title;
+  if (!selectEl) return ProductsSortFields.Title;
   return selectEl.value;
 };
 

@@ -3,7 +3,7 @@ import {
   CENTIMETERS_IN_METER,
   GRAMS_IN_KG,
   MILIMETERS_IN_CENTIMETER,
-} from "../const/measurments";
+} from "../const/measurements";
 
 export const ProductSchema = z
   .object({
@@ -79,5 +79,6 @@ export const ProductSchema = z
   });
 
 export type Product = z.infer<typeof ProductSchema>;
+
 // to calculate derived props use parse() method, i.e.
 // const item = ProductSchema.parse(value);

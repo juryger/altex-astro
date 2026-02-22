@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const CategorySchema = z.object({
+export const CategorySchema = z.object({
   id: z.number(),
   slug: z.string(),
   title: z.string(),

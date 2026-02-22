@@ -1,4 +1,4 @@
-import type { CacheInfo } from "@/web/src/core/models/cache";
+import type { CacheInfo } from "@/lib/domain";
 import { getErrorMessage } from "../utils/error-parser";
 import { CacheManager } from "./cache/cacheManager";
 

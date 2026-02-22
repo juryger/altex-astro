@@ -45,22 +45,6 @@ enum NavPathNames {
   ServerError = "500",
 }
 
-enum SortOrder {
-  Ascending = 0,
-  Descending = 1,
-}
-
-enum FilterOperator {
-  Equals = 0,
-  NotEquals = 1,
-  Greater = 2,
-  Less = 3,
-  GreaterOrEqual = 4,
-  LessOrEqual = 5,
-  In = 6,
-  NotIn = 7,
-}
-
 enum TextSeparators {
   Comma = ",",
   Dot = ".",
@@ -75,11 +59,6 @@ enum ImageContainers {
 enum CategoriesViewMode {
   Compact = 0,
   Full = 1,
-}
-
-enum ProductsSortFileds {
-  Title = "title",
-  Price = "price",
 }
 
 enum DialogSize {
@@ -104,12 +83,6 @@ enum DialogActionResult {
 
 enum WorkerNames {
   Catalog = "catalog-sync-worker",
-}
-
-enum SortFields {
-  Id = "id",
-  Title = "title",
-  Price = "price",
 }
 
 enum OrderTypes {
@@ -139,17 +112,13 @@ export {
   NavPathNames,
   APIEndpointNames,
   APISearchParamNames,
-  SortOrder,
-  FilterOperator,
   TextSeparators,
   ImageContainers,
   CategoriesViewMode,
-  ProductsSortFileds,
   DialogActionButtons,
   DialogActionResult,
   DialogSize,
   WorkerNames,
-  SortFields,
   OrderTypes,
   AlertKind,
   CatalogSyncType,

@@ -1,5 +1,5 @@
 import { defineAction } from "astro:actions";
-import { CartCheckoutRequestSchema } from "../core/models/cart";
+import { CartCheckoutRequestSchema } from "@/lib/domain";
 import { getCartManager } from "../core/services/cart/cartManager";
 
 export const cartActions = {

@@ -8,24 +8,21 @@ import {
   type SQLiteColumn,
   SQL,
 } from "@/lib/dal";
-import { categories, products } from "@/lib/dal/src/schema/catalog";
-import type { Category as DbCategory } from "@/lib/dal/src/types";
-import type { Category } from "@/web/src/core/models/category";
+import type { Category as DbCategory } from "@/lib/dal";
+import type { PageResult, Paging, Sorting, Category } from "@/lib/domain";
+import { categories, products } from "@/lib/dal";
+import { CategoriesSortFields, SortOrder } from "@/lib/domain";
 import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
-import {
-  NO_IMAGE_FILE_NAME,
-  SortFields,
-  SortOrder,
-} from "@/web/src/core/const";
-import type { PageResult, Paging } from "@/web/src/core/models/paging";
-import type { Sorting } from "@/web/src/core/models/sorting";
+import { NO_IMAGE_FILE_NAME } from "@/web/src/core/const";
 
 const columnId: SQLiteColumn = categories.id;
 const columnTitle: SQLiteColumn = categories.title;
 
 const getSortCondition = (value: Sorting): SQL => {
   const column =
-    value.field.toLowerCase() === SortFields.Title ? columnTitle : columnId;
+    value.field.toLowerCase() === CategoriesSortFields.Title
+      ? columnTitle
+      : columnId;
   return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 

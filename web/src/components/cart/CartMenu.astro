@@ -54,7 +54,7 @@ const dataCartShowCommandName = "cartmenu-show";
 <script>
   import { clientDb } from "@/web/src/core/db/indexed-db";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
-  import { type Discount } from "@/web/src/core/models/discount";
+  import { type Discount } from "@/lib/domain";
   import { $cartCount, $cartCost, $cartWhsCost1, $cartWhsCost2 } from "@/web/src/core/stores/cart-store";
   import { getButtonElementByName, getElementByDataAttribute, getElementById } from "@/web/src/core/utils/dom-utils";
  

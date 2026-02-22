@@ -1,5 +1,6 @@
 import type { InferSelectModel } from "drizzle-orm";
-import type {
+
+import {
   categories,
   colors,
   discounts,
@@ -11,7 +12,8 @@ import type {
   relatedProducts,
   catalogVersion,
 } from "../schema/catalog";
-import type {
+
+import {
   cartCheckout,
   cartCheckoutItems,
   guests,
@@ -20,7 +22,8 @@ import type {
   readReplicas,
   operationsVersion,
 } from "../schema/operations";
-import type { info, generalVersion } from "../schema/general";
+
+import { info, generalVersion } from "../schema/general";
 
 // Catalog
 export type CatalogVersion = InferSelectModel<typeof catalogVersion>;

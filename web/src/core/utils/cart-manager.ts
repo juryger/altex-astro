@@ -1,5 +1,4 @@
-import type { CartItem } from "../models/cart";
-import type { ProductColor } from "../models/product-color";
+import type { CartItem, ProductColor } from "@/lib/domain";
 import { formatCurrency, trimEnd } from "./text-formatter";
 
 const titleProductColor = "Цвет:";

@@ -1,9 +1,8 @@
 import type { APIRoute } from "astro";
 import { fetchCategoryBySlug } from "@/web/src/core/services/queries/categories";
 import { getQueryManager } from "@/web/src/core/services/queryManager";
-import type { Category } from "@/web/src/core/models/category";
-import { getCacheInfo } from "@/web/src/core/models/cache";
-import { CACHE_STALE_TIMEOUT_1MN, CacheKeys } from "@/web/src/core/const/cache";
+import type { Category } from "@/lib/domain";
+import { CACHE_STALE_TIMEOUT_1MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 

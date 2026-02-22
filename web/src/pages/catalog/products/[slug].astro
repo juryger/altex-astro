@@ -3,16 +3,14 @@ export const prerender = false;
 
 import BaseLayout from '@/web/src/layouts/BaseLayout.astro';
 import { getProduct } from '@/web/src/core/utils/live-collection-manager';
-import type { Product } from '@/web/src/core/models/product';
 import ProductDetails from '@/web/src/components/catalog/ProductDetails.astro';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
-import type { Catalog } from '@/lib/domain/';
 import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurement-units';
 import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
 import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
 import { getQueryManager } from '@/web/src/core/services/queryManager';
-import { getCacheInfo } from '@/web/src/core/models/cache';
-import { CacheKeys } from '@/web/src/core/const/cache';
+import type { Catalog, Product } from '@/lib/domain/';
+import { CacheKeys, getCacheInfo } from '@/lib/domain';
 
 const { slug } = Astro.params;
 

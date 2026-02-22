@@ -1,10 +1,5 @@
-import { ProductSchema, type Product } from "@/web/src/core/models/product";
-import {
-  initEmptyPageResult,
-  type PageResult,
-  type Paging,
-} from "@/web/src/core/models/paging";
-import type { Sorting } from "@/web/src/core/models/sorting";
+import type { Product, PageResult, Paging, Sorting } from "@/lib/domain";
+import { ProductSchema, CategoriesSortFields, SortOrder } from "@/lib/domain";
 import {
   createCatalogDb,
   eq,
@@ -14,23 +9,15 @@ import {
   or,
   isNull,
   SQL,
-  type SQLiteColumn,
-} from "@/lib/dal/src";
-import {
   categories,
   makeCountries,
   makers,
   measurementUnits,
   productColors,
   products,
-} from "@/lib/dal/src/schema/catalog";
+} from "@/lib/dal";
 import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
-import {
-  ImageContainers,
-  NO_IMAGE_FILE_NAME,
-  SortFields,
-  SortOrder,
-} from "@/web/src/core/const";
+import { ImageContainers, NO_IMAGE_FILE_NAME } from "@/web/src/core/const";
 import type {
   Product as DbProduct,
   Category as DbCategory,
@@ -38,7 +25,9 @@ import type {
   MakeCountry as DbMakeCountry,
   MeasurementUnit as DbMeasurementUnit,
   ProductColor as DbProductColor,
-} from "@/lib/dal/src/types";
+  SQLiteColumn,
+} from "@/lib/dal";
+import { initEmptyPageResult } from "@/web/src/core/utils/paging";
 
 const columnId: SQLiteColumn = products.id;
 const columnTitle: SQLiteColumn = products.title;
@@ -47,10 +36,10 @@ const columnPrice: SQLiteColumn = products.price;
 const getSortCondition = (value: Sorting): SQL => {
   var column: SQLiteColumn | undefined;
   switch (value.field.toLowerCase()) {
-    case SortFields.Title:
+    case CategoriesSortFields.Title:
       column = columnTitle;
       break;
-    case SortFields.Price:
+    case CategoriesSortFields.Price:
       column = columnPrice;
       break;
     default:

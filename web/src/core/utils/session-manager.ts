@@ -1,5 +1,6 @@
 import { type AstroSession } from "astro";
-import { FilterOperator, SessionNames, SortOrder } from "../const";
+import { SessionNames } from "../const";
+import { FilterOperator, SortOrder } from "@/lib/domain";
 
 type CatalogItem = {
   slug: string;

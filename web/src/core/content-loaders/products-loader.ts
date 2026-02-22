@@ -1,9 +1,12 @@
 import type { LiveLoader } from "astro/loaders";
 import { getErrorMessage } from "../utils/error-parser";
-import type { Product } from "../models/product";
-import type { PageResult, Paging } from "../models/paging";
-import type { Sorting } from "../models/sorting";
-import type { Filtering } from "../models/filtering";
+import type {
+  Product,
+  PageResult,
+  Paging,
+  Sorting,
+  Filtering,
+} from "@/lib/domain";
 import {
   APIEndpointNames,
   APISearchParamNames,

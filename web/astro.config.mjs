@@ -17,6 +17,12 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        "@/": new URL("..", import.meta.url).pathname,
+        "@/lib": new URL("../lib", import.meta.url).pathname,
+      },
+    },
   },
   integrations: [sitemap()],
   experimental: {

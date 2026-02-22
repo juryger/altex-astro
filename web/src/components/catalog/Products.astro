@@ -1,16 +1,14 @@
 ---
 export const prerender = false;
 
-import type { Product } from '@/web/src/core/models/product';
-import ProductCard from './ProductCard.astro';
-import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import type { Filtering } from '@/web/src/core/models/filtering';
-import { loadProducts, type ProductCollectionFilter } from '@/web/src/core/content-loaders/products-loader';
-import { DialogActionButtons, DialogSize, ProductsSortFileds, SortOrder } from '@/web/src/core/const';
-import { getSessionManager } from '@/web/src/core/utils/session-manager';
-import ModalDialog from '../ModalDialog.astro';
-import type { Catalog, PageResult, Paging } from '@/lib/domain/';
-import { defaultPaging } from '@/web/src/core/utils/paging';
+import type { Product, Catalog, PageResult, Paging, Sorting, Filtering } from "@/lib/domain";
+import { defaultSorting, SortOrder, ProductsSortFields } from "@/lib/domain";
+import ProductCard from "./ProductCard.astro";
+import { loadProducts, type ProductCollectionFilter } from "@/web/src/core/content-loaders/products-loader";
+import { DialogActionButtons, DialogSize } from "@/web/src/core/const";
+import { getSessionManager } from "@/web/src/core/utils/session-manager";
+import ModalDialog from "../ModalDialog.astro";
+import { defaultPaging } from "@/web/src/core/utils/paging";
 
 interface Props {
   categorySlug: string;
@@ -88,8 +86,8 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       <div class="items-center justify-self-center sm:justify-self-end flex flex-row flex-nowrap">
         <span class="content-center text-nowrap mr-1">{titleSortBy}:</span>
         <select name={nameSortFieldSelect} class="select w-38 mr-2">
-          <option value={ProductsSortFileds.Title} selected={productsView?.sorting?.field === ProductsSortFileds.Title}>{titlSortByTitle}</option>
-          <option value={ProductsSortFileds.Price} selected={productsView?.sorting?.field === ProductsSortFileds.Price}>{titleSortByPrice}</option>
+          <option value={ProductsSortFields.Title} selected={productsView?.sorting?.field === ProductsSortFields.Title}>{titlSortByTitle}</option>
+          <option value={ProductsSortFields.Price} selected={productsView?.sorting?.field === ProductsSortFields.Price}>{titleSortByPrice}</option>
         </select>
         <label class="toggle toggle-xl" title={productsView?.sorting?.order === SortOrder.Ascending ? titleSortAscending : titleSortDescending}>
           <input name={nameSortOrder} type="checkbox" checked={productsView?.sorting?.order === SortOrder.Ascending} />

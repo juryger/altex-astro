@@ -1,5 +1,10 @@
-enum SortFields {
+enum CategoriesSortFields {
   Id = "id",
+  Title = "title",
+  Price = "price",
+}
+
+enum ProductsSortFields {
   Title = "title",
   Price = "price",
 }
@@ -9,4 +14,4 @@ enum SortOrder {
   Descending = 1,
 }
 
-export { SortFields, SortOrder };
+export { CategoriesSortFields, ProductsSortFields, SortOrder };

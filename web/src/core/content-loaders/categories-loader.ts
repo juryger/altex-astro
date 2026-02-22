@@ -1,9 +1,8 @@
 import type { LiveLoader } from "astro/loaders";
 import { getErrorMessage } from "../utils/error-parser";
-import type { Category } from "../models/category";
+import type { Category } from "@/lib/domain";
 import { APIEndpointNames, APISearchParamNames } from "../const";
-import type { Sorting } from "../models/sorting";
-import type { PageResult, Paging } from "../models/paging";
+import type { PageResult, Paging, Sorting } from "@/lib/domain";
 
 type CategoryCollectionFilter = {
   skipParentMatch: boolean;

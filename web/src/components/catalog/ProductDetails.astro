@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import type { Product } from '@/web/src/core/models/product';
+import  { type Product, type Catalog } from "@/lib/domain";
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -8,7 +8,6 @@ import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
 import ProductDimensions from './ProductDimensions.astro';
-import type { Catalog } from '@/lib/domain/';
 
 interface Props {
   item: Product;
@@ -92,15 +91,13 @@ const titleUnknown = "(?)";
 </product-details>
 
 <script>
-  import type { Product } from "@/web/src/core/models/product";
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
-  import type { CartItem } from "@/web/src/core/models/cart";
+  import type { CartItem, Product, ProductColor } from "@/lib/domain";
   import { addAlert } from "@/web/src/core/stores/alert-store";
   import { AlertKind } from "@/web/src/core/const";
   import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
-  import type { ProductColor } from "@/web/src/core/models/product-color";
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import { NO_VALUE_ASSIGNED } from "@/web/src/core/const";
 

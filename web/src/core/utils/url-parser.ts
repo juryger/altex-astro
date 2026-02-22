@@ -1,7 +1,6 @@
-import type { Paging } from "@/lib/domain/src";
-import { APISearchParamNames, SortOrder, TextSeparators } from "../const";
-import type { Filtering } from "../models/filtering";
-import { defaultSorting, type Sorting } from "../models/sorting";
+import { APISearchParamNames, TextSeparators } from "../const";
+import type { Sorting, Filtering, Paging } from "@/lib/domain";
+import { defaultSorting, SortOrder } from "@/lib/domain";
 import { regexTrue } from "./regex";
 import { defaultPaging } from "./paging";
 

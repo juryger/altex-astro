@@ -1,4 +1,4 @@
-import type { Product } from "../models/product";
+import type { Product } from "@/lib/domain";
 
 const parseProduct = (dataset: DOMStringMap): Product | undefined => {
   const id = parseInt(dataset.id ?? "0", 10);

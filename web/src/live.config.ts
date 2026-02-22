@@ -9,9 +9,9 @@ import {
   type ProductCollectionFilter,
   type ProductEntryFilter,
 } from "./core/content-loaders/products-loader";
-import { CategorySchema, type Category } from "./core/models/category";
 import { type LiveLoader } from "astro/loaders";
-import { ProductSchema, type Product } from "./core/models/product";
+import { CategorySchema, ProductSchema } from "@/lib/domain";
+import { type Category, type Product } from "@/lib/domain";
 
 const apiBaseUrl = `${import.meta.env.PUBLIC_API_BASE_URL}`;
 console.log("🛠️ ~ live.config ~ API url:", apiBaseUrl);

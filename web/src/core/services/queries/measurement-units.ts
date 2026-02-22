@@ -1,8 +1,9 @@
-import { asc, createCatalogDb, SQL, type SQLiteColumn } from "@/lib/dal/src";
-import type { MeasurementUnit } from "@/web/src/core/models/measurement-unit";
-import type { MeasurementUnit as DbMeasurementUnit } from "@/lib/dal/src/types";
-import { isNull } from "@/lib/dal";
-import { measurementUnits } from "@/lib/dal/src/schema/catalog";
+import { asc, createCatalogDb, SQL, isNull, measurementUnits } from "@/lib/dal";
+import type { MeasurementUnit } from "@/lib/domain";
+import type {
+  MeasurementUnit as DbMeasurementUnit,
+  SQLiteColumn,
+} from "@/lib/dal";
 
 const columnTitle: SQLiteColumn = measurementUnits.title;
 

@@ -1,8 +1,6 @@
-import type { Sorting } from "@/web/src/core/models/sorting";
-import type { Paging } from "@/web/src/core/models/paging";
-import type { Filtering } from "@/web/src/core/models/filtering";
+import type { Sorting, Paging, Filtering } from "@/lib/domain";
+import { FilterOperator } from "@/lib/domain";
 import { regexFilterParams, regexPageParams, regexSortParams } from "./regex";
-import { FilterOperator } from "../const";
 
 interface RouteParser {
   getCatalogSorting(): Sorting | undefined;

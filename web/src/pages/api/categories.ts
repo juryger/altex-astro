@@ -7,14 +7,13 @@ import {
 } from "@/web/src/core/utils/url-parser";
 import { fetchCategories } from "@/web/src/core/services/queries/categories";
 import { getQueryManager } from "@/web/src/core/services/queryManager";
-import type { PageResult } from "@/web/src/core/models/paging";
-import type { Category } from "@/web/src/core/models/category";
-import { getCacheInfo } from "@/web/src/core/models/cache";
+import type { Category, PageResult } from "@/lib/domain";
 import {
   CACHE_STALE_TIMEOUT_1HR,
   CACHE_STALE_TIMEOUT_5MN,
   CacheKeys,
-} from "@/web/src/core/const/cache";
+  getCacheInfo,
+} from "@/lib/domain";
 
 export const prerender = false;
 

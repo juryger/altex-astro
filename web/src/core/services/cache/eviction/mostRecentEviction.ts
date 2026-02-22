@@ -1,7 +1,4 @@
-import type {
-  CacheEntry,
-  CacheEvictionStrategy,
-} from "@/web/src/core/models/cache";
+import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
 
 const getMostRecentEvictionStrategy = (): CacheEvictionStrategy => {
   return {

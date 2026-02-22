@@ -1,8 +1,6 @@
-import { asc, createCatalogDb, SQL, type SQLiteColumn } from "@/lib/dal/src";
-import { discounts } from "@/lib/dal/src/schema/catalog";
+import { asc, createCatalogDb, SQL, discounts, isNull } from "@/lib/dal";
+import type { Discount as DbDiscount, SQLiteColumn } from "@/lib/dal";
 import { type Discount } from "@/lib/domain/";
-import type { Discount as DbDiscount } from "@/lib/dal/src/types";
-import { isNull } from "@/lib/dal";
 
 const columnFromSum: SQLiteColumn = discounts.fromSum;
 

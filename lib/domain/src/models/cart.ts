@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { GuestUserSchema } from "./guest-user";
 
-const CartSchema = z
+export const CartSchema = z
   .object({
     productId: z.number(),
     productCode: z.string(),
@@ -25,7 +25,7 @@ const CartSchema = z
         : data.productId.toString(),
   }));
 
-const CartCheckoutRequestSchema = z.object({
+export const CartCheckoutRequestSchema = z.object({
   userId: z.string().optional(),
   guestUser: GuestUserSchema.optional(),
   cartContent: z.array(CartSchema),

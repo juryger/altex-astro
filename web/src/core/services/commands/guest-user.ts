@@ -1,7 +1,7 @@
-import { createOperationsDb } from "@/lib/dal/src";
-import type { GuestUser } from "@/web/src/core/models/guest-user";
-import type { Guest } from "@/lib/dal/src/types";
-import { guests } from "@/lib/dal/src/schema/operations";
+import { createOperationsDb } from "@/lib/dal";
+import type { GuestUser } from "@/lib/domain";
+import type { Guest } from "@/lib/dal";
+import { guests } from "@/lib/dal";
 import { encode } from "html-entities";
 
 const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {

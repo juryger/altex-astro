@@ -1,13 +1,8 @@
-import type { CartItem } from "@/web/src/core/models/cart";
+import type { CartItem } from "@/lib/domain";
+import { CacheKeys, getCacheInfo } from "@/lib/domain";
 import { getQueryManager } from "../queryManager";
 import { fetchDiscounts } from "../queries/discounts";
-import { getCacheInfo } from "@/web/src/core/models/cache";
-import { CacheKeys } from "@/web/src/core/const/cache";
-import {
-  cartCheckout,
-  cartCheckoutItems,
-} from "@/lib/dal/src/schema/operations";
-import { createOperationsDb } from "@/lib/dal/src";
+import { createOperationsDb, cartCheckout, cartCheckoutItems } from "@/lib/dal";
 
 export async function checkoutCart(
   items: Array<CartItem>,

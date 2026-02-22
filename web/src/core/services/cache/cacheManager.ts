@@ -1,7 +1,4 @@
-import type {
-  CacheEntry,
-  CacheEvictionStrategy,
-} from "@/web/src/core/models/cache";
+import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
 import { delayWithRetry } from "@/web/src/core/utils/delays";
 import { getErrorMessage } from "@/web/src/core/utils/error-parser";
 import {
@@ -9,7 +6,7 @@ import {
   CACHE_LOAD_RETRY_ATTEMPS,
   CACHE_LOAD_RETRY_DELAY_MS,
   CACHE_ITEM_LOCK_TIMEOUT_1MN,
-} from "@/web/src/core/const/cache";
+} from "@/lib/domain";
 import { getMostRecentEvictionStrategy } from "./eviction/mostRecentEviction";
 
 type CacheResult<T = any> = {

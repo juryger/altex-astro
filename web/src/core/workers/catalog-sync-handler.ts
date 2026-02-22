@@ -1,12 +1,7 @@
-import type { PageResult } from "@/lib/domain/src";
-import {
-  APIEndpointNames,
-  APISearchParamNames,
-  SortFields,
-  SortOrder,
-} from "../const";
+import type { PageResult, CategoryCache, Category } from "@/lib/domain";
+import { CategoriesSortFields, SortOrder } from "@/lib/domain";
+import { APIEndpointNames, APISearchParamNames } from "../const";
 import { clientDb } from "../db/indexed-db";
-import type { CategoryCache, Category } from "../models/category";
 
 const CATEGORIES_PAGE_SIZE = 150;
 
@@ -25,7 +20,11 @@ const getCatalogSyncHandler = (config: {
     async syncCategories() {
       const response = await fetch(
         new URL(
-          `${config.baseUrl}/${APIEndpointNames.Categories}?${APISearchParamNames.SortField}=${SortFields.Id}&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
+          `${config.baseUrl}/${APIEndpointNames.Categories}?
+           ${APISearchParamNames.SortField}=${CategoriesSortFields.Id}&
+           ${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&
+           ${APISearchParamNames.Page}=0&
+           ${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
         ),
       );
       if (!response.ok) {

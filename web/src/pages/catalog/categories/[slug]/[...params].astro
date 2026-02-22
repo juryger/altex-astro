@@ -2,23 +2,19 @@
 export const prerender = false;
 
 import BaseLayout from '@/web/src/layouts/BaseLayout.astro';
-import { type Category } from '@/web/src/core/models/category';
 import { getCategory } from '@/web/src/core/utils/live-collection-manager';
 import Categories from '@/web/src/components/catalog/Categories.astro';
 import Products from '@/web/src/components/catalog/Products.astro';
 import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
-import { defaultSorting, type Sorting } from '@/web/src/core/models/sorting';
-import type { Filtering } from '@/web/src/core/models/filtering';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 import { getQueryManager } from '@/web/src/core/services/queryManager';
 import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurement-units';
 import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
 import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
-import type { Catalog, Paging } from '@/lib/domain/';
-import { getCacheInfo } from '@/web/src/core/models/cache';
-import { CacheKeys } from '@/web/src/core/const/cache';
+import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain/';
+import { defaultSorting, CacheKeys, getCacheInfo } from '@/lib/domain';
 
 const { slug, params } = Astro.params;
 

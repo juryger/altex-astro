@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import type { Product } from "@/web/src/core/models/product";
 import { APISearchParamNames } from "@/web/src/core/const";
 import {
   extractUrlPaging,
@@ -8,9 +7,8 @@ import {
 } from "@/web/src/core/utils/url-parser";
 import { getQueryManager } from "@/web/src/core/services/queryManager";
 import { fetchProducts } from "@/web/src/core/services/queries/products";
-import type { PageResult } from "@/web/src/core/models/paging";
-import { CACHE_STALE_TIMEOUT_5MN, CacheKeys } from "@/web/src/core/const/cache";
-import { getCacheInfo } from "@/web/src/core/models/cache";
+import type { Product, PageResult } from "@/lib/domain";
+import { CACHE_STALE_TIMEOUT_5MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 

@@ -1,5 +1,4 @@
-import type { CartItem } from "@/web/src/core/models/cart";
-import type { GuestUser } from "@/web/src/core/models/guest-user";
+import type { CartItem, GuestUser } from "@/lib/domain";
 import {
   getCommandManager,
   type CommandManager,

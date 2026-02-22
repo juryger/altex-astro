@@ -1,6 +1,6 @@
 import { computed } from "nanostores";
 import { persistentAtom } from "@nanostores/persistent";
-import { CartSchema, type CartItem } from "@/web/src/core/models/cart";
+import { CartSchema, type CartItem } from "@/lib/domain";
 
 export const $cart = persistentAtom<CartItem[]>("cart", [], {
   encode: JSON.stringify,

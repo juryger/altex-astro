@@ -128,7 +128,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
   import { $cart, $cartCount } from "@/web/src/core/stores/cart-store";
-  import { type GuestUser } from '@/web/src/core/models/guest-user';
+  import { type GuestUser } from '@/lib/domain';
   import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 
   class CartCheckout extends HTMLElement {

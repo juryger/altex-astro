@@ -1,9 +1,8 @@
 import type { APIRoute } from "astro";
 import { getQueryManager } from "@/web/src/core/services/queryManager";
 import { fetchProductColors } from "@/web/src/core/services/queries/product-colors";
-import type { ProductColor } from "@/web/src/core/models/product-color";
-import { CacheKeys } from "@/web/src/core/const/cache";
-import { getCacheInfo } from "@/web/src/core/models/cache";
+import type { ProductColor } from "@/lib/domain";
+import { CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 

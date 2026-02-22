@@ -1,8 +1,6 @@
-import { createGeneralDb } from "@/lib/dal/src";
-import { info } from "@/lib/dal/src/schema/general";
-import type { Info } from "@/lib/dal/src/types";
-import { isNull } from "@/lib/dal";
-import type { CompanyInfo } from "@/web/src/core/models/company-info";
+import { createGeneralDb, info, isNull } from "@/lib/dal";
+import type { Info } from "@/lib/dal";
+import type { CompanyInfo } from "@/lib/domain";
 
 const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
   return <CompanyInfo>{

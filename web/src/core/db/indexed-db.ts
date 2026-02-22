@@ -1,7 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { CategoryCache } from "../models/category";
-import type { ProductColor } from "../models/product-color";
-import { type Discount } from "@/lib/domain/";
+import type { CategoryCache } from "@/lib/domain";
+import type { ProductColor, Discount } from "@/lib/domain";
 
 const dbName = "Catalog";
 

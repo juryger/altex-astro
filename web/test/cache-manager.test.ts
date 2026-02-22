@@ -10,14 +10,13 @@ import {
 } from "vitest";
 import { CacheManager } from "../src/core/services/cache/cacheManager";
 import productColors from "./data/product-colors.json" with { type: "json" };
-import type { ProductColor } from "../src/core/models/product-color";
-import {
-  CACHE_ITEM_LOCK_TIMEOUT_1MN,
-  CacheKeys,
-} from "../src/core/const/cache";
-import type { Category } from "../src/core/models/category";
-import type { MeasurementUnit } from "../src/core/models/measurement-unit";
-import { type Discount } from "@/lib/domain/";
+import { CACHE_ITEM_LOCK_TIMEOUT_1MN, CacheKeys } from "@/lib/domain";
+import type {
+  Category,
+  Discount,
+  ProductColor,
+  MeasurementUnit,
+} from "@/lib/domain/";
 
 const CACHE_STALTE_TIME_MS = 10000;
 const CACHE_SIZE_LIMIT = 5;

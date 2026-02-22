@@ -1,8 +1,6 @@
-import { asc, createCatalogDb, SQL, type SQLiteColumn } from "@/lib/dal/src";
-import type { ProductColor } from "@/web/src/core/models/product-color";
-import type { Color as DbColor } from "@/lib/dal/src/types";
-import { isNull } from "@/lib/dal";
-import { colors } from "@/lib/dal/src/schema/catalog";
+import { asc, createCatalogDb, SQL, colors, isNull } from "@/lib/dal";
+import type { Color as DbColor, SQLiteColumn } from "@/lib/dal/";
+import { type ProductColor } from "@/lib/domain";
 
 const columnTitle: SQLiteColumn = colors.title;
 
