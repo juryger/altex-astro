@@ -1,5 +1,5 @@
 import type { LiveLoader } from "astro/loaders";
-import { getErrorMessage } from "../utils/error-parser";
+import { getErrorMessage } from "@/lib/domain";
 import type {
   Product,
   PageResult,

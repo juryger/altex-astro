@@ -1,12 +1,11 @@
 ---
 export const prerender = false;
 
-import type { Category } from "@/lib/domain";
 import CategoryCard from "./CategoryCard.astro";
 import { CategoriesViewMode } from "@/web/src/core/const";
-import { defaultSorting, type Sorting } from "@/lib/domain";
 import { loadCategories } from "@/web/src/core/content-loaders/categories-loader";
-import type { PageResult, Paging } from "@/lib/domain/src";
+import type { Category, Sorting, PageResult, Paging } from "@/lib/domain";
+import { defaultSorting } from "@/web/src/core/utils/sorting";
 import { defaultPaging } from "@/web/src/core/utils/paging";
 
 // Categories horizontal scrolling is based on

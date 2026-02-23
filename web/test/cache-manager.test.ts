@@ -8,7 +8,7 @@ import {
   test,
   vi,
 } from "vitest";
-import { CacheManager } from "../src/core/services/cache/cacheManager";
+import { CacheManager } from "@/lib/cqrs";
 import productColors from "./data/product-colors.json" with { type: "json" };
 import { CACHE_ITEM_LOCK_TIMEOUT_1MN, CacheKeys } from "@/lib/domain";
 import type {
@@ -16,7 +16,7 @@ import type {
   Discount,
   ProductColor,
   MeasurementUnit,
-} from "@/lib/domain/";
+} from "@/lib/domain";
 
 const CACHE_STALTE_TIME_MS = 10000;
 const CACHE_SIZE_LIMIT = 5;

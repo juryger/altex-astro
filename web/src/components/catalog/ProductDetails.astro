@@ -92,14 +92,14 @@ const titleUnknown = "(?)";
 
 <script>
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
-  import type { CartItem, Product, ProductColor } from "@/lib/domain";
   import { addAlert } from "@/web/src/core/stores/alert-store";
   import { AlertKind } from "@/web/src/core/const";
   import { addToCart } from "@/web/src/core/stores/cart-store";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
   import { clientDb } from '@/web/src/core/db/indexed-db';
-  import { NO_VALUE_ASSIGNED } from "@/web/src/core/const";
+  import type { CartItem, Product, ProductColor } from "@/lib/domain";
+  import { NO_VALUE_ASSIGNED } from "@/lib/domain";
 
   class ProductDetails extends HTMLElement {
     private addToCartEl: Element | null = null;

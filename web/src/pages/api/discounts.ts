@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
-import { getQueryManager } from "@/web/src/core/services/queryManager";
-import { fetchDiscounts } from "@/web/src/core/services/queries/discounts";
-import { type Discount } from "@/lib/domain/";
+import { getQueryManager, fetchDiscounts } from "@/lib/cqrs";
+import { type Discount } from "@/lib/domain";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;

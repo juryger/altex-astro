@@ -5,8 +5,7 @@ import {
   extractUrlParam,
   extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
-import { getQueryManager } from "@/web/src/core/services/queryManager";
-import { fetchProducts } from "@/web/src/core/services/queries/products";
+import { getQueryManager, fetchProducts } from "@/lib/cqrs";
 import type { Product, PageResult } from "@/lib/domain";
 import { CACHE_STALE_TIMEOUT_5MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 

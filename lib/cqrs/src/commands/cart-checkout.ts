@@ -1,11 +1,10 @@
-import type { CartItem } from "@/lib/domain";
-import { CacheKeys, getCacheInfo } from "@/lib/domain";
-import { getQueryManager } from "../queryManager";
-import { fetchDiscounts } from "../queries/discounts";
+import type { CartItem, Discount } from "@/lib/domain";
+import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import { createOperationsDb, cartCheckout, cartCheckoutItems } from "@/lib/dal";
 
 export async function checkoutCart(
   items: Array<CartItem>,
+  discounts: Array<Discount>,
   userId?: string,
   guestId?: string,
 ): Promise<number> {
@@ -14,14 +13,11 @@ export async function checkoutCart(
     0,
   );
 
-  const discounts = await getQueryManager().fetch(
-    () => fetchDiscounts(),
-    getCacheInfo(CacheKeys.Discounts),
-  );
-  const discountId =
-    discounts.data?.findLast((x) => cartSum >= x.fromSum)?.id ?? 0;
+  const discountId = discounts.findLast((x) => cartSum >= x.fromSum)?.id ?? 0;
 
-  const db = createOperationsDb(import.meta.env.DB_OPERATIONS_PATH);
+  const db = createOperationsDb(
+    selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
+  );
   return db.transaction((tx) => {
     const cart = tx
       .insert(cartCheckout)

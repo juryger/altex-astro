@@ -1,16 +1,18 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    // File Layout
+    "composite": true,
     "rootDir": "./src",
     "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "es2020",
+    "module": "es2022",
     "target": "es2022",
     // For nodejs:
-    "lib": ["ES2020"],
+    "lib": ["ESNext"],
     "types": ["node"],
     // and npm install -D @types/node
 
@@ -43,7 +45,5 @@
     "esModuleInterop": true,
     "preserveConstEnums": true,
     "moduleResolution": "node"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  }
 }

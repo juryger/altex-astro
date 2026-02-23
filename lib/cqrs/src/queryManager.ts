@@ -1,10 +1,9 @@
-import type { CacheInfo } from "@/lib/domain";
-import { getErrorMessage } from "../utils/error-parser";
-import { CacheManager } from "./cache/cacheManager";
+import { getErrorMessage, type CacheInfo } from "@/lib/domain";
+import { CacheManager } from "./cacheManager";
 
 type QueryResult<T = any> = {
-  data?: T;
-  error?: Error;
+  data?: T | undefined;
+  error?: Error | undefined;
 };
 
 interface QueryManager {
@@ -64,4 +63,5 @@ function getQueryManager(): QueryManager {
   };
 }
 
-export { type QueryResult, type QueryManager, getQueryManager };
+export type { QueryResult, QueryManager };
+export { getQueryManager };

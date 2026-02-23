@@ -1,5 +1,27 @@
 import type { Product, PageResult, Paging, Sorting } from "@/lib/domain";
-import { ProductSchema, CategoriesSortFields, SortOrder } from "@/lib/domain";
+
+import type {
+  Product as DbProduct,
+  Category as DbCategory,
+  Maker as DbMaker,
+  MakeCountry as DbMakeCountry,
+  MeasurementUnit as DbMeasurementUnit,
+  ProductColor as DbProductColor,
+  SQLiteColumn,
+} from "@/lib/dal";
+
+import {
+  ProductSchema,
+  CategoriesSortFields,
+  SortOrder,
+  constructNavigationPath,
+  NO_IMAGE_FILE_NAME,
+  selectEnvironment,
+  EnvironmentNames,
+  ImageContainers,
+  getEmptyPageResult,
+} from "@/lib/domain";
+
 import {
   createCatalogDb,
   eq,
@@ -16,18 +38,6 @@ import {
   productColors,
   products,
 } from "@/lib/dal";
-import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
-import { ImageContainers, NO_IMAGE_FILE_NAME } from "@/web/src/core/const";
-import type {
-  Product as DbProduct,
-  Category as DbCategory,
-  Maker as DbMaker,
-  MakeCountry as DbMakeCountry,
-  MeasurementUnit as DbMeasurementUnit,
-  ProductColor as DbProductColor,
-  SQLiteColumn,
-} from "@/lib/dal";
-import { initEmptyPageResult } from "@/web/src/core/utils/paging";
 
 const columnId: SQLiteColumn = products.id;
 const columnTitle: SQLiteColumn = products.title;
@@ -98,19 +108,23 @@ const mapQueryResultToDomainModel = (entity: ProductsQueryResult): Product => {
     categorySlug: entity.categories?.slug,
     categoryTitle: entity.categories?.title,
     colors: colorId !== undefined ? [colorId] : [],
-    imageUrl: constructNavigationPaths(
-      import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL,
-      entity.main.products.hasImage
-        ? entity.main.products.uid.concat(".png")
-        : NO_IMAGE_FILE_NAME,
-    ),
-    thumbnailImageUrl: constructNavigationPaths(
-      import.meta.env.PUBLIC_BLOB_STORAGE_PRODUCTS_URL,
-      ImageContainers.Thumbnails,
-      entity.main.products.hasImage
-        ? entity.main.products.uid.concat(".png")
-        : NO_IMAGE_FILE_NAME,
-    ),
+    imageUrl: constructNavigationPath({
+      args: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_PRODUCTS_URL),
+        entity.main.products.hasImage
+          ? entity.main.products.uid.concat(".png")
+          : NO_IMAGE_FILE_NAME,
+      ],
+    }),
+    thumbnailImageUrl: constructNavigationPath({
+      args: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_PRODUCTS_URL),
+        ImageContainers.Thumbnails,
+        entity.main.products.hasImage
+          ? entity.main.products.uid.concat(".png")
+          : NO_IMAGE_FILE_NAME,
+      ],
+    }),
     makerId:
       entity.main.products.makerId !== null
         ? entity.main.products.makerId
@@ -131,7 +145,9 @@ export async function fetchProducts(
   sorting: Sorting,
   paging: Paging,
 ): Promise<PageResult<Product>> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const parentCategorySq = db
     .select()
@@ -177,7 +193,7 @@ export async function fetchProducts(
       eq(productsSq.products.makeCountryId, makeCountries.id),
     );
 
-  if (queryResult.length === 0) return initEmptyPageResult<Product>();
+  if (queryResult.length === 0) return getEmptyPageResult<Product>();
 
   const totalCount = await db.$count(
     db
@@ -200,17 +216,19 @@ export async function fetchProducts(
   const result: Product[] = Array(paging.pageSize);
   for (var i = 0; i < queryResult.length; i++) {
     const item = queryResult[i];
+    if (item === undefined) continue;
+
     const colorId = item.product_colors?.colorId;
     const productIndex = result.findIndex(
       (x) => x !== undefined && x.id === item.main.products.id,
     );
 
     if (productIndex !== -1 && colorId !== undefined) {
-      result[productIndex].colors?.push(colorId);
+      result[productIndex]?.colors?.push(colorId);
       continue;
     }
 
-    const value = mapQueryResultToDomainModel(item);
+    const value = mapQueryResultToDomainModel(item as ProductsQueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
 
@@ -228,7 +246,9 @@ export async function fetchProducts(
 export async function fetchProductBySlug(
   slug: string,
 ): Promise<Product | undefined> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const productsSq = db
     .select()
@@ -262,17 +282,19 @@ export async function fetchProductBySlug(
   const result: Product[] = Array(1);
   for (var i = 0; i < queryResult.length; i++) {
     const item = queryResult[i];
+    if (item === undefined) continue;
+
     const colorId = item.product_colors?.colorId;
     const productIndex = result.findIndex(
       (x) => x !== undefined && x.id === item.main.products.id,
     );
 
     if (productIndex !== -1 && colorId !== undefined) {
-      result[productIndex].colors?.push(colorId);
+      result[productIndex]?.colors?.push(colorId);
       continue;
     }
 
-    const value = mapQueryResultToDomainModel(item);
+    const value = mapQueryResultToDomainModel(item as ProductsQueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
 

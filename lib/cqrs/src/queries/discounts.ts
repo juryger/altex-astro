@@ -1,6 +1,7 @@
+import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import { asc, createCatalogDb, SQL, discounts, isNull } from "@/lib/dal";
 import type { Discount as DbDiscount, SQLiteColumn } from "@/lib/dal";
-import { type Discount } from "@/lib/domain/";
+import { type Discount } from "@/lib/domain";
 
 const columnFromSum: SQLiteColumn = discounts.fromSum;
 
@@ -18,7 +19,9 @@ const mapQueryResultToDomainModel = (entity: DbDiscount): Discount => {
 };
 
 export async function fetchDiscounts(): Promise<Discount[]> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const queryResult = await db
     .select()

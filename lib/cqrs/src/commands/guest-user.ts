@@ -1,6 +1,7 @@
-import { createOperationsDb } from "@/lib/dal";
 import type { GuestUser } from "@/lib/domain";
 import type { Guest } from "@/lib/dal";
+import { createOperationsDb } from "@/lib/dal";
+import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import { guests } from "@/lib/dal";
 import { encode } from "html-entities";
 
@@ -19,8 +20,10 @@ const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
   } as Guest;
 };
 
-export async function UpsertGuestUser(guest: GuestUser): Promise<string> {
-  const db = createOperationsDb(import.meta.env.DB_OPERATIONS_PATH);
+export async function upsertGuestUser(guest: GuestUser): Promise<string> {
+  const db = createOperationsDb(
+    selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
+  );
   const result = await db
     .insert(guests)
     .values(mapDomainToDatabaseModel(guest))

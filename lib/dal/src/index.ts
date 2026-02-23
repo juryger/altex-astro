@@ -52,7 +52,7 @@ export {
   and,
 } from "drizzle-orm";
 
-export type { SQLiteColumn } from "drizzle-orm/sqlite-core";
+export type { SQLiteColumn, SQLiteTransaction } from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
 export { CompanyInfoKeys } from "./const/index.js";
 
@@ -67,7 +67,7 @@ export {
   measurementUnits,
   relatedProducts,
   catalogVersion,
-} from "./schema/catalog";
+} from "./schema/catalog/index.js";
 
 export {
   cartCheckout,
@@ -77,9 +77,9 @@ export {
   notifications,
   readReplicas,
   operationsVersion,
-} from "./schema/operations";
+} from "./schema/operations/index.js";
 
-export { info, generalVersion } from "./schema/general";
+export { info, generalVersion } from "./schema/general/index.js";
 
 export type {
   CatalogVersion,

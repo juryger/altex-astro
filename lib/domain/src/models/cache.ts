@@ -13,10 +13,10 @@ const getCacheInfo = (
 };
 
 interface CacheEntry<T = any> {
-  data?: T;
+  data?: T | undefined;
   isLoading: boolean;
-  acquireTimestamp?: number;
-  staleTimestamp?: number;
+  acquireTimestamp?: number | undefined;
+  staleTimestamp?: number | undefined;
 }
 
 interface CacheEvictionStrategy {

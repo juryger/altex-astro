@@ -3,9 +3,15 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "composite": true,
     "rootDir": "./src",
     "outDir": "./dist",
+
+    "paths": {
+      "@/*": ["../../*"], // This maps "@/" to the "/" folder
+      "@/lib/*": ["../*"],
+      "@/lib/domain": ["../domain/src/index.ts"],
+      "@/lib/dal": ["../dal/src/index.ts"]
+    },
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -45,5 +51,13 @@
     "esModuleInterop": true,
     "preserveConstEnums": true,
     "moduleResolution": "node"
-  }
+  },
+  "references": [
+    {
+      "path": "../domain"
+    },
+    {
+      "path": "../dal"
+    }
+  ]
 }

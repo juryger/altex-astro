@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../utils/error-parser";
+import { getErrorMessage } from "@/lib/domain";
 
 type CommandResult<T = any> = {
   data?: T;
@@ -8,11 +8,7 @@ type CommandResult<T = any> = {
 interface CommandManager {
   mutate: <T = any>(commandFn: () => Promise<T>) => Promise<CommandResult<T>>;
 }
-/*
-const cartCheckout = () => { db.update(cartItems: Array<CartItem>)}
-commandManager().mutate(cartCheckout);
 
-*/
 function getCommandManager(): CommandManager {
   return {
     mutate: async <T = any>(commandFn: () => Promise<T>) => {
@@ -29,4 +25,5 @@ function getCommandManager(): CommandManager {
   };
 }
 
-export { type CommandManager, type CommandResult, getCommandManager };
+export type { CommandManager, CommandResult };
+export { getCommandManager };

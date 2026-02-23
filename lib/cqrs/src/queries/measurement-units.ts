@@ -1,5 +1,9 @@
 import { asc, createCatalogDb, SQL, isNull, measurementUnits } from "@/lib/dal";
-import type { MeasurementUnit } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  selectEnvironment,
+  type MeasurementUnit,
+} from "@/lib/domain";
 import type {
   MeasurementUnit as DbMeasurementUnit,
   SQLiteColumn,
@@ -22,7 +26,9 @@ const mapQueryResultToDomainModel = (
 };
 
 export async function fetchMeasurementUnits(): Promise<MeasurementUnit[]> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const queryResult = await db
     .select()

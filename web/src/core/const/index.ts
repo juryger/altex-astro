@@ -1,6 +1,3 @@
-const NO_IMAGE_FILE_NAME = "noimage.png";
-const NO_VALUE_ASSIGNED = "---";
-
 enum LiveCollectionNames {
   Categories = "categories",
   Products = "products",
@@ -52,10 +49,6 @@ enum TextSeparators {
   Semicolon = ";",
 }
 
-enum ImageContainers {
-  Thumbnails = "thumbnails",
-}
-
 enum CategoriesViewMode {
   Compact = 0,
   Full = 1,
@@ -105,15 +98,12 @@ enum CatalogSyncType {
 }
 
 export {
-  NO_IMAGE_FILE_NAME,
-  NO_VALUE_ASSIGNED,
   LiveCollectionNames,
   SessionNames,
   NavPathNames,
   APIEndpointNames,
   APISearchParamNames,
   TextSeparators,
-  ImageContainers,
   CategoriesViewMode,
   DialogActionButtons,
   DialogActionResult,

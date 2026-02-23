@@ -1,12 +1,12 @@
 {
-  "name": "altex-domain",
+  "name": "domain",
   "type": "module",
   "version": "0.0.1",
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc -p .",
-    "preview": "node --env-file=.env.development ./dist/index.js"
+    "build": "rm -rf dist && tsc -b .",
+    "preview": "node ./dist/index.js"
   },
   "dependencies": {
     "typescript": "^5.9.3",

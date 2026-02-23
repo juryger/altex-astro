@@ -1,13 +1,13 @@
 import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
-import { delayWithRetry } from "@/web/src/core/utils/delays";
-import { getErrorMessage } from "@/web/src/core/utils/error-parser";
+import { getErrorMessage } from "@/lib/domain";
 import {
   CACHE_ITEMS_LIMIT,
   CACHE_LOAD_RETRY_ATTEMPS,
   CACHE_LOAD_RETRY_DELAY_MS,
   CACHE_ITEM_LOCK_TIMEOUT_1MN,
 } from "@/lib/domain";
-import { getMostRecentEvictionStrategy } from "./eviction/mostRecentEviction";
+import { delayWithRetry } from "@/lib/domain";
+import { getMostRecentEvictionStrategy } from "./cache/eviction/mostRecentEviction";
 
 type CacheResult<T = any> = {
   value?: T;
@@ -255,4 +255,5 @@ class CacheManager implements BaseCacheManager {
   }
 }
 
-export { CacheManager, type CacheResult };
+export { type CacheResult };
+export { CacheManager };

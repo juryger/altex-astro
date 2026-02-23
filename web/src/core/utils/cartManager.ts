@@ -1,14 +1,16 @@
 import type { CartItem, GuestUser } from "@/lib/domain";
-import {
-  getCommandManager,
-  type CommandManager,
-  type CommandResult,
-} from "../commandManager";
-import { UpsertGuestUser } from "../commands/guest-user";
-import { getErrorMessage } from "../../utils/error-parser";
-import { checkoutCart } from "../commands/cart-checkout";
+import { getErrorMessage } from "@/lib/domain";
 import { OrderTypes } from "@/web/src/core/const";
-import { getEmailManager, type EmailManager } from "@/lib/email/src";
+import { getEmailManager, type EmailManager } from "@/lib/email";
+import { CacheKeys, getCacheInfo } from "@/lib/domain";
+import type { CommandManager, CommandResult } from "@/lib/cqrs";
+import {
+  getQueryManager,
+  fetchDiscounts,
+  checkoutCart,
+  upsertGuestUser,
+  getCommandManager,
+} from "@/lib/cqrs";
 
 interface CartManager {
   checkoutCart: (
@@ -22,7 +24,7 @@ const saveGuestUser = async (
   commandManager: CommandManager,
   guest: GuestUser,
 ): Promise<CommandResult<string>> => {
-  return await commandManager.mutate<string>(() => UpsertGuestUser(guest));
+  return await commandManager.mutate<string>(() => upsertGuestUser(guest));
 };
 
 const saveCartCheckout = async (
@@ -31,8 +33,13 @@ const saveCartCheckout = async (
   userId?: string,
   guestId?: string,
 ): Promise<CommandResult<number>> => {
+  const discounts = await getQueryManager().fetch(
+    () => fetchDiscounts(),
+    getCacheInfo(CacheKeys.Discounts),
+  );
+
   return await commandManager.mutate<number>(() =>
-    checkoutCart(items, userId, guestId),
+    checkoutCart(items, discounts.data ?? [], userId, guestId),
   );
 };
 

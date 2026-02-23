@@ -1,3 +1,6 @@
+import { EnvironmentNames } from "../const/environment";
+import { selectEnvironment } from "../helpers/environment";
+
 type Paging = {
   page: number;
   pageSize: number;
@@ -13,4 +16,17 @@ type PageResult<T = any> = {
   };
 };
 
-export { type Paging, type PageResult };
+function getEmptyPageResult<T = any>(): PageResult<T> {
+  return {
+    items: [],
+    pageInfo: {
+      total: 0,
+      page: 0,
+      pageSize: 0,
+      hasMore: false,
+    },
+  } as PageResult<T>;
+}
+
+export type { Paging, PageResult };
+export { getEmptyPageResult };

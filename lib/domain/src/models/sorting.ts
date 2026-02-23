@@ -5,9 +5,4 @@ type Sorting = {
   order: SortOrder;
 };
 
-const defaultSorting: Sorting = {
-  field: CategoriesSortFields.Title,
-  order: SortOrder.Ascending,
-};
-
-export { type Sorting, defaultSorting };
+export { type Sorting };

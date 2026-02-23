@@ -1,26 +1,22 @@
 {
-  "name": "altex-email",
+  "name": "cqrs",
   "type": "module",
   "version": "0.0.1",
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "generate": "mjml ./src/templates/[!_]*.mjml -o /Users/iuriig/Sources/altex-astro/emails",
     "build": "rm -rf dist && tsc -b .",
     "preview": "node --env-file=.env.development ./dist/index.js"
   },
   "dependencies": {
-    "handlebars": "^4.7.8",
-    "mjml": "^4.18.0",
+    "html-entities": "^2.6.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/node": "^25.0.5"
   },
-  "description": "Email manager",
+  "description": "ALTEX CQRS pattern implementation",
   "keywords": [
-    "mjml",
-    "handlebars",
     "nodejs"
   ],
   "author": "Iurii Gerasimov",

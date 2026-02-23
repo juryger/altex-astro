@@ -9,11 +9,16 @@ import {
   SQL,
 } from "@/lib/dal";
 import type { Category as DbCategory } from "@/lib/dal";
-import type { PageResult, Paging, Sorting, Category } from "@/lib/domain";
 import { categories, products } from "@/lib/dal";
-import { CategoriesSortFields, SortOrder } from "@/lib/domain";
-import { constructNavigationPaths } from "@/web/src/core/utils/url-builder";
-import { NO_IMAGE_FILE_NAME } from "@/web/src/core/const";
+import type { PageResult, Paging, Sorting, Category } from "@/lib/domain";
+import {
+  CategoriesSortFields,
+  constructNavigationPath,
+  EnvironmentNames,
+  NO_IMAGE_FILE_NAME,
+  selectEnvironment,
+  SortOrder,
+} from "@/lib/domain";
 
 const columnId: SQLiteColumn = categories.id;
 const columnTitle: SQLiteColumn = categories.title;
@@ -43,12 +48,14 @@ const mapQueryResultToDomainModel = (entity: CategoryQueryResult): Category => {
       entity.categories.description !== null
         ? entity.categories.description
         : undefined,
-    imageUrl: constructNavigationPaths(
-      import.meta.env.PUBLIC_BLOB_STORAGE_CATEGORIES_URL,
-      entity.categories.hasImage
-        ? entity.categories.uid.concat(".png")
-        : NO_IMAGE_FILE_NAME,
-    ),
+    imageUrl: constructNavigationPath({
+      args: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATEGORIES_URL),
+        entity.categories.hasImage
+          ? entity.categories.uid.concat(".png")
+          : NO_IMAGE_FILE_NAME,
+      ],
+    }),
     parentId:
       entity.categories.parentId !== null
         ? entity.categories.parentId
@@ -65,7 +72,9 @@ export async function fetchCategories(
   sorting: Sorting,
   paging: Paging,
 ): Promise<PageResult<Category>> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const parentSq = db.select().from(categories).as("parent_sq");
   const productSq = db
@@ -122,7 +131,9 @@ export async function fetchCategories(
   );
 
   return {
-    items: queryResult.map((item) => mapQueryResultToDomainModel(item)),
+    items: queryResult.map((item) =>
+      mapQueryResultToDomainModel(item as CategoryQueryResult),
+    ),
     pageInfo: {
       total: totalCount,
       page: paging.page,
@@ -135,7 +146,9 @@ export async function fetchCategories(
 export async function fetchCategoryBySlug(
   slug: string,
 ): Promise<Category | undefined> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const parentSq = db.select().from(categories).as("parent_sq");
   const productSq = db
@@ -162,6 +175,7 @@ export async function fetchCategoryBySlug(
     .where(and(isNull(categories.deletedAt), eq(categories.slug, slug)))
     .limit(1);
 
-  if (queryResult.length === 0) return undefined;
-  return mapQueryResultToDomainModel(queryResult[0]);
+  const item = queryResult[0];
+  if (item === undefined) return undefined;
+  return mapQueryResultToDomainModel(item as CategoryQueryResult);
 }

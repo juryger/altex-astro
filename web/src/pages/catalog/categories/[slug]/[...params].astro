@@ -9,12 +9,10 @@ import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
-import { getQueryManager } from '@/web/src/core/services/queryManager';
-import { fetchMeasurementUnits } from '@/web/src/core/services/queries/measurement-units';
-import { fetchDiscounts } from '@/web/src/core/services/queries/discounts';
-import { fetchProductColors } from '@/web/src/core/services/queries/product-colors';
-import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain/';
-import { defaultSorting, CacheKeys, getCacheInfo } from '@/lib/domain';
+import { getQueryManager, fetchMeasurementUnits, fetchDiscounts, fetchProductColors } from '@/lib/cqrs';
+import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain';
+import { CacheKeys, getCacheInfo } from '@/lib/domain';
+import { defaultSorting } from "@/web/src/core/utils/sorting";
 
 const { slug, params } = Astro.params;
 

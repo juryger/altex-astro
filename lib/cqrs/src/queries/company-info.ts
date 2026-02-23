@@ -1,6 +1,10 @@
 import { createGeneralDb, info, isNull } from "@/lib/dal";
 import type { Info } from "@/lib/dal";
-import type { CompanyInfo } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  selectEnvironment,
+  type CompanyInfo,
+} from "@/lib/domain";
 
 const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
   return <CompanyInfo>{
@@ -13,7 +17,9 @@ const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
 };
 
 export async function fetchCompanyInfo(): Promise<CompanyInfo[]> {
-  const db = createGeneralDb(import.meta.env.DB_GENERAL_PATH);
+  const db = createGeneralDb(
+    selectEnvironment(EnvironmentNames.DB_GENERAL_PATH),
+  );
 
   const queryResult = await db
     .select()

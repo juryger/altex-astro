@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
-import { getQueryManager } from "@/web/src/core/services/queryManager";
-import { fetchProductColors } from "@/web/src/core/services/queries/product-colors";
+import { getQueryManager, fetchProductColors } from "@/lib/cqrs";
 import type { ProductColor } from "@/lib/domain";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
 

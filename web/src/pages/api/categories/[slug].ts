@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
-import { fetchCategoryBySlug } from "@/web/src/core/services/queries/categories";
-import { getQueryManager } from "@/web/src/core/services/queryManager";
+import { fetchCategoryBySlug, getQueryManager } from "@/lib/cqrs";
 import type { Category } from "@/lib/domain";
 import { CACHE_STALE_TIMEOUT_1MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 

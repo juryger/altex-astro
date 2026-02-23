@@ -1,6 +1,10 @@
 import { asc, createCatalogDb, SQL, colors, isNull } from "@/lib/dal";
-import type { Color as DbColor, SQLiteColumn } from "@/lib/dal/";
-import { type ProductColor } from "@/lib/domain";
+import type { Color as DbColor, SQLiteColumn } from "@/lib/dal";
+import {
+  EnvironmentNames,
+  selectEnvironment,
+  type ProductColor,
+} from "@/lib/domain";
 
 const columnTitle: SQLiteColumn = colors.title;
 
@@ -19,7 +23,9 @@ const mapQueryResultToDomainModel = (entity: DbColor): ProductColor => {
 };
 
 export async function fetchProductColors(): Promise<ProductColor[]> {
-  const db = createCatalogDb(import.meta.env.DB_CATALOG_PATH);
+  const db = createCatalogDb(
+    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  );
 
   const queryResult = await db
     .select()

@@ -1,8 +1,11 @@
 import { navigate } from "astro:transitions/client";
 import { DialogActionResult } from "../const";
 import { regexPageParams, regexSortParams } from "./regex";
-import { constructNavigationPaths } from "./url-builder";
-import { ProductsSortFields, SortOrder } from "@/lib/domain";
+import {
+  ProductsSortFields,
+  SortOrder,
+  constructNavigationPath,
+} from "@/lib/domain";
 
 interface ProductsViewManager {
   apply: (signal: AbortSignal) => void;
@@ -68,7 +71,7 @@ const handleSortOrderChange = (
   url =
     url.indexOf("/sort:") !== -1
       ? url.replace(regexSortParams, sortQuery)
-      : constructNavigationPaths(url, sortQuery);
+      : constructNavigationPath({ args: [url, sortQuery] });
 
   // reset paging on sort change
   if (url.indexOf("/page:") !== -1)
@@ -103,7 +106,7 @@ const handleDialogClose = (
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryAsc)
-          : constructNavigationPaths(url, sortQueryAsc);
+          : constructNavigationPath({ args: [url, sortQueryAsc] });
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
@@ -114,7 +117,7 @@ const handleDialogClose = (
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryDesc)
-          : constructNavigationPaths(url, sortQueryDesc);
+          : constructNavigationPath({ args: [url, sortQueryDesc] });
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
@@ -136,7 +139,7 @@ const handlePageNavigation = (pageQuery: string) => {
   url =
     url.indexOf("/page:") !== -1
       ? url.replace(regexPageParams, pageQuery)
-      : constructNavigationPaths(url, pageQuery);
+      : constructNavigationPath({ args: [url, pageQuery] });
   navigate(url);
 };
 

@@ -8,8 +8,12 @@
     //"baseUrl": "..",
     "paths": {
       "@/*": ["../*"], // This maps "@/" to the "/" folder
-      "@/web/*": ["../web/*"],
-      "@/lib/*": ["../lib/*"]
+      "@/web": ["../web/src/index.ts"],
+      "@/lib/*": ["../lib/*"], // This maps "@/" to the "/" folder
+      "@/lib/cqrs": ["../lib/cqrs/src/index.ts"],
+      "@/lib/domain": ["../lib/domain/src/index.ts"],
+      "@/lib/email": ["../lib/email/src/index.ts"],
+      "@/lib/dal": ["../lib/dal/src/index.ts"]
     }
   }
 }

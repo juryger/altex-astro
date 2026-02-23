@@ -5,8 +5,7 @@ import {
   extractUrlParam,
   extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
-import { fetchCategories } from "@/web/src/core/services/queries/categories";
-import { getQueryManager } from "@/web/src/core/services/queryManager";
+import { fetchCategories, getQueryManager } from "@/lib/cqrs";
 import type { Category, PageResult } from "@/lib/domain";
 import {
   CACHE_STALE_TIMEOUT_1HR,

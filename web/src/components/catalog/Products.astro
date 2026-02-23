@@ -2,12 +2,13 @@
 export const prerender = false;
 
 import type { Product, Catalog, PageResult, Paging, Sorting, Filtering } from "@/lib/domain";
-import { defaultSorting, SortOrder, ProductsSortFields } from "@/lib/domain";
+import { SortOrder, ProductsSortFields } from "@/lib/domain";
 import ProductCard from "./ProductCard.astro";
 import { loadProducts, type ProductCollectionFilter } from "@/web/src/core/content-loaders/products-loader";
 import { DialogActionButtons, DialogSize } from "@/web/src/core/const";
 import { getSessionManager } from "@/web/src/core/utils/session-manager";
 import ModalDialog from "../ModalDialog.astro";
+import { defaultSorting } from "@/web/src/core/utils/sorting";
 import { defaultPaging } from "@/web/src/core/utils/paging";
 
 interface Props {
