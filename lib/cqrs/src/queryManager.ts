@@ -1,28 +1,24 @@
-import { getErrorMessage, type CacheInfo } from "@/lib/domain";
+import { getErrorMessage, type CacheInfo, type Result } from "@/lib/domain";
 import { CacheManager } from "./cacheManager";
-
-type QueryResult<T = any> = {
-  data?: T | undefined;
-  error?: Error | undefined;
-};
 
 interface QueryManager {
   fetch: <T = any>(
     queryFn: () => Promise<T>,
     cacheInfo?: CacheInfo,
-  ) => Promise<QueryResult<T>>;
+  ) => Promise<Result<T>>;
 }
 
 const checkCache = async <T = any>(
   cacheManager: CacheManager,
   cacheInfo: CacheInfo,
   queryFn: () => Promise<T>,
-): Promise<QueryResult<T>> => {
-  const result: QueryResult<T> = {};
+): Promise<Result<T>> => {
   const cacheResult = await cacheManager.get(cacheInfo.key);
-
-  result.error = cacheResult.error;
-  result.data = cacheResult.value;
+  const result: Result<T> = {
+    status: cacheResult.error === undefined ? "Ok" : "Failed",
+    data: cacheResult.value,
+    error: cacheResult.error,
+  };
 
   if (cacheResult.set !== undefined) {
     try {
@@ -31,6 +27,7 @@ const checkCache = async <T = any>(
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       result.error = new Error(errorMessage);
+      result.status = "Failed";
       console.error("~ queryManager ~ %s", errorMessage);
     }
   }
@@ -44,9 +41,10 @@ function getQueryManager(): QueryManager {
       queryFn: () => Promise<T>,
       cacheInfo?: CacheInfo,
     ) => {
-      let result: QueryResult<T> = {};
+      let result: Result<T> = { status: "Ok" };
       if (cacheInfo !== undefined) {
         result = await checkCache(cacheManager, cacheInfo, queryFn);
+        if (result.status !== "Ok") return result;
       }
 
       if (result.data === undefined) {
@@ -58,10 +56,11 @@ function getQueryManager(): QueryManager {
           console.error("~ queryManager ~ %s", errorMessage);
         }
       }
+
       return result;
     },
   };
 }
 
-export type { QueryResult, QueryManager };
+export type { QueryManager };
 export { getQueryManager };

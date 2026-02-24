@@ -54,7 +54,7 @@ export {
 
 export type { SQLiteColumn, SQLiteTransaction } from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
-export { CompanyInfoKeys } from "./const/index.js";
+export { CompanyInfoKeys } from "../../domain/src/const/company-info.js";
 
 export {
   categories,

@@ -30,14 +30,11 @@ export {
 export {
   type CartCheckout,
   type CartCheckoutItem,
+  type CartCheckoutAggregate,
 } from "./models/cart-checkout";
 
-export {
-  type CartItem,
-  type CartCheckoutRequest,
-  CartCheckoutRequestSchema,
-  CartSchema,
-} from "./models/cart";
+export type { CartItem, CartCheckoutRequest } from "./models/cart";
+export { CartCheckoutRequestSchema, CartSchema } from "./models/cart";
 
 export { type Catalog } from "./models/catalog";
 
@@ -74,7 +71,10 @@ export { getEmptyPageResult } from "./models/paging";
 
 export { type Sorting } from "./models/sorting";
 
+export type { Result } from "./models/result";
+
 export { selectEnvironment } from "./helpers/environment";
 export { constructNavigationPath } from "./helpers/navigation";
 export { getErrorMessage } from "./helpers/error";
 export { delay, delayWithRetry } from "./helpers/delays";
+export { parseCompanyInfo } from "./helpers/company-info";

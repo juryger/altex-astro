@@ -1,9 +1,10 @@
 import { createGeneralDb, info, isNull } from "@/lib/dal";
 import type { Info } from "@/lib/dal";
+import type { CompanyInfo } from "@/lib/domain";
 import {
   EnvironmentNames,
+  parseCompanyInfo,
   selectEnvironment,
-  type CompanyInfo,
 } from "@/lib/domain";
 
 const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
@@ -16,7 +17,7 @@ const mapQueryResultToDomainModel = (entity: Info): CompanyInfo => {
   };
 };
 
-export async function fetchCompanyInfo(): Promise<CompanyInfo[]> {
+export async function fetchCompanyInfo(): Promise<Record<string, string>> {
   const db = createGeneralDb(
     selectEnvironment(EnvironmentNames.DB_GENERAL_PATH),
   );
@@ -26,5 +27,7 @@ export async function fetchCompanyInfo(): Promise<CompanyInfo[]> {
     .from(info)
     .where(isNull(info.deletedAt));
 
-  return queryResult.map((item) => mapQueryResultToDomainModel(item));
+  return parseCompanyInfo(
+    queryResult.map((item) => mapQueryResultToDomainModel(item)),
+  );
 }

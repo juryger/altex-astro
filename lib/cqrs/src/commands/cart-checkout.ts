@@ -12,7 +12,6 @@ export async function checkoutCart(
     (acc, curr) => acc + curr.price * curr.quantity,
     0,
   );
-
   const discountId = discounts.findLast((x) => cartSum >= x.fromSum)?.id ?? 0;
 
   const db = createOperationsDb(

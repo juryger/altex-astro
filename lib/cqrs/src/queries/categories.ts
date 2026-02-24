@@ -31,7 +31,7 @@ const getSortCondition = (value: Sorting): SQL => {
   return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 
-type CategoryQueryResult = {
+type QueryResult = {
   categories: DbCategory;
   parentSlug?: string | null;
   parentTitle?: string | null;
@@ -39,7 +39,7 @@ type CategoryQueryResult = {
   totalProductsSub: number;
 };
 
-const mapQueryResultToDomainModel = (entity: CategoryQueryResult): Category => {
+const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
   return <Category>{
     id: entity.categories.id,
     slug: entity.categories.slug,
@@ -132,7 +132,7 @@ export async function fetchCategories(
 
   return {
     items: queryResult.map((item) =>
-      mapQueryResultToDomainModel(item as CategoryQueryResult),
+      mapQueryResultToDomainModel(item as QueryResult),
     ),
     pageInfo: {
       total: totalCount,
@@ -177,5 +177,5 @@ export async function fetchCategoryBySlug(
 
   const item = queryResult[0];
   if (item === undefined) return undefined;
-  return mapQueryResultToDomainModel(item as CategoryQueryResult);
+  return mapQueryResultToDomainModel(item as QueryResult);
 }

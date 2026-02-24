@@ -12,9 +12,10 @@
       padding="0px 0px 0px 0px"
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
-        <mj-text align="center" padding="10px 0px 10px 0px">{{
-          titleFailure
-        }}</mj-text>
+        <mj-text align="center" padding="10px 0px 10px 0px"
+          >Уведомление о технической неисправности на сайте
+          <a href="{{companyWeb}}">↗АЛТЕХ</a>.</mj-text
+        >
       </mj-column>
     </mj-section>
     <mj-section
@@ -32,7 +33,7 @@
       >
         <mj-image
           align="center"
-          src="http://localhost:4321/fail.png"
+          src="{{companyWeb}}/fail.png"
           alt="product image"
           width="60px"
           height="auto"

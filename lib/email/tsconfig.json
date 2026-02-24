@@ -6,6 +6,12 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
+    "paths": {
+      "@/*": ["../../*"], // This maps "@/" to the "/" folder
+      "@/lib/*": ["../*"],
+      "@/lib/domain": ["../domain/src/index.ts"]
+    },
+
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
@@ -44,5 +50,10 @@
     "esModuleInterop": true,
     "preserveConstEnums": true,
     "moduleResolution": "node"
-  }
+  },
+  "references": [
+    {
+      "path": "../domain"
+    }
+  ]
 }

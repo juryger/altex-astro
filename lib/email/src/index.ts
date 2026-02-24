@@ -2,6 +2,7 @@ import path from "path";
 import fs_sync from "fs";
 import fs from "fs/promises";
 import Handlebars from "handlebars";
+import { getErrorMessage, type Result } from "@/lib/domain";
 
 // Values correspondes to template file names (*.html)
 enum EmailTemplates {
@@ -32,7 +33,7 @@ const applyTemplateParams = ({
   params,
 }: {
   content: string;
-  params: Record<string, string> | undefined;
+  params: Record<string, any> | undefined;
 }): string => {
   const hbDelegate = Handlebars.compile(content);
   return hbDelegate(params);
@@ -45,7 +46,7 @@ const prepareTemplate = async ({
 }: {
   fileName: string;
   rootPath: string;
-  params: Record<string, string> | undefined;
+  params: Record<string, any> | undefined;
 }): Promise<string> => {
   const content = await getTemplate(rootPath, fileName);
   return applyTemplateParams({ content, params });
@@ -59,12 +60,13 @@ const sendEmail = async ({
   to: string;
   subject: string;
   content: string;
-}): Promise<void> => {
+}): Promise<Result> => {
   console.info("sendEmail", {
     to,
     subject,
     content,
   });
+  return { status: "Ok" };
 };
 
 type EmailManager = {
@@ -77,8 +79,8 @@ type EmailManager = {
     toCustomer: string;
     toBackOffice: string;
     subject: string;
-    templateParams?: Record<string, string>;
-  }) => Promise<void>;
+    templateParams?: Record<string, any>;
+  }) => Promise<Result>;
   sendFailure: ({
     to,
     subject,
@@ -87,7 +89,7 @@ type EmailManager = {
     to: string;
     subject: string;
     templateParams?: Record<string, string>;
-  }) => Promise<void>;
+  }) => Promise<Result>;
 };
 
 const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
@@ -101,8 +103,8 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
       toCustomer: string;
       toBackOffice: string;
       subject: string;
-      templateParams?: Record<string, string>;
-    }): Promise<void> => {
+      templateParams?: Record<string, any>;
+    }): Promise<Result> => {
       try {
         const content = await prepareTemplate({
           rootPath,
@@ -116,8 +118,14 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
           content,
         });
       } catch (error) {
-        console.error(error);
+        const errorMessage = getErrorMessage(error);
+        console.error(
+          "Failed to send 'New Order' email, see more details below. %s",
+          errorMessage,
+        );
+        return { status: "Failed", error: new Error(errorMessage) };
       }
+      return { status: "Ok" };
     },
     sendFailure: async ({
       to,
@@ -126,8 +134,8 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
     }: {
       to: string;
       subject: string;
-      templateParams?: Record<string, string>;
-    }): Promise<void> => {
+      templateParams?: Record<string, any>;
+    }): Promise<Result> => {
       try {
         const content = await prepareTemplate({
           rootPath,
@@ -141,11 +149,20 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
           content,
         });
       } catch (error) {
-        console.error(error);
+        const errorMessage = getErrorMessage(error);
+        console.error(
+          "Failed to send 'Failurer' email, see more details below. %s",
+          errorMessage,
+        );
+        return { status: "Failed", error: new Error(errorMessage) };
       }
+      return { status: "Ok" };
     },
   };
 };
+
+export { TemplateKeys } from "./const";
+export { getEmailManager, type EmailManager };
 
 // const manager = getEmailManager({
 //   rootPath: process.env.EMAIL_TEMPLATES_PATH ?? "",
@@ -162,5 +179,3 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
 //     companyPhone: "+7(910)911-3877",
 //   },
 // });
-
-export { getEmailManager, type EmailManager };

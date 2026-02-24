@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CompanyInfoKeys } from "../const/company-info";
 
 const CompanyInfoSchema = z.object({
   id: z.number(),

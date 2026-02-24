@@ -1,4 +1,8 @@
-import type { CartItem, ProductColor } from "@/lib/domain";
+import {
+  NO_VALUE_ASSIGNED,
+  type CartItem,
+  type ProductColor,
+} from "@/lib/domain";
 import { formatCurrency, trimEnd } from "./text-formatter";
 
 const titleProductColor = "Цвет:";
@@ -7,7 +11,6 @@ const titleProductCode = "Артикул:";
 const titleProductPrice = "Цена:";
 const titleEdit = "Изменить";
 const titleRemove = "Удалить";
-const titleColorUnavailable = "---";
 
 const getPriceWithDiscount = (
   value: CartItem,
@@ -38,7 +41,7 @@ const getColorSelectOptions = (
     value.availableColors,
     productColors,
   );
-  var result = `<option>${titleColorUnavailable}</option>`;
+  var result = `<option>${NO_VALUE_ASSIGNED}</option>`;
   value.availableColors
     ?.sort((a, b) => a - b)
     .forEach((item: number) => {

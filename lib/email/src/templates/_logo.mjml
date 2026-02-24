@@ -16,8 +16,8 @@
       >
         <mj-image
           align="center"
-          src="http://localhost:4321/altex-logo.png"
-          href="http://localhost:4321"
+          src="{{companyWeb}}/altex-logo.png"
+          href="{{companyPhone}}"
           title="АЛТЕХ"
           alt="altex logo"
           width="100px"

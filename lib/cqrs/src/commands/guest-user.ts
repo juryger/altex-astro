@@ -1,14 +1,18 @@
 import type { GuestUser } from "@/lib/domain";
 import type { Guest } from "@/lib/dal";
 import { createOperationsDb } from "@/lib/dal";
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  NO_VALUE_ASSIGNED,
+  selectEnvironment,
+} from "@/lib/domain";
 import { guests } from "@/lib/dal";
 import { encode } from "html-entities";
 
 const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
   return {
-    fullName: encode(entity.fullName ?? "---"),
-    email: encode(entity.email ?? "---"),
+    fullName: encode(entity.fullName ?? NO_VALUE_ASSIGNED),
+    email: encode(entity.email ?? NO_VALUE_ASSIGNED),
     phone: entity.phone !== undefined ? encode(entity.phone) : null,
     compnayName:
       entity.compnayName !== undefined ? encode(entity.compnayName) : null,

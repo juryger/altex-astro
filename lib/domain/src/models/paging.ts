@@ -1,6 +1,3 @@
-import { EnvironmentNames } from "../const/environment";
-import { selectEnvironment } from "../helpers/environment";
-
 type Paging = {
   page: number;
   pageSize: number;

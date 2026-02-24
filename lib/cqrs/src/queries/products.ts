@@ -58,7 +58,7 @@ const getSortCondition = (value: Sorting): SQL => {
   return value.order === SortOrder.Ascending ? asc(column) : desc(column);
 };
 
-type ProductsQueryResult = {
+type QueryResult = {
   main: { products: DbProduct; categories: DbCategory };
   categories: DbCategory;
   measurement_units: DbMeasurementUnit | null;
@@ -67,7 +67,7 @@ type ProductsQueryResult = {
   product_colors: DbProductColor | null;
 };
 
-const mapQueryResultToDomainModel = (entity: ProductsQueryResult): Product => {
+const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
   const colorId = entity.product_colors?.colorId;
   return <Product>{
     id: entity.main.products.id,
@@ -228,7 +228,7 @@ export async function fetchProducts(
       continue;
     }
 
-    const value = mapQueryResultToDomainModel(item as ProductsQueryResult);
+    const value = mapQueryResultToDomainModel(item as QueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
 
@@ -294,7 +294,7 @@ export async function fetchProductBySlug(
       continue;
     }
 
-    const value = mapQueryResultToDomainModel(item as ProductsQueryResult);
+    const value = mapQueryResultToDomainModel(item as QueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
 

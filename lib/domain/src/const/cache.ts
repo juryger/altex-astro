@@ -10,12 +10,14 @@ enum CacheKeys {
   ProductColors = "product-colors",
   MeasurementUnits = "measurement-units",
   Discounts = "discounts",
+  CompanyInfo = "company-info",
   CategoriesAll = "categories:all",
   CategoriesRoot = "categories:root",
   CategoriesParent = "categories:parent",
   CategoryItem = "category-item",
   Products = "products",
   ProductItem = "product-item",
+  CartCheckout = "cart-checkout",
 }
 
 export {

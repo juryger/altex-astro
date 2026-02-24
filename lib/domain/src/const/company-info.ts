@@ -13,6 +13,7 @@ enum CompanyInfoKeys {
   PhoneNumber = "PhoneNumber",
   ContactEmail = "ContactEmail",
   AdminEmail = "AdminEmail",
+  CompanyWeb = "CompanyWeb",
 }
 
 export { CompanyInfoKeys };

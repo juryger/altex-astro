@@ -53,3 +53,7 @@ WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'ContactEmail');
 INSERT INTO info (name, value)
 SELECT 'AdminEmail', 'juryger@gmail.com'
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'AdminEmail');
+
+INSERT INTO info (name, value)
+SELECT 'CompanyWeb', 'https://altexweb.ru'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyWeb');

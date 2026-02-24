@@ -1,12 +1,12 @@
 import { defineAction } from "astro:actions";
 import { CartCheckoutRequestSchema } from "@/lib/domain";
-import { getCartManager } from "../core/utils/cartManager";
+import { getCartCheckoutManager } from "../core/utils/cart-checkout-manager";
 
 export const cartActions = {
   checkout: defineAction({
     input: CartCheckoutRequestSchema,
     handler: async (input) => {
-      const result = await getCartManager().checkoutCart(
+      const result = await getCartCheckoutManager().checkoutCart(
         input.cartContent,
         input.guestUser,
         input.userId,
