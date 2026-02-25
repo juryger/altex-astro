@@ -105,6 +105,10 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
+      // console.log(
+      //   "🧪 ~ getEmailMananger ~ sendNewOrder, params:",
+      //   templateParams,
+      // );
       try {
         const content = await prepareTemplate({
           rootPath,
@@ -161,21 +165,4 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
   };
 };
 
-export { TemplateKeys } from "./const";
 export { getEmailManager, type EmailManager };
-
-// const manager = getEmailManager({
-//   rootPath: process.env.EMAIL_TEMPLATES_PATH ?? "",
-// });
-// manager.sendNewOrder({
-//   toCustomer: "juryger@gmail.com",
-//   toBackOffice: "alextechnologies@gmail.com",
-//   subject: "Test email for new order",
-//   templateParams: {
-//     orderNo: "WEB-01",
-//     companyName: "ИП Герасимов Алексей Владимирович",
-//     companyWeb: "http://altexweb.ru",
-//     companyEmail: "alextechnologies@gmail.com",
-//     companyPhone: "+7(910)911-3877",
-//   },
-// });

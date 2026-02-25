@@ -32,7 +32,7 @@ const titleUnknown = "(?)";
 
 <product-details 
   data-btn_add_to_cart={btnAddToCartName} data-input_quatnity={inputQuantityName}
-  data-id={item.id} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
+  data-id={item.id} data-product_uid={item.uid} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
   data-image={item.imageUrl} data-thumbnail-image={item.thumbnailImageUrl} data-slug={item.slug}
@@ -124,12 +124,13 @@ const titleUnknown = "(?)";
       const quanityEl = getInputElementByName(this, this.dataset.input_quatnity);
       
       const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
-      const colorTitle = this.productColors.find(x => x.id === color)?.title ?? NO_VALUE_ASSIGNED;
+      const colorItem = this.productColors.find(x => x.id === color);
       const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
 
       addToCart({
         productId: this.value.id,
         productCode: this.value.productCode,
+        productUid: this.value.uid,
         title: this.value.title,
         availableColors: this.value.colors,
         price: this.value.price,
@@ -137,8 +138,9 @@ const titleUnknown = "(?)";
         whsPrice2: this.value.whsPrice2,
         image: this.value.thumbnailImageUrl,
         slug: this.value.slug,
-        color,
-        colorTitle,
+        colorId: color,
+        colorUid: colorItem?.uid,
+        colorTitle: colorItem?.title ?? NO_VALUE_ASSIGNED,
         quantity
       } as CartItem);
 

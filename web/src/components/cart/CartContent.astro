@@ -50,7 +50,7 @@ const titleSubtotal = "Итого:";
       {'border': isCheckout}, 
       {'border-solid': isCheckout}, 
       {'border-gray-200': isCheckout}, 
-      {'h-[122]': isCheckout}, 
+      {'h-[28rem]': isCheckout}, 
       {'mt-2': isCheckout}
     ]}
   >
@@ -179,7 +179,7 @@ const titleSubtotal = "Итого:";
 
       this.cleanupCartContent();
       cartItems.forEach(x => {
-        console.log("~ CartContent ~ syncCartContentFromStore", x);
+        //console.log("~ CartContent ~ syncCartContentFromStore", x);
         const divAlert = document.createElement("li");
         divAlert.classList.add("flex", "p-2");
         this.cartContainerEl && this.cartContainerEl.appendChild(divAlert);
@@ -280,33 +280,39 @@ const titleSubtotal = "Итого:";
 
     private onUpdateCart = (id: string): any => {
       return (): void => {
-        var item = $cart.get().find(x => x.id === id);
-        if (!item) {
+        var cartItem = $cart.get().find(x => x.id === id);
+        if (!cartItem) {
           console.warn(`~ CartContent ~ cannot update cart as item with id:'%s' not found`, id);
           return;
         }
 
         const colorEl = this.querySelector(`select[name='${id}-color']`);
-        const color = colorEl !== null ? parseInt((colorEl as HTMLInputElement).value) : undefined;
+        const colorId = colorEl !== null ? parseInt((colorEl as HTMLInputElement).value) : undefined;
 
         const quantityEl = this.querySelector(`input[name='${id}-quantity']`);
         const quantity = quantityEl ? Math.abs(parseInt((quantityEl as HTMLInputElement).value)) : 1;
 
-        if (item.color !== undefined && item.color !== color) {
+        if (cartItem.colorId !== undefined && cartItem.colorId !== colorId) {
           // color has changed
           removeFromCart(id);
 
-          const existingItem = $cart.get().find(x => x.productId === item?.productId && x.color === color);
+          const existingItem = $cart.get().find(x => x.productId === cartItem?.productId && x.colorId === colorId);
           if (existingItem) { 
             updateCart({ ...existingItem, quantity: existingItem.quantity + quantity })
           } else {
-            const colorTitle = this.productColors.find(x => x.id === color)?.title ?? NO_VALUE_ASSIGNED;
-            addToCart({ ...item, color, colorTitle, quantity})
+            const colorItem = this.productColors.find(x => x.id === colorId);
+            console.log("🧪 ~ CartContent ~ onUpdateCart ~ colorItem", colorItem);
+            addToCart({ 
+              ...cartItem, 
+              colorId, 
+              colorUid: colorItem?.uid,
+              colorTitle: colorItem?.title ?? NO_VALUE_ASSIGNED, 
+              quantity})
           }
         }
         else {
           // just quantity has changed
-          updateCart({ ...item, quantity });
+          updateCart({ ...cartItem, quantity });
         }
 
         addAlert({ 

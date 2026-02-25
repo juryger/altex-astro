@@ -5,14 +5,20 @@ import { createOperationsDb, cartCheckout, cartCheckoutItems } from "@/lib/dal";
 export async function checkoutCart(
   items: Array<CartItem>,
   discounts: Array<Discount>,
-  userId?: string,
-  guestId?: string,
+  userUid?: string,
+  guestUid?: string,
 ): Promise<number> {
   const cartSum = items.reduce(
     (acc, curr) => acc + curr.price * curr.quantity,
     0,
   );
-  const discountId = discounts.findLast((x) => cartSum >= x.fromSum)?.id ?? 0;
+  const discountIndex =
+    discounts.findLastIndex((x) => cartSum >= x.fromSum) ?? 0;
+  console.log(
+    "🧪 ~ command:checkoutCart ~ summ: %i, discount: %i",
+    cartSum,
+    discountIndex,
+  );
 
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
@@ -21,30 +27,30 @@ export async function checkoutCart(
     const cart = tx
       .insert(cartCheckout)
       .values({
-        userId,
-        guestId,
+        userUid,
+        guestUid,
       })
       .returning({ id: cartCheckout.id })
       .all();
-    const result = cart.at(0)?.id ?? 0;
+    const checkoutId = cart.at(0)?.id ?? 0;
 
     for (const item of items) {
       tx.insert(cartCheckoutItems)
         .values({
-          cartCheckoutId: result,
-          productId: item.productId,
-          colorId: item.color,
+          cartCheckoutId: checkoutId,
+          productUid: item.productUid,
+          colorUid: item.colorUid,
           quantity: item.quantity,
           price:
-            discountId === 0
+            discountIndex === 0
               ? item.price
-              : discountId === 1
+              : discountIndex === 1
                 ? item.whsPrice1
                 : item.whsPrice2,
         })
         .run();
     }
 
-    return result;
+    return checkoutId;
   });
 }

@@ -1,7 +1,8 @@
+import crypto from "crypto";
 import type { CartItem, GuestUser, Result } from "@/lib/domain";
 import { getErrorMessage } from "@/lib/domain";
 import { OrderTypes } from "@/web/src/core/const";
-import { getEmailManager, TemplateKeys, type EmailManager } from "@/lib/email";
+import { getEmailManager, type EmailManager } from "@/lib/email";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
 import type { CommandManager } from "@/lib/cqrs";
 import {
@@ -14,6 +15,7 @@ import {
   fetchCartCheckout,
 } from "@/lib/cqrs";
 import { CompanyInfoKeys } from "@/lib/dal/src";
+import { EmailSubjects } from "../const/messages";
 
 interface CartCheckoutManager {
   checkoutCart: (
@@ -26,25 +28,27 @@ interface CartCheckoutManager {
 const saveGuestUser = async (
   commandManager: CommandManager,
   guest: GuestUser,
-): Promise<Result<string>> => {
-  return await commandManager.mutate<string>(() => upsertGuestUser(guest));
+): Promise<Result<number>> => {
+  return await commandManager.mutate<number>(() => upsertGuestUser(guest));
 };
 
 const saveCartCheckout = async (
   commandManager: CommandManager,
   items: Array<CartItem>,
-  userId?: string,
-  guestId?: string,
+  userUid?: string,
+  guestUid?: string,
 ): Promise<Result<number>> => {
   const discounts = await getQueryManager().fetch(
     () => fetchDiscounts(),
     getCacheInfo(CacheKeys.Discounts),
   );
-  if (discounts.error !== undefined)
+
+  if (discounts.error !== undefined) {
     return { status: "Failed", error: discounts.error };
+  }
 
   return await commandManager.mutate<number>(() =>
-    checkoutCart(items, discounts.data ?? [], userId, guestId),
+    checkoutCart(items, discounts.data ?? [], userUid, guestUid),
   );
 };
 
@@ -61,59 +65,39 @@ const sendNewOrderEmail = async (
     return { status: "Failed", error: companyInfo.error };
   }
 
-  if (companyInfo.data === undefined) {
-    return {
-      status: "Failed",
-      error: new Error(
-        "Failed to retrieve compnay data for the cart checkout email",
-      ),
-    };
-  }
-
   const cartCheckoutData = await getQueryManager().fetch(
     () => fetchCartCheckout(checkoutId),
     getCacheInfo(CacheKeys.CartCheckout),
   );
 
-  if (cartCheckoutData.status !== undefined) {
+  if (cartCheckoutData.status !== "Ok") {
     return { status: "Failed", error: cartCheckoutData.error };
   }
 
-  if (
-    cartCheckoutData.data?.guest === undefined &&
-    cartCheckoutData.data?.customer === undefined
-  ) {
+  if (!companyInfo.data || !cartCheckoutData.data) {
     return {
       status: "Failed",
       error: new Error(
-        "Failed to retrieve guest/customer details for the cart checkout email",
+        `Failed to retrieve company and cart data for checkout ID: ${checkoutId}`,
       ),
     };
   }
 
-  if (cartCheckoutData.data === undefined) {
-    return {
-      status: "Failed",
-      error: new Error(
-        "Failed to retrieve details for the cart checkout email",
-      ),
-    };
-  }
+  const params = companyInfo.data && {
+    orderNo: `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`,
+    orderSumValue: cartCheckoutData.data?.items.reduce(
+      (acc, curr) => acc + curr.quantity * curr.price,
+      0,
+    ),
+    items: cartCheckoutData.data.items,
+    client: cartCheckoutData.data.guest,
+  };
 
   await emailManager.sendNewOrder({
     toCustomer: cartCheckoutData.data?.guest?.email ?? "",
     toBackOffice: companyInfo.data[CompanyInfoKeys.ContactEmail],
-    subject: "New order on the website altexweb.ru",
-    templateParams: companyInfo.data && {
-        orderNo: `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`,
-      } && {
-        orderSumValue: cartCheckoutData.data?.items.reduce(
-          (acc, curr) => acc + curr.quantity * curr.price,
-          0,
-        ),
-      } && { items: cartCheckoutData.data.items } && {
-        client: cartCheckoutData.data.guest,
-      },
+    subject: EmailSubjects.NewOrder,
+    templateParams: params,
   });
 
   return { status: "Ok" };
@@ -132,22 +116,20 @@ const sendFailureEmail = async (
     return { status: "Failed", error: companyInfo.error };
   }
 
-  if (companyInfo.data === undefined) {
+  if (!companyInfo.data) {
     return {
       status: "Failed",
-      error: new Error(
-        "Failed to retrieve compnay data for the cart checkout email",
-      ),
+      error: new Error("Unable to retrieve company data"),
     };
   }
 
-  await emailManager.sendFailure({
+  const emailResult = await emailManager.sendFailure({
     to: companyInfo.data[CompanyInfoKeys.AdminEmail],
-    subject: "Server error on the website altexweb.ru",
+    subject: EmailSubjects.Failure,
     templateParams: companyInfo.data && { failureDescription: message },
   });
 
-  return { status: "Ok" };
+  return { status: emailResult.status, error: emailResult.error };
 };
 
 function getCartCheckoutManager(): CartCheckoutManager {
@@ -159,67 +141,65 @@ function getCartCheckoutManager(): CartCheckoutManager {
     checkoutCart: async (
       items: Array<CartItem>,
       guest?: GuestUser,
-      userId?: string,
+      userUid?: string,
     ): Promise<Result<string>> => {
       const result: Result<string> = { status: "Ok" };
       try {
-        let guestId: string | undefined = undefined;
+        let guestUid: string | undefined = undefined;
         if (guest) {
+          guestUid = crypto.randomUUID();
+          guest.uid = guestUid;
           const guestResult = await saveGuestUser(commandManager, guest);
-          if (guestResult.status !== "Ok")
-            return { status: "Failed", error: guestResult.error };
-          guestId = guestResult.data;
+          if (guestResult.status !== "Ok") {
+            result.status = "Failed";
+            result.error = guestResult.error;
+            return result;
+          }
         }
 
         const cartCheckoutResult = await saveCartCheckout(
           commandManager,
           items,
-          userId,
-          guestId,
+          userUid,
+          guestUid,
         );
-
         if (
           cartCheckoutResult.status !== "Ok" ||
           cartCheckoutResult.data === undefined
         ) {
-          return {
-            status: "Failed",
-            error: cartCheckoutResult.error,
-          };
+          result.status = "Failed";
+          result.error = cartCheckoutResult.error;
+          return result;
         }
 
         const emailResult = await sendNewOrderEmail(
           emailManager,
           cartCheckoutResult.data,
         );
-
         if (emailResult.status !== "Ok") {
-          return { status: "Failed", error: emailResult.error };
+          result.status = "Failed";
+          result.error = emailResult.error;
+          return result;
         }
 
         result.data = `${OrderTypes.Web}-${cartCheckoutResult.data}`;
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        result.error = new Error(errorMessage);
-
-        const emailResult = await sendFailureEmail(
-          emailManager,
-          `Failed to create new order based on the cart checkout, see details below. ${errorMessage}`,
-        );
-
-        if (emailResult.status !== "Ok") {
-          console.error(
-            "Failed to send admin email regarding failed to place new order based on cart checkout",
-            emailResult.error,
-          );
-        }
-
         console.error(
-          "❌ ~ cartManager ~ failed to checkout cart: ",
+          "~ cartManager ~ failed to checkout cart: ",
           errorMessage,
         );
+        result.status = "Failed";
+        result.error = new Error(errorMessage);
+      } finally {
+        if (result.status !== "Ok") {
+          const emailResult = await sendFailureEmail(
+            emailManager,
+            `Failed to create new order based on the cart checkout, see details below. ${result.error}`,
+          );
+          if (emailResult.error !== undefined) console.error(emailResult.error);
+        }
       }
-
       return result;
     },
   };

@@ -53,8 +53,8 @@ export const guests = table(
 
 export const cartCheckout = table("cart_checkout", {
   id: t.int().primaryKey({ autoIncrement: true }),
-  userId: t.text("user_id"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
-  guestId: t.text("guest_id").references(() => guests.id),
+  userUid: t.text("user_uid"), //.reference(() => users.id), <- cannot reference external db-file, not supported by SQLite
+  guestUid: t.text("guest_uid"), //.references(() => guests.id),
   createdAt: t
     .int("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
@@ -67,8 +67,8 @@ export const cartCheckoutItems = table("cart_checkout_items", {
     .int("cart_checkout_id")
     .notNull()
     .references(() => cartCheckout.id),
-  productId: t.int("product_id").notNull(), // .references(() => products.id), <- cannot reference external db-file, not supported by SQLite
-  colorId: t.int("color_id"),
+  productUid: t.text("product_uid").notNull(), // .references(() => products.id), <- cannot reference external db-file, not supported by SQLite
+  colorUid: t.text("color_uid"),
   quantity: t.int().notNull(),
   price: t.real().notNull(),
 });

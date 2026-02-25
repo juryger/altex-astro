@@ -13,6 +13,7 @@ const checkCache = async <T = any>(
   cacheInfo: CacheInfo,
   queryFn: () => Promise<T>,
 ): Promise<Result<T>> => {
+  console.log("~ queryManager ~ try cache for key '%s':", cacheInfo.key);
   const cacheResult = await cacheManager.get(cacheInfo.key);
   const result: Result<T> = {
     status: cacheResult.error === undefined ? "Ok" : "Failed",
@@ -22,15 +23,25 @@ const checkCache = async <T = any>(
 
   if (cacheResult.set !== undefined) {
     try {
+      console.log(
+        "~ queryManager ~ cache is missed for '%s', run query and add to cache",
+        cacheInfo.key,
+      );
       result.data = await queryFn();
       cacheResult.set(result.data, cacheInfo.staleTimeMs);
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      result.error = new Error(errorMessage);
-      result.status = "Failed";
       console.error("~ queryManager ~ %s", errorMessage);
+      result.status = "Failed";
+      result.error = new Error(errorMessage);
     }
   }
+
+  console.log(
+    "~ queryManager ~ cache check result for key '%s': %o",
+    cacheInfo.key,
+    result,
+  );
   return result;
 };
 
@@ -49,14 +60,21 @@ function getQueryManager(): QueryManager {
 
       if (result.data === undefined) {
         try {
+          console.log("~ queryManager ~ run query bypassing cache");
           result.data = await queryFn();
         } catch (error) {
           const errorMessage = getErrorMessage(error);
-          result.error = new Error(errorMessage);
           console.error("~ queryManager ~ %s", errorMessage);
+          result.status = "Failed";
+          result.error = new Error(errorMessage);
         }
       }
 
+      console.log(
+        "~ queryManager ~ queryFn result for key '%s': %o",
+        cacheInfo?.key ?? "NA",
+        result,
+      );
       return result;
     },
   };

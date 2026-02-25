@@ -24,7 +24,7 @@ const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
   } as Guest;
 };
 
-export async function upsertGuestUser(guest: GuestUser): Promise<string> {
+export async function upsertGuestUser(guest: GuestUser): Promise<number> {
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
@@ -41,9 +41,10 @@ export async function upsertGuestUser(guest: GuestUser): Promise<string> {
         city: encode(guest.city),
         postCode: encode(guest.postCode),
         taxNumber: encode(guest.taxNumber),
+        uid: guest.uid,
       },
     })
-    .returning({ uid: guests.uid });
+    .returning({ id: guests.id });
 
-  return result.at(0)?.uid ?? "";
+  return result.at(0)?.id ?? 0;
 }

@@ -14,7 +14,7 @@ const db = new Dexie(dbName) as Dexie & {
 db.version(1).stores({
   categories: "id, slug, title, parentId, parentSlug", // primary key "id" (for the runtime!)
   discounts: "id, code, title, fromSum",
-  productColors: "id, code, title, fillColor, borderColor",
+  productColors: "id, code, title, fillColor, borderColor, uid",
 });
 
 export { db as clientDb };

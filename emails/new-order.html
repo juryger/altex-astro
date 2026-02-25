@@ -150,8 +150,8 @@
                                   <tbody>
                                     <tr>
                                       <td style="width:100px;">
-                                        <a href="http://localhost:4321" target="_blank" title="АЛТЕХ">
-                                          <img alt="altex logo" src="http://localhost:4321/altex-logo.png" style="border:0;display:block;outline:none;text-decoration:none;height:100px;width:100%;font-size:13px;" title="АЛТЕХ" width="100" height="100" />
+                                        <a href="{{companyPhone}}" target="_blank" title="АЛТЕХ">
+                                          <img alt="altex logo" src="{{companyWeb}}/altex-logo.png" style="border:0;display:block;outline:none;text-decoration:none;height:100px;width:100%;font-size:13px;" title="АЛТЕХ" width="100" height="100" />
                                         </a>
                                       </td>
                                     </tr>
@@ -274,100 +274,104 @@
         <tbody>
           <tr>
             <td style="direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;">
-              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:560px;" width="560" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
-              <div style="margin:0px auto;max-width:560px;">
-                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-                  <tbody>
-                    <tr>
-                      <td style="border:none;border-bottom:solid lightgrey;direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
-                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:middle;width:112px;" ><![endif]-->
-                        <div class="mj-column-per-20 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
-                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                            <tbody>
-                              <tr>
-                                <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
-                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                                    <tbody>
-                                      <tr>
-                                        <td align="center" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
-                                            <tbody>
-                                              <tr>
-                                                <td style="width:90px;">
-                                                  <a href="http://localhost:4321/catalog/products/ZAMOFERR1323MEJO" target="_blank">
-                                                    <img alt="product image" src="http://localhost:4321/products/thumbnails/f0eced48-627b-49d4-8cc6-f2a90452c9a8.png" style="border:1px solid #e5e5e5;border-radius:10px;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="90" height="auto" />
-                                                  </a>
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <!--[if mso | IE]></td><td class="" style="vertical-align:middle;width:336px;" ><![endif]-->
-                        <div class="mj-column-per-60 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
-                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                            <tbody>
-                              <tr>
-                                <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
-                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                                    <tbody>
-                                      <tr>
-                                        <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                          <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:bold;line-height:1.5;text-align:left;color:#000000;">{{ this.title
+              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><![endif]-->
+              {{#each items}}
+                <!--[if mso | IE]><tr><td class="" width="600px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:560px;" width="560" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+                <div style="margin:0px auto;max-width:560px;">
+                  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
+                    <tbody>
+                      <tr>
+                        <td style="border:none;border-bottom:solid lightgrey;direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+                          <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:middle;width:112px;" ><![endif]-->
+                          <div class="mj-column-per-20 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                              <tbody>
+                                <tr>
+                                  <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                                      <tbody>
+                                        <tr>
+                                          <td align="center" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                              <tbody>
+                                                <tr>
+                                                  <td style="width:90px;">
+                                                    <a href="http://localhost:4321/catalog/products/ZAMOFERR1323MEJO" target="_blank">
+                                                      <img alt="product image" src="http://localhost:4321/products/thumbnails/f0eced48-627b-49d4-8cc6-f2a90452c9a8.png" style="border:1px solid #e5e5e5;border-radius:10px;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="90" height="auto" />
+                                                    </a>
+                                                  </td>
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <!--[if mso | IE]></td><td class="" style="vertical-align:middle;width:336px;" ><![endif]-->
+                          <div class="mj-column-per-60 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                              <tbody>
+                                <tr>
+                                  <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                                      <tbody>
+                                        <tr>
+                                          <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:bold;line-height:1.5;text-align:left;color:#000000;">{{ this.title
           }}</div>
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                          <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;line-height:1.5;text-align:left;color:grey;">Количество: {{ this.quantity }}</div>
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                          <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;line-height:1.5;text-align:left;color:grey;">Цвет: {{ this.colorTitle }}</div>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <!--[if mso | IE]></td><td class="" style="vertical-align:middle;width:112px;" ><![endif]-->
-                        <div class="mj-column-per-20 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
-                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                            <tbody>
-                              <tr>
-                                <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
-                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                                    <tbody>
-                                      <tr>
-                                        <td align="left" style="font-size:0px;padding:0px 10px 0px 10px;word-break:break-word;">
-                                          <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ this.price }} руб.</div>
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <!--[if mso | IE]></td></tr></table><![endif]-->
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!--[if mso | IE]></td></tr></table></td></tr></table><![endif]-->
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;line-height:1.5;text-align:left;color:grey;">Количество: {{ this.quantity }}</div>
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;line-height:1.5;text-align:left;color:grey;">Цвет: {{ this.colorTitle }}</div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <!--[if mso | IE]></td><td class="" style="vertical-align:middle;width:112px;" ><![endif]-->
+                          <div class="mj-column-per-20 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                              <tbody>
+                                <tr>
+                                  <td style="border:none;vertical-align:middle;padding:0px 0px 0px 0px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                                      <tbody>
+                                        <tr>
+                                          <td align="left" style="font-size:0px;padding:0px 10px 0px 10px;word-break:break-word;">
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ this.price }} руб.</div>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <!--[if mso | IE]></td></tr></table><![endif]-->
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              {{/each}}
+              <!--[if mso | IE]></table><![endif]-->
             </td>
           </tr>
         </tbody>
@@ -443,68 +447,72 @@
         <tbody>
           <tr>
             <td style="border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:left;">
-              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:bottom;width:280px;" ><![endif]-->
-              <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:bottom;width:100%;">
-                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                  <tbody>
-                    <tr>
-                      <td style="border:none;vertical-align:bottom;padding:0px 0px 0px 0px;">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                          <tbody>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">👤 {{ client.name }}</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">💼 {{ client.company }}</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📩 {{ client.email }}</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📞 {{ client.phone }}</div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!--[if mso | IE]></td><td class="" style="vertical-align:top;width:280px;" ><![endif]-->
-              <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
-                  <tbody>
-                    <tr>
-                      <td style="border:none;vertical-align:top;padding:0px 0px 0px 0px;">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
-                          <tbody>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📍 {{ client.postCode }} {{ client.addressCity }}</div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="left" style="font-size:0px;padding:0px 0px 0px 20px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ client.addressStreet
+              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><![endif]-->
+              {{#with client}}
+                <!--[if mso | IE]><td class="" style="vertical-align:bottom;width:280px;" ><![endif]-->
+                <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:bottom;width:100%;">
+                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                    <tbody>
+                      <tr>
+                        <td style="border:none;vertical-align:bottom;padding:0px 0px 0px 0px;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">👤 {{ name }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">💼 {{ company }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📩 {{ email }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📞 {{ phone }}</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!--[if mso | IE]></td><td class="" style="vertical-align:top;width:280px;" ><![endif]-->
+                <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                    <tbody>
+                      <tr>
+                        <td style="border:none;vertical-align:top;padding:0px 0px 0px 0px;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">📍 {{ postCode }} {{ addressCity }}</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0px 0px 0px 20px;word-break:break-word;">
+                                  <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ addressStreet
         }}</div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <!--[if mso | IE]></td></tr></table><![endif]-->
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!--[if mso | IE]></td><![endif]-->
+              {{/with}}
+              <!--[if mso | IE]></tr></table><![endif]-->
             </td>
           </tr>
         </tbody>

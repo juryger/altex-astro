@@ -137,6 +137,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     makeCountry: entity.make_countries?.title,
     createdAt: entity.main.products.createdAt,
     modifiedAt: entity.main.products.modifiedAt,
+    uid: entity.main.products.uid,
   };
 };
 

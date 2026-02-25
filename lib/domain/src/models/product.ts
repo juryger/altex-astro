@@ -42,6 +42,7 @@ export const ProductSchema = z
     makeCountry: z.string().optional(),
     createdAt: z.date(),
     modifiedAt: z.date(),
+    uid: z.string(),
     relatedProdcuts: z.array(z.string()).optional(),
   })
   .transform((data) => {

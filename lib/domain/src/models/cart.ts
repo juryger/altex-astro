@@ -4,6 +4,7 @@ import { GuestUserSchema } from "./guest-user";
 export const CartSchema = z
   .object({
     productId: z.number(),
+    productUid: z.string(),
     productCode: z.string(),
     title: z.string(),
     availableColors: z.array(z.number()).optional(),
@@ -12,7 +13,8 @@ export const CartSchema = z
     whsPrice2: z.number(),
     image: z.string(),
     slug: z.string(),
-    color: z.number().optional(),
+    colorId: z.number().optional(),
+    colorUid: z.string().optional(),
     colorTitle: z.string().optional(),
     quantity: z.number(),
   })
@@ -20,8 +22,8 @@ export const CartSchema = z
     ...data,
     // Derived properties
     id:
-      data.color !== undefined
-        ? `${data.productId}-${data.color}`
+      data.colorId !== undefined
+        ? `${data.productId}-${data.colorId}`
         : data.productId.toString(),
   }));
 

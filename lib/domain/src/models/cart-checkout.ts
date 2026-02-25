@@ -3,16 +3,16 @@ import type { GuestUser } from "./guest-user";
 
 const CartCheckoutSchema = z.object({
   id: z.number().optional(),
-  userId: z.string().optional(),
-  guestId: z.string().optional(),
+  userUid: z.string().optional(),
+  guestUid: z.string().optional(),
   createdAt: z.date().optional(),
 });
 
 const CartCheckoutItemSchema = z.object({
   id: z.number().optional(),
   cartCheckoutId: z.number(),
-  productId: z.number(),
-  colorId: z.number().optional(),
+  productUid: z.string(),
+  colorUid: z.string().optional(),
   quantity: z.number(),
   price: z.number(),
 });

@@ -28,7 +28,7 @@ const titleConfirmOrder = "Подтвердить заказ";
 const titleErrorHeader = "Техническая неисправность";
 const titleErrorDetailsHeader = "Технические детали";
 const titleErrorDetails = "Мы работает над выяснением причин."
-const titleCartCheckoutFailed = "При размещении заказа возникла техническая неисправность. В ближайшее время мы свяжемся с Вами относительно этого.";
+const titleCartCheckoutFailed = "При размещении заказа возникла техническая неисправность. Но не стоит беспокоиться, в ближайшее время мы пришлем подтверждение заказа на электронную почту.";
 ---
 
 <cart-checkout 
@@ -56,7 +56,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             <legend class="fieldset-legend">{titlePhonetName}</legend>
             <input type="tel" name="phone" class="input w-full validator" placeholder="8..."
               pattern="8[0-9]*"
-              minlength="1"
+              minlength="11"
               maxlength="11" />
             <p class="validator-hint hidden">{titleIncorrectPhone}</p>
           </fieldset>
@@ -66,7 +66,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
           </fieldset>
           <fieldset class="fieldset col-span-2 sm:col-span-1">
             <legend class="fieldset-legend">{titleTaxNumber}</legend>
-            <input type="number" name="taxNumber" class="input w-full validator" placeholder="" 
+            <input type="text" name="taxNumber" class="input w-full validator" placeholder="" 
               pattern="[0-9]*"
               minlength="12"
               maxlength="12" />
@@ -128,7 +128,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
   import { $cart, $cartCount } from "@/web/src/core/stores/cart-store";
-  import { type GuestUser } from '@/lib/domain';
+  import { getErrorMessage, type GuestUser } from '@/lib/domain';
   import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 
   class CartCheckout extends HTMLElement {
@@ -180,10 +180,10 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             this.resetCart();
             navigate(`/cart/confirmed?order=${result}`);
           })
-          .catch((reason) => {
-            const err = (reason as Error);
-            console.error(err ?? reason);
-            if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = err.message;
+          .catch((error) => {
+            const errorMessage = getErrorMessage(error);
+            console.error(errorMessage);
+            if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = errorMessage;
             (this.errorPopupEl as HTMLDialogElement).showModal();
           });
       }

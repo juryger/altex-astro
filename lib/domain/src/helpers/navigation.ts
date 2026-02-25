@@ -15,8 +15,6 @@ function constructNavigationPath({
         index !== args.length - 1 ? pathSeparator : "",
       )),
   );
-
-  console.log("🧪 ~ constructNavigationPath ~ result:", result);
   return result;
 }
 

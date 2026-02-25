@@ -6,6 +6,7 @@ const ProductColorSchema = z.object({
   title: z.string(),
   fillColor: z.string(),
   borderColor: z.string(),
+  uid: z.string(),
 });
 
 export type ProductColor = z.infer<typeof ProductColorSchema>;

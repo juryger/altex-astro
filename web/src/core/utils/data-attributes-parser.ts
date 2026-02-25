@@ -18,6 +18,14 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     return undefined;
   }
 
+  const productUid = dataset.product_uid;
+  if (productUid === undefined) {
+    console.warn(
+      `~ Product data attributes parser ~ value of Product UID is not defined`,
+    );
+    return undefined;
+  }
+
   const productCode = dataset.product_code;
   if (productCode === undefined) {
     console.warn(
@@ -104,8 +112,9 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
 
   return {
     id,
-    title,
+    uid: productUid,
     productCode,
+    title,
     quantityInPack: -1,
     minQuantityToBuy: -1,
     price,

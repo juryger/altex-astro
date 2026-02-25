@@ -64,7 +64,7 @@ export function updateCart(value: CartItem): void {
 
   $cart.set([
     ...$cart.get().filter((x) => x.id !== item.id),
-    { ...existingEntry, quantity: item.quantity, color: item.color },
+    { ...existingEntry, quantity: item.quantity, colorId: item.colorId },
   ]);
 }
 

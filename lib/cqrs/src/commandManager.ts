@@ -12,9 +12,12 @@ function getCommandManager(): CommandManager {
         result.data = await commandFn();
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        result.error = new Error(errorMessage);
+        console.error(
+          "~ commandManager ~ Failed to execute command against database, see deatils below.",
+          errorMessage,
+        );
         result.status = "Failed";
-        console.error("~ commandManager ~ %s", errorMessage);
+        result.error = new Error(errorMessage);
       }
       return result;
     },

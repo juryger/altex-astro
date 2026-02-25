@@ -19,6 +19,7 @@ const mapQueryResultToDomainModel = (entity: DbColor): ProductColor => {
     title: entity.title,
     fillColor: entity.fillColor,
     borderColor: entity.borderColor,
+    uid: entity.uid,
   };
 };
 

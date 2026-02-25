@@ -19,6 +19,10 @@ interface BaseCacheManager {
   contains: (key: string) => boolean;
   get: <T = any>(key: string) => Promise<CacheResult<T>>;
   getSize: () => number;
+  getSizeLimit: () => number;
+  containsInvalid: () => boolean;
+  revalidate: () => boolean;
+  reset: () => void;
   terminate: () => void;
 }
 
@@ -235,6 +239,10 @@ class CacheManager implements BaseCacheManager {
     return this.cache.size;
   }
 
+  getSizeLimit(): number {
+    return this.sizeLimit;
+  }
+
   contains(key: string): boolean {
     if (this.withTracing) {
       console.log(
@@ -248,6 +256,39 @@ class CacheManager implements BaseCacheManager {
       item = undefined;
     }
     return item !== undefined;
+  }
+
+  containsInvalid(): boolean {
+    return this.cache.entries().some(([key, value]) => !this.isValid(value));
+  }
+
+  revalidate(): boolean {
+    if (!this.containsInvalid()) return false;
+
+    const currentSize = this.cache.size;
+    this.cache.entries().forEach(([key, value]) => {
+      if (!this.isValid(value)) this.invalidate(key);
+    });
+
+    if (currentSize < this.cache.size && this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ revalidate completed, the number of removed items: %i",
+        currentSize - this.cache.size,
+      );
+    }
+
+    return true;
+  }
+
+  reset() {
+    this.cache.clear();
+
+    if (this.withTracing) {
+      console.log(
+        "🐾 ~ cacheManager ~ reset completed, the number of all items: %i",
+        this.cache.size,
+      );
+    }
   }
 
   terminate() {

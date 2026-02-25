@@ -27,7 +27,6 @@ const getPriceWithDiscount = (
     )}</span>
       <del class="text-xs text-info">${formatCurrency(value.price)}</del>`;
   }
-
   return `<span class="text-xs text-info">${formatCurrency(value.price)}</span>
       <del class="text-xs text-info"></del>`;
 };
@@ -36,11 +35,7 @@ const getColorSelectOptions = (
   value: CartItem,
   productColors: ProductColor[],
 ): string => {
-  console.log(
-    "~ cartManager ~ colors: %o, all %o",
-    value.availableColors,
-    productColors,
-  );
+  //console.log("~ cartManager ~ colors: %o, all %o", value.availableColors, productColors);
   var result = `<option>${NO_VALUE_ASSIGNED}</option>`;
   value.availableColors
     ?.sort((a, b) => a - b)
@@ -48,7 +43,7 @@ const getColorSelectOptions = (
       var metadata = productColors.find((x) => x.id === item);
       result = result.concat(
         `<option value="${item}"
-          ${value.color !== undefined && value.color === item ? "selected" : ""}>
+          ${value.colorId !== undefined && value.colorId === item ? "selected" : ""}>
           ${metadata?.title}
         </option>`,
       );
@@ -67,7 +62,7 @@ const createCartItemMarkup = (
     <div class="flex flex-row gap-3 items-start">
       <!-- Item image and code -->
       <div class="grow-0">
-        <figure class="aspect-square lg:aspect-auto min-h-[80px]">
+        <figure class="aspect-square min-h-[80px]">
           <Image 
             src=${value.image} 
             alt=${value.title} 

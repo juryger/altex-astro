@@ -12,7 +12,7 @@ export const cartActions = {
         input.userId,
       );
 
-      if (result.error !== undefined) {
+      if (result.status !== "Ok") {
         // * Generate email for Admin in case of any exceptions
         throw result.error;
       }

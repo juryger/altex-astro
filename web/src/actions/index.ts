@@ -1,7 +1,9 @@
 import { cartActions } from "./cart";
+import { internalsActions } from "./internals";
 
 export const server = {
   cartActions,
+  internalsActions,
 };
 
 /* Examples of use server actions:

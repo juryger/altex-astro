@@ -4,4 +4,9 @@ enum CartMessages {
   RemovedFromTheCart = "Товар удален из корзины",
 }
 
-export { CartMessages };
+enum EmailSubjects {
+  NewOrder = "Новый заказ на сайте АЛТЕХ",
+  Failure = "Техническая неисправность на сайте АЛТЕХ",
+}
+
+export { CartMessages, EmailSubjects };
