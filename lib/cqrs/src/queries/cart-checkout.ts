@@ -52,7 +52,7 @@ const mapQueryResultToDomainModel = (
       fullName: data[0]?.guests?.fullName,
       email: data[0]?.guests?.email,
       phone: data[0]?.guests?.phone ?? undefined,
-      compnayName: data[0]?.guests?.compnayName ?? undefined,
+      companyName: data[0]?.guests?.companyName ?? undefined,
       address: data[0]?.guests?.address ?? undefined,
       city: data[0]?.guests?.city ?? undefined,
       postCode: data[0]?.guests?.postCode ?? undefined,

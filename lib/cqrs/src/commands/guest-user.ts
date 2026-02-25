@@ -14,8 +14,8 @@ const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
     fullName: encode(entity.fullName ?? NO_VALUE_ASSIGNED),
     email: encode(entity.email ?? NO_VALUE_ASSIGNED),
     phone: entity.phone !== undefined ? encode(entity.phone) : null,
-    compnayName:
-      entity.compnayName !== undefined ? encode(entity.compnayName) : null,
+    companyName:
+      entity.companyName !== undefined ? encode(entity.companyName) : null,
     address: entity.address !== undefined ? encode(entity.address) : null,
     city: entity.city !== undefined ? encode(entity.city) : null,
     postCode: entity.postCode !== undefined ? encode(entity.postCode) : null,
@@ -36,7 +36,7 @@ export async function upsertGuestUser(guest: GuestUser): Promise<number> {
       set: {
         fullName: encode(guest.fullName),
         phone: encode(guest.phone),
-        compnayName: encode(guest.compnayName),
+        companyName: encode(guest.companyName),
         address: encode(guest.address),
         city: encode(guest.city),
         postCode: encode(guest.postCode),

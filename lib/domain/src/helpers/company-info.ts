@@ -8,14 +8,14 @@ const parseCompanyInfo = (data: Array<CompanyInfo>): Record<string, string> => {
       case CompanyInfoKeys.AdminEmail.toLowerCase():
         result[CompanyInfoKeys.AdminEmail] = x.value;
         break;
-      case CompanyInfoKeys.ContactEmail.toLowerCase():
-        result[CompanyInfoKeys.ContactEmail] = x.value;
+      case CompanyInfoKeys.CompanyEmail.toLowerCase():
+        result[CompanyInfoKeys.CompanyEmail] = x.value;
         break;
-      case CompanyInfoKeys.PhoneNumber.toLowerCase():
-        result[CompanyInfoKeys.PhoneNumber] = x.value;
+      case CompanyInfoKeys.CompanyPhone.toLowerCase():
+        result[CompanyInfoKeys.CompanyPhone] = x.value;
         break;
-      case CompanyInfoKeys.Name.toLowerCase():
-        result[CompanyInfoKeys.Name] = x.value;
+      case CompanyInfoKeys.CompanyName.toLowerCase():
+        result[CompanyInfoKeys.CompanyName] = x.value;
         break;
       case CompanyInfoKeys.CompanyWeb.toLowerCase():
         result[CompanyInfoKeys.CompanyWeb] = x.value;

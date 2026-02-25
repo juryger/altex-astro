@@ -95,7 +95,7 @@ const sendNewOrderEmail = async (
 
   await emailManager.sendNewOrder({
     toCustomer: cartCheckoutData.data?.guest?.email ?? "",
-    toBackOffice: companyInfo.data[CompanyInfoKeys.ContactEmail],
+    toBackOffice: companyInfo.data[CompanyInfoKeys.CompanyEmail],
     subject: EmailSubjects.NewOrder,
     templateParams: params,
   });

@@ -10,22 +10,26 @@ enum EmailTemplates {
   Failure = "failure.html",
 }
 
+enum XmlTEmplates {
+  NewOrder = "new-order.xml",
+}
+
 const getTemplate = async (
   rootPath: string,
   fileName: string,
 ): Promise<string> => {
   if (rootPath === undefined || rootPath.trim().length === 0) {
     throw new Error(
-      "The email templates path is required, check the value of environment variable 'EMAIL_TEMPLATES_PATH'.",
+      "The root templates path is required, check the value of environment variable 'EMAIL_TEMPLATES_PATH'.",
     );
   }
-  const htmlTemplatePath = path.resolve(rootPath, fileName);
-  if (!fs_sync.existsSync(htmlTemplatePath)) {
+  const templatePath = path.resolve(rootPath, fileName);
+  if (!fs_sync.existsSync(templatePath)) {
     throw new Error(
-      `Required email template file is not found, file path: ${htmlTemplatePath}`,
+      `Required template file is not found, file path: ${templatePath}`,
     );
   }
-  return await fs.readFile(htmlTemplatePath, "utf8");
+  return await fs.readFile(templatePath, "utf8");
 };
 
 const applyTemplateParams = ({
@@ -56,15 +60,18 @@ const sendEmail = async ({
   to,
   subject,
   content,
+  xmlContent,
 }: {
   to: string;
   subject: string;
   content: string;
+  xmlContent?: string;
 }): Promise<Result> => {
   console.info("sendEmail", {
     to,
     subject,
     content,
+    xmlContent,
   });
   return { status: "Ok" };
 };
@@ -105,10 +112,10 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
-      // console.log(
-      //   "🧪 ~ getEmailMananger ~ sendNewOrder, params:",
-      //   templateParams,
-      // );
+      console.log(
+        "🧪 ~ getEmailMananger ~ sendNewOrder, params:",
+        templateParams,
+      );
       try {
         const content = await prepareTemplate({
           rootPath,
@@ -120,6 +127,24 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
           to: toCustomer,
           subject,
           content,
+        });
+
+        const xmlContent = await prepareTemplate({
+          rootPath,
+          fileName: XmlTEmplates.NewOrder,
+          params: templateParams,
+        });
+
+        console.log(
+          "🧪 ~ getEmailMananger ~ sendNewOrder, xml attachment:",
+          xmlContent,
+        );
+
+        await sendEmail({
+          to: toBackOffice,
+          subject,
+          content,
+          xmlContent,
         });
       } catch (error) {
         const errorMessage = getErrorMessage(error);

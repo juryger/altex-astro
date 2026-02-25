@@ -27,8 +27,8 @@ SELECT 'TaxLicense', 'Свидетельство 40 № 000999515 от 20.03.199
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'TaxLicense');
 
 INSERT INTO info (name, value)
-SELECT 'Name', 'ИП Герасимов Алексей Владимирович'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'Name');
+SELECT 'CompanyName', 'ИП Герасимов Алексей Владимирович'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyName');
 
 INSERT INTO info (name, value)
 SELECT 'PostCode', '248000'
@@ -39,16 +39,16 @@ SELECT 'City', 'Калуга'
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'City');
 
 INSERT INTO info (name, value)
-SELECT 'StreetAddress', 'ул. Первомайская 18-7'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'StreetAddress');
+SELECT 'Address', 'ул. Первомайская 18-7'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'Address');
 
 INSERT INTO info (name, value)
-SELECT 'PhoneNumber', '+7(910)911-3877'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'PhoneNumber');
+SELECT 'CompanyPhone', '+7(910)911-3877'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyPhone');
 
 INSERT INTO info (name, value)
-SELECT 'ContactEmail', 'alextechnologies@gmail.com'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'ContactEmail');
+SELECT 'CompanyEmail', 'alextechnologies@gmail.com'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyEmail');
 
 INSERT INTO info (name, value)
 SELECT 'AdminEmail', 'juryger@gmail.com'

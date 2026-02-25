@@ -178,13 +178,12 @@ const titleSubtotal = "Итого:";
       //console.log("🚩 ~ CartContent ~ scroll position before repaint:", scrollTop);
 
       this.cleanupCartContent();
-      cartItems.forEach(x => {
-        //console.log("~ CartContent ~ syncCartContentFromStore", x);
+      cartItems.forEach(item => {
         const divAlert = document.createElement("li");
         divAlert.classList.add("flex", "p-2");
         this.cartContainerEl && this.cartContainerEl.appendChild(divAlert);
         if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
-          divAlert.innerHTML = createCartItemMarkup(x, this.discountIndex, this.productColors, this.updateCartCommandName, this.removeCartCommandName);
+          divAlert.innerHTML = createCartItemMarkup(item, this.discountIndex, this.productColors, this.updateCartCommandName, this.removeCartCommandName);
         }
       });
 
@@ -301,7 +300,6 @@ const titleSubtotal = "Итого:";
             updateCart({ ...existingItem, quantity: existingItem.quantity + quantity })
           } else {
             const colorItem = this.productColors.find(x => x.id === colorId);
-            console.log("🧪 ~ CartContent ~ onUpdateCart ~ colorItem", colorItem);
             addToCart({ 
               ...cartItem, 
               colorId, 

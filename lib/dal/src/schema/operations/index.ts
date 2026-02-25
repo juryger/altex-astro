@@ -37,7 +37,7 @@ export const guests = table(
     fullName: t.text("full_name").notNull(),
     email: t.text().notNull(),
     phone: t.text(),
-    compnayName: t.text("company_name"),
+    companyName: t.text("company_name"),
     address: t.text(),
     city: t.text(),
     postCode: t.text("post_code"),

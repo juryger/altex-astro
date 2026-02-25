@@ -6,6 +6,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "generate": "mjml ./src/templates/[!_]*.mjml -o /Users/iuriig/Sources/altex-astro/emails",
+    "xml": "cp ./src/xml/*.xml /Users/iuriig/Sources/altex-astro/emails",
     "build": "rm -rf dist && tsc -b .",
     "preview": "node --env-file=.env.development ./dist/index.js"
   },
