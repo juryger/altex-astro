@@ -3,6 +3,7 @@ import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalog from "./schema/catalog/index.js";
 import * as operations from "./schema/operations/index.js";
 import * as general from "./schema/general/index.js";
+import { sql } from "drizzle-orm";
 
 const createGeneralDb = (
   path: string | undefined,
@@ -16,12 +17,26 @@ const createGeneralDb = (
 
 const createOperationsDb = (
   path: string | undefined,
+  catalogPath?: string,
 ): BetterSQLite3Database<typeof operations> => {
   const clientOperations = new Database(path, {
     fileMustExist: true,
   });
   clientOperations.pragma("journal_mode = WAL");
-  return drizzle({ client: clientOperations, schema: operations });
+
+  if (catalogPath === undefined) {
+    return drizzle({ client: clientOperations, schema: operations });
+  }
+
+  const db = drizzle({
+    client: clientOperations,
+    schema: { ...operations, ...catalog },
+  });
+
+  const attachDatabase = `ATTACH DATABASE '${catalogPath}' AS catalog`;
+  db.run(sql.raw(attachDatabase));
+
+  return db;
 };
 
 const createCatalogDb = (
@@ -54,7 +69,6 @@ export {
 
 export type { SQLiteColumn, SQLiteTransaction } from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
-export { CompanyInfoKeys } from "../../domain/src/const/company-info.js";
 
 export {
   categories,

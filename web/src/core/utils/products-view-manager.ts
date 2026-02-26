@@ -1,6 +1,6 @@
 import { navigate } from "astro:transitions/client";
 import { DialogActionResult } from "../const";
-import { regexPageParams, regexSortParams } from "./regex";
+import { regexPageParams, regexSortParams } from "@/lib/domain";
 import {
   ProductsSortFields,
   SortOrder,

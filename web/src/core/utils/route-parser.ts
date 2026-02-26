@@ -1,6 +1,10 @@
 import type { Sorting, Paging, Filtering } from "@/lib/domain";
-import { FilterOperator } from "@/lib/domain";
-import { regexFilterParams, regexPageParams, regexSortParams } from "./regex";
+import {
+  FilterOperator,
+  regexFilterParams,
+  regexPageParams,
+  regexSortParams,
+} from "@/lib/domain";
 
 interface RouteParser {
   getCatalogSorting(): Sorting | undefined;

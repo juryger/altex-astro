@@ -68,11 +68,10 @@ const titleSubtotal = "Итого:";
   import type { Discount, CartItem } from "@/lib/domain";
   import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
   import { formatCurrency } from "@/web/src/core/utils/text-formatter";
-  import { regexTrue } from '@/web/src/core/utils/regex';
   import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import type { ProductColor } from '@/lib/domain';
-  import { NO_VALUE_ASSIGNED } from '@/lib/domain';
+  import { NO_VALUE_ASSIGNED, regexTrue } from '@/lib/domain';
 
   const CART_VIEW_INIT_TIMEOUT_MS = 300;
 
@@ -352,9 +351,9 @@ const titleSubtotal = "Итого:";
       this.discountedCostEl = getElementByDataAttribute(this, this.dataset.discounted_cost);
       this.fullCostEl = getElementByDataAttribute(this, this.dataset.full_cost);
       this.scrollContainerEl = this.getScrollContainerElement();
-      this.cartCheckoutEl = !this.dataset.is_checkout?.match(regexTrue) ? 
-      getButtonElementByName(this, this.dataset.cart_checkout) : 
-      null;
+      this.cartCheckoutEl = !this.dataset.is_checkout?.match(regexTrue) 
+        ? getButtonElementByName(this, this.dataset.cart_checkout)
+        : null;
 
       this.updateCartCommandName = this.assertDataAttributeValue(this.dataset.cart_update, "cart_update");
       this.removeCartCommandName = this.assertDataAttributeValue(this.dataset.cart_remove, "cart_remove");

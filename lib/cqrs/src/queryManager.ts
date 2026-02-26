@@ -38,7 +38,7 @@ const checkCache = async <T = any>(
   }
 
   console.log(
-    "~ queryManager ~ cache check result for key '%s': %o",
+    "~ queryManager ~ cache result for key '%s': %o",
     cacheInfo.key,
     result,
   );
@@ -70,11 +70,6 @@ function getQueryManager(): QueryManager {
         }
       }
 
-      console.log(
-        "~ queryManager ~ queryFn result for key '%s': %o",
-        cacheInfo?.key ?? "NA",
-        result,
-      );
       return result;
     },
   };

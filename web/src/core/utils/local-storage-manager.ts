@@ -1,5 +1,5 @@
 import { getDateHandler } from "./date-handler";
-import { regexTrue } from "./regex";
+import { regexTrue } from "@/lib/domain";
 
 type StateManagerFeatures = {
   checkCataloSyncRequired(expireHours: number): boolean;

@@ -7,6 +7,7 @@ import { DialogActionButtons } from "../../core/const";
 
 const dataFormCheckoutName = "form-checkout"
 const dataOrderConfirmCommandName = "order-confirm";
+const dataLoadingName = "loading";
 const dataCheckoutErrorDialogID = "cart-checkout-error-popup";
 const dataCheckoutErrorDetailsId = "cart-checkout-error-details";
 
@@ -26,14 +27,15 @@ const titleIncorrectPostCode = "Почтовый индеск должен со�
 const titleIncorrectTaxNumber = "ИНН должен состоять из 12 цифр";
 const titleConfirmOrder = "Подтвердить заказ";
 const titleErrorHeader = "Техническая неисправность";
-const titleErrorDetailsHeader = "Технические детали";
+const titleErrorDetailsHeader = "Детали";
 const titleErrorDetails = "Мы работает над выяснением причин."
-const titleCartCheckoutFailed = "При размещении заказа возникла техническая неисправность. Но не стоит беспокоиться, в ближайшее время мы пришлем подтверждение заказа на электронную почту.";
+const titleCartCheckoutFailed = "К сожалению у нас возникла техническая неисправность. Но не стоит беспокоиться, в ближайшее время мы пришлем подтверждение заказа на электронную почту.";
 ---
 
 <cart-checkout 
   data-form_checkout={dataFormCheckoutName}
   data-order_confirm={dataOrderConfirmCommandName}
+  data-loading={dataLoadingName}
   data-error_popup_id={dataCheckoutErrorDialogID}
   data-error_details_id={dataCheckoutErrorDetailsId}
 >
@@ -88,10 +90,13 @@ const titleCartCheckoutFailed = "При размещении заказа воз
               maxlength="6"/>
             <p class="validator-hint hidden">{titleIncorrectPostCode}</p>
           </fieldset>
-          <div class="col-span-2 flex justify-center">
+          <div class="col-span-2 flex justify-center items-center">
             <button name={dataOrderConfirmCommandName} class="btn btn-primary w-1/2 sm:w-1/3 rounded-md border border-transparent">
               {titleConfirmOrder}
             </button>
+            <div class="w-6">
+              <span id={dataLoadingName} class="loading loading-ring loading-xl text-primary ml-2 hidden"></span>
+            </div>
           </div>
         </div>      
       </form>
@@ -109,14 +114,11 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             alt="Fail logo"
           />
       </div>
-      <div class="grow content-center">
+      <div class="flex flex-col">
         <span>{titleCartCheckoutFailed}</span>
-        <div class="m-2">
-          <div tabindex="0" class="collapse collapse-arrow bg-base-100 border-base-300 border">
-            <div class="collapse-title font-semibold">{titleErrorDetailsHeader}</div>
-            <div class="collapse-content text-sm">
-              <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
-            </div>
+        <div class="font-semibold mt-2">{titleErrorDetailsHeader}</div>
+          <div class="text-sm border-0 rounded-sm bg-base-300 my-2.5 p-2.5 min-h-20 overflow-auto">
+            <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
           </div>
         </div>
       </div>
@@ -135,6 +137,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
     private storeCountUnsubscribe?: () => void;
     private formCartCheckoutEl: Element | null = null;
     private orderConfirmEl: Element | null = null;
+    private loadingEl: Element | null = null;
     private errorPopupEl: Element | null = null;
     private errorDetailsEl: Element | null = null;
     private orderConfirmHandler: any;
@@ -170,6 +173,8 @@ const titleCartCheckoutFailed = "При размещении заказа воз
         formEl?.reportValidity();
         if (!formEl || !formEl.checkValidity()) return;
 
+        (this.orderConfirmEl as HTMLInputElement).disabled = true;
+        (this.loadingEl as HTMLSpanElement).style.display = "block"; 
         await this.createOrder()
           .then((result) => {
             if (!result) {
@@ -185,6 +190,10 @@ const titleCartCheckoutFailed = "При размещении заказа воз
             console.error(errorMessage);
             if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = errorMessage;
             (this.errorPopupEl as HTMLDialogElement).showModal();
+          })
+          .finally(() => {
+            (this.orderConfirmEl as HTMLInputElement).disabled = false;
+            (this.loadingEl as HTMLSpanElement).style.display = "none"; 
           });
       }
     }
@@ -209,6 +218,7 @@ const titleCartCheckoutFailed = "При размещении заказа воз
     connectedCallback() {
       this.formCartCheckoutEl = getFormElementByName(this, this.dataset.form_checkout);
       this.orderConfirmEl = getButtonElementByName(this, this.dataset.order_confirm);
+      this.loadingEl = getElementById(this, this.dataset.loading); 
       this.errorPopupEl = getElementById(this, this.dataset.error_popup_id);
       this.errorDetailsEl = getElementById(this, this.dataset.error_details_id);
       this.subscribeToCountStore();

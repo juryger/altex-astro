@@ -2,7 +2,14 @@ import path from "path";
 import fs_sync from "fs";
 import fs from "fs/promises";
 import Handlebars from "handlebars";
-import { getErrorMessage, type Result } from "@/lib/domain";
+import type { Result } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  getErrorMessage,
+  regexTrue,
+  selectEnvironment,
+} from "@/lib/domain";
+import { getEmailTransport } from "./transport";
 
 // Values correspondes to template file names (*.html)
 enum EmailTemplates {
@@ -56,123 +63,127 @@ const prepareTemplate = async ({
   return applyTemplateParams({ content, params });
 };
 
-const sendEmail = async ({
-  to,
-  subject,
-  content,
-  xmlContent,
-}: {
-  to: string;
-  subject: string;
-  content: string;
-  xmlContent?: string;
-}): Promise<Result> => {
-  console.info("sendEmail", {
-    to,
-    subject,
-    content,
-    xmlContent,
-  });
-  return { status: "Ok" };
-};
-
 type EmailManager = {
   sendNewOrder: ({
+    from,
     toCustomer,
     toBackOffice,
     subject,
     templateParams,
   }: {
+    from: string;
     toCustomer: string;
     toBackOffice: string;
     subject: string;
     templateParams?: Record<string, any>;
   }) => Promise<Result>;
   sendFailure: ({
+    from,
     to,
     subject,
     templateParams,
   }: {
+    from: string;
     to: string;
     subject: string;
     templateParams?: Record<string, string>;
   }) => Promise<Result>;
 };
 
-const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
+const getEmailManager = (): EmailManager => {
+  const isTracingEnabled = regexTrue.test(
+    selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+  );
+  const transport = getEmailTransport();
   return {
     sendNewOrder: async ({
+      from,
       toCustomer,
       toBackOffice,
       subject,
       templateParams,
     }: {
+      from: string;
       toCustomer: string;
       toBackOffice: string;
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
-      console.log(
-        "🧪 ~ getEmailMananger ~ sendNewOrder, params:",
-        templateParams,
-      );
+      if (isTracingEnabled) {
+        console.log("🐾 ~ email service ~ New Order email: %o", {
+          toCustomer,
+          subject,
+          templateParams,
+        });
+      }
+
       try {
         const content = await prepareTemplate({
-          rootPath,
+          rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
           fileName: EmailTemplates.NewOrder,
           params: templateParams,
         });
 
-        await sendEmail({
+        const customerEmail = await transport.sendEmail({
+          from,
           to: toCustomer,
           subject,
           content,
         });
+        if (customerEmail.status !== "Ok") {
+          return { status: "Failed", error: customerEmail.error };
+        }
 
         const xmlContent = await prepareTemplate({
-          rootPath,
+          rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
           fileName: XmlTEmplates.NewOrder,
           params: templateParams,
         });
 
-        console.log(
-          "🧪 ~ getEmailMananger ~ sendNewOrder, xml attachment:",
-          xmlContent,
-        );
-
-        await sendEmail({
+        return await transport.sendEmail({
+          from,
           to: toBackOffice,
           subject,
           content,
-          xmlContent,
+          attachmentContent: xmlContent,
         });
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         console.error(
-          "Failed to send 'New Order' email, see more details below. %s",
+          "Cannot send 'New Order' email, see more details below. %s",
           errorMessage,
         );
         return { status: "Failed", error: new Error(errorMessage) };
       }
-      return { status: "Ok" };
     },
     sendFailure: async ({
+      from,
       to,
       subject,
       templateParams,
     }: {
+      from: string;
       to: string;
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
+      if (isTracingEnabled) {
+        console.log("🐾 ~ emailService ~ Failure email: %o", {
+          to,
+          subject,
+          templateParams,
+        });
+      }
+
       try {
         const content = await prepareTemplate({
-          rootPath,
+          rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
           fileName: EmailTemplates.Failure,
           params: templateParams,
         });
 
-        await sendEmail({
+        return await transport.sendEmail({
+          from,
           to,
           subject,
           content,
@@ -180,12 +191,11 @@ const getEmailManager = ({ rootPath }: { rootPath: string }): EmailManager => {
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         console.error(
-          "Failed to send 'Failurer' email, see more details below. %s",
+          "Cannot send 'Failurer' email, see more details below. %s",
           errorMessage,
         );
         return { status: "Failed", error: new Error(errorMessage) };
       }
-      return { status: "Ok" };
     },
   };
 };

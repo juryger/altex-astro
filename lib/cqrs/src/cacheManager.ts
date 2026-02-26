@@ -1,5 +1,10 @@
 import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
-import { getErrorMessage } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  getErrorMessage,
+  regexTrue,
+  selectEnvironment,
+} from "@/lib/domain";
 import {
   CACHE_ITEMS_LIMIT,
   CACHE_LOAD_RETRY_ATTEMPS,
@@ -33,31 +38,24 @@ class CacheManager implements BaseCacheManager {
   private cache: Map<string, CacheEntry<any>> = new Map();
   private evictionStrategy: CacheEvictionStrategy | undefined;
 
-  constructor(
-    evictionStrategy: CacheEvictionStrategy,
-    sizeLimit: number,
-    withTracing: boolean,
-  ) {
+  constructor(evictionStrategy: CacheEvictionStrategy, sizeLimit: number) {
     this.evictionStrategy = evictionStrategy;
     this.sizeLimit = sizeLimit;
-    this.withTracing = withTracing;
+    this.withTracing = regexTrue.test(
+      selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+    );
   }
 
   static instance({
     evictionStrategy = getMostRecentEvictionStrategy(),
     sizeLimit = CACHE_ITEMS_LIMIT,
-    withTracing = false,
   }: {
     evictionStrategy?: CacheEvictionStrategy;
     sizeLimit?: number;
     withTracing?: boolean;
   }) {
     if (!CacheManager.__instance) {
-      CacheManager.__instance = new CacheManager(
-        evictionStrategy,
-        sizeLimit,
-        withTracing,
-      );
+      CacheManager.__instance = new CacheManager(evictionStrategy, sizeLimit);
     }
     return CacheManager.__instance;
   }

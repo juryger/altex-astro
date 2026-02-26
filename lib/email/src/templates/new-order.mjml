@@ -69,9 +69,9 @@
         >
           <mj-image
             align="center"
-            src="http://localhost:4321/products/thumbnails/f0eced48-627b-49d4-8cc6-f2a90452c9a8.png"
-            href="http://localhost:4321/catalog/products/ZAMOFERR1323MEJO"
-            alt="product image"
+            src="{{companyWeb}}/products/thumbnails/{{this.uid}}.png"
+            href="{{companyWeb}}/catalog/products/{{this.slug}}"
+            alt="{{this.title}}"
             width="90px"
             height="auto"
             padding="0px 0px 0px 0px"

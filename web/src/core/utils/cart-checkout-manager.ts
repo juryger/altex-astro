@@ -14,7 +14,7 @@ import {
   fetchCompanyInfo,
   fetchCartCheckout,
 } from "@/lib/cqrs";
-import { CompanyInfoKeys } from "@/lib/dal/src";
+import { CompanyInfoKeys } from "@/lib/domain";
 import { EmailSubjects } from "../const/messages";
 
 interface CartCheckoutManager {
@@ -65,9 +65,8 @@ const sendNewOrderEmail = async (
     return { status: "Failed", error: companyInfo.error };
   }
 
-  const cartCheckoutData = await getQueryManager().fetch(
-    () => fetchCartCheckout(checkoutId),
-    getCacheInfo(CacheKeys.CartCheckout),
+  const cartCheckoutData = await getQueryManager().fetch(() =>
+    fetchCartCheckout(checkoutId),
   );
 
   if (cartCheckoutData.status !== "Ok") {
@@ -83,7 +82,7 @@ const sendNewOrderEmail = async (
     };
   }
 
-  const params = companyInfo.data && {
+  const params = {
     orderNo: `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`,
     orderSumValue: cartCheckoutData.data?.items.reduce(
       (acc, curr) => acc + curr.quantity * curr.price,
@@ -93,14 +92,13 @@ const sendNewOrderEmail = async (
     client: cartCheckoutData.data.guest,
   };
 
-  await emailManager.sendNewOrder({
+  return await emailManager.sendNewOrder({
+    from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
     toCustomer: cartCheckoutData.data?.guest?.email ?? "",
     toBackOffice: companyInfo.data[CompanyInfoKeys.CompanyEmail],
     subject: EmailSubjects.NewOrder,
-    templateParams: params,
+    templateParams: { ...companyInfo.data, ...params },
   });
-
-  return { status: "Ok" };
 };
 
 const sendFailureEmail = async (
@@ -123,20 +121,17 @@ const sendFailureEmail = async (
     };
   }
 
-  const emailResult = await emailManager.sendFailure({
+  return await emailManager.sendFailure({
+    from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
     to: companyInfo.data[CompanyInfoKeys.AdminEmail],
     subject: EmailSubjects.Failure,
-    templateParams: companyInfo.data && { failureDescription: message },
+    templateParams: { ...companyInfo.data, failureDescription: message },
   });
-
-  return { status: emailResult.status, error: emailResult.error };
 };
 
 function getCartCheckoutManager(): CartCheckoutManager {
   const commandManager = getCommandManager();
-  const emailManager = getEmailManager({
-    rootPath: import.meta.env.EMAIL_TEMPLATES_PATH,
-  });
+  const emailManager = getEmailManager();
   return {
     checkoutCart: async (
       items: Array<CartItem>,
@@ -186,7 +181,7 @@ function getCartCheckoutManager(): CartCheckoutManager {
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         console.error(
-          "~ cartManager ~ failed to checkout cart: ",
+          "~ cartManager ~ failed to checkout cart: %s",
           errorMessage,
         );
         result.status = "Failed";
@@ -195,7 +190,7 @@ function getCartCheckoutManager(): CartCheckoutManager {
         if (result.status !== "Ok") {
           const emailResult = await sendFailureEmail(
             emailManager,
-            `Failed to create new order based on the cart checkout, see details below. ${result.error}`,
+            `Failed to create new order based on the cart checkout for user ${guest?.uid ?? userUid}, see details below. ${result.error}`,
           );
           if (emailResult.error !== undefined) console.error(emailResult.error);
         }
