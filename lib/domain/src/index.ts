@@ -85,3 +85,4 @@ export {
   regexPageParams,
   regexFilterParams,
 } from "./helpers/regex";
+export { formatCurrency } from "./helpers/formatters";

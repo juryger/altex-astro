@@ -67,7 +67,7 @@ const titleSubtotal = "Итого:";
   import { $cart, $cartCost, $cartWhsCost1, $cartWhsCost2, addToCart, removeFromCart, updateCart } from "@/web/src/core/stores/cart-store";
   import type { Discount, CartItem } from "@/lib/domain";
   import { createCartItemMarkup } from "@/web/src/core/utils/cart-manager";
-  import { formatCurrency } from "@/web/src/core/utils/text-formatter";
+  import { formatCurrency } from "@/lib/domain";
   import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import type { ProductColor } from '@/lib/domain';

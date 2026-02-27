@@ -220,7 +220,7 @@
                           <tbody>
                             <tr>
                               <td align="left" style="font-size:0px;padding:10px 0px 10px 0px;word-break:break-word;">
-                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">Благодарим вас за размещение заказа на сайте <a href="{{companyWeb}}">↗АЛТЕХ</a>. В ближайшее время мы свяжемся с вами для уточнения деталей.</div>
+                                <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">Благодарим Вас за размещение заказа на сайте <a href="{{companyWeb}}">↗АЛТЕХ</a>. В ближайшее время мы свяжемся с Вами для уточнения деталей и подтверждения заказа.</div>
                               </td>
                             </tr>
                           </tbody>
@@ -296,8 +296,8 @@
                                               <tbody>
                                                 <tr>
                                                   <td style="width:90px;">
-                                                    <a href="{{companyWeb}}/catalog/products/{{this.slug}}" target="_blank">
-                                                      <img alt="{{this.title}}" src="{{companyWeb}}/products/thumbnails/{{this.uid}}.png" style="border:1px solid #e5e5e5;border-radius:10px;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="90" height="auto" />
+                                                    <a href="{{@root.companyWeb}}/catalog/products/{{this.productSlug}}" target="_blank">
+                                                      <img alt="{{this.productTitle}}" src="{{@root.companyWeb}}/products/thumbnails/{{this.productUid}}.png" style="border:1px solid #e5e5e5;border-radius:10px;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="90" height="auto" />
                                                     </a>
                                                   </td>
                                                 </tr>
@@ -322,7 +322,7 @@
                                       <tbody>
                                         <tr>
                                           <td align="left" style="font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;">
-                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:bold;line-height:1.5;text-align:left;color:#000000;">{{ this.title
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:bold;line-height:1.5;text-align:left;color:#000000;">{{ this.productTitle
           }}</div>
                                           </td>
                                         </tr>
@@ -352,8 +352,9 @@
                                     <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
                                       <tbody>
                                         <tr>
-                                          <td align="left" style="font-size:0px;padding:0px 10px 0px 10px;word-break:break-word;">
-                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ this.price }} руб.</div>
+                                          <td align="left" style="font-size:0px;padding:0px 10px 0px 0px;word-break:break-word;">
+                                            <div style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;font-weight:400;line-height:1.5;text-align:left;color:#000000;">{{ this.priceLocal
+          }}</div>
                                           </td>
                                         </tr>
                                       </tbody>

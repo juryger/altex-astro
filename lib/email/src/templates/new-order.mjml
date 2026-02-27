@@ -32,9 +32,9 @@
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
         <mj-text align="left" padding="10px 0px 10px 0px"
-          >Благодарим вас за размещение заказа на сайте
+          >Благодарим Вас за размещение заказа на сайте
           <a href="{{companyWeb}}">↗АЛТЕХ</a>. В ближайшее время мы свяжемся с
-          вами для уточнения деталей.</mj-text
+          Вами для уточнения деталей и подтверждения заказа.</mj-text
         >
       </mj-column>
     </mj-section>
@@ -69,9 +69,9 @@
         >
           <mj-image
             align="center"
-            src="{{companyWeb}}/products/thumbnails/{{this.uid}}.png"
-            href="{{companyWeb}}/catalog/products/{{this.slug}}"
-            alt="{{this.title}}"
+            src="{{@root.companyWeb}}/products/thumbnails/{{this.productUid}}.png"
+            href="{{@root.companyWeb}}/catalog/products/{{this.productSlug}}"
+            alt="{{this.productTitle}}"
             width="90px"
             height="auto"
             padding="0px 0px 0px 0px"
@@ -86,7 +86,7 @@
           padding="0px 0px 0px 0px"
         >
           <mj-text align="left" padding="0px 0px 0px 0px" font-weight="bold">{{
-            this.title
+            this.productTitle
           }}</mj-text>
           <mj-text
             align="left"
@@ -109,9 +109,9 @@
           width="20%"
           padding="0px 0px 0px 0px"
         >
-          <mj-text align="left" padding="0px 10px 0px 10px"
-            >{{ this.price }} руб.</mj-text
-          >
+          <mj-text align="left" padding="0px 10px 0px 0px">{{
+            this.priceLocal
+          }}</mj-text>
         </mj-column>
       </mj-section>
       <mj-raw>{{/each}}</mj-raw>

@@ -55,6 +55,9 @@ const getEmailTransport = (): EmailTransport => {
       attachmentContent?: string;
     }): Promise<Result> => {
       try {
+        console.log(
+          "🧪 ~ Email service ~ getting access token to connect to Gmail...",
+        );
         const accessToken = await oauth2Client.getAccessToken();
 
         const transport = nodemailer.createTransport({
@@ -71,6 +74,14 @@ const getEmailTransport = (): EmailTransport => {
             ),
             accessToken: accessToken.token,
           },
+          logger: isTracingEnabled,
+        } as SMTPTransport.Options);
+
+        const mailOptions = {
+          from,
+          to,
+          subject,
+          html: content,
           attachments:
             attachmentContent !== undefined
               ? [
@@ -80,14 +91,6 @@ const getEmailTransport = (): EmailTransport => {
                   },
                 ]
               : undefined,
-          logger: isTracingEnabled,
-        } as SMTPTransport.Options);
-
-        const mailOptions = {
-          from,
-          to,
-          subject,
-          html: content,
         };
 
         if (isTracingEnabled) {
@@ -96,12 +99,14 @@ const getEmailTransport = (): EmailTransport => {
             {
               mailOptions,
               content,
-              attachmentContent,
             },
             transport,
           );
         }
 
+        console.log(
+          "🧪 ~ Email service ~ sending email via Nodmail transport (gmail)",
+        );
         await transport.sendMail(mailOptions);
       } catch (error) {
         const errorMessage = getErrorMessage(error);

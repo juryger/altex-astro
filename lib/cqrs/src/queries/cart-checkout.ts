@@ -24,6 +24,7 @@ import type {
   CartCheckoutItem,
   GuestUser,
 } from "@/lib/domain";
+import { formatCurrency } from "@/lib/domain";
 
 type QueryResult = {
   cart_checkout: DBCartCheckout;
@@ -52,14 +53,17 @@ const mapQueryResultToDomainModel = (
           cartCheckoutId: x.cart_checkout_items.cartCheckoutId,
           productUid: x.cart_checkout_items.productUid,
           productTitle: x.products.title,
+          productSlug: x.products.slug,
           colorUid: x.cart_checkout_items.colorUid ?? undefined,
           colorTitle: x.colors?.title ?? NO_VALUE_ASSIGNED,
           quantity: x.cart_checkout_items.quantity,
           price: x.cart_checkout_items.price,
+          priceLocal: formatCurrency(x.cart_checkout_items.price),
         }) as CartCheckoutItem,
     ),
     guest: {
       id: data[0]?.guests?.id,
+      uid: data[0]?.guests?.uid,
       fullName: data[0]?.guests?.fullName,
       email: data[0]?.guests?.email,
       phone: data[0]?.guests?.phone ?? NO_VALUE_ASSIGNED,
@@ -68,7 +72,6 @@ const mapQueryResultToDomainModel = (
       city: data[0]?.guests?.city ?? NO_VALUE_ASSIGNED,
       postCode: data[0]?.guests?.postCode ?? NO_VALUE_ASSIGNED,
       taxNumber: data[0]?.guests?.taxNumber ?? NO_VALUE_ASSIGNED,
-      uid: data[0]?.guests?.uid,
     } as GuestUser,
     customer: undefined,
   };

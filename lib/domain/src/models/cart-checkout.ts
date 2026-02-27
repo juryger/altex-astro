@@ -13,10 +13,12 @@ const CartCheckoutItemSchema = z.object({
   cartCheckoutId: z.number(),
   productUid: z.string(),
   productTitle: z.string().optional(),
+  productSlug: z.string().optional(),
   colorUid: z.string().optional(),
   colorTitle: z.string().optional(),
   quantity: z.number(),
   price: z.number(),
+  priceLocal: z.string(),
 });
 
 export type CartCheckout = z.infer<typeof CartCheckoutSchema>;

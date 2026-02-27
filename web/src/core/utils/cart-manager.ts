@@ -3,7 +3,8 @@ import {
   type CartItem,
   type ProductColor,
 } from "@/lib/domain";
-import { formatCurrency, trimEnd } from "./text-formatter";
+import { trimEnd } from "./text-formatter";
+import { formatCurrency } from "@/lib/domain";
 
 const titleProductColor = "Цвет:";
 const titleProductQuantity = "Количество:";

@@ -9,7 +9,7 @@ import { extractUrlParam } from '@/web/src/core/utils/url-parser';
 const orderNumber = extractUrlParam(new URL(Astro.request.url), "order", "string"); 
 console.log("🛠️ ~ Cart checkout confirmation page ~ request: %s", orderNumber);
 
-const titleOrderConfirmation = "Спасибо за раземещение заказа. В ближайшее время мы свяжимся с Вами по указанном email адресу для уточнения деталей.";
+const titleOrderConfirmation = "Спасибо за раземещение заказа. В ближайшее время мы свяжемся с Вами по указанном email адресу для уточнения деталей.";
 const titleOrderReference = "Идентификатор заказа";
 ---
 
