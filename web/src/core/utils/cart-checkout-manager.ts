@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import type { CartItem, GuestUser, Result } from "@/lib/domain";
-import { getErrorMessage } from "@/lib/domain";
+import { formatCurrency, getErrorMessage } from "@/lib/domain";
 import { OrderTypes } from "@/web/src/core/const";
 import { getEmailManager, type EmailManager } from "@/lib/email";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
@@ -82,12 +82,15 @@ const sendNewOrderEmail = async (
     };
   }
 
+  const orderNo = `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`;
+  const orderSum = cartCheckoutData.data?.items.reduce(
+    (acc, curr) => acc + curr.quantity * curr.price,
+    0,
+  );
   const params = {
-    orderNo: `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`,
-    orderSumValue: cartCheckoutData.data?.items.reduce(
-      (acc, curr) => acc + curr.quantity * curr.price,
-      0,
-    ),
+    orderNo,
+    orderSum,
+    orderSumLocal: formatCurrency(orderSum),
     items: cartCheckoutData.data.items,
     client: cartCheckoutData.data.guest,
   };
@@ -96,7 +99,7 @@ const sendNewOrderEmail = async (
     from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
     toCustomer: cartCheckoutData.data?.guest?.email ?? "",
     toBackOffice: companyInfo.data[CompanyInfoKeys.CompanyEmail],
-    subject: EmailSubjects.NewOrder,
+    subject: `${EmailSubjects.NewOrder} #${orderNo}`,
     templateParams: { ...companyInfo.data, ...params },
   });
 };

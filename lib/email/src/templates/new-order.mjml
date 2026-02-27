@@ -126,7 +126,7 @@
     >
       <mj-column border="none" vertical-align="top" padding="0px 20px 0px 20px">
         <mj-text align="right" padding="10px 0px 10px 0px"
-          >Итого: <b>{{ orderSumValue }} руб.</b></mj-text
+          >Итого: <b>{{ orderSumLocal }}.</b></mj-text
         >
       </mj-column>
     </mj-section>

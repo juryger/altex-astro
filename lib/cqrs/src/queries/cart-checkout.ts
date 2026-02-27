@@ -66,12 +66,34 @@ const mapQueryResultToDomainModel = (
       uid: data[0]?.guests?.uid,
       fullName: data[0]?.guests?.fullName,
       email: data[0]?.guests?.email,
-      phone: data[0]?.guests?.phone ?? NO_VALUE_ASSIGNED,
-      companyName: data[0]?.guests?.companyName ?? NO_VALUE_ASSIGNED,
-      address: data[0]?.guests?.address ?? NO_VALUE_ASSIGNED,
-      city: data[0]?.guests?.city ?? NO_VALUE_ASSIGNED,
-      postCode: data[0]?.guests?.postCode ?? NO_VALUE_ASSIGNED,
-      taxNumber: data[0]?.guests?.taxNumber ?? NO_VALUE_ASSIGNED,
+      phone:
+        data[0]?.guests?.phone !== undefined && data[0]?.guests?.phone !== null
+          ? data[0]?.guests?.phone
+          : NO_VALUE_ASSIGNED,
+      companyName:
+        data[0]?.guests?.companyName !== undefined &&
+        data[0]?.guests?.companyName !== null
+          ? data[0]?.guests?.companyName
+          : NO_VALUE_ASSIGNED,
+      address:
+        data[0]?.guests?.address !== undefined &&
+        data[0]?.guests?.address !== null
+          ? data[0]?.guests?.address
+          : NO_VALUE_ASSIGNED,
+      city:
+        data[0]?.guests?.city !== undefined && data[0]?.guests?.city !== null
+          ? data[0]?.guests?.city
+          : NO_VALUE_ASSIGNED,
+      postCode:
+        data[0]?.guests?.postCode !== undefined &&
+        data[0]?.guests?.postCode !== null
+          ? data[0]?.guests?.postCode
+          : NO_VALUE_ASSIGNED,
+      taxNumber:
+        data[0]?.guests?.taxNumber !== undefined &&
+        data[0]?.guests?.taxNumber !== null
+          ? data[0]?.guests?.taxNumber
+          : NO_VALUE_ASSIGNED,
     } as GuestUser,
     customer: undefined,
   };
