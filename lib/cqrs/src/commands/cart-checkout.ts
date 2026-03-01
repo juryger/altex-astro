@@ -14,12 +14,6 @@ export async function checkoutCart(
   );
   const discountIndex =
     discounts.findLastIndex((x) => cartSum >= x.fromSum) ?? 0;
-  console.log(
-    "🧪 ~ command:checkoutCart ~ summ: %i, discount: %i",
-    cartSum,
-    discountIndex,
-  );
-
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );

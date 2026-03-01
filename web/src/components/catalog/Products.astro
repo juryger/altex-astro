@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import type { Product, Catalog, PageResult, Paging, Sorting, Filtering } from "@/lib/domain";
+import type { Product, Catalog, PagingResult, Paging, Sorting, Filtering } from "@/lib/domain";
 import { SortOrder, ProductsSortFields } from "@/lib/domain";
 import ProductCard from "./ProductCard.astro";
 import { loadProducts, type ProductCollectionFilter } from "@/web/src/core/content-loaders/products-loader";
@@ -24,7 +24,7 @@ const sessionManager = getSessionManager(Astro.session);
 const productsView = await sessionManager.getProductsView();
 
 let hasDataLoadError = false;
-let products: PageResult<Product> | undefined = undefined;
+let products: PagingResult<Product> | undefined = undefined;
 try {
   products = await loadProducts(import.meta.env.PUBLIC_API_BASE_URL, {
     categorySlug,

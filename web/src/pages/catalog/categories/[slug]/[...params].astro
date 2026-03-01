@@ -11,27 +11,28 @@ import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 import { getQueryManager, fetchMeasurementUnits, fetchDiscounts, fetchProductColors } from '@/lib/cqrs';
 import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain';
-import { CacheKeys, getCacheInfo } from '@/lib/domain';
+import { CacheKeys, EnvironmentNames, getCacheInfo, regexTrue, selectEnvironment } from '@/lib/domain';
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 
 const { slug, params } = Astro.params;
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 const parseRouteParams = (): { 
   sorting: Sorting | undefined, 
   paging: Paging | undefined,
   filtering: Filtering[]
 } => {
-  console.log("🌎 ~ Category page ~ slug %s, params: %o", slug, params);
-  const routeParser = getRouteParser(params);
-  
+  const routeParser = getRouteParser(params);  
   const sorting = routeParser.getCatalogSorting();
-  console.log("🌎 ~ Categories page ~ parsed sort", sorting);
-
-  let paging = routeParser.getCatalogPaging();
-  console.log("🌎 ~ Category page ~ parse paging", paging);
-
+  const paging = routeParser.getCatalogPaging();
   const filtering = routeParser.getCatalogFiltering();  
-  console.log("🌎 ~ Category page ~ parsed filters", filtering);
+
+  withTracing && console.log("🐾 ~ Category page ~ slug %s, params: %o", slug, params);
+  withTracing && console.log("🐾 ~ Categories page ~ parsed sort", sorting);
+  withTracing && console.log("🐾 ~ Category page ~ parse paging", paging);
+  withTracing && console.log("🌎 ~ Category page ~ parsed filters", filtering);
 
   return { sorting, paging, filtering };
 }
@@ -54,7 +55,7 @@ const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
   ]).then((data) => {        
     if (data.some(x => x.error !== undefined)) {
       const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
-      console.error("~ Category page ~", errorMessage);  
+      console.error("🛑 ~ Category page ~", errorMessage);  
       return undefined;
     }
     return {
@@ -63,7 +64,7 @@ const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
       productColors: data[2].data ?? [],
     }
   }).catch((err) => { 
-    console.error("~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+    console.error("🛑 ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
     return undefined;
   });
 }
@@ -82,7 +83,7 @@ const sessionManager = getSessionManager(Astro.session);
 const category = await fetchCategory();
 if (category === undefined) {
   sessionManager.resetActiveCatalogItem();
-  return Astro.redirect("/404");
+  return Astro.redirect("/500");
 }
 
 const references = await fetchCatalogReferences();
@@ -109,7 +110,6 @@ const newProductsView = {
     : productsView?.filtering,
 };
 sessionManager.setProductsView(newProductsView);
-//console.log("🌎 ~ Categories page ~ set Session['productsView']", newProductsView);
 ---
 
 <BaseLayout title=`Каталог - ${category?.title}`>

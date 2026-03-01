@@ -3,7 +3,9 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import google from "googleapis";
 import {
   EnvironmentNames,
+  FailedResult,
   getErrorMessage,
+  OkResult,
   regexTrue,
   selectEnvironment,
   type Result,
@@ -26,7 +28,7 @@ type EmailTransport = {
 };
 
 const getEmailTransport = (): EmailTransport => {
-  const isTracingEnabled = regexTrue.test(
+  const withTracing = regexTrue.test(
     selectEnvironment(EnvironmentNames.ENABLE_TRACING),
   );
 
@@ -55,11 +57,11 @@ const getEmailTransport = (): EmailTransport => {
       attachmentContent?: string;
     }): Promise<Result> => {
       try {
-        console.log(
-          "🧪 ~ Email service ~ getting access token to connect to Gmail...",
-        );
+        withTracing &&
+          console.log(
+            "🐾 ~ Email service ~ getting access token to connect to Gmail...",
+          );
         const accessToken = await oauth2Client.getAccessToken();
-
         const transport = nodemailer.createTransport({
           service: "gmail",
           auth: {
@@ -74,7 +76,7 @@ const getEmailTransport = (): EmailTransport => {
             ),
             accessToken: accessToken.token,
           },
-          logger: isTracingEnabled,
+          logger: withTracing,
         } as SMTPTransport.Options);
 
         const mailOptions = {
@@ -92,8 +94,7 @@ const getEmailTransport = (): EmailTransport => {
                 ]
               : undefined,
         };
-
-        if (isTracingEnabled) {
+        withTracing &&
           console.log(
             "🐾 ~ nodemailer ~ email: %o via transport: %o",
             {
@@ -102,22 +103,16 @@ const getEmailTransport = (): EmailTransport => {
             },
             transport,
           );
-        }
-
-        console.log(
-          "🧪 ~ Email service ~ sending email via Nodmail transport (gmail)",
-        );
         await transport.sendMail(mailOptions);
+        return OkResult();
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         console.error(
-          "Failed to send email using nodemail transport: %s",
+          "Failed to send email using Nodemail transport: %s",
           errorMessage,
         );
-        return { status: "Failed", error: new Error(errorMessage) };
+        return FailedResult(new Error(errorMessage));
       }
-
-      return { status: "Ok" };
     },
   };
 };

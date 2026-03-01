@@ -1,4 +1,4 @@
-import type { PageResult, CategoryCache, Category } from "@/lib/domain";
+import type { PagingResult, CategoryCache, Category } from "@/lib/domain";
 import { CategoriesSortFields, SortOrder } from "@/lib/domain";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 import { clientDb } from "../db/indexed-db";
@@ -15,18 +15,17 @@ type CatalogSyncHandler = {
 const getCatalogSyncHandler = (config: {
   baseUrl: string;
 }): CatalogSyncHandler => {
-  //console.log("🛠️ ~ catalog-sync-handler ~ config: ", config);
   return {
     async syncCategories() {
-      const response = await fetch(
-        new URL(
-          `${config.baseUrl}/${APIEndpointNames.Categories}?
-           ${APISearchParamNames.SortField}=${CategoriesSortFields.Id}&
-           ${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&
-           ${APISearchParamNames.Page}=0&
-           ${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
-        ),
+      const apiUrl = new URL(
+        `${config.baseUrl}/${APIEndpointNames.Categories}?${APISearchParamNames.SortField}=${CategoriesSortFields.Id}&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
       );
+      console.log(
+        "🛠️ ~ catalog-sync-handler ~ config: %o, api url: %s",
+        config,
+        apiUrl,
+      );
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         response.text().then((errorMessage) => {
           throw new Error(
@@ -36,7 +35,7 @@ const getCatalogSyncHandler = (config: {
       }
 
       var data = await response.json();
-      var dataCache = (data as PageResult<Category>).items.map(
+      var dataCache = (data as PagingResult<Category>).items.map(
         (x) =>
           ({
             id: x.id,

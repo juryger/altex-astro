@@ -1,6 +1,11 @@
 import crypto from "crypto";
 import type { CartItem, GuestUser, Result } from "@/lib/domain";
-import { formatCurrency, getErrorMessage } from "@/lib/domain";
+import {
+  FailedResult,
+  formatCurrency,
+  getErrorMessage,
+  OkResult,
+} from "@/lib/domain";
 import { OrderTypes } from "@/web/src/core/const";
 import { getEmailManager, type EmailManager } from "@/lib/email";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
@@ -44,7 +49,7 @@ const saveCartCheckout = async (
   );
 
   if (discounts.error !== undefined) {
-    return { status: "Failed", error: discounts.error };
+    return FailedResult(discounts.error);
   }
 
   return await commandManager.mutate<number>(() =>
@@ -56,80 +61,83 @@ const sendNewOrderEmail = async (
   emailManager: EmailManager,
   checkoutId: number,
 ): Promise<Result> => {
-  const companyInfo = await getQueryManager().fetch(
-    () => fetchCompanyInfo(),
-    getCacheInfo(CacheKeys.CompanyInfo),
-  );
-
-  if (companyInfo.status !== "Ok") {
-    return { status: "Failed", error: companyInfo.error };
-  }
-
-  const cartCheckoutData = await getQueryManager().fetch(() =>
-    fetchCartCheckout(checkoutId),
-  );
-
-  if (cartCheckoutData.status !== "Ok") {
-    return { status: "Failed", error: cartCheckoutData.error };
-  }
-
-  if (!companyInfo.data || !cartCheckoutData.data) {
-    return {
-      status: "Failed",
-      error: new Error(
-        `Failed to retrieve company and cart data for checkout ID: ${checkoutId}`,
-      ),
-    };
-  }
-
-  const orderNo = `${OrderTypes.Web}-${cartCheckoutData.data.root.id}`;
-  const orderSum = cartCheckoutData.data?.items.reduce(
-    (acc, curr) => acc + curr.quantity * curr.price,
-    0,
-  );
-  const params = {
-    orderNo,
-    orderSum,
-    orderSumLocal: formatCurrency(orderSum),
-    items: cartCheckoutData.data.items,
-    client: cartCheckoutData.data.guest,
-  };
-
-  return await emailManager.sendNewOrder({
-    from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
-    toCustomer: cartCheckoutData.data?.guest?.email ?? "",
-    toBackOffice: companyInfo.data[CompanyInfoKeys.CompanyEmail],
-    subject: `${EmailSubjects.NewOrder} #${orderNo}`,
-    templateParams: { ...companyInfo.data, ...params },
-  });
+  return Promise.all([
+    getQueryManager().fetch(
+      () => fetchCompanyInfo(),
+      getCacheInfo(CacheKeys.CompanyInfo),
+    ),
+    getQueryManager().fetch(() => fetchCartCheckout(checkoutId)),
+  ])
+    .then(([companyInfo, cartCheckout]) => {
+      if (!companyInfo.ok || companyInfo.data === undefined) {
+        return FailedResult(
+          companyInfo.error ??
+            new Error(
+              "Could not obtain company info for email placeholders substitution.",
+            ),
+        );
+      }
+      if (!cartCheckout.ok || cartCheckout.data === undefined) {
+        return FailedResult(
+          cartCheckout.error ??
+            new Error(
+              `Could not obtain cart items for checkout with ID #${checkoutId}.`,
+            ),
+        );
+      }
+      const orderNo = `${OrderTypes.Web}-${cartCheckout.data.root.id}`;
+      const orderSum = cartCheckout.data?.items.reduce(
+        (acc, curr) => acc + curr.quantity * curr.price,
+        0,
+      );
+      const params = {
+        orderNo,
+        orderSum,
+        orderSumLocal: formatCurrency(orderSum),
+        items: cartCheckout.data.items,
+        client: cartCheckout.data.guest,
+      };
+      return emailManager.sendNewOrder({
+        from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
+        toCustomer: cartCheckout.data?.guest?.email ?? "",
+        toBackOffice: companyInfo.data[CompanyInfoKeys.CompanyEmail],
+        subject: `${EmailSubjects.NewOrder} #${orderNo}`,
+        templateParams: { ...companyInfo.data, ...params },
+      });
+    })
+    .then((result) => {
+      return !result.ok
+        ? FailedResult(
+            result.error ?? new Error("Failed to send new order email"),
+          )
+        : OkResult();
+    })
+    .catch((err) => FailedResult(err));
 };
 
 const sendFailureEmail = async (
   emailManager: EmailManager,
   message: string,
 ): Promise<Result> => {
-  const companyInfo = await getQueryManager().fetch(
-    () => fetchCompanyInfo(),
-    getCacheInfo(CacheKeys.CompanyInfo),
-  );
-
-  if (companyInfo.status !== "Ok") {
-    return { status: "Failed", error: companyInfo.error };
-  }
-
-  if (!companyInfo.data) {
-    return {
-      status: "Failed",
-      error: new Error("Unable to retrieve company data"),
-    };
-  }
-
-  return await emailManager.sendFailure({
-    from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
-    to: companyInfo.data[CompanyInfoKeys.AdminEmail],
-    subject: EmailSubjects.Failure,
-    templateParams: { ...companyInfo.data, failureDescription: message },
-  });
+  return getQueryManager()
+    .fetch(() => fetchCompanyInfo(), getCacheInfo(CacheKeys.CompanyInfo))
+    .then((companyInfo) => {
+      if (!companyInfo.ok || companyInfo.data === undefined) {
+        return FailedResult(
+          companyInfo.error ??
+            new Error(
+              "Could not obtain company info for email placeholders substitution.",
+            ),
+        );
+      }
+      return emailManager.sendFailure({
+        from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
+        to: companyInfo.data[CompanyInfoKeys.AdminEmail],
+        subject: EmailSubjects.Failure,
+        templateParams: { ...companyInfo.data, failureDescription: message },
+      });
+    })
+    .catch((err) => FailedResult(err));
 };
 
 function getCartCheckoutManager(): CartCheckoutManager {
@@ -141,64 +149,49 @@ function getCartCheckoutManager(): CartCheckoutManager {
       guest?: GuestUser,
       userUid?: string,
     ): Promise<Result<string>> => {
-      const result: Result<string> = { status: "Ok" };
+      let guestUid: string | undefined = undefined;
       try {
-        let guestUid: string | undefined = undefined;
         if (guest) {
           guestUid = crypto.randomUUID();
           guest.uid = guestUid;
-          const guestResult = await saveGuestUser(commandManager, guest);
-          if (guestResult.status !== "Ok") {
-            result.status = "Failed";
-            result.error = guestResult.error;
-            return result;
+          const result = await saveGuestUser(commandManager, guest);
+          if (!result.ok) {
+            return FailedResult(
+              result.error ??
+                new Error("Failed to save guest user for checkout"),
+            );
           }
         }
 
-        const cartCheckoutResult = await saveCartCheckout(
+        const cartCheckout = await saveCartCheckout(
           commandManager,
           items,
           userUid,
           guestUid,
         );
-        if (
-          cartCheckoutResult.status !== "Ok" ||
-          cartCheckoutResult.data === undefined
-        ) {
-          result.status = "Failed";
-          result.error = cartCheckoutResult.error;
-          return result;
+        if (!cartCheckout.ok || cartCheckout.data === undefined) {
+          return FailedResult(
+            cartCheckout.error ?? new Error("Failed to complete cart checkout"),
+          );
         }
 
-        const emailResult = await sendNewOrderEmail(
-          emailManager,
-          cartCheckoutResult.data,
-        );
-        if (emailResult.status !== "Ok") {
-          result.status = "Failed";
-          result.error = emailResult.error;
-          return result;
-        }
+        sendNewOrderEmail(emailManager, cartCheckout.data).then((result) => {
+          if (!result.ok) {
+            const errorMessage = `Failed to send new order email, see error details below. ${result.error}`;
+            console.error(errorMessage);
+            sendFailureEmail(emailManager, errorMessage);
+          }
+        });
 
-        result.data = `${OrderTypes.Web}-${cartCheckoutResult.data}`;
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
+        return OkResult(`${OrderTypes.Web}-${cartCheckout.data}`);
+      } catch (err) {
+        const errorMessage = getErrorMessage(err);
         console.error(
           "~ cartManager ~ failed to checkout cart: %s",
           errorMessage,
         );
-        result.status = "Failed";
-        result.error = new Error(errorMessage);
-      } finally {
-        if (result.status !== "Ok") {
-          const emailResult = await sendFailureEmail(
-            emailManager,
-            `Failed to create new order based on the cart checkout for user ${guest?.uid ?? userUid}, see details below. ${result.error}`,
-          );
-          if (emailResult.error !== undefined) console.error(emailResult.error);
-        }
+        return FailedResult(new Error(errorMessage));
       }
-      return result;
     },
   };
 }

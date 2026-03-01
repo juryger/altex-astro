@@ -1,4 +1,10 @@
-import { getErrorMessage, type CacheInfo, type Result } from "@/lib/domain";
+import {
+  FailedResult,
+  getErrorMessage,
+  OkResult,
+  type CacheInfo,
+  type Result,
+} from "@/lib/domain";
 import { CacheManager } from "./cacheManager";
 
 interface QueryManager {
@@ -13,36 +19,22 @@ const checkCache = async <T = any>(
   cacheInfo: CacheInfo,
   queryFn: () => Promise<T>,
 ): Promise<Result<T>> => {
-  console.log("~ queryManager ~ try cache for key '%s':", cacheInfo.key);
-  const cacheResult = await cacheManager.get(cacheInfo.key);
-  const result: Result<T> = {
-    status: cacheResult.error === undefined ? "Ok" : "Failed",
-    data: cacheResult.value,
-    error: cacheResult.error,
-  };
-
-  if (cacheResult.set !== undefined) {
+  const cache = await cacheManager.get(cacheInfo.key);
+  if (cache.set !== undefined && cache.reset !== undefined) {
     try {
-      console.log(
-        "~ queryManager ~ cache is missed for '%s', run query and add to cache",
-        cacheInfo.key,
-      );
-      result.data = await queryFn();
-      cacheResult.set(result.data, cacheInfo.staleTimeMs);
+      const data = await queryFn();
+      cache.set(data, cacheInfo.staleTimeMs);
+      return OkResult(data);
     } catch (error) {
+      cache.reset();
       const errorMessage = getErrorMessage(error);
       console.error("~ queryManager ~ %s", errorMessage);
-      result.status = "Failed";
-      result.error = new Error(errorMessage);
+      return FailedResult(new Error(errorMessage));
     }
   }
-
-  console.log(
-    "~ queryManager ~ cache result for key '%s': %o",
-    cacheInfo.key,
-    result,
-  );
-  return result;
+  return cache.error === undefined
+    ? OkResult(cache.value)
+    : FailedResult(cache.error);
 };
 
 function getQueryManager(): QueryManager {
@@ -52,28 +44,19 @@ function getQueryManager(): QueryManager {
       queryFn: () => Promise<T>,
       cacheInfo?: CacheInfo,
     ) => {
-      let result: Result<T> = { status: "Ok" };
       if (cacheInfo !== undefined) {
-        result = await checkCache(cacheManager, cacheInfo, queryFn);
-        if (result.status !== "Ok") return result;
+        const cache = await checkCache(cacheManager, cacheInfo, queryFn);
+        return cache;
       }
-
-      if (result.data === undefined) {
-        try {
-          console.log("~ queryManager ~ run query bypassing cache");
-          result.data = await queryFn();
-        } catch (error) {
-          const errorMessage = getErrorMessage(error);
-          console.error("~ queryManager ~ %s", errorMessage);
-          result.status = "Failed";
-          result.error = new Error(errorMessage);
-        }
+      try {
+        return OkResult(await queryFn());
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        console.error("~ queryManager ~ %s", errorMessage);
+        return FailedResult(new Error(errorMessage));
       }
-
-      return result;
     },
   };
 }
 
-export type { QueryManager };
-export { getQueryManager };
+export { type QueryManager, getQueryManager };

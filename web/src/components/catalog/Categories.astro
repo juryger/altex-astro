@@ -4,7 +4,7 @@ export const prerender = false;
 import CategoryCard from "./CategoryCard.astro";
 import { CategoriesViewMode } from "@/web/src/core/const";
 import { loadCategories } from "@/web/src/core/content-loaders/categories-loader";
-import type { Category, Sorting, PageResult, Paging } from "@/lib/domain";
+import type { Category, Sorting, PagingResult, Paging } from "@/lib/domain";
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 import { defaultPaging } from "@/web/src/core/utils/paging";
 
@@ -21,7 +21,7 @@ interface Props {
 const { parentSlug, sorting = defaultSorting, paging = defaultPaging } = Astro.props;
 
 let hasDataLoadError = false;
-let categories: PageResult<Category> | undefined = undefined;
+let categories: PagingResult<Category> | undefined = undefined;
 try {
   categories = await loadCategories(import.meta.env.PUBLIC_API_BASE_URL, {
     skipParentMatch: false,

@@ -18,6 +18,7 @@ type CacheResult<T = any> = {
   value?: T;
   error?: Error;
   set?: (value: T, staleTimeMs: number) => void;
+  reset?: () => void;
 };
 
 interface BaseCacheManager {
@@ -68,14 +69,13 @@ class CacheManager implements BaseCacheManager {
       acquireTimestamp: undefined,
       staleTimestamp: currDate.getTime() + staleTimeMs,
     } as CacheEntry<T>);
-    if (this.withTracing) {
+    this.withTracing &&
       console.log(
         "🐾 ~ cacheManager ~ set key '%s' with value %o, length %i",
         key,
         value,
         this.cache.size,
       );
-    }
   }
 
   private isExpired<T = any>(value: CacheEntry<T>): boolean {
@@ -110,9 +110,8 @@ class CacheManager implements BaseCacheManager {
 
   private invalidate(key: string) {
     if (!this.cache.has(key)) return;
-    if (this.withTracing) {
+    this.withTracing &&
       console.log("🐾 ~ cacheManager ~ invalidating the item with key:", key);
-    }
     this.cache.delete(key);
   }
 
@@ -182,12 +181,12 @@ class CacheManager implements BaseCacheManager {
   }
 
   async get<T = any>(key: string): Promise<CacheResult<T>> {
-    if (this.withTracing) {
+    this.withTracing &&
       console.log(
         "🐾 ~ cacheManager ~ obtaining cache item with key '%s'",
         key,
       );
-    }
+
     const cacheEntry = this.cache.has(key)
       ? (this.cache.get(key) as CacheEntry<T>)
       : undefined;
@@ -205,6 +204,7 @@ class CacheManager implements BaseCacheManager {
             ? (value: T, staleTimeMs: number) =>
                 this.set<T>(key, value, staleTimeMs)
             : undefined,
+        reset: error === undefined ? () => this.invalidate(key) : undefined,
       } as CacheResult<T>;
     }
 
@@ -219,7 +219,7 @@ class CacheManager implements BaseCacheManager {
       } as CacheResult<T>;
     }
 
-    if (this.withTracing) {
+    this.withTracing &&
       console.log(
         "🐾 ~ cacheManager ~ get key '%s', expire on '%s'",
         key,
@@ -227,7 +227,7 @@ class CacheManager implements BaseCacheManager {
           ? new Date(cacheEntry.staleTimestamp).toLocaleString()
           : "NA",
       );
-    }
+
     return {
       value: cacheEntry.data,
     } as CacheResult<T>;
@@ -242,12 +242,12 @@ class CacheManager implements BaseCacheManager {
   }
 
   contains(key: string): boolean {
-    if (this.withTracing) {
+    this.withTracing &&
       console.log(
         "🐾 ~ cacheManager ~ checking that cache contains item with key '%s'",
         key,
       );
-    }
+
     let item = this.cache.has(key) ? this.cache.get(key) : undefined;
     if (item !== undefined && !this.isValid(item)) {
       this.invalidate(key);
@@ -280,13 +280,11 @@ class CacheManager implements BaseCacheManager {
 
   reset() {
     this.cache.clear();
-
-    if (this.withTracing) {
+    this.withTracing &&
       console.log(
         "🐾 ~ cacheManager ~ reset completed, the number of all items: %i",
         this.cache.size,
       );
-    }
   }
 
   terminate() {
@@ -294,5 +292,4 @@ class CacheManager implements BaseCacheManager {
   }
 }
 
-export { type CacheResult };
-export { CacheManager };
+export { type CacheResult, CacheManager };

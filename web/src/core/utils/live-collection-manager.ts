@@ -3,7 +3,17 @@ import { LiveCollectionNames as CollectionNames } from "../const";
 import type { LiveCollectionNames } from "../const";
 import type { CategoryCollectionFilter } from "../content-loaders/categories-loader";
 import type { ProductCollectionFilter } from "../content-loaders/products-loader";
-import type { Product, Category } from "@/lib/domain";
+import {
+  type Product,
+  type Category,
+  regexTrue,
+  selectEnvironment,
+  EnvironmentNames,
+} from "@/lib/domain";
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 const getEntryBySlug = async <T>(
   collection: LiveCollectionNames,
@@ -36,7 +46,8 @@ const getCollectionByFilter = async <T>(
 const getCategoriesList = async (
   filter: CategoryCollectionFilter,
 ): Promise<Category[] | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getCategoriesList", filter);
+  withTracing &&
+    console.log("🐾 ~ live-collection-manager ~ getCategoriesList", filter);
   const result = await getCollectionByFilter<Category>(
     CollectionNames.Categories,
     filter,
@@ -45,7 +56,8 @@ const getCategoriesList = async (
 };
 
 const getCategory = async (slug: string): Promise<Category | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getCategory", slug);
+  withTracing &&
+    console.log("🐾 ~ live-collection-manager ~ getCategory", slug);
   const result = await getEntryBySlug<Category>(
     CollectionNames.Categories,
     slug,
@@ -56,7 +68,8 @@ const getCategory = async (slug: string): Promise<Category | undefined> => {
 const getProductsList = async (
   filter: ProductCollectionFilter,
 ): Promise<Product[] | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getProductsList", filter);
+  withTracing &&
+    console.log("🐾 ~ live-collection-manager ~ getProductsList", filter);
   const result = await getCollectionByFilter<Product>(
     CollectionNames.Products,
     filter,
@@ -65,7 +78,7 @@ const getProductsList = async (
 };
 
 const getProduct = async (slug: string): Promise<Product | undefined> => {
-  console.log("⚡️ ~ live-collection-manager ~ getProduct", slug);
+  withTracing && console.log("🐾 ~ live-collection-manager ~ getProduct", slug);
   const result = await getEntryBySlug<Product>(CollectionNames.Products, slug);
   return result.value;
 };

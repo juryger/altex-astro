@@ -67,12 +67,13 @@ export { type ProductColor } from "./models/product-color";
 
 export { type Product, ProductSchema } from "./models/product";
 
-export type { Paging, PageResult } from "./models/paging";
-export { getEmptyPageResult } from "./models/paging";
+export type { Paging, PagingResult } from "./models/paging";
+export { EmptyPagingResult } from "./models/paging";
 
 export { type Sorting } from "./models/sorting";
 
 export type { Result } from "./models/result";
+export { OkResult, FailedResult } from "./models/result";
 
 export { selectEnvironment } from "./helpers/environment";
 export { constructNavigationPath } from "./helpers/navigation";

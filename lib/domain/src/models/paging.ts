@@ -3,7 +3,7 @@ type Paging = {
   pageSize: number;
 };
 
-type PageResult<T = any> = {
+type PagingResult<T = any> = {
   items: T[];
   pageInfo: {
     total: number;
@@ -13,7 +13,7 @@ type PageResult<T = any> = {
   };
 };
 
-function getEmptyPageResult<T = any>(): PageResult<T> {
+function EmptyPagingResult<T = any>(): PagingResult<T> {
   return {
     items: [],
     pageInfo: {
@@ -22,8 +22,8 @@ function getEmptyPageResult<T = any>(): PageResult<T> {
       pageSize: 0,
       hasMore: false,
     },
-  } as PageResult<T>;
+  } as PagingResult<T>;
 }
 
-export type { Paging, PageResult };
-export { getEmptyPageResult };
+export type { Paging, PagingResult };
+export { EmptyPagingResult };

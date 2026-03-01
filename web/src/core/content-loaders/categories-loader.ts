@@ -1,6 +1,6 @@
 import type { LiveLoader } from "astro/loaders";
 import { getErrorMessage } from "@/lib/domain";
-import type { Category, PageResult, Paging, Sorting } from "@/lib/domain";
+import type { Category, PagingResult, Paging, Sorting } from "@/lib/domain";
 import { APIEndpointNames, APISearchParamNames } from "../const";
 
 type CategoryCollectionFilter = {
@@ -17,7 +17,7 @@ type CategoryEntryFilter = {
 const loadCategories = async (
   baseUrl: string,
   filter: CategoryCollectionFilter | undefined,
-): Promise<PageResult<Category>> => {
+): Promise<PagingResult<Category>> => {
   const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Categories}`);
   if (filter !== undefined) {
     apiUrl.searchParams.set(

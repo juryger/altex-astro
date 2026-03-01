@@ -6,14 +6,13 @@ import {
   extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
 import { getQueryManager, fetchProducts } from "@/lib/cqrs";
-import type { Product, PageResult } from "@/lib/domain";
+import type { Product, PagingResult } from "@/lib/domain";
 import { CACHE_STALE_TIMEOUT_5MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  console.log("📍 ~ API-GET ~ products list ~ URL:", URL.parse(request.url));
-
+  //console.log("📍 ~ API-GET ~ products list ~ URL:", URL.parse(request.url));
   const url = URL.parse(request.url);
   const categorySlug =
     extractUrlParam(url, APISearchParamNames.Category, "string") ?? "";
@@ -21,7 +20,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const sorting = extractUrlSorting(url);
 
   const cacheKey = `${CacheKeys.Products}:parent:${categorySlug}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
-  const result = await getQueryManager().fetch<PageResult<Product>>(
+  const result = await getQueryManager().fetch<PagingResult<Product>>(
     () => fetchProducts(categorySlug, sorting, paging),
     getCacheInfo(cacheKey, CACHE_STALE_TIMEOUT_5MN),
   );

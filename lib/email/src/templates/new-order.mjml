@@ -93,13 +93,6 @@
             padding="0px 0px 0px 0px"
             font-size="12px"
             color="grey"
-            >Количество: {{ this.quantity }}</mj-text
-          >
-          <mj-text
-            align="left"
-            padding="0px 0px 0px 0px"
-            font-size="12px"
-            color="grey"
             >Цвет: {{ this.colorTitle }}</mj-text
           >
         </mj-column>
@@ -109,9 +102,9 @@
           width="20%"
           padding="0px 0px 0px 0px"
         >
-          <mj-text align="left" padding="0px 10px 0px 0px">{{
-            this.priceLocal
-          }}</mj-text>
+          <mj-text align="left" padding="0px 10px 0px 0px"
+            >{{ this.quantity }} x {{ this.priceLocal }}</mj-text
+          >
         </mj-column>
       </mj-section>
       <mj-raw>{{/each}}</mj-raw>

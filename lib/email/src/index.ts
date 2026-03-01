@@ -5,7 +5,9 @@ import Handlebars from "handlebars";
 import type { Result } from "@/lib/domain";
 import {
   EnvironmentNames,
+  FailedResult,
   getErrorMessage,
+  OkResult,
   regexTrue,
   selectEnvironment,
 } from "@/lib/domain";
@@ -91,7 +93,7 @@ type EmailManager = {
 };
 
 const getEmailManager = (): EmailManager => {
-  const isTracingEnabled = regexTrue.test(
+  const withTracing = regexTrue.test(
     selectEnvironment(EnvironmentNames.ENABLE_TRACING),
   );
   const transport = getEmailTransport();
@@ -109,52 +111,55 @@ const getEmailManager = (): EmailManager => {
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
-      if (isTracingEnabled) {
+      withTracing &&
         console.log("🐾 ~ email service ~ New Order email: %o", {
           toCustomer,
           subject,
           templateParams,
         });
-      }
 
-      try {
-        const content = await prepareTemplate({
+      return Promise.all([
+        prepareTemplate({
           rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
           fileName: EmailTemplates.NewOrder,
           params: templateParams,
-        });
-
-        const customerEmail = await transport.sendEmail({
-          from,
-          to: toCustomer,
-          subject,
-          content,
-        });
-        if (customerEmail.status !== "Ok") {
-          return { status: "Failed", error: customerEmail.error };
-        }
-
-        const xmlContent = await prepareTemplate({
+        }),
+        prepareTemplate({
           rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
           fileName: XmlTEmplates.NewOrder,
           params: templateParams,
-        });
-
-        return await transport.sendEmail({
-          from,
-          to: toBackOffice,
-          subject,
-          content,
-          attachmentContent: xmlContent,
-        });
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        console.error(
-          "Cannot send 'New Order' email, see more details below. %s",
-          errorMessage,
-        );
-        return { status: "Failed", error: new Error(errorMessage) };
-      }
+        }),
+      ])
+        .then(async ([emailContent, xmlContent]) => {
+          try {
+            const [customerEmail, backOfficeEmail] = await Promise.all([
+              transport.sendEmail({
+                from,
+                to: toCustomer,
+                subject,
+                content: emailContent,
+              }),
+              transport.sendEmail({
+                from,
+                to: toBackOffice,
+                subject,
+                content: emailContent,
+                attachmentContent: xmlContent,
+              }),
+            ]);
+            return !customerEmail.ok || !backOfficeEmail.ok
+              ? FailedResult(
+                  customerEmail.error ??
+                    backOfficeEmail.error ??
+                    new Error("Failed to send new order email."),
+                )
+              : OkResult();
+          } catch (error) {
+            const errorMessage = getErrorMessage(error);
+            return FailedResult(new Error(errorMessage));
+          }
+        })
+        .catch((error) => FailedResult(error));
     },
     sendFailure: async ({
       from,
@@ -167,35 +172,38 @@ const getEmailManager = (): EmailManager => {
       subject: string;
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
-      if (isTracingEnabled) {
+      withTracing &&
         console.log("🐾 ~ emailService ~ Failure email: %o", {
           to,
           subject,
           templateParams,
         });
-      }
-
-      try {
-        const content = await prepareTemplate({
-          rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
-          fileName: EmailTemplates.Failure,
-          params: templateParams,
-        });
-
-        return await transport.sendEmail({
-          from,
-          to,
-          subject,
-          content,
-        });
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        console.error(
-          "Cannot send 'Failurer' email, see more details below. %s",
-          errorMessage,
-        );
-        return { status: "Failed", error: new Error(errorMessage) };
-      }
+      return prepareTemplate({
+        rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
+        fileName: EmailTemplates.Failure,
+        params: templateParams,
+      })
+        .then(async (content) => {
+          try {
+            const result = await transport.sendEmail({
+              from,
+              to,
+              subject,
+              content,
+            });
+            return !result.ok
+              ? FailedResult(
+                  new Error(
+                    "Failed to send email to admin regarding tehcnical issue.",
+                  ),
+                )
+              : OkResult();
+          } catch (error) {
+            const errorMessage = getErrorMessage(error);
+            return FailedResult(new Error(errorMessage));
+          }
+        })
+        .catch((error) => FailedResult(error));
     },
   };
 };

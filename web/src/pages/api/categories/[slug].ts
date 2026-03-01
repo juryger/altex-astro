@@ -6,7 +6,7 @@ import { CACHE_STALE_TIMEOUT_1MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  console.log("📍 ~ API-GET ~ category ~ params:", params);
+  //console.log("📍 ~ API-GET ~ category ~ params:", params);
   const { slug } = params;
   if (!slug) {
     return new Response(null, {

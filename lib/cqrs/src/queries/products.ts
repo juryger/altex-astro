@@ -1,4 +1,4 @@
-import type { Product, PageResult, Paging, Sorting } from "@/lib/domain";
+import type { Product, PagingResult, Paging, Sorting } from "@/lib/domain";
 
 import type {
   Product as DbProduct,
@@ -19,7 +19,7 @@ import {
   selectEnvironment,
   EnvironmentNames,
   ImageContainers,
-  getEmptyPageResult,
+  EmptyPagingResult,
 } from "@/lib/domain";
 
 import {
@@ -145,7 +145,7 @@ export async function fetchProducts(
   categorySlug: string,
   sorting: Sorting,
   paging: Paging,
-): Promise<PageResult<Product>> {
+): Promise<PagingResult<Product>> {
   const db = createCatalogDb(
     selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
   );
@@ -194,7 +194,7 @@ export async function fetchProducts(
       eq(productsSq.products.makeCountryId, makeCountries.id),
     );
 
-  if (queryResult.length === 0) return getEmptyPageResult<Product>();
+  if (queryResult.length === 0) return EmptyPagingResult<Product>();
 
   const totalCount = await db.$count(
     db
@@ -241,7 +241,7 @@ export async function fetchProducts(
       pageSize: paging.pageSize,
       hasMore: (paging.page + 1) * paging.pageSize < totalCount,
     },
-  } as PageResult<Product>;
+  } as PagingResult<Product>;
 }
 
 export async function fetchProductBySlug(

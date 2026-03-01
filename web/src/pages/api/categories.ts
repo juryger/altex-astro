@@ -6,7 +6,7 @@ import {
   extractUrlSorting,
 } from "@/web/src/core/utils/url-parser";
 import { fetchCategories, getQueryManager } from "@/lib/cqrs";
-import type { Category, PageResult } from "@/lib/domain";
+import type { Category, PagingResult } from "@/lib/domain";
 import {
   CACHE_STALE_TIMEOUT_1HR,
   CACHE_STALE_TIMEOUT_5MN,
@@ -17,8 +17,7 @@ import {
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  console.log("📍 ~ API-GET ~ categories list ~ URL:", URL.parse(request.url));
-
+  //console.log("📍 ~ API-GET ~ categories list ~ URL:", URL.parse(request.url));
   const url = URL.parse(request.url);
   const skipParentMatch =
     extractUrlParam(url, APISearchParamNames.SkipParentMatch, "boolean") ??
@@ -34,7 +33,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       ? CacheKeys.CategoriesRoot
       : `${CacheKeys.CategoriesParent}:${parentSlug}`;
   cacheKey = `${cacheKey}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
-  const result = await getQueryManager().fetch<PageResult<Category>>(
+  const result = await getQueryManager().fetch<PagingResult<Category>>(
     () => fetchCategories(skipParentMatch, parentSlug, sorting, paging),
     getCacheInfo(
       cacheKey,

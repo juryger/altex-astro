@@ -10,7 +10,7 @@ import {
 } from "@/lib/dal";
 import type { Category as DbCategory } from "@/lib/dal";
 import { categories, products } from "@/lib/dal";
-import type { PageResult, Paging, Sorting, Category } from "@/lib/domain";
+import type { PagingResult, Paging, Sorting, Category } from "@/lib/domain";
 import {
   CategoriesSortFields,
   constructNavigationPath,
@@ -71,7 +71,7 @@ export async function fetchCategories(
   parentSlug: string = "",
   sorting: Sorting,
   paging: Paging,
-): Promise<PageResult<Category>> {
+): Promise<PagingResult<Category>> {
   const db = createCatalogDb(
     selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
   );
@@ -140,7 +140,7 @@ export async function fetchCategories(
       pageSize: paging.pageSize,
       hasMore: (paging.page + 1) * paging.pageSize < totalCount,
     },
-  } as PageResult<Category>;
+  } as PagingResult<Category>;
 }
 
 export async function fetchCategoryBySlug(

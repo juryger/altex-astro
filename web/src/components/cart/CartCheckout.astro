@@ -2,8 +2,10 @@
 import Modal from "../ModalDialog.astro";
 import CartContent from "./CartContent.astro"
 import { Image } from 'astro:assets';
-import failLogo from '@/web/src/assets/fail.png';
+import failureLogo from '@/web/src/assets/failure.png';
 import { DialogActionButtons } from "../../core/const";
+
+const isDevMode = import.meta.env.DEV;
 
 const dataFormCheckoutName = "form-checkout"
 const dataOrderConfirmCommandName = "order-confirm";
@@ -109,18 +111,18 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
   <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader} actionButtons={DialogActionButtons.OK}>
     <div class="flex gap-2 mt-2">
       <div class="grow-0 content-start">
-        <Image src={failLogo}
+        <Image src={failureLogo}
             class="w-32"
             alt="Fail logo"
           />
       </div>
       <div class="flex flex-col">
         <span>{titleCartCheckoutFailed}</span>
-        <div class="font-semibold mt-2">{titleErrorDetailsHeader}</div>
+        {isDevMode && <div class="font-semibold mt-2">{titleErrorDetailsHeader}</div>
           <div class="text-sm border-0 rounded-sm bg-base-300 my-2.5 p-2.5 min-h-20 overflow-auto">
             <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   </Modal>

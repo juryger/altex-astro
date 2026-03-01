@@ -7,10 +7,9 @@ import AlertsContainer from '../components/alerts/AlertsContainer.astro';
 import { ClientRouter } from 'astro:transitions';
 
 const { title } = Astro.props;
+
 const currentPath = Astro.url.pathname;
 const MainTitle = `АЛТЕХ - ${title}`;
-
-console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 ---
 
 <!doctype html>
@@ -47,24 +46,28 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 	import { getLocalStorageManager } from "../core/utils/local-storage-manager";
 	import { CatalogSyncType, WorkerNames } from "../core/const";
 	import type { CatalogSyncStatus } from "../core/workers";
+	import { EnvironmentNames, regexTrue, selectEnvironment } from '@/lib/domain';
 	
 	let catalogSyncWorker: Worker | undefined;
-
+	
 	// Need to open API endpoint to make request to WebAPI from script
 	const localStorageManager = getLocalStorageManager();
-
+	const withTracing = regexTrue.test(
+		selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+	);
+	
 	const terminateWorker = () => {
 		catalogSyncWorker && catalogSyncWorker.terminate();
 	}
 
-	const processWorkerMessage = (msg: MessageEvent<any>): void => {
+	
+	const processWorkerMessage = (msg: MessageEvent<any>): void => {				
 		const syncStatus = msg.data as CatalogSyncStatus;
 			if (!msg.data || !syncStatus) {
-				console.error("⚙️ ~ BaseLayout ~ CatalogSync worker, unsupported message", msg.data);
+				console.error("🛑 ~ BaseLayout ~ CatalogSync worker, unsupported message", msg.data);
 				return;
 			}
-
-			console.log("⚙️ ~ BaseLayout ~ CatalogSync worker status update:", syncStatus);
+			withTracing && console.log("🐾 ~ BaseLayout ~ CatalogSync worker status update:", syncStatus);
 			switch (syncStatus.syncType)
 			{
 				case CatalogSyncType.Cache:
@@ -77,29 +80,25 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 					localStorageManager.setCatalogSyncPostponed(true);
 					break;
 				case CatalogSyncType.Failure:
-					console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
+					console.error("🛑 ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
 					localStorageManager.setCatalogSyncInProgress(false);
 					break;
 				default:
-					console.error("⚙️ ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
+					console.error("🛑 ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
 					localStorageManager.setCatalogSyncInProgress(false);
 					break;
 			}
-
-			// terminate worker, as next sync is part of another page load.
 			terminateWorker();
 	}
 
 	const processWorkerError = (err: ErrorEvent): void => {
-		console.error("⚙️ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", err.message);
+		withTracing && console.error("🐾 ~ BaseLayout ~ Failed to save catalog data to IndexedDB", err.message);
 		localStorageManager.setCatalogSyncInProgress(false);
-		
-		// clean up worker resource
 		terminateWorker();
 	}
 
 	if (localStorageManager.checkCataloSyncRequired(4)) {
-		console.log("⚙️ ~ BaseLayout ~ Catalog cache data is outdated, preaparing to revalidate cache.");	
+		withTracing && console.log("🐾 ~ BaseLayout ~ Catalog cache data is outdated, preaparing to revalidate cache.");	
 		try {
 			catalogSyncWorker = createWorker(
 				WorkerNames.Catalog,
@@ -112,10 +111,11 @@ console.log("🌎 ~ BaseLayout ~ current path:", currentPath);
 			localStorageManager.setCatalogSyncInProgress(true);
 			localStorageManager.setCatalogSyncPostponed(false);
 		} catch(error) {
-			console.log("⚙️ ~ BaseLayout ~ Failed to create CatalogSync worker", error);	
+			console.error("🛑 ~ BaseLayout ~ Failed to create CatalogSync worker", error);	
 		}
 	} else {
-		console.log("⚙️ ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
+		withTracing && 
+			console.log("🐾 ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
 	}
 
 	window.addEventListener('pagehide', () => {

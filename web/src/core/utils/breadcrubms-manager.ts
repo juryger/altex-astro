@@ -1,3 +1,4 @@
+import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
 import { NavPathNames } from "../const";
 import { getNavPathManager, type NavPathItem } from "./nav-path-manager";
 import type { ActiveCatalogItem } from "./session-manager";
@@ -59,6 +60,9 @@ const getBreadcrumbsFromPath = (
   fullPath: string,
   catalogItem?: ActiveCatalogItem,
 ): Array<BreadcrumbItem> => {
+  const isTracingEnabled = regexTrue.test(
+    selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+  );
   const pathCollection = fullPath.endsWith("/")
     ? fullPath
         .substring(0, fullPath.length - 1)
@@ -66,11 +70,12 @@ const getBreadcrumbsFromPath = (
         .reverse()
     : fullPath.split("/").reverse();
 
-  console.log(
-    "🛠️ ~ getBreadcrumbsFromPath ~ path: %s, parsed: %o",
-    fullPath,
-    pathCollection,
-  );
+  isTracingEnabled &&
+    console.log(
+      "🐾 ~ getBreadcrumbsFromPath ~ path: %s, parsed: %o",
+      fullPath,
+      pathCollection,
+    );
 
   var overallNavUrl = "";
   const navPathManager = getNavPathManager();
@@ -97,7 +102,9 @@ const getBreadcrumbsFromPath = (
     result.push(...values);
   }
 
-  console.log("🛠️ ~ getBreadcrumbsFromPath ~ result:", result);
+  isTracingEnabled &&
+    console.log("🐾 ~ getBreadcrumbsFromPath ~ result:", result);
+
   return result;
 };
 

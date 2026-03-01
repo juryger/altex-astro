@@ -2,7 +2,7 @@ import type { LiveLoader } from "astro/loaders";
 import { getErrorMessage } from "@/lib/domain";
 import type {
   Product,
-  PageResult,
+  PagingResult,
   Paging,
   Sorting,
   Filtering,
@@ -26,7 +26,7 @@ type ProductEntryFilter = {
 const loadProducts = async (
   baseUrl: string,
   filter: ProductCollectionFilter | undefined,
-): Promise<PageResult<Product>> => {
+): Promise<PagingResult<Product>> => {
   const apiUrl = new URL(`${baseUrl}/${APIEndpointNames.Products}`);
   if (filter !== undefined) {
     apiUrl.searchParams.set(APISearchParamNames.Category, filter.categorySlug);
