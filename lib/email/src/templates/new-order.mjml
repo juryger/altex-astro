@@ -69,8 +69,8 @@
         >
           <mj-image
             align="center"
-            src="{{@root.companyWeb}}/products/thumbnails/{{this.productUid}}.png"
             href="{{@root.companyWeb}}/catalog/products/{{this.productSlug}}"
+            src="{{@root.catalogImagesUrl}}/products/thumbnails/{{this.productImageFile}}"
             alt="{{this.productTitle}}"
             width="90px"
             height="auto"

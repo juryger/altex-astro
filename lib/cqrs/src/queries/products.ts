@@ -1,5 +1,4 @@
 import type { Product, PagingResult, Paging, Sorting } from "@/lib/domain";
-
 import type {
   Product as DbProduct,
   Category as DbCategory,
@@ -9,7 +8,6 @@ import type {
   ProductColor as DbProductColor,
   SQLiteColumn,
 } from "@/lib/dal";
-
 import {
   ProductSchema,
   CategoriesSortFields,
@@ -22,7 +20,6 @@ import {
   EmptyPagingResult,
   ReadReplicaTypes,
 } from "@/lib/domain";
-
 import {
   createCatalogDb,
   eq,
@@ -112,7 +109,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     colors: colorId !== undefined ? [colorId] : [],
     imageUrl: constructNavigationPath({
       args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_PRODUCTS_URL),
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
+        ImageContainers.Products,
         entity.main.products.hasImage
           ? entity.main.products.uid.concat(".png")
           : NO_IMAGE_FILE_NAME,
@@ -120,7 +118,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     }),
     thumbnailImageUrl: constructNavigationPath({
       args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_PRODUCTS_URL),
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
+        ImageContainers.Products,
         ImageContainers.Thumbnails,
         entity.main.products.hasImage
           ? entity.main.products.uid.concat(".png")

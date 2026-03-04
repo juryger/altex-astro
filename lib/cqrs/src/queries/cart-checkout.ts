@@ -1,5 +1,6 @@
 import {
   EnvironmentNames,
+  NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
   ReadReplicaTypes,
   selectEnvironment,
@@ -53,9 +54,13 @@ const mapQueryResultToDomainModel = (
         ({
           id: x.cart_checkout_items.id,
           cartCheckoutId: x.cart_checkout_items.cartCheckoutId,
-          productUid: x.cart_checkout_items.productUid,
+          productUid: x.products.uid,
           productTitle: x.products.title,
           productSlug: x.products.slug,
+          productImageFile:
+            x.products.hasImage === 1
+              ? `${x.products.uid}.png`
+              : NO_IMAGE_FILE_NAME,
           colorUid: x.cart_checkout_items.colorUid ?? undefined,
           colorTitle: x.colors?.title ?? NO_VALUE_ASSIGNED,
           quantity: x.cart_checkout_items.quantity,

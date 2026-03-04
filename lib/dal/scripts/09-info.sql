@@ -61,3 +61,7 @@ WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'AdminEmail');
 INSERT INTO info (name, value)
 SELECT 'CompanyWeb', 'https://altexweb.ru'
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyWeb');
+
+INSERT INTO info (name, value)
+SELECT 'CatalogImagesUrl', 'https://s3.regru.cloud/altexweb-catalog'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CatalogImagesUrl');

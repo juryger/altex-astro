@@ -15,6 +15,7 @@ enum CompanyInfoKeys {
   CompanyEmail = "companyEmail",
   AdminEmail = "adminEmail",
   CompanyWeb = "companyWeb",
+  CatalogImagesUrl = "catalogImagesUrl",
 }
 
 export { CompanyInfoKeys };

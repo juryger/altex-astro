@@ -23,6 +23,9 @@ const parseCompanyInfo = (data: Array<CompanyInfo>): Record<string, string> => {
       case CompanyInfoKeys.CompanyWeb.toLowerCase():
         result[CompanyInfoKeys.CompanyWeb] = x.value;
         break;
+      case CompanyInfoKeys.CatalogImagesUrl.toLowerCase():
+        result[CompanyInfoKeys.CatalogImagesUrl] = x.value;
+        break;
       default:
         result[x.name] = x.value;
         break;

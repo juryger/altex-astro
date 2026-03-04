@@ -14,6 +14,7 @@ const CartCheckoutItemSchema = z.object({
   productUid: z.string(),
   productTitle: z.string().optional(),
   productSlug: z.string().optional(),
+  productImageFile: z.string().optional(),
   colorUid: z.string().optional(),
   colorTitle: z.string().optional(),
   quantity: z.number(),

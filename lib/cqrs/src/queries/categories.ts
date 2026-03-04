@@ -15,6 +15,7 @@ import {
   CategoriesSortFields,
   constructNavigationPath,
   EnvironmentNames,
+  ImageContainers,
   NO_IMAGE_FILE_NAME,
   ReadReplicaTypes,
   selectEnvironment,
@@ -52,7 +53,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
         : undefined,
     imageUrl: constructNavigationPath({
       args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATEGORIES_URL),
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
+        ImageContainers.Categories,
         entity.categories.hasImage
           ? entity.categories.uid.concat(".png")
           : NO_IMAGE_FILE_NAME,
