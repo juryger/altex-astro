@@ -26,7 +26,7 @@ const titleCancelButton = "Отменить";
 <!-- You can open the modal using ID.showModal() method -->
 <!-- <button class="btn" onclick="my_modal_3.showModal()">open modal</button> -->
 <dialog id={id} class="modal">
-  <div class:list={['modal-box', {'max-w-5xl': size === DialogSize.Large }, {'max-w-xl': size === DialogSize.Small}]}>
+  <div class:list={['modal-box', 'text-left', {'max-w-5xl': size === DialogSize.Large }, {'max-w-xl': size === DialogSize.Small}]}>
     <h3 class="text-lg font-bold">{title}</h3>
     <main>
       <slot />

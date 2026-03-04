@@ -60,6 +60,16 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
           : NO_IMAGE_FILE_NAME,
       ],
     }),
+    thumbnailImageUrl: constructNavigationPath({
+      args: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
+        ImageContainers.Categories,
+        ImageContainers.Thumbnails,
+        entity.categories.hasImage
+          ? entity.categories.uid.concat(".png")
+          : NO_IMAGE_FILE_NAME,
+      ],
+    }),
     parentId:
       entity.categories.parentId !== null
         ? entity.categories.parentId

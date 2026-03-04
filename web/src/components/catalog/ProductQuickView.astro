@@ -14,6 +14,7 @@ const { item, references } = Astro.props;
 const nameProductDialogId = `product-preview-${item.id}`;
 
 const titleQuickView = "Просмотр";
+const titleDialogHeader = "Карточка товара";
 ---
 
 <figure class="aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto h-[150px]">
@@ -28,7 +29,7 @@ const titleQuickView = "Просмотр";
     </button>
   </div>
 </figure>
-<ModalDialog id={nameProductDialogId} title={item.title} size={DialogSize.Large} actionButtons={DialogActionButtons.OK}>
+<ModalDialog id={nameProductDialogId} title={titleDialogHeader} size={DialogSize.Large} actionButtons={DialogActionButtons.OK}>
   <ProductDetails item={item} references={references} isPreview={true} />
 </ModalDialog>
 
