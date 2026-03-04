@@ -17,6 +17,9 @@ const parseCompanyInfo = (data: Array<CompanyInfo>): Record<string, string> => {
       case CompanyInfoKeys.CompanyName.toLowerCase():
         result[CompanyInfoKeys.CompanyName] = x.value;
         break;
+      case CompanyInfoKeys.CompanySlogan.toLowerCase():
+        result[CompanyInfoKeys.CompanySlogan] = x.value;
+        break;
       case CompanyInfoKeys.CompanyWeb.toLowerCase():
         result[CompanyInfoKeys.CompanyWeb] = x.value;
         break;

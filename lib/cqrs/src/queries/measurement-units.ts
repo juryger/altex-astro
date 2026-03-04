@@ -1,6 +1,7 @@
 import { asc, createCatalogDb, SQL, isNull, measurementUnits } from "@/lib/dal";
 import {
   EnvironmentNames,
+  ReadReplicaTypes,
   selectEnvironment,
   type MeasurementUnit,
 } from "@/lib/domain";
@@ -8,6 +9,7 @@ import type {
   MeasurementUnit as DbMeasurementUnit,
   SQLiteColumn,
 } from "@/lib/dal";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 const columnTitle: SQLiteColumn = measurementUnits.title;
 
@@ -26,9 +28,10 @@ const mapQueryResultToDomainModel = (
 };
 
 export async function fetchMeasurementUnits(): Promise<MeasurementUnit[]> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const queryResult = await db
     .select()

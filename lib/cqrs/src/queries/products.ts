@@ -20,6 +20,7 @@ import {
   EnvironmentNames,
   ImageContainers,
   EmptyPagingResult,
+  ReadReplicaTypes,
 } from "@/lib/domain";
 
 import {
@@ -38,6 +39,7 @@ import {
   productColors,
   products,
 } from "@/lib/dal";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 const columnId: SQLiteColumn = products.id;
 const columnTitle: SQLiteColumn = products.title;
@@ -146,9 +148,10 @@ export async function fetchProducts(
   sorting: Sorting,
   paging: Paging,
 ): Promise<PagingResult<Product>> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const parentCategorySq = db
     .select()
@@ -247,9 +250,10 @@ export async function fetchProducts(
 export async function fetchProductBySlug(
   slug: string,
 ): Promise<Product | undefined> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const productsSq = db
     .select()

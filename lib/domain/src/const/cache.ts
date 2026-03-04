@@ -18,6 +18,7 @@ enum CacheKeys {
   Products = "products",
   ProductItem = "product-item",
   CartCheckout = "cart-checkout",
+  ReadReplica = "read-replica",
 }
 
 export {

@@ -12,7 +12,7 @@ const createGeneralDb = (
     fileMustExist: true,
   });
   clientOperations.pragma("journal_mode = WAL");
-  return drizzle({ client: clientOperations, schema: general });
+  return drizzle({ client: clientOperations, schema: general, logger: true });
 };
 
 const createOperationsDb = (
@@ -31,6 +31,7 @@ const createOperationsDb = (
   const db = drizzle({
     client: clientOperations,
     schema: { ...operations, ...catalog },
+    logger: true,
   });
 
   const attachDatabase = `ATTACH DATABASE '${catalogPath}' AS catalog`;
@@ -48,10 +49,6 @@ const createCatalogDb = (
   clientCatalog.pragma("journal_mode = WAL");
   return drizzle({ client: clientCatalog, schema: catalog, logger: true });
 };
-
-//createGeneralDb(process.env.DB_GENERAL_PATH);
-//createOperationsDb(process.env.DB_OPERATIONS_PATH);
-//createCatalogDb(process.env.DB_CATALOG_PATH);
 
 export {
   eq,

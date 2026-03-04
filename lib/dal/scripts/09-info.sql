@@ -31,6 +31,10 @@ SELECT 'CompanyName', 'ИП Герасимов Алексей Владимиро
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyName');
 
 INSERT INTO info (name, value)
+SELECT 'CompanySlogan', 'Поставка надежных товаров и услуг с 1995 г.'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanySlogan');
+
+INSERT INTO info (name, value)
 SELECT 'PostCode', '248000'
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'PostCode');
 

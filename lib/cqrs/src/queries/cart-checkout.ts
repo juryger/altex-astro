@@ -1,6 +1,7 @@
 import {
   EnvironmentNames,
   NO_VALUE_ASSIGNED,
+  ReadReplicaTypes,
   selectEnvironment,
 } from "@/lib/domain";
 import {
@@ -25,6 +26,7 @@ import type {
   GuestUser,
 } from "@/lib/domain";
 import { formatCurrency } from "@/lib/domain";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 type QueryResult = {
   cart_checkout: DBCartCheckout;
@@ -100,9 +102,12 @@ const mapQueryResultToDomainModel = (
 export async function fetchCartCheckout(
   id: number,
 ): Promise<CartCheckoutAggregate | undefined> {
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
+  );
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+    dbCatalogPath,
   );
   const queryResult = await db
     .select()

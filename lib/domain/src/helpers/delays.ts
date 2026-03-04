@@ -1,6 +1,6 @@
-const delay = (delayMs: number): Promise<void> => {
+const delay = (delayMs: number): Promise<NodeJS.Timeout> => {
   return new Promise((res) => {
-    setTimeout(res, delayMs);
+    const timeoutRef = setTimeout(() => res(timeoutRef), delayMs);
   });
 };
 
@@ -13,7 +13,8 @@ const delayWithRetry = async (
   let isValidated = false;
 
   while (!isValidated && retriesCounter-- > 0) {
-    await delay(delayMs);
+    const timeoutRef = await delay(delayMs);
+    clearTimeout(timeoutRef);
     isValidated = validateFn();
   }
 

@@ -7,6 +7,7 @@ enum CompanyInfoKeys {
   TaxRegoReasonCode = "taxRegoReasonCode",
   TaxCertificate = "taxCertificate",
   CompanyName = "companyName",
+  CompanySlogan = "companySlogan",
   PostCode = "postCode",
   City = "city",
   Address = "address",

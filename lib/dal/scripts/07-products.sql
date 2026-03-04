@@ -525,3 +525,13 @@ WHERE NOT EXISTS (SELECT * FROM products WHERE slug = 'PROU9040GOBR');
 INSERT INTO products(slug, product_code, category_id, title, description, unit_id, dimension_length_mm, dimension_width_mm, dimension_height_mm, quantity_in_pack, min_quantity_to_buy, price, whs_price1, whs_price2, maker_id, make_country_id, has_image, uid)
 SELECT 'PROU9040PR', 'PROU-18', 25, 'Проушина 90х 40 ПР', NULL, 1, 90, 40, NULL, 100, 100, 22.5, 19.2, 17.7, NULL, 1, 0, '77c8f5a0-601c-4bb8-aa8f-e3a819171c6b'
 WHERE NOT EXISTS (SELECT * FROM products WHERE slug = 'PROU9040PR');
+
+
+/* 63. 
+  Отвертка крест 70х25
+  Price: 12.25 / 11.5
+  Pack: 1/10 
+*/
+INSERT INTO products(slug, product_code, category_id, title, description, unit_id, dimension_length_mm, dimension_width_mm, dimension_height_mm, quantity_in_pack, min_quantity_to_buy, price, whs_price1, whs_price2, maker_id, make_country_id, has_image, uid)
+SELECT 'OTVEKRES7025', 'OTVE-1', 26, 'Отвертка крест 70х25', NULL, 1, 70, 25, NULL, 1, 10, 12.25, 11.5, 10.7, NULL, 3, 1, 'e8cdc2e6-bf9e-4390-bda5-e308fac649ca'
+WHERE NOT EXISTS (SELECT * FROM products WHERE slug = 'OTVEKRES7025');

@@ -1,12 +1,27 @@
 ---
+export const prerender = false;
+
 import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
 import { getNavPathManager } from '../core/utils/nav-path-manager';
+import { fetchCompanyInfo, getQueryManager } from '@/lib/cqrs';
+import { CacheKeys, CompanyInfoKeys, getCacheInfo } from '@/lib/domain';
 
-const allPaths = getNavPathManager().getAllPaths({ isMainMenu: false, isFooter: true, isBreadcrumbs: false });
+const navPathmanager = getNavPathManager();
+const queryManager = getQueryManager();
+
+const allPaths = navPathmanager.getAllPaths({ isMainMenu: false, isFooter: true, isBreadcrumbs: false });
+const companyInfo = await queryManager.fetch(() => fetchCompanyInfo(), getCacheInfo(CacheKeys.CompanyInfo));
+if (!companyInfo.ok) {
+	console.error(companyInfo.error);
+}
+
+const titleCompanyName = "ИП Герасимов Алексей Владимирович";
+const titleCompanySlogan = "Поставка надежных товаров и услуг с 1995 г.";
+const titleCopyright = "Все права защищены";
 ---
 
-<footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded pt-2 pb-2">
+<footer class="footer footer-horizontal footer-center bg-base-300 text-base-content rounded pt-3 pb-3">
   <nav class="grid grid-flow-col gap-4">
     {allPaths && allPaths.map((x) => (
       <a class="link link-info link-hover" href=`/${x.path}`>{x.value}</a>
@@ -15,12 +30,16 @@ const allPaths = getNavPathManager().getAllPaths({ isMainMenu: false, isFooter: 
   <aside class="grid-flow-col items-center px-4 lg:px-0">
     <Image src={AltexLogo} class="w-16" alt="Footer logo"/>
     <p>
-      ИП Герасимов Алексей Владимирович 
+      {companyInfo?.data && Object.hasOwn(companyInfo?.data, CompanyInfoKeys.CompanyName) 
+        ? companyInfo.data[CompanyInfoKeys.CompanyName] 
+        : titleCompanyName}
       <br />
-      Поставка надежных товаров и услуг с 1995 г.
+      {companyInfo?.data && Object.hasOwn(companyInfo?.data, CompanyInfoKeys.CompanySlogan) 
+        ? companyInfo.data[CompanyInfoKeys.CompanySlogan] 
+        : titleCompanySlogan}
     </p>
   </aside>
   <aside>
-    <p>Copyright © {new Date().getFullYear()} - Все права защищены</p>
+    <p>Copyright © {new Date().getFullYear()} - {titleCopyright}</p>
   </aside>
 </footer>

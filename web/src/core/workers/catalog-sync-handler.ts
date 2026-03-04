@@ -20,11 +20,6 @@ const getCatalogSyncHandler = (config: {
       const apiUrl = new URL(
         `${config.baseUrl}/${APIEndpointNames.Categories}?${APISearchParamNames.SortField}=${CategoriesSortFields.Id}&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
       );
-      console.log(
-        "🛠️ ~ catalog-sync-handler ~ config: %o, api url: %s",
-        config,
-        apiUrl,
-      );
       const response = await fetch(apiUrl);
       if (!response.ok) {
         response.text().then((errorMessage) => {

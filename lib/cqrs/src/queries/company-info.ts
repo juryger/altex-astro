@@ -21,13 +21,12 @@ export async function fetchCompanyInfo(): Promise<Record<string, string>> {
   const db = createGeneralDb(
     selectEnvironment(EnvironmentNames.DB_GENERAL_PATH),
   );
-
   const queryResult = await db
     .select()
     .from(info)
     .where(isNull(info.deletedAt));
-
-  return parseCompanyInfo(
+  const result = parseCompanyInfo(
     queryResult.map((item) => mapQueryResultToDomainModel(item)),
   );
+  return result;
 }

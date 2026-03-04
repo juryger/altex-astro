@@ -21,12 +21,10 @@ const createWorker = (
   }
 
   result.onmessage = (e) => {
-    console.log("~ worker-factory ~ onmessage", e);
     onMessage(e);
   };
 
   result.onerror = (e) => {
-    console.log("~ worker-factory ~ onerror", e);
     onError(e);
   };
 

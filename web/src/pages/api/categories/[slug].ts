@@ -1,12 +1,23 @@
 import type { APIRoute } from "astro";
 import { fetchCategoryBySlug, getQueryManager } from "@/lib/cqrs";
 import type { Category } from "@/lib/domain";
-import { CACHE_STALE_TIMEOUT_1MN, CacheKeys, getCacheInfo } from "@/lib/domain";
+import {
+  CACHE_STALE_TIMEOUT_1MN,
+  CacheKeys,
+  EnvironmentNames,
+  getCacheInfo,
+  regexTrue,
+  selectEnvironment,
+} from "@/lib/domain";
 
 export const prerender = false;
 
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
+
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  //console.log("📍 ~ API-GET ~ category ~ params:", params);
+  withTracing && console.log("🐾 ~ API-GET ~ category ~ params:", params);
   const { slug } = params;
   if (!slug) {
     return new Response(null, {
@@ -23,12 +34,12 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
   if (result.error) {
     console.error(result.error);
     return new Response(null, {
-      status: 404,
-      statusText: "Not found",
+      status: 500,
+      statusText: "Server error",
     });
   }
 
-  //console.log("🧪 category by slug '%s', %o", slug, result);
+  withTracing && console.log("🧪 category by slug '%s', %o", slug, result);
   return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {

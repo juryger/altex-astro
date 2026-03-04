@@ -16,9 +16,11 @@ import {
   constructNavigationPath,
   EnvironmentNames,
   NO_IMAGE_FILE_NAME,
+  ReadReplicaTypes,
   selectEnvironment,
   SortOrder,
 } from "@/lib/domain";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 const columnId: SQLiteColumn = categories.id;
 const columnTitle: SQLiteColumn = categories.title;
@@ -63,6 +65,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
     parentSlug: entity.parentSlug !== null ? entity.parentSlug : undefined,
     parentTitle: entity.parentTitle !== null ? entity.parentTitle : undefined,
     totalProducts: entity.totalProducts + entity.totalProductsSub,
+    createdAt: entity.categories.createdAt,
+    modifiedAt: entity.categories.modifiedAt,
   };
 };
 
@@ -72,9 +76,10 @@ export async function fetchCategories(
   sorting: Sorting,
   paging: Paging,
 ): Promise<PagingResult<Category>> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const parentSq = db.select().from(categories).as("parent_sq");
   const productSq = db
@@ -146,9 +151,10 @@ export async function fetchCategories(
 export async function fetchCategoryBySlug(
   slug: string,
 ): Promise<Category | undefined> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const parentSq = db.select().from(categories).as("parent_sq");
   const productSq = db

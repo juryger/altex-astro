@@ -1,7 +1,12 @@
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  ReadReplicaTypes,
+  selectEnvironment,
+} from "@/lib/domain";
 import { asc, createCatalogDb, SQL, discounts, isNull } from "@/lib/dal";
 import type { Discount as DbDiscount, SQLiteColumn } from "@/lib/dal";
 import { type Discount } from "@/lib/domain";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 const columnFromSum: SQLiteColumn = discounts.fromSum;
 
@@ -19,9 +24,10 @@ const mapQueryResultToDomainModel = (entity: DbDiscount): Discount => {
 };
 
 export async function fetchDiscounts(): Promise<Discount[]> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const queryResult = await db
     .select()

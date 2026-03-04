@@ -137,6 +137,7 @@ WHERE NOT EXISTS (SELECT * FROM categories WHERE slug = 'PROU');
 
 /* ---------------------------------------------------- */
 /* -> INSTRUMENTI: SUB-CATEGORIES */
+-- 26. OTVE
 INSERT INTO categories
 (slug, title, parent_id, has_image, uid)
 SELECT 'OTVE', 'Отвертки', 3, 1, '6da455ab-917b-4556-869d-2667d8b36847'

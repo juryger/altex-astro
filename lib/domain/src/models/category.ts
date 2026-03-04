@@ -10,6 +10,8 @@ export const CategorySchema = z.object({
   parentSlug: z.string().optional(),
   parentTitle: z.string().optional(),
   totalProducts: z.number(),
+  createdAt: z.date(),
+  modifiedAt: z.date(),
 });
 
 const CategoryCacheSchema = z.object({

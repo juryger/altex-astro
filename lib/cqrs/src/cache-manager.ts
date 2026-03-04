@@ -12,13 +12,13 @@ import {
   CACHE_ITEM_LOCK_TIMEOUT_1MN,
 } from "@/lib/domain";
 import { delayWithRetry } from "@/lib/domain";
-import { getMostRecentEvictionStrategy } from "./cache/eviction/mostRecentEviction";
+import { getMostRecentEvictionStrategy } from "./cache/eviction/most-recent-eviction";
 
 type CacheResult<T = any> = {
   value?: T;
   error?: Error;
   set?: (value: T, staleTimeMs: number) => void;
-  reset?: () => void;
+  clearSetLock?: () => void;
 };
 
 interface BaseCacheManager {
@@ -34,29 +34,36 @@ interface BaseCacheManager {
 
 class CacheManager implements BaseCacheManager {
   private static __instance: CacheManager;
-  private withTracing: boolean;
   private sizeLimit: number;
+  private withTracing: boolean;
   private cache: Map<string, CacheEntry<any>> = new Map();
   private evictionStrategy: CacheEvictionStrategy | undefined;
 
-  constructor(evictionStrategy: CacheEvictionStrategy, sizeLimit: number) {
+  constructor(
+    evictionStrategy: CacheEvictionStrategy,
+    sizeLimit: number,
+    withTracing: boolean,
+  ) {
     this.evictionStrategy = evictionStrategy;
     this.sizeLimit = sizeLimit;
-    this.withTracing = regexTrue.test(
-      selectEnvironment(EnvironmentNames.ENABLE_TRACING),
-    );
+    this.withTracing = withTracing;
   }
 
   static instance({
     evictionStrategy = getMostRecentEvictionStrategy(),
     sizeLimit = CACHE_ITEMS_LIMIT,
+    withTracing = false,
   }: {
     evictionStrategy?: CacheEvictionStrategy;
     sizeLimit?: number;
     withTracing?: boolean;
   }) {
     if (!CacheManager.__instance) {
-      CacheManager.__instance = new CacheManager(evictionStrategy, sizeLimit);
+      CacheManager.__instance = new CacheManager(
+        evictionStrategy,
+        sizeLimit,
+        withTracing,
+      );
     }
     return CacheManager.__instance;
   }
@@ -78,34 +85,31 @@ class CacheManager implements BaseCacheManager {
       );
   }
 
-  private isExpired<T = any>(value: CacheEntry<T>): boolean {
+  private isExpired<T = any>(key: string, value: CacheEntry<T>): boolean {
     const currDate = new Date();
     const result =
       value.staleTimestamp !== undefined &&
       value.staleTimestamp <= currDate.getTime();
-
-    if (this.withTracing) {
-      console.log("🐾 ~ cacheManager ~ isExpired:", result);
-    }
-
+    this.withTracing &&
+      console.log("🐾 ~ cacheManager ~ '%s' isExpired:", key, result);
     return result;
   }
 
-  private isAcquireExpired<T = any>(value: CacheEntry<T>): boolean {
+  private isAcquireExpired<T = any>(
+    key: string,
+    value: CacheEntry<T>,
+  ): boolean {
     const currDate = new Date();
     const result =
       value.acquireTimestamp !== undefined &&
       value.acquireTimestamp <= currDate.getTime();
-
-    if (this.withTracing) {
-      console.log("🐾 ~ cacheManager ~ isAcquireExpired:", result);
-    }
-
+    this.withTracing &&
+      console.log("🐾 ~ cacheManager ~ '%s' isAcquireExpired:", key, result);
     return result;
   }
 
-  private isValid<T = any>(value: CacheEntry<T>): boolean {
-    return !this.isExpired(value) && !this.isAcquireExpired(value);
+  private isValid<T = any>(key: string, value: CacheEntry<T>): boolean {
+    return !this.isExpired(key, value) && !this.isAcquireExpired(key, value);
   }
 
   private invalidate(key: string) {
@@ -192,7 +196,7 @@ class CacheManager implements BaseCacheManager {
       : undefined;
 
     const nonValid =
-      cacheEntry !== undefined && this.isValid(cacheEntry) === false;
+      cacheEntry !== undefined && this.isValid(key, cacheEntry) === false;
 
     if (cacheEntry === undefined || nonValid) {
       if (nonValid) this.invalidate(key);
@@ -204,7 +208,8 @@ class CacheManager implements BaseCacheManager {
             ? (value: T, staleTimeMs: number) =>
                 this.set<T>(key, value, staleTimeMs)
             : undefined,
-        reset: error === undefined ? () => this.invalidate(key) : undefined,
+        clearSetLock:
+          error === undefined ? () => this.invalidate(key) : undefined,
       } as CacheResult<T>;
     }
 
@@ -249,7 +254,7 @@ class CacheManager implements BaseCacheManager {
       );
 
     let item = this.cache.has(key) ? this.cache.get(key) : undefined;
-    if (item !== undefined && !this.isValid(item)) {
+    if (item !== undefined && !this.isValid(key, item)) {
       this.invalidate(key);
       item = undefined;
     }
@@ -257,7 +262,9 @@ class CacheManager implements BaseCacheManager {
   }
 
   containsInvalid(): boolean {
-    return this.cache.entries().some(([key, value]) => !this.isValid(value));
+    return this.cache
+      .entries()
+      .some(([key, value]) => !this.isValid(key, value));
   }
 
   revalidate(): boolean {
@@ -265,7 +272,7 @@ class CacheManager implements BaseCacheManager {
 
     const currentSize = this.cache.size;
     this.cache.entries().forEach(([key, value]) => {
-      if (!this.isValid(value)) this.invalidate(key);
+      if (!this.isValid(key, value)) this.invalidate(key);
     });
 
     if (currentSize < this.cache.size && this.withTracing) {

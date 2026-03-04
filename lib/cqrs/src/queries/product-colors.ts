@@ -2,9 +2,11 @@ import { asc, createCatalogDb, SQL, colors, isNull } from "@/lib/dal";
 import type { Color as DbColor, SQLiteColumn } from "@/lib/dal";
 import {
   EnvironmentNames,
+  ReadReplicaTypes,
   selectEnvironment,
   type ProductColor,
 } from "@/lib/domain";
+import { ReadReplicaManager } from "../read-replica-manager";
 
 const columnTitle: SQLiteColumn = colors.title;
 
@@ -24,9 +26,10 @@ const mapQueryResultToDomainModel = (entity: DbColor): ProductColor => {
 };
 
 export async function fetchProductColors(): Promise<ProductColor[]> {
-  const db = createCatalogDb(
-    selectEnvironment(EnvironmentNames.DB_CATALOG_PATH),
+  const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
+    ReadReplicaTypes.Catalog,
   );
+  const db = createCatalogDb(dbCatalogPath);
 
   const queryResult = await db
     .select()

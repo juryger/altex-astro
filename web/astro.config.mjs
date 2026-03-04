@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
+import boot from "@astroscope/boot";
 import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
@@ -11,6 +12,7 @@ export default defineConfig({
     mode: "standalone",
     experimentalDisableStreaming: true,
   }),
+  integrations: [boot()],
   image: {
     domains: ["altexweb.ru", "localhost:4321"],
     responsiveStyles: true,
@@ -24,7 +26,6 @@ export default defineConfig({
       },
     },
   },
-  integrations: [sitemap()],
   experimental: {
     liveContentCollections: true,
   },

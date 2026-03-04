@@ -1,21 +1,25 @@
 ---
-import { CacheManager } from '@/lib/cqrs/src';
+export const prerender = false;
+
+import { ReadReplicaManager } from '@/lib/cqrs';
+import { CacheManager } from '@/lib/cqrs';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDate, NO_VALUE_ASSIGNED, ReadReplicaTypes } from '@/lib/domain';
 
 const cacheManager = CacheManager.instance({});
+const catalogReadReplica = ReadReplicaManager.instance().get(ReadReplicaTypes.Catalog);
 
 const pageTitle = "Системные данные";
 const titleQueryCache = "Кэш запросов";
 const titleQueryCacheOf = "из";
 const titleBrowserCache = "Кэш браузера";
-const titleCatalogReplica = "Инстанс реплики";
+const titleCatalogReplica = "Реплика каталога";
 const titleRevalidateQueryCache = "Оптимизировать";
 const titleResetCache = "Сбросить";
 ---
 
 <BaseLayout title={pageTitle}>
-	<section class="px-4 text-center">
-		<div class="stats bg-base-100 border-base-300 border">
+		<div class="stats stats-vertical lg:stats-horizontal bg-base-100 border-base-300 border text-center">
 			<div class="stat">
 				<div class="stat-figure text-info">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
@@ -37,10 +41,9 @@ const titleResetCache = "Сбросить";
 					</svg>
 				</div>
 				<div class="stat-title">{titleBrowserCache}</div>
-				<div class="stat-value text-primary">2.6M</div>
+				<div data-browser-cahe-sync-date class="stat-value text-primary">{NO_VALUE_ASSIGNED}</div>
 				<div class="stat-actions">
 					<button data-browser-cache-reset class="btn btn-xs btn-secondary">{titleResetCache}</button>
-					<span class="stat-desc">(next check: [date-time])</span>
 				</div>
 			</div>
 
@@ -51,47 +54,60 @@ const titleResetCache = "Сбросить";
 					</svg>
 				</div>
 				<div class="stat-title">{titleCatalogReplica}</div>
-				<div class="stat-value text-primary">Initial</div>
-				<div class="stat-desc">(created at: [date-time])</div>
+				<div class="stat-value text-primary text-xl">{catalogReadReplica.fileName}</div>
+				<div class="stat-desc">(created at: {formatDate(catalogReadReplica.createdAt)})</div>
 			</div>
 		</div>
-	</div>
 </BaseLayout>
 
 <script>
-	import { getErrorMessage } from "@/lib/domain/src";
+	import { getErrorMessage, NO_VALUE_ASSIGNED } from "@/lib/domain/src";
 	import { actions } from "astro:actions";
 	import { navigate } from "astro:transitions/client";
+	import { getLocalStorageManager } from "../core/utils/local-storage-manager";
 
 	const controller: AbortController = new AbortController();
+	const localStorageManager = getLocalStorageManager();
+	const localStorageSyncDate = localStorageManager.getCatalogSyncDate();
 
 	const assingEventHandlers = (signal: AbortSignal) => {
 		// Query Cache revalidate 
 		const buttonCacheRevalidate = document.querySelector('[data-query-cache-revalidate]');
 		buttonCacheRevalidate?.addEventListener('click', async () => { 		
-			console.log("🧪 ~ internals ~ prepare to revalidate query cache");
 			const result = await actions.internalsActions.revalidateQueryCache();		
 			if (result.error) {
 				const errorMessage = getErrorMessage(result.error);
-				console.error(errorMessage);
+				console.error(`🛑 ~ internals ~ cache revalidation failed: ${errorMessage}`);
 				return;
 			}
-			console.log("🧪 ~ internals ~ query cache revalidate, result:", result);
 			if (result.data) navigate(`/internals`);
 		}, { signal });
 
 		// Query Cache reset 
 		const buttonCacheReset = document.querySelector('[data-query-cache-reset]');
 		buttonCacheReset?.addEventListener('click', async () => {
-			console.log("🧪 ~ internals ~ prepare to reset query cache");
 			const result = await actions.internalsActions.resetQueryCache();
 			if (result.error) {
 				const errorMessage = getErrorMessage(result.error);
-				console.error(errorMessage);
+				console.error(`🛑 ~ internals ~ cache reset failed: ${errorMessage}`);
 				return;
-			}
-			console.log("🧪 ~ internals ~ query cache reset, result:", result);
+			}			
 			navigate(`/internals`);
+		}, { signal });
+
+		// Browser cache syncDate
+		const localCacheSyncDateEl = document.querySelector('[data-browser-cahe-sync-date]');
+		if (localCacheSyncDateEl !== null) {
+			localCacheSyncDateEl.textContent = localStorageSyncDate !== undefined 
+				? localStorageSyncDate.toLocaleTimeString("ru-RU")
+				: NO_VALUE_ASSIGNED;
+		}
+
+		// Browswer cahce reset button
+		const buttonLocalCacheReset = document.querySelector('[data-browser-cache-reset]');
+		buttonLocalCacheReset?.addEventListener('click', async () => {
+			localStorageManager.resetCatalogSyncDate();
+			navigate(`/internals`, {  });
 		}, { signal });
 	}
 

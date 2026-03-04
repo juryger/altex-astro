@@ -33,10 +33,10 @@ const MainTitle = `АЛТЕХ - ${title}`;
 				</div>
 			</Breadcrumbs>
 		}
-		<div class="mx-auto max-w-7xl px-4 py-3">
+		<div class="mx-auto max-w-7xl px-4 py-3 text-center">
 			<slot />
 		</div>
-		<Footer />
+		<Footer server:defer />
 	</body>
 </html>
 
@@ -60,7 +60,6 @@ const MainTitle = `АЛТЕХ - ${title}`;
 		catalogSyncWorker && catalogSyncWorker.terminate();
 	}
 
-	
 	const processWorkerMessage = (msg: MessageEvent<any>): void => {				
 		const syncStatus = msg.data as CatalogSyncStatus;
 			if (!msg.data || !syncStatus) {
@@ -73,11 +72,9 @@ const MainTitle = `АЛТЕХ - ${title}`;
 				case CatalogSyncType.Cache:
 					localStorageManager.setCatalogSyncDate(new Date());
 					localStorageManager.setCatalogSyncInProgress(false);
-					localStorageManager.setCatalogSyncPostponed(false);
 					break;
 				case CatalogSyncType.CleanUp:
 					localStorageManager.setCatalogSyncInProgress(false);
-					localStorageManager.setCatalogSyncPostponed(true);
 					break;
 				case CatalogSyncType.Failure:
 					console.error("🛑 ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
@@ -97,7 +94,7 @@ const MainTitle = `АЛТЕХ - ${title}`;
 		terminateWorker();
 	}
 
-	if (localStorageManager.checkCataloSyncRequired(4)) {
+	if (localStorageManager.checkCataloSyncRequired()) {
 		withTracing && console.log("🐾 ~ BaseLayout ~ Catalog cache data is outdated, preaparing to revalidate cache.");	
 		try {
 			catalogSyncWorker = createWorker(
@@ -109,7 +106,6 @@ const MainTitle = `АЛТЕХ - ${title}`;
 			// Performe sync process (pass CatalogSyncType.CleanUpCache if sync is not required and local store need to be cleaned)
 			catalogSyncWorker.postMessage(CatalogSyncType.Cache);
 			localStorageManager.setCatalogSyncInProgress(true);
-			localStorageManager.setCatalogSyncPostponed(false);
 		} catch(error) {
 			console.error("🛑 ~ BaseLayout ~ Failed to create CatalogSync worker", error);	
 		}

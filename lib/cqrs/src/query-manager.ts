@@ -5,7 +5,7 @@ import {
   type CacheInfo,
   type Result,
 } from "@/lib/domain";
-import { CacheManager } from "./cacheManager";
+import { CacheManager } from "./cache-manager";
 
 interface QueryManager {
   fetch: <T = any>(
@@ -20,13 +20,13 @@ const checkCache = async <T = any>(
   queryFn: () => Promise<T>,
 ): Promise<Result<T>> => {
   const cache = await cacheManager.get(cacheInfo.key);
-  if (cache.set !== undefined && cache.reset !== undefined) {
+  if (cache.set !== undefined && cache.clearSetLock !== undefined) {
     try {
       const data = await queryFn();
       cache.set(data, cacheInfo.staleTimeMs);
       return OkResult(data);
     } catch (error) {
-      cache.reset();
+      cache.clearSetLock();
       const errorMessage = getErrorMessage(error);
       console.error("~ queryManager ~ %s", errorMessage);
       return FailedResult(new Error(errorMessage));
@@ -52,7 +52,7 @@ function getQueryManager(): QueryManager {
         return OkResult(await queryFn());
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        console.error("~ queryManager ~ %s", errorMessage);
+        console.error("~ query-manager ~ %s", errorMessage);
         return FailedResult(new Error(errorMessage));
       }
     },

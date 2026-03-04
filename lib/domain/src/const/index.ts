@@ -5,4 +5,13 @@ enum ImageContainers {
   Thumbnails = "thumbnails",
 }
 
-export { NO_IMAGE_FILE_NAME, NO_VALUE_ASSIGNED, ImageContainers };
+enum ReadReplicaTypes {
+  Catalog = "catalog",
+}
+
+export {
+  NO_IMAGE_FILE_NAME,
+  NO_VALUE_ASSIGNED,
+  ImageContainers,
+  ReadReplicaTypes,
+};
