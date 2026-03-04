@@ -45,7 +45,7 @@ export async function onStartup({ dev, host, port }: BootContext) {
 
   replicaIntervalObj = setInterval(
     readReplicasUpdateMonitor,
-    10000, // READ_REPLICAS_UPDATE_CHECK_1HR
+    READ_REPLICAS_UPDATE_CHECK_1HR,
   );
 }
 

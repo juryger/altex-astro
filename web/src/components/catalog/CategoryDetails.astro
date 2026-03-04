@@ -19,7 +19,7 @@ const titleOverallProductsNumber = "Всего товарных позиций";
     <figure class="self-center bg-base-100 aspect-square object-cover lg:aspect-auto h-[37.5] md:h-[50]">
       <Image src=`${item.imageUrl}` alt=`${item.title}` width="200" height="200" class="rounded-xl h-[37.5] md:h-[50] object-contain" />
     </figure>
-    <div class="px-2 py-2 flex-1">
+    <div class="px-2 py-2 flex-1 text-left">
       <h1 class="card-title text-lg font-bold" title={item.title}>
         {trimEnd(item.title, 100)} 
       </h1>
