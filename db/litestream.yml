@@ -1,0 +1,11 @@
+dbs:
+  - path: /Users/iuriig/Sources/altex-astro/db/catalog.db
+    replicas:
+      - type: s3
+        bucket: altexweb-backups
+        path: catalog
+        access-key-id: $LITESTREAM_ACCESS_KEY_ID
+        secret-access-key: $LITESTREAM_SECRET_ACCESS_KEY
+        endpoint: $LITESTREAM_REPLICA_ENDPOINT
+        region: auto
+        sync-interval: 24h
