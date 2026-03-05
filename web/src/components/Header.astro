@@ -3,49 +3,17 @@ import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
 import { getNavPathManager } from '../core/utils/nav-path-manager';
 import CartMenu from './cart/CartMenu.astro';
+import { DialogActionButtons } from '../core/const';
+import Modal from "./ModalDialog.astro";
 
 const allPaths = getNavPathManager().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
+const searchDialogID = "search-dialog";
+
 const titleLightThemeSwitch = "Переключиться тему на светлую";
 const titleDarkThemeSwitch = "Переключить тему на темную";
+const titleSearchInput = "Введите ключевые слова для поиска";
+const titleDialog = "Поиск по каталогу товаров"
 ---
-
-<script>
-  import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
-
-  let controller: AbortController | undefined;
-  let themeToggleManager: ThemeToggleManager | undefined;
-
-  const applyThemeToggler = () => {
-    //console.log("🌎 ~ Header component ~ apply theme toggler");
-    controller && controller.abort();
-    
-    themeToggleManager = getThemeToggleManager({
-      coreEl: document.querySelector('[data-theme-toggle]'),
-      darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
-      lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
-        
-    controller = new AbortController();
-    themeToggleManager.apply(controller.signal);
-  }
-
-  document.addEventListener("astro:page-load", () => {
-    // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
-    applyThemeToggler();
-  });
-
-  // To avoid glitch with current theme on page transitions.
-  document.addEventListener("astro:after-swap", () => {    
-    const currentTheme = themeToggleManager && themeToggleManager.getCurrentTheme();
-    if (currentTheme !== undefined) {
-     document.documentElement.setAttribute("data-theme", currentTheme);
-    }
-  });
-
-  window.addEventListener('pagehide', () => {
-    // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller && controller.abort(); 
-  });
-</script>
 
 <div class="navbar sticky top-0 z-50 bg-base-300 border-b border-solid border-neutral-content">
   <div class="navbar-start pl-3">
@@ -75,50 +43,24 @@ const titleDarkThemeSwitch = "Переключить тему на темную"
   <div class="navbar-center hidden sm:flex">
     <ul class="menu menu-horizontal px-1 font-semibold">
       {allPaths && allPaths.map((x) => (
-        <li>
+        <li id={x.path}>
           <a href={"/".concat(x.path)}>{x.value}</a>
         </li>
       ))}
-      {/* Search for desktop screens */}
-      <li class="px-3">
-        <input id="search" type="text" placeholder="Поиск" class="input input-sm w-24 md:w-auto" />
-      </lid>
     </ul>
   </div>
   <div class="navbar-end gap-1">
-    {/* Search for mobile screens */}
-    <div class="sm:hidden">
+    <button id="searchButton" type="button" class="btn inline-flex items-center gap-1 rounded-full bg-gray-950/2 px-2 py-1 inset-ring inset-ring-gray-950/8 dark:bg-white/5 dark:inset-ring-white/2">      
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="size-5">
         <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
-    </div>
+      <kbd class="kbd kbd-sm font-mono opacity-60">
+        <span data-keyboard-prefix class="mr-0.5">⌘</span>K
+      </kbd>
+    </button>
     {/* Shopping cart */}
     <CartMenu />
-    {/* User profile - not supported yet, guest users only */}
-    {/* <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="indicator">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <title>Аккаунт пользователя</title>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-          </svg>
-        </div>
-      </div>
-      <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-300 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li>
-          <a class="justify-between">
-            Мой профиль
-            <span class="badge">New</span>
-          </a>
-        </li>
-        <li><a>Настройки</a></li>
-        <li><a>Выход</a></li>
-      </ul>
-    </div> */}
     {/* Light/Dark theme toggler */}
     <div class="ml-1 mr-5">
       <label class="swap swap-rotate hover:text-gray-500">
@@ -146,5 +88,89 @@ const titleDarkThemeSwitch = "Переключить тему на темную"
         </svg>
       </label>
     </div>
-  </div>
+  </div>  
 </div>
+<Modal id={searchDialogID} title={titleDialog} actionButtons={DialogActionButtons.None}>
+  <div class="flex gap-2 mt-2">
+    <label class="input border-hidden outline-hidden">
+      <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <g
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2.5"
+          fill="none"
+          stroke="currentColor"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </g>
+      </svg>
+      <input type="search" placeholder={titleSearchInput} required />
+    </label>
+  </div>
+</Modal>
+
+<script>
+  import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
+
+  const controller: AbortController = new AbortController();
+  const searchDialogEl = document.querySelector("#search-dialog");
+  const themeToggleManager: ThemeToggleManager = getThemeToggleManager({
+      coreEl: document.querySelector('[data-theme-toggle]'),
+      darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
+      lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
+
+
+  const showSearchDialog = () => {
+    (searchDialogEl as HTMLDialogElement).showModal();
+  }
+
+  const applyThemeToggler = () => {
+    themeToggleManager.apply(controller.signal);
+  }
+
+  const applyKeyboardShortcuts = () => {
+    const isMacOs = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone";
+    const modifierKeyPrefix = isMacOs
+      ? "⌘" 
+      : "Ctrl";
+    
+    const keyboardPrefixEl = document.querySelector('[data-keyboard-prefix]');
+    if (keyboardPrefixEl !== null) keyboardPrefixEl.textContent = modifierKeyPrefix;
+
+    const searchButtonEl = document.querySelector(`#searchButton`);
+    searchButtonEl?.addEventListener("click", 
+      showSearchDialog, 
+      { signal: controller.signal });
+
+    document.addEventListener("keydown", (e) => { 
+      if (isMacOs && e.metaKey && e.key.toLowerCase() === 'k') {
+        showSearchDialog()
+        return;
+      }
+      if (!isMacOs && e.ctrlKey && e.key.toLowerCase() === 'k') {
+        showSearchDialog(); 
+        return;
+      }
+    }, { signal: controller.signal });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
+    applyThemeToggler();
+    applyKeyboardShortcuts();
+  });
+
+  // To avoid glitch with current theme on page transitions.
+  document.addEventListener("astro:after-swap", () => {    
+    const currentTheme = themeToggleManager.getCurrentTheme();
+    if (currentTheme !== undefined) {
+     document.documentElement.setAttribute("data-theme", currentTheme);
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    // This instantly removes all listeners using 'signal' from themeToggleManager
+    controller && controller.abort(); 
+  });
+</script>

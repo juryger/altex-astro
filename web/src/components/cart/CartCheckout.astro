@@ -181,7 +181,7 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
           .then((result) => {
             if (!result) {
               if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = "Failed to create new order." ;
-              (this.errorPopupEl as HTMLDialogElement).showModal();
+              this.errorPopupEl && (this.errorPopupEl as HTMLDialogElement).showModal();
               return;
             }
             this.resetCart();
