@@ -1,0 +1,120 @@
+---
+const searchLoadingId = "search-loading";
+const searchInputName = "search-input";
+
+interface Props {
+  searchDialogId: string;
+  searchResultDataAttribute: string;
+}
+const { searchDialogId, searchResultDataAttribute } = Astro.props; 
+
+const titleSearchInput = "Введите ключевые слова";
+---
+
+<search-input data-search_dialog={searchDialogId} data-search_results={searchResultDataAttribute} data-search_input={searchInputName} data-search_loading={searchLoadingId}>
+  <label class="input p-0 border-0 border-b-2 rounded-none focus-within:border-primary focus-within:outline-hidden w-full">
+    <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <g
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        stroke-width="2.5"
+        fill="none"
+        stroke="currentColor"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </g>
+    </svg>
+    <input name={searchInputName} type="search" placeholder={titleSearchInput} autocomplete="off" autocorrect="off" autofocus />
+    <div class="w-8">
+      <span id={searchLoadingId} class="loading loading-ring loading-xl text-primary hidden"></span>
+    </div>
+    <kbd class="kbd kbd-sm">esc</kbd>
+  </label>
+</search-input>
+
+<script>
+  import searchResults from "./data.json" with { type: "json" };
+  import type { SearchResult } from "@/lib/domain";
+  import { debounce, INPUT_DEBOUNCE_DELAY_MS } from "@/lib/domain";
+  import { getElementByDataAttribute, getDialogElementById, getElementById, getInputElementByName } from "@/web/src/core/utils/dom-utils";
+  import { createSearchResultMarkup } from "@/web/src/core/utils/search-manager";
+  import { saveSearch } from "@/web/src/core/stores/search-store";
+
+  class SearchInput extends HTMLElement {
+    private controller: AbortController;
+    private searchDialogEl: HTMLDialogElement | null = null;
+    private searchResultEl: HTMLUListElement | null = null;
+    private searchInputEl: HTMLInputElement | null = null;
+    private searchLoadingEl: HTMLSpanElement | null = null;
+    
+    constructor() {
+      super();
+      this.controller = new AbortController();
+      this.onSearchInput = this.onSearchInput.bind(this);
+      this.handleDialogToggle = this.handleDialogToggle.bind(this);
+    }
+    
+    private cleanupSearchResults = () => { 
+      this.searchResultEl?.replaceChildren();
+    }
+
+    private onSearchInput(value: string) {
+      const searchTerms = value.trim();
+      if (this.searchLoadingEl) {
+          this.searchLoadingEl.style.display = searchTerms.length > 0 
+            ? "block" 
+            : "none";
+      }
+
+      this.cleanupSearchResults();
+      const results = searchResults as SearchResult[];
+      saveSearch(results);
+
+      results.forEach(item => {
+        const divAlert = document.createElement("li");
+        divAlert.classList.add("flex", "p-2", "gap-3", "items-start");
+        this.searchResultEl && this.searchResultEl.appendChild(divAlert);
+        divAlert.innerHTML = createSearchResultMarkup(item);
+      });
+    }
+
+    private handleDialogToggle(e: ToggleEvent) {
+      if (e.newState === "closed") {
+        this.searchLoadingEl && (this.searchLoadingEl.style.display = "none");
+      }
+    }
+
+    connectedCallback() {
+      this.searchDialogEl = getDialogElementById(document, 
+        this.dataset.search_dialog) as HTMLDialogElement;
+    this.searchResultEl = getElementByDataAttribute(document, 
+        this.dataset.search_results
+      ) as HTMLUListElement;
+      this.searchInputEl = getInputElementByName(this,
+        this.dataset.search_input
+      ) as HTMLInputElement;
+      this.searchLoadingEl = getElementById(this, 
+        this.dataset.search_loading
+      ) as HTMLSpanElement;
+
+      this.searchDialogEl?.addEventListener(
+        "toggle",
+        this.handleDialogToggle,
+        { signal: this.controller.signal },
+      );
+
+      const debouncedInput = debounce(this.onSearchInput, INPUT_DEBOUNCE_DELAY_MS);
+      this.searchInputEl?.addEventListener(
+        "input", 
+        () => debouncedInput(this.searchInputEl?.value), 
+        { signal: this.controller.signal }
+      );
+    }
+
+    disconnectedCallback() {
+      this.controller.abort();
+    }
+  }
+  customElements.define('search-input', SearchInput);
+</script>

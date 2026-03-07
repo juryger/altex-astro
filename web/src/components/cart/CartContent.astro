@@ -161,6 +161,14 @@ const titleSubtotal = "Итого:";
       }
     }
 
+    private addNewCartProductElement(value: string) {
+      if (!this.cartContainerEl) return;
+      const divAlert: Element = document.createElement("li");
+      divAlert.classList.add("flex", "p-2");
+      this.cartContainerEl.appendChild(divAlert);
+      divAlert.innerHTML = value;
+    }
+
     private syncCartContentFromStore() {
       if (this.cartContainerEl === null
         || this.updateCartCommandName === null
@@ -174,15 +182,18 @@ const titleSubtotal = "Итого:";
       
       // remember scroll position to restore after content repaint
       const scrollTop = this.scrollContainerEl?.scrollTop;
-      //console.log("🚩 ~ CartContent ~ scroll position before repaint:", scrollTop);
-
+    
       this.cleanupCartContent();
-      cartItems.forEach(item => {
-        const divAlert = document.createElement("li");
-        divAlert.classList.add("flex", "p-2");
-        this.cartContainerEl && this.cartContainerEl.appendChild(divAlert);
+      cartItems.forEach(item => {        
         if (this.updateCartCommandName !== undefined && this.removeCartCommandName !== undefined) {
-          divAlert.innerHTML = createCartItemMarkup(item, this.discountIndex, this.productColors, this.updateCartCommandName, this.removeCartCommandName);
+          const cartItemMarkup = createCartItemMarkup(
+            item, 
+            this.discountIndex, 
+            this.productColors, 
+            this.updateCartCommandName, 
+            this.removeCartCommandName
+          );
+          this.addNewCartProductElement(cartItemMarkup);
         }
       });
 

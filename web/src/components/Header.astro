@@ -3,15 +3,15 @@ import { Image } from 'astro:assets';
 import AltexLogo from '../assets/altex-logo-md.png';
 import { getNavPathManager } from '../core/utils/nav-path-manager';
 import CartMenu from './cart/CartMenu.astro';
-import { DialogActionButtons } from '../core/const';
+import { DialogActionButtons, DialogSize } from '../core/const';
 import Modal from "./ModalDialog.astro";
+import SearchContainer from "./search/SearchContainer.astro";
 
 const allPaths = getNavPathManager().getAllPaths({ isMainMenu: true, isFooter: false, isBreadcrumbs: false });
-const searchDialogID = "search-dialog";
+const searchDialogId = "search-dialog";
 
 const titleLightThemeSwitch = "Переключиться тему на светлую";
 const titleDarkThemeSwitch = "Переключить тему на темную";
-const titleSearchInput = "Введите ключевые слова для поиска";
 const titleDialog = "Поиск по каталогу товаров"
 ---
 
@@ -50,7 +50,7 @@ const titleDialog = "Поиск по каталогу товаров"
     </ul>
   </div>
   <div class="navbar-end gap-1">
-    <button id="searchButton" type="button" class="btn inline-flex items-center gap-1 rounded-full bg-gray-950/2 px-2 py-1 inset-ring inset-ring-gray-950/8 dark:bg-white/5 dark:inset-ring-white/2">      
+    <button id="searchButton" type="button" class="btn inline-flex items-center gap-1 rounded-full bg-gray-950/2 px-2 py-1 inset-ring inset-ring-gray-950/8 dark:bg-white/5 dark:inset-ring-white/2">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="size-5">
         <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -88,33 +88,16 @@ const titleDialog = "Поиск по каталогу товаров"
         </svg>
       </label>
     </div>
-  </div>  
-</div>
-<Modal id={searchDialogID} title={titleDialog} actionButtons={DialogActionButtons.None}>
-  <div class="flex gap-2 mt-2">
-    <label class="input border-hidden outline-hidden">
-      <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-        <g
-          stroke-linejoin="round"
-          stroke-linecap="round"
-          stroke-width="2.5"
-          fill="none"
-          stroke="currentColor"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
-        </g>
-      </svg>
-      <input type="search" placeholder={titleSearchInput} required />
-    </label>
   </div>
+</div>
+<Modal id={searchDialogId} title={titleDialog} actionButtons={DialogActionButtons.None} size={DialogSize.Medium}>
+  <SearchContainer searchDialogId={searchDialogId} />
 </Modal>
 
 <script>
   import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
 
-  const controller: AbortController = new AbortController();
-  const searchDialogEl = document.querySelector("#search-dialog");
+  const controller: AbortController = new AbortController();  
   const themeToggleManager: ThemeToggleManager = getThemeToggleManager({
       coreEl: document.querySelector('[data-theme-toggle]'),
       darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
@@ -122,47 +105,51 @@ const titleDialog = "Поиск по каталогу товаров"
 
 
   const showSearchDialog = () => {
-    (searchDialogEl as HTMLDialogElement).showModal();
+    const searchDialogEl = document.querySelector("#search-dialog") as HTMLDialogElement;
+    searchDialogEl.showModal();
   }
 
   const applyThemeToggler = () => {
+    console.log("🧪 ~ Header ~ apply theme toggler");
     themeToggleManager.apply(controller.signal);
   }
 
   const applyKeyboardShortcuts = () => {
     const isMacOs = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone";
     const modifierKeyPrefix = isMacOs
-      ? "⌘" 
+      ? "⌘"
       : "Ctrl";
-    
+
     const keyboardPrefixEl = document.querySelector('[data-keyboard-prefix]');
     if (keyboardPrefixEl !== null) keyboardPrefixEl.textContent = modifierKeyPrefix;
 
     const searchButtonEl = document.querySelector(`#searchButton`);
-    searchButtonEl?.addEventListener("click", 
-      showSearchDialog, 
+    searchButtonEl?.addEventListener("click",
+      showSearchDialog,
       { signal: controller.signal });
 
-    document.addEventListener("keydown", (e) => { 
+    document.addEventListener("keydown", (e) => {
       if (isMacOs && e.metaKey && e.key.toLowerCase() === 'k') {
         showSearchDialog()
         return;
       }
       if (!isMacOs && e.ctrlKey && e.key.toLowerCase() === 'k') {
-        showSearchDialog(); 
+        showSearchDialog();
         return;
       }
     }, { signal: controller.signal });
   }
 
   document.addEventListener("astro:page-load", () => {
+    console.log("🧪 ~ Header ~ astro load");
     // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
     applyThemeToggler();
     applyKeyboardShortcuts();
   });
 
   // To avoid glitch with current theme on page transitions.
-  document.addEventListener("astro:after-swap", () => {    
+  document.addEventListener("astro:after-swap", () => {
+    console.log("🧪 ~ Header ~ astro swap");
     const currentTheme = themeToggleManager.getCurrentTheme();
     if (currentTheme !== undefined) {
      document.documentElement.setAttribute("data-theme", currentTheme);
@@ -170,7 +157,8 @@ const titleDialog = "Поиск по каталогу товаров"
   });
 
   window.addEventListener('pagehide', () => {
+    console.log("🧪 ~ Header ~ pagehide");
     // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller && controller.abort(); 
+    controller && controller.abort();
   });
 </script>

@@ -46,7 +46,7 @@ const getLocalStorageManager = (
       );
       if (isSyncing !== null && regexTrue.test(isSyncing)) {
         console.warn(
-          "⚠️ ~ local-storage-manager ~ catalog caching is in progress, cannot start another one.",
+          "~ local-storage-manager ~ catalog caching is in progress, cannot start another one.",
         );
         return false;
       }
@@ -59,7 +59,7 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(lastSyncDate), invalidateHours);
       isSyncRequired &&
         console.warn(
-          "⚠️ ~ local-storage-manager ~ catalog sync is required (either expired or new setup):",
+          "~ local-storage-manager ~ catalog sync is required (either expired or new setup):",
           lastSyncDate ? new Date(lastSyncDate) : "",
         );
       return isSyncRequired;
@@ -103,7 +103,7 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(themeChangedDate), invalidateHours)
       ) {
         console.warn(
-          "⚠️ ~ local-storage-manger ~ theme settings reset is required (either expired or new setup).",
+          "~ local-storage-manger ~ theme settings reset is required (either expired or new setup).",
         );
         localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);
         localStorage.removeItem(LocalStorageKeys.USER_THEME_CHANGED_DATE);

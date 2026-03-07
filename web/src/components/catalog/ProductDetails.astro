@@ -38,24 +38,24 @@ const titleUnknown = "(?)";
   data-image={item.imageUrl} data-thumbnail-image={item.thumbnailImageUrl} data-slug={item.slug}
 >
   <div class="grid grid-cols-1 gap-2 sm:gap-6 sm:grid-cols-3 px-2 py-2">
-    <div>
+    <div class="flex flex-col gap-4 px-2 py-2">
       {/* Product code */}
       <div class="flex flex-row justify-center lg:justify-start pb-2">
         <span class="text-xs italic \">{titleProductCode}:</span>
         <span class="text-xs italic ml-1">{item.productCode}</span>
       </div>
       {/* Gallery */}
-      <figure class="bg-base-100 aspect-square w-full object-cover lg:aspect-auto h-[37.5] md:h-[125]">
-        <Image src=`${item.imageUrl}` alt=`${item.title}` width="350" height="350" class="rounded-xl h-[37.5] md:h-[125] object-contain" />
+      <figure class="self-center bg-base-100 aspect-square bject-cover lg:aspect-auto h-42 md:h-92">
+        <Image src=`${item.imageUrl}` alt=`${item.title}` width="350" height="350" class="rounded-xl object-contain" />
       </figure>
     </div>
     <div class="flex flex-col gap-2 col-span-2">
       <div>
         {isPreview && 
           <a href=`/catalog/products/${item.slug}`>
-            <div class="flex flex-row align-top">
+            <div class="flex flex-row items-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pt-1">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
               </svg>
               <h1 class="card-title text-lg font-bold pl-1 text-left" title={item.title}>
                 {trimEnd(item.title, 100)} 
@@ -82,7 +82,7 @@ const titleUnknown = "(?)";
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
       <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
-      <div class="flex items-center justify-center md:justify-start my-4">
+      <div class="flex items-center justify-start my-4">
         <QuantitySelector inputControlName={inputQuantityName} quantity={1} />
         <button name={btnAddToCartName} class="btn btn-active btn-primary ml-4">{titleAddToCart}</button>
       </div>

@@ -6,4 +6,4 @@ type Filtering = {
   operator: FilterOperator;
 };
 
-export { type Filtering };
+export type { Filtering };

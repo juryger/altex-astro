@@ -1,13 +1,12 @@
 ---
 import { Image } from 'astro:assets';
-import altexLogo from '../assets/alex-welcome.jpg';
+import altexLogo from '../assets/alex-welcome.png';
 ---
 
 <div class="hero bg-base-100">
   <div class="hero-content flex-col lg:flex-row">
-    <Image src={altexLogo}
-      class="max-w-3xs rounded-lg shadow-2xl"
-      alt="Owner"
+    <Image src={altexLogo} width="256" height="256" class="rounded-lg object-contain shadow-2xl"
+      alt="Altex director"
     />
     <div class="px-0 lg:pl-3">
       <h3 class="text-3xl font-bold text-center lg:text-left">Приветствую, Вас!</h3>

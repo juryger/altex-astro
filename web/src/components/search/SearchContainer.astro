@@ -1,0 +1,71 @@
+---
+import SearchInput from "./SearchInput.astro"
+
+interface Props {
+  searchDialogId: string;
+};
+const { searchDialogId } = Astro.props; 
+
+const searchResultDataAttribute = "data-search-results";
+const titleSearchHistory = "История поиска";
+---
+
+<search-conatiner data-search_results={searchResultDataAttribute} data-search_history={titleSearchHistory}>
+  <div class="flex flex-col gap-2 min-h-[420px] max-h-[420px] md:min-h-[600px] md:max-h-[600px]">
+    <SearchInput searchDialogId={searchDialogId} searchResultDataAttribute={searchResultDataAttribute} />    
+    <div class="overflow-auto">
+      <ul data-search-results role="list" class="divide-y divide-gray-200">
+      </ul>  
+    </div>
+  </div>  
+</search-conatiner>
+
+<script>
+  import { getElementByDataAttribute } from "@/web/src/core/utils/dom-utils";
+  import { $search, saveSearch } from "@/web/src/core/stores/search-store";
+  import { createSearchResultMarkup } from "@/web/src/core/utils/search-manager";
+
+  class SearchContainer extends HTMLElement {
+    private controller: AbortController;    
+    private searchResultEl: HTMLUListElement | null = null;
+    private titleSearchHistory: string = "";
+
+    constructor() {
+      super();
+      this.controller = new AbortController(); 
+    }
+  
+    private addNewSearchResultElement(value: string) {
+      const divAlert: Element = document.createElement("li");
+      divAlert.classList.add("flex", "gap-1", "p-2");
+      this.searchResultEl && this.searchResultEl.appendChild(divAlert);
+      divAlert.innerHTML = value;
+    }
+
+    private syncSearchHistory() {
+      this.addNewSearchResultElement(
+        `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span class="text-sm">${this.titleSearchHistory}</span>`
+      );
+      $search.get().forEach(item => 
+        this.addNewSearchResultElement(createSearchResultMarkup(item))
+      );
+    }
+
+    connectedCallback() {      
+      this.searchResultEl = getElementByDataAttribute(document, 
+        this.dataset.search_results
+      ) as HTMLUListElement;
+
+      this.titleSearchHistory = this.dataset.search_history ?? "";
+      this.syncSearchHistory();
+    }
+
+    disconnectedCallback() {
+      this.controller.abort();
+    }
+  }
+  customElements.define('search-conatiner', SearchContainer);
+</script>

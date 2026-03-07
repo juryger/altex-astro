@@ -75,3 +75,16 @@ input[type="number"] {
 .hide-scroll-bar::-webkit-scrollbar {
   display: none;
 }
+
+/* For WebKit and Blink browsers (Chrome, Safari, Edge, Opera) */
+input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+  -webkit-appearance: none; /* additional styling to ensure no space is left */
+}
+
+/* For Internet Explorer */
+input[type="search"]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}

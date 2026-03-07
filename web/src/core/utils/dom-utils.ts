@@ -1,5 +1,5 @@
 const getFormElementByName = (
-  rootNode: Element,
+  rootNode: Element | Document,
   name: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`form[name='${name}']`);
@@ -12,7 +12,7 @@ const getFormElementByName = (
 };
 
 const getDialogElementById = (
-  rootNode: Element,
+  rootNode: Element | Document,
   name: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`dialog[id='${name}']`);
@@ -25,7 +25,7 @@ const getDialogElementById = (
 };
 
 const getInputElementByName = (
-  rootNode: Element,
+  rootNode: Element | Document,
   name: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`input[name='${name}']`);
@@ -38,7 +38,7 @@ const getInputElementByName = (
 };
 
 const getButtonElementByName = (
-  rootNode: Element,
+  rootNode: Element | Document,
   name: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`button[name='${name}']`);
@@ -51,7 +51,7 @@ const getButtonElementByName = (
 };
 
 const getElementById = (
-  rootNode: Element,
+  rootNode: Element | Document,
   id: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`#${id}`);
@@ -64,7 +64,7 @@ const getElementById = (
 };
 
 const getElementByDataAttribute = (
-  rootNode: Element,
+  rootNode: Element | Document,
   name: string | undefined,
 ): Element | null => {
   const result = rootNode.querySelector(`[${name}]`);

@@ -74,6 +74,11 @@ const handleThemeToggle = (
   localStorageManager: StateManagerFeatures,
   themeToggled: (value: string) => void,
 ) => {
+  console.log(
+    "🧪 ~ theme-toggler ~ handel theme toggle, current theme: '%s', new theme: '%s'",
+    currentTheme,
+    newTheme,
+  );
   if (newTheme === undefined || currentTheme === undefined) {
     console.warn("🌎 ~ theme-toggler ~ new and current are undefined");
     return;
@@ -108,8 +113,9 @@ const getThemeToggleManager = (
   let newTheme: string | undefined;
   const localStorageManager = getLocalStorageManager();
   let currentTheme = localStorageManager.getUserThemePreference();
-  if (currentTheme !== undefined)
+  if (currentTheme !== undefined) {
     syncThemeToggleControls(currentTheme, inputElements);
+  }
 
   return {
     apply: (signal: AbortSignal) => {
