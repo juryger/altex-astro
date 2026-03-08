@@ -66,7 +66,7 @@ const createCartItemMarkup = (
         <a href=/catalog/products/${value.slug}>
           <figure class="aspect-square min-h-[80px]">
             <Image 
-              src=${value.image} 
+              src=${value.thumbnailImageUrl} 
               alt=${value.title} 
               width="80" height="80" class="rounded-xl" />
           </figure>

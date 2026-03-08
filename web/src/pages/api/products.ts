@@ -12,7 +12,6 @@ import { CACHE_STALE_TIMEOUT_5MN, CacheKeys, getCacheInfo } from "@/lib/domain";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  //console.log("📍 ~ API-GET ~ products list ~ URL:", URL.parse(request.url));
   const url = URL.parse(request.url);
   const categorySlug =
     extractUrlParam(url, APISearchParamNames.Category, "string") ?? "";
@@ -33,7 +32,6 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     });
   }
 
-  //console.log("🧪 products %o", result);
   if (!categorySlug) {
     return new Response(null, {
       status: 404,

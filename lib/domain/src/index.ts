@@ -3,6 +3,7 @@ export {
   NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
   INPUT_DEBOUNCE_DELAY_MS,
+  SEARCH_RECORDS_LIMIT,
   ImageContainers,
   ReadReplicaTypes,
   SearchTypes,

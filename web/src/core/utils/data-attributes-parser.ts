@@ -69,16 +69,16 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     return undefined;
   }
 
-  const image = dataset.image;
-  if (image === undefined) {
+  const imageUrl = dataset.image_url;
+  if (imageUrl === undefined) {
     console.warn(
       `~ Product data attributes parser ~ value of Image is not defined`,
     );
     return undefined;
   }
 
-  const thumbnailImage = dataset.thumbnailImage;
-  if (thumbnailImage === undefined) {
+  const thumbnailImageUrl = dataset.thumbnail_image_url;
+  if (thumbnailImageUrl === undefined) {
     console.warn(
       `~ Product data attributes parser ~ value of Thumbnail image is not defined`,
     );
@@ -123,8 +123,8 @@ const parseProduct = (dataset: DOMStringMap): Product | undefined => {
     categoryId,
     categorySlug,
     colors,
-    imageUrl: image,
-    thumbnailImageUrl: thumbnailImage,
+    imageUrl,
+    thumbnailImageUrl,
     slug,
   } as Product;
 };

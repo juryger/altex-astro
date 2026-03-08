@@ -100,8 +100,6 @@ const titleDialog = "Поиск по каталогу товаров"
   let controller: AbortController | undefined;  
   let themeToggleManager: ThemeToggleManager | undefined ;
 
-  console.log("🧪 ~ Header ~ load");
-
   const showSearchDialog = () => {
     const searchDialogEl = document.querySelector("#search-dialog") as HTMLDialogElement;
     searchDialogEl.showModal();
@@ -142,7 +140,6 @@ const titleDialog = "Поиск по каталогу товаров"
   }
 
   document.addEventListener("astro:page-load", () => {
-    console.log("~ Header ~ astro:page-load");
     // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
     controller?.abort()
     controller = new AbortController();
@@ -151,7 +148,6 @@ const titleDialog = "Поиск по каталогу товаров"
   });
 
   window.addEventListener('pagehide', () => {
-    console.log("~ Header ~ pagehide");
     // This instantly removes all listeners using 'signal' from themeToggleManager
     controller?.abort();
   });

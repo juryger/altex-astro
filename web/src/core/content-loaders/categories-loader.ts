@@ -57,15 +57,10 @@ const loadCategories = async (
 function createCategoriesLoader(config: {
   baseUrl: string;
 }): LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter> {
-  //console.log("🛠️ ~ createCategoriesLoader ~ config:", config);
   return {
     name: "categories-loader",
     loadCollection: async ({ filter }) => {
       try {
-        // console.log(
-        //   "🛠️ ~ createCategoriesLoader ~ collection retrieving ~ filter:",
-        //   filter,
-        // );
         const data = await loadCategories(config.baseUrl, filter);
         return {
           entries: data.items.map((x: Category) => ({
@@ -95,7 +90,6 @@ function createCategoriesLoader(config: {
         }
 
         const data = await response.json();
-        //console.log("🛠️ ~ categories-loader ~ entry:", data);
         const result = {
           ...data,
           createdAt: new Date(data.createdAt),

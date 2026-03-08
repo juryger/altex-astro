@@ -71,10 +71,6 @@ function createProductsLoader(config: {
     name: "product-loader",
     loadCollection: async ({ filter }) => {
       try {
-        // console.log(
-        //   "🛠️ ~ createProductsLoader ~ collection retrieving ~ filter:",
-        //   filter,
-        // );
         const data = await loadProducts(config.baseUrl, filter);
         return {
           entries: data.items.map((x: Product) => ({ id: x.slug, data: x })),
@@ -87,10 +83,6 @@ function createProductsLoader(config: {
     },
     loadEntry: async ({ filter }) => {
       try {
-        // console.log(
-        //   "🛠️ ~ createProductsLoader ~ entry retrieving ~ filter:",
-        //   filter,
-        // );
         const response = await fetch(
           `${config.baseUrl}/${APIEndpointNames.Products}/${filter.slug}`,
         );
@@ -104,7 +96,6 @@ function createProductsLoader(config: {
         }
 
         const data = await response.json();
-        //console.log("🛠️ ~ products-loader ~ entry:", data);
         const result = {
           ...data,
           createdAt: new Date(data.createdAt),

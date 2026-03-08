@@ -25,7 +25,7 @@ const titleCancelButton = "Отменить";
 
 <dialog id={id} class="modal">
   <div class:list={['modal-box', 'text-left', {'max-w-5xl': size === DialogSize.Large }, {'max-w-2xl': size === DialogSize.Medium }, {'max-w-xl': size === DialogSize.Small}]}>
-    <h3 class="text-lg font-bold mt-[-15px]">{title}</h3>
+    <h3 class="text-lg font-bold mt-[-15px] mb-2.5">{title}</h3>
     <main>
       <slot />
       <div class="modal-action">

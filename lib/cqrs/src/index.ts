@@ -20,3 +20,5 @@ export { fetchReadReplica } from "./queries/read-replica";
 
 export { checkoutCart } from "./commands/cart-checkout";
 export { upsertGuestUser } from "./commands/guest-user";
+
+export { fetchAllCategories, fetchAllProducts } from "./queries/search";

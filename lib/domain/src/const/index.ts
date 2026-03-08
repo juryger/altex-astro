@@ -1,6 +1,7 @@
 const NO_IMAGE_FILE_NAME = "noimage.png";
 const NO_VALUE_ASSIGNED = "---";
 const INPUT_DEBOUNCE_DELAY_MS = 500;
+const SEARCH_RECORDS_LIMIT: number = 1000;
 
 enum ImageContainers {
   Categories = "categories",
@@ -13,14 +14,15 @@ enum ReadReplicaTypes {
 }
 
 enum SearchTypes {
-  Category = "category",
-  Product = "product",
+  Category = 0,
+  Product = 1,
 }
 
 export {
   NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
   INPUT_DEBOUNCE_DELAY_MS,
+  SEARCH_RECORDS_LIMIT,
   ImageContainers,
   ReadReplicaTypes,
   SearchTypes,

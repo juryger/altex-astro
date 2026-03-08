@@ -32,7 +32,7 @@ const titleUnknown = "(?)";
   data-id={item.id} data-product_uid={item.uid} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
-  data-image={item.imageUrl} data-thumbnail-image={item.thumbnailImageUrl} data-slug={item.slug}
+  data-image_url={item.imageUrl} data-thumbnail_image_url={item.thumbnailImageUrl} data-slug={item.slug}
 >
   <div class="card bg-base-300 w-auto shadow-sm px-2 py-2">
     {/* Product image with quick preivew */}
@@ -108,7 +108,7 @@ const titleUnknown = "(?)";
         price: this.value.price,
         whsPrice1: this.value.whsPrice1,
         whsPrice2: this.value.whsPrice2,
-        image: this.value.thumbnailImageUrl,
+        thumbnailImageUrl: this.value.thumbnailImageUrl,
         slug: this.value.slug,
         colorId: color,
         colorUid: colorItem?.uid,

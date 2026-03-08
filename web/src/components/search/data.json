@@ -1,6 +1,6 @@
 [
   {
-    "type": "category",
+    "type": 0,
     "slug": "ZAMK",
     "title": "Замки",
     "description": null,
@@ -9,7 +9,7 @@
     "thumbnailImageUrl": "http://localhost:4321/categories/thumbnails/a514f2f2-7d2e-434a-97e3-f3b2637663c2.png"
   },
   {
-    "type": "category",
+    "type": 0,
     "slug": "ZAMKFURN",
     "title": "Замочная фурнитура",
     "description": "Loaf da erd kj-ad adfasi. ADfa jruaa ladfuae; sdft.",
@@ -18,7 +18,7 @@
     "thumbnailImageUrl": "http://localhost:4321/categories/thumbnails/5155a71f-9bdb-4bb8-992e-7c98f42e95fe.png"
   },
   {
-    "type": "category",
+    "type": 0,
     "slug": "INST",
     "title": "Инструменты",
     "description": "Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here'.",
@@ -27,7 +27,7 @@
     "thumbnailImageUrl": "http://localhost:4321/categories/thumbnails/5292c9ef-3431-43fa-9f67-a8620d0f19b4.png"
   },
   {
-    "type": "product",
+    "type": 1,
     "slug": "ZAMOFERR1323MEJO",
     "title": "Замок FERRE 1323 межос 80 мм",
     "description": "Замки серии FERRE от производителя из Ferre.",
@@ -36,7 +36,7 @@
     "thumbnailImageUrl": "http://localhost:4321/products/thumbnails/f0eced48-627b-49d4-8cc6-f2a90452c9a8.png"
   },
   {
-    "type": "product",
+    "type": 1,
     "slug": "ZAMOAPEKPD38PERFOKLUC",
     "title": "Замок АПЕКС PD-38 перфо-ключ",
     "description": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
@@ -45,7 +45,7 @@
     "thumbnailImageUrl": "http://localhost:4321/products/thumbnails/6416c021-2212-488b-90aa-edaa174258e0.png"
   },
   {
-    "type": "product",
+    "type": 1,
     "slug": "LICH90MMKLUCKLUC",
     "title": "Личинка МСМ 90 мм ключ-ключ",
     "description": "Rhjd alja farka dalj eerrtos.",
@@ -54,7 +54,7 @@
     "thumbnailImageUrl": "http://localhost:4321/products/thumbnails/noimage.png"
   },
   {
-    "type": "product",
+    "type": 1,
     "slug": "OTVEKRES7025",
     "title": "Отвертка крест 70х25, The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters",
     "description": null,

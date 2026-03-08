@@ -1,38 +1,7 @@
 import { defineAction } from "astro:actions";
-import {
-  CacheKeys,
-  CartCheckoutRequestSchema,
-  CompanyInfoKeys,
-  FailedResult,
-  getCacheInfo,
-  type Result,
-} from "@/lib/domain";
+import { CartCheckoutRequestSchema } from "@/lib/domain";
 import { getCartCheckoutManager } from "../core/utils/cart-checkout-manager";
-import { fetchCompanyInfo, getQueryManager } from "@/lib/cqrs/src";
-import { getEmailManager } from "@/lib/email/src";
-import { EmailSubjects } from "../core/const/messages";
-
-const sendFailureEmail = async (message: string): Promise<Result> => {
-  return getQueryManager()
-    .fetch(() => fetchCompanyInfo(), getCacheInfo(CacheKeys.CompanyInfo))
-    .then((companyInfo) => {
-      if (!companyInfo.ok || companyInfo.data === undefined) {
-        return FailedResult(
-          companyInfo.error ??
-            new Error(
-              "Could not obtain company info for email placeholders substitution",
-            ),
-        );
-      }
-      return getEmailManager().sendFailure({
-        from: companyInfo.data[CompanyInfoKeys.CompanyEmail],
-        to: companyInfo.data[CompanyInfoKeys.AdminEmail],
-        subject: EmailSubjects.Failure,
-        templateParams: { ...companyInfo.data, failureDescription: message },
-      });
-    })
-    .catch((error) => FailedResult(error));
-};
+import { sendFailureEmail } from "../core/utils/failure-manager";
 
 export const cartActions = {
   checkout: defineAction({

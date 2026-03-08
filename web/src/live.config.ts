@@ -14,7 +14,6 @@ import { CategorySchema, ProductSchema } from "@/lib/domain";
 import { type Category, type Product } from "@/lib/domain";
 
 const apiBaseUrl = `${import.meta.env.PUBLIC_API_BASE_URL}`;
-//console.log("🛠️ ~ live.config ~ API url:", apiBaseUrl);
 
 const categories = defineLiveCollection<
   LiveLoader<Category, CategoryEntryFilter, CategoryCollectionFilter>,

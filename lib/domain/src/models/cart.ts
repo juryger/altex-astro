@@ -11,7 +11,7 @@ export const CartSchema = z
     price: z.number(),
     whsPrice1: z.number(),
     whsPrice2: z.number(),
-    image: z.string(),
+    thumbnailImageUrl: z.string(),
     slug: z.string(),
     colorId: z.number().optional(),
     colorUid: z.string().optional(),

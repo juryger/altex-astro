@@ -39,7 +39,6 @@ const assertInputElements = (inputElements: ThemToggleComponents) => {
 };
 
 const setDocumentTheme = (theme: string) => {
-  console.log("🧪 ~ theme-toggle ~ setDocumentTheme:", theme);
   document.documentElement.setAttribute("data-theme", theme);
 };
 
@@ -47,7 +46,6 @@ const syncThemeToggleControls = (
   theme: string,
   inputElements: ThemToggleComponents,
 ): void => {
-  console.log("🧪 ~ theme-toggle ~ syncThemeToggleControls:", theme);
   setDocumentTheme(theme);
   if (theme === darkThemeName) {
     inputElements.coreEl?.setAttribute("value", lightThemeName);
@@ -85,15 +83,9 @@ const getThemeToggleManager = (
   };
 
   const onThemeToggle = () => {
-    console.log("🧪 ~ theme-toggle ~ toggle handler:", nextTheme);
     setDocumentTheme(nextTheme);
     saveThemeToLocalStorage(nextTheme, localStorageManager);
     swapThemeVariables();
-    console.log(
-      "🧪 ~ theme-toggle ~ theme has change, current: '%s', next: '%s'",
-      currentTheme,
-      nextTheme,
-    );
   };
 
   return {

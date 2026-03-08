@@ -6,7 +6,6 @@ import { CacheKeys, getCacheInfo } from "@/lib/domain";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  //console.log("📍 ~ API-GET ~ discounts list ~ URL:", URL.parse(request.url));
   const result = await getQueryManager().fetch<Discount[]>(
     () => fetchDiscounts(),
     getCacheInfo(CacheKeys.Discounts),
