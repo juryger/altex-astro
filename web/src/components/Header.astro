@@ -97,12 +97,10 @@ const titleDialog = "Поиск по каталогу товаров"
 <script>
   import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
 
-  const controller: AbortController = new AbortController();  
-  const themeToggleManager: ThemeToggleManager = getThemeToggleManager({
-      coreEl: document.querySelector('[data-theme-toggle]'),
-      darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
-      lightThemeEl: document.querySelector('[data-theme-toggle-light]')});
+  let controller: AbortController | undefined;  
+  let themeToggleManager: ThemeToggleManager | undefined ;
 
+  console.log("🧪 ~ Header ~ load");
 
   const showSearchDialog = () => {
     const searchDialogEl = document.querySelector("#search-dialog") as HTMLDialogElement;
@@ -110,8 +108,11 @@ const titleDialog = "Поиск по каталогу товаров"
   }
 
   const applyThemeToggler = () => {
-    console.log("🧪 ~ Header ~ apply theme toggler");
-    themeToggleManager.apply(controller.signal);
+    themeToggleManager = getThemeToggleManager({
+      coreEl: document.querySelector('[data-theme-toggle]'),
+      darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
+      lightThemeEl: document.querySelector('[data-theme-toggle-light]')})
+    themeToggleManager.apply(controller?.signal);
   }
 
   const applyKeyboardShortcuts = () => {
@@ -126,7 +127,7 @@ const titleDialog = "Поиск по каталогу товаров"
     const searchButtonEl = document.querySelector(`#searchButton`);
     searchButtonEl?.addEventListener("click",
       showSearchDialog,
-      { signal: controller.signal });
+      { signal: controller?.signal });
 
     document.addEventListener("keydown", (e) => {
       if (isMacOs && e.metaKey && e.key.toLowerCase() === 'k') {
@@ -137,28 +138,21 @@ const titleDialog = "Поиск по каталогу товаров"
         showSearchDialog();
         return;
       }
-    }, { signal: controller.signal });
+    }, { signal: controller?.signal });
   }
 
   document.addEventListener("astro:page-load", () => {
-    console.log("🧪 ~ Header ~ astro load");
+    console.log("~ Header ~ astro:page-load");
     // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
+    controller?.abort()
+    controller = new AbortController();
     applyThemeToggler();
     applyKeyboardShortcuts();
   });
 
-  // To avoid glitch with current theme on page transitions.
-  document.addEventListener("astro:after-swap", () => {
-    console.log("🧪 ~ Header ~ astro swap");
-    const currentTheme = themeToggleManager.getCurrentTheme();
-    if (currentTheme !== undefined) {
-     document.documentElement.setAttribute("data-theme", currentTheme);
-    }
-  });
-
   window.addEventListener('pagehide', () => {
-    console.log("🧪 ~ Header ~ pagehide");
+    console.log("~ Header ~ pagehide");
     // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller && controller.abort();
+    controller?.abort();
   });
 </script>

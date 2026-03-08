@@ -1,7 +1,7 @@
 import { getDateHandler } from "./date-handler";
 import { regexTrue } from "@/lib/domain";
 
-type StateManagerFeatures = {
+type LocalStorageManager = {
   checkCataloSyncRequired(): boolean;
   checkCatalogSyncInProgress(): boolean;
   getCatalogSyncDate(): Date | undefined;
@@ -38,7 +38,7 @@ function IsCacheValid(value: Date, invalidateHours: number) {
 
 const getLocalStorageManager = (
   invalidateHours: number = 4,
-): StateManagerFeatures => {
+): LocalStorageManager => {
   return {
     checkCataloSyncRequired: (): boolean => {
       const isSyncing = localStorage.getItem(
@@ -59,8 +59,8 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(lastSyncDate), invalidateHours);
       isSyncRequired &&
         console.warn(
-          "~ local-storage-manager ~ catalog sync is required (either expired or new setup):",
-          lastSyncDate ? new Date(lastSyncDate) : "",
+          "~ local-storage-manager ~ catalog sync is required as it's either expired or new setup (%s))",
+          lastSyncDate ? new Date(lastSyncDate) : "not set",
         );
       return isSyncRequired;
     },
@@ -103,7 +103,8 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(themeChangedDate), invalidateHours)
       ) {
         console.warn(
-          "~ local-storage-manger ~ theme settings reset is required (either expired or new setup).",
+          "~ local-storage-manger ~ theme settings reset is required as it's either expired or new setup ('%s').",
+          themeChangedDate !== null ? new Date(themeChangedDate) : "not set",
         );
         localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);
         localStorage.removeItem(LocalStorageKeys.USER_THEME_CHANGED_DATE);
@@ -142,4 +143,4 @@ const getLocalStorageManager = (
   };
 };
 
-export { getLocalStorageManager, type StateManagerFeatures };
+export { getLocalStorageManager, type LocalStorageManager };

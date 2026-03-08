@@ -1,5 +1,5 @@
 import {
-  type StateManagerFeatures,
+  type LocalStorageManager,
   getLocalStorageManager,
 } from "./local-storage-manager";
 
@@ -13,12 +13,11 @@ type ThemToggleComponents = {
 };
 
 interface ThemeToggleManager {
-  apply: (signal: AbortSignal) => void;
-  getCurrentTheme: () => string | undefined;
+  apply: (signal?: AbortSignal) => void;
 }
 
 const assertInputElements = (inputElements: ThemToggleComponents) => {
-  const assertMessage = "⚠️ ~ theme-toggle-manager ~ '%s' is not defined";
+  const assertMessage = "⚠️ ~ theme-toggle ~ '%s' is not defined";
 
   console.assert(
     inputElements.coreEl !== null,
@@ -39,15 +38,17 @@ const assertInputElements = (inputElements: ThemToggleComponents) => {
   );
 };
 
-const setTheme = (value: string) => {
-  document.documentElement.setAttribute("data-theme", value);
+const setDocumentTheme = (theme: string) => {
+  console.log("🧪 ~ theme-toggle ~ setDocumentTheme:", theme);
+  document.documentElement.setAttribute("data-theme", theme);
 };
 
 const syncThemeToggleControls = (
   theme: string,
   inputElements: ThemToggleComponents,
 ): void => {
-  setTheme(theme);
+  console.log("🧪 ~ theme-toggle ~ syncThemeToggleControls:", theme);
+  setDocumentTheme(theme);
   if (theme === darkThemeName) {
     inputElements.coreEl?.setAttribute("value", lightThemeName);
     inputElements.darkThemeEl?.classList.replace("swap-on", "swap-off");
@@ -60,106 +61,62 @@ const syncThemeToggleControls = (
 };
 
 const saveThemeToLocalStorage = (
-  theme: string,
-  localStorageManager: StateManagerFeatures,
+  value: string,
+  localStorageManager: LocalStorageManager,
 ) => {
   // Saves user preference to localStorage
-  localStorageManager.setUserThemePreference(theme);
+  localStorageManager.setUserThemePreference(value);
   localStorageManager.setUserThemeChangeDate(new Date());
 };
 
-const handleThemeToggle = (
-  newTheme: string | undefined,
-  currentTheme: string | undefined,
-  localStorageManager: StateManagerFeatures,
-  themeToggled: (value: string) => void,
-) => {
-  console.log(
-    "🧪 ~ theme-toggler ~ handel theme toggle, current theme: '%s', new theme: '%s'",
-    currentTheme,
-    newTheme,
-  );
-  if (newTheme === undefined || currentTheme === undefined) {
-    console.warn("🌎 ~ theme-toggler ~ new and current are undefined");
-    return;
-  }
-
-  if (newTheme === currentTheme) {
-    console.warn(
-      "🌎 ~ theme-toggler ~ new theme %s is the same as current '%s'",
-      newTheme,
-      currentTheme,
-    );
-    return;
-  }
-
-  saveThemeToLocalStorage(newTheme, localStorageManager);
-
-  console.log(
-    "🌎 ~ theme-toggler ~ current theme switched to new theme:",
-    newTheme,
-  );
-
-  setTheme(newTheme);
-  themeToggled(newTheme);
-};
-
-// Handle theme toggle logic with support of localStorage
 const getThemeToggleManager = (
   inputElements: ThemToggleComponents,
 ): ThemeToggleManager => {
   assertInputElements(inputElements);
 
-  let newTheme: string | undefined;
+  let currentTheme: string = lightThemeName;
+  let nextTheme: string = darkThemeName;
   const localStorageManager = getLocalStorageManager();
-  let currentTheme = localStorageManager.getUserThemePreference();
-  if (currentTheme !== undefined) {
-    syncThemeToggleControls(currentTheme, inputElements);
-  }
+
+  const swapThemeVariables = () => {
+    const value = currentTheme;
+    currentTheme = nextTheme;
+    nextTheme = value;
+  };
+
+  const onThemeToggle = () => {
+    console.log("🧪 ~ theme-toggle ~ toggle handler:", nextTheme);
+    setDocumentTheme(nextTheme);
+    saveThemeToLocalStorage(nextTheme, localStorageManager);
+    swapThemeVariables();
+    console.log(
+      "🧪 ~ theme-toggle ~ theme has change, current: '%s', next: '%s'",
+      currentTheme,
+      nextTheme,
+    );
+  };
 
   return {
-    apply: (signal: AbortSignal) => {
-      const isClientOSDarkThemeOn = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-
+    apply: (signal?: AbortSignal) => {
+      currentTheme =
+        localStorageManager.getUserThemePreference() ?? lightThemeName;
       if (currentTheme === undefined) {
         // Apply OS theme
-        currentTheme = isClientOSDarkThemeOn ? darkThemeName : lightThemeName;
-        if (isClientOSDarkThemeOn) {
-          newTheme = lightThemeName;
-          syncThemeToggleControls(darkThemeName, inputElements);
-          saveThemeToLocalStorage(darkThemeName, localStorageManager);
-        } else {
-          newTheme = darkThemeName;
-          syncThemeToggleControls(lightThemeName, inputElements);
-          saveThemeToLocalStorage(lightThemeName, localStorageManager);
-        }
-      } else {
-        newTheme =
-          currentTheme === darkThemeName ? lightThemeName : darkThemeName;
+        const isDeviceOSDarkTheme = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        currentTheme = isDeviceOSDarkTheme ? darkThemeName : lightThemeName;
+        saveThemeToLocalStorage(currentTheme, localStorageManager);
       }
+      syncThemeToggleControls(currentTheme, inputElements);
 
-      const themeSelectorInput = inputElements.coreEl as HTMLInputElement;
-      themeSelectorInput?.addEventListener(
-        "click",
-        () =>
-          handleThemeToggle(
-            newTheme,
-            currentTheme,
-            localStorageManager,
-            (value: string) => {
-              newTheme = currentTheme;
-              currentTheme = value;
-            },
-          ),
-        {
-          signal,
-        },
-      );
-    },
-    getCurrentTheme: (): string | undefined => {
-      return currentTheme;
+      nextTheme =
+        currentTheme === darkThemeName ? lightThemeName : darkThemeName;
+
+      inputElements.coreEl?.removeEventListener("click", onThemeToggle);
+      inputElements.coreEl?.addEventListener("click", onThemeToggle, {
+        signal,
+      });
     },
   };
 };

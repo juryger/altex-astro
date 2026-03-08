@@ -221,7 +221,7 @@ const titleSubtotal = "Итого:";
           return;
         }
         this.discounts = data;
-        this.syncCartCostFromStore()
+        this.syncCartCostFromStore();
       });    
     }
 
@@ -242,14 +242,8 @@ const titleSubtotal = "Итого:";
       this.storeCartUnsubscribe = $cart.listen((items) => {
         //console.log("~ CartContent ~ cart store changed");
         if (this.cartCheckoutEl) (this.cartCheckoutEl as HTMLInputElement).disabled = (items.length === 0);
-        setTimeout(() => {
+        setTimeout(() => {          
           this.syncCartContentFromStore();
-          if (this.discounts.length === 0) {
-            this.loadDiscountsFromIndexedDB();
-          }
-          if (this.productColors.length === 0) {
-            this.loadProductColorsFromIndexedDB();
-          }
         }, CART_VIEW_INIT_TIMEOUT_MS)
       });
     }
@@ -371,14 +365,14 @@ const titleSubtotal = "Итого:";
 
       this.cartCheckoutHandler = this.onCartCheckoutClick();
       this.cartCheckoutEl?.addEventListener('click', this.cartCheckoutHandler, { signal: this.controller.signal });
+      
+      this.loadDiscountsFromIndexedDB();
+      this.loadProductColorsFromIndexedDB();
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
       this.subscribeToWhsCost1Store();
       this.subscribeToWhsCost2Store();
-      
-      this.loadDiscountsFromIndexedDB();
-      this.loadProductColorsFromIndexedDB();
     }
 
     disconnectedCallback() {
