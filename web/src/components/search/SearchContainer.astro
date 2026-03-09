@@ -10,7 +10,10 @@ const searchResultDataAttribute = "data-search-results";
 const titleSearchHistory = "История поиска";
 ---
 
-<search-conatiner data-search_results={searchResultDataAttribute} data-search_history={titleSearchHistory}>
+<search-conatiner 
+  data-search_results={searchResultDataAttribute} 
+  data-search_history={titleSearchHistory}
+>
   <div class="flex flex-col gap-2 min-h-[420px] max-h-[420px] md:min-h-[600px] md:max-h-[600px]">
     <SearchInput searchDialogId={searchDialogId} searchResultDataAttribute={searchResultDataAttribute} />    
     <div class="overflow-auto">
@@ -22,7 +25,7 @@ const titleSearchHistory = "История поиска";
 
 <script>
   import { getElementByDataAttribute } from "@/web/src/core/utils/dom-utils";
-  import { $search, saveSearch } from "@/web/src/core/stores/search-store";
+  import { $search } from "@/web/src/core/stores/search-store";
   import { createSearchResultMarkup } from "@/web/src/core/utils/search-manager";
 
   class SearchContainer extends HTMLElement {
@@ -37,7 +40,7 @@ const titleSearchHistory = "История поиска";
   
     private addNewSearchResultElement(value: string) {
       const divAlert: Element = document.createElement("li");
-      divAlert.classList.add("flex", "gap-1", "p-2");
+      divAlert.classList.add("flex", "p-2", "gap-1");
       this.searchResultEl && this.searchResultEl.appendChild(divAlert);
       divAlert.innerHTML = value;
     }

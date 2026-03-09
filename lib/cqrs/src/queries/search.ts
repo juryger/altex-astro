@@ -52,7 +52,7 @@ const mapProductQueryResultToDomainModel = (
   entity: ProductsQueryResult,
 ): SearchResult => {
   return {
-    type: SearchTypes.Category,
+    type: SearchTypes.Product,
     slug: entity.products.slug,
     title: entity.products.title,
     description: entity.products.description,
@@ -99,7 +99,7 @@ export async function fetchAllProducts(): Promise<SearchResult[]> {
     .select()
     .from(products)
     .leftJoin(makeCountries, eq(products.makeCountryId, makeCountries.id))
-    .where(isNull(categories.deletedAt))
+    .where(isNull(products.deletedAt))
     .orderBy(products.title)
     .limit(SEARCH_RECORDS_LIMIT);
 

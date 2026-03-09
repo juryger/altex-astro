@@ -6,7 +6,6 @@ import failureLogo from '@/web/src/assets/failure.png';
 import { DialogActionButtons } from "../../core/const";
 
 const isDevMode = import.meta.env.DEV;
-
 const dataFormCheckoutName = "form-checkout"
 const dataOrderConfirmCommandName = "order-confirm";
 const dataLoadingName = "loading";
@@ -177,6 +176,7 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
 
         (this.orderConfirmEl as HTMLInputElement).disabled = true;
         (this.loadingEl as HTMLSpanElement).style.display = "block"; 
+
         await this.createOrder()
           .then((result) => {
             if (!result) {

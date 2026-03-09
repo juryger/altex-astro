@@ -1,6 +1,8 @@
 ---
-const searchLoadingId = "search-loading";
-const searchInputName = "search-input";
+import Modal from "../ModalDialog.astro";
+import { Image } from 'astro:assets';
+import failureLogo from '@/web/src/assets/failure.png';
+import { DialogActionButtons } from "@/web/src/core/const";
 
 interface Props {
   searchDialogId: string;
@@ -8,10 +10,29 @@ interface Props {
 }
 const { searchDialogId, searchResultDataAttribute } = Astro.props; 
 
+const isDevMode = import.meta.env.DEV;
+const searchLoadingId = "search-loading";
+const searchInputName = "search-input";
+const dataCheckoutErrorDialogID = "cart-checkout-error-popup";
+const dataCheckoutErrorDetailsId = "cart-checkout-error-details";
+
 const titleSearchInput = "Введите ключевые слова";
+const titleSearchResultsCount = "Найдено";
+const titleErrorHeader = "Техническая неисправность";
+const titleErrorDetailsHeader = "Детали";
+const titleErrorDetails = "Мы работает над выяснением причин."
+const titleSearchFailed = "К сожалению у нас возникла техническая неисправность, попробуйте повторить поиск позднее.";
 ---
 
-<search-input data-search_dialog={searchDialogId} data-search_results={searchResultDataAttribute} data-search_input={searchInputName} data-search_loading={searchLoadingId}>
+<search-input 
+  data-search_dialog={searchDialogId} 
+  data-search_results={searchResultDataAttribute} 
+  data-search_input={searchInputName} 
+  data-search_loading={searchLoadingId}
+  data-error_popup_id={dataCheckoutErrorDialogID}
+  data-error_details_id={dataCheckoutErrorDetailsId}
+  data-search_results_count={titleSearchResultsCount}
+>
   <label class="input p-0 border-0 border-b-2 rounded-none focus-within:border-primary focus-within:outline-hidden w-full">
     <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <g
@@ -28,13 +49,31 @@ const titleSearchInput = "Введите ключевые слова";
     <input name={searchInputName} type="search" placeholder={titleSearchInput} autocomplete="off" autocorrect="off" autofocus />
     <div class="w-8">
       <span id={searchLoadingId} class="loading loading-ring loading-xl text-primary hidden"></span>
+    </label>
     </div>
     <kbd class="kbd kbd-sm">esc</kbd>
-  </label>
+    <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader} actionButtons={DialogActionButtons.OK}>
+      <div class="flex gap-2 mt-2">
+        <div class="grow-0 content-start">
+          <Image src={failureLogo}
+              class="w-32"
+              alt="Fail logo"
+            />
+        </div>
+        <div class="flex flex-col">
+          <span>{titleSearchFailed}</span>
+          {isDevMode && <div class="font-semibold mt-2">{titleErrorDetailsHeader}</div>
+            <div class="text-sm border-0 rounded-sm bg-base-300 my-2.5 p-2.5 min-h-20 overflow-auto">
+              <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
+            </div>
+          </div>}
+        </div>
+      </div>
+    </Modal>
 </search-input>
 
 <script>
-  import searchResults from "./data.json" with { type: "json" };
+  import { actions } from 'astro:actions';
   import type { SearchResult } from "@/lib/domain";
   import { debounce, INPUT_DEBOUNCE_DELAY_MS } from "@/lib/domain";
   import { getElementByDataAttribute, getDialogElementById, getElementById, getInputElementByName } from "@/web/src/core/utils/dom-utils";
@@ -43,10 +82,13 @@ const titleSearchInput = "Введите ключевые слова";
 
   class SearchInput extends HTMLElement {
     private controller: AbortController;
+    private titleSearchResultsCount: string = "";
     private searchDialogEl: HTMLDialogElement | null = null;
     private searchResultEl: HTMLUListElement | null = null;
     private searchInputEl: HTMLInputElement | null = null;
     private searchLoadingEl: HTMLSpanElement | null = null;
+    private errorPopupEl: HTMLDialogElement | null = null;
+    private errorDetailsEl: HTMLSpanElement | null = null;
     
     constructor() {
       super();
@@ -59,24 +101,50 @@ const titleSearchInput = "Введите ключевые слова";
       this.searchResultEl?.replaceChildren();
     }
 
-    private onSearchInput(value: string) {
-      const searchTerms = value.trim();
+    private updateLoadingState = (value: boolean) => {
       if (this.searchLoadingEl) {
-          this.searchLoadingEl.style.display = searchTerms.length > 0 
-            ? "block" 
-            : "none";
+        this.searchLoadingEl.style.display = value 
+          ? "block" 
+          : "none";
       }
+    }
 
-      this.cleanupSearchResults();
-      const results = searchResults as SearchResult[];
-      saveSearch(results);
-
-      results.forEach(item => {
-        const divAlert = document.createElement("li");
-        divAlert.classList.add("flex", "p-2", "gap-3", "items-start");
-        this.searchResultEl && this.searchResultEl.appendChild(divAlert);
-        divAlert.innerHTML = createSearchResultMarkup(item);
+    private addNewSearchResultElement(value: string) {
+      const divAlert = document.createElement("li");
+      divAlert.classList.add("flex", "p-2", "gap-3", "items-start");
+      this.searchResultEl && this.searchResultEl.appendChild(divAlert);
+      divAlert.innerHTML = value;
+    }
+    
+    private async onSearchInput(value: string) {
+      const searchTerms = value.trim();
+      this.updateLoadingState(searchTerms.length > 0);      
+      if (searchTerms.length === 0) {
+        return;
+      }
+      
+      this.cleanupSearchResults();      
+      const { data, error } = await actions.searchActions.search({ 
+        query: searchTerms
       });
+      saveSearch((data as SearchResult[]) ?? []);
+      this.updateLoadingState(false);
+
+      if (error) {
+        if (this.errorDetailsEl) this.errorDetailsEl.innerHTML = error.message;
+        (this.errorPopupEl as HTMLDialogElement).showModal();
+        return;
+      }
+      
+      this.addNewSearchResultElement(
+        `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
+        </svg>
+        <span class="text-sm">${this.titleSearchResultsCount}: ${data?.length ?? 0}</span>`
+      );
+      data?.forEach(item => 
+        this.addNewSearchResultElement(createSearchResultMarkup(item))
+      );
     }
 
     private handleDialogToggle(e: ToggleEvent) {
@@ -86,9 +154,10 @@ const titleSearchInput = "Введите ключевые слова";
     }
 
     connectedCallback() {
+      this.titleSearchResultsCount = this.dataset.search_results_count ?? "";
       this.searchDialogEl = getDialogElementById(document, 
         this.dataset.search_dialog) as HTMLDialogElement;
-    this.searchResultEl = getElementByDataAttribute(document, 
+      this.searchResultEl = getElementByDataAttribute(document, 
         this.dataset.search_results
       ) as HTMLUListElement;
       this.searchInputEl = getInputElementByName(this,
@@ -97,18 +166,24 @@ const titleSearchInput = "Введите ключевые слова";
       this.searchLoadingEl = getElementById(this, 
         this.dataset.search_loading
       ) as HTMLSpanElement;
-
-      this.searchDialogEl?.addEventListener(
-        "toggle",
-        this.handleDialogToggle,
-        { signal: this.controller.signal },
-      );
+      this.errorPopupEl = getElementById(this, 
+        this.dataset.error_popup_id
+      ) as HTMLDialogElement;
+      this.errorDetailsEl = getElementById(this,
+        this.dataset.error_details_id
+      ) as HTMLSpanElement;
 
       const debouncedInput = debounce(this.onSearchInput, INPUT_DEBOUNCE_DELAY_MS);
       this.searchInputEl?.addEventListener(
         "input", 
         () => debouncedInput(this.searchInputEl?.value), 
         { signal: this.controller.signal }
+      );
+
+      this.searchDialogEl?.addEventListener(
+        "toggle",
+        this.handleDialogToggle,
+        { signal: this.controller.signal },
       );
     }
 
