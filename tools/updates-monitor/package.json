@@ -1,0 +1,24 @@
+{
+  "name": "updates-monitor",
+  "type": "module",
+  "version": "0.0.1",
+  "exports": "./src/index.ts",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc -b .",
+    "dev": "node --env-file=.env.development ./dist/index.js",
+    "preview": "node --env-file=.env.development ./dist/index.js"
+  },
+  "dependencies": {
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.5"
+  },
+  "description": "Altex backend updates monitor",
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "Iurii Gerasimov",
+  "license": "ISC"
+}

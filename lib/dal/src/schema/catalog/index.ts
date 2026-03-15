@@ -122,6 +122,7 @@ export const products = table(
     dimensionLengthMm: t.int("dimension_length_mm"),
     dimensionWidthMm: t.int("dimension_width_mm"),
     dimensionHeightMm: t.int("dimension_height_mm"),
+    dimensionDiameterMm: t.numeric(""),
     weightGr: t.int("weight_gr"),
     quantityInPack: t.int("quantity_in_pack").default(1).notNull(),
     minQuantityToBuy: t.int("min_quantity_to_buy").default(1).notNull(),
@@ -154,23 +155,19 @@ export const relatedProducts = table(
       .notNull()
       .references(() => products.id),
     uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)],
 );
 
-export const productColors = table(
-  "product_colors",
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    productId: t
-      .int("product_id")
-      .notNull()
-      .references(() => products.id),
-    colorId: t
-      .int("color_id")
-      .notNull()
-      .references(() => colors.id),
-    uid: t.text().notNull(),
-  },
-  (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)],
-);
+export const productColors = table("product_colors", {
+  id: t.int().primaryKey({ autoIncrement: true }),
+  productId: t
+    .int("product_id")
+    .notNull()
+    .references(() => products.id),
+  colorId: t
+    .int("color_id")
+    .notNull()
+    .references(() => colors.id),
+});

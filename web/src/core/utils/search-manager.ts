@@ -1,8 +1,4 @@
-import {
-  NO_VALUE_ASSIGNED,
-  SearchTypes,
-  type SearchResult,
-} from "@/lib/domain";
+import { SearchTypes, type SearchResult } from "@/lib/domain";
 import { trimEnd } from "./text-formatter";
 import { formatCurrency } from "@/lib/domain";
 

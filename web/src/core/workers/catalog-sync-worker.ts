@@ -10,7 +10,7 @@ self.onmessage = async (e) => {
   const command = e.data as CatalogSyncType;
   if (!e.data || !command) {
     console.error(
-      "🛠️ ~ catalog-sync-worker ~ required input parameter does not have value:",
+      "🛑 ~ catalog-sync-worker ~ required input parameter does not have value:",
       e,
     );
     return;
@@ -35,7 +35,7 @@ self.onmessage = async (e) => {
         ]);
         syncStatus.resultMessage = SyncComplete;
         console.info(
-          "🛠️ ~ catalog-sync-worker ~ catalog references has been saved to IndexedDB, number of synced records:",
+          "🛑 ~ catalog-sync-worker ~ catalog references has been saved to IndexedDB, number of synced records:",
           result.reduce((acc, curr) => acc + curr, 0),
         );
         break;
@@ -46,14 +46,14 @@ self.onmessage = async (e) => {
       default:
         syncStatus.resultMessage = SyncUnsupprtedCommand + `: ${command}.`;
         console.error(
-          "🛠️ ~ catalog-sync-worker ~ %s",
+          "🛑 ~ catalog-sync-worker ~ %s",
           syncStatus.resultMessage,
         );
         break;
     }
   } catch (error: any) {
     console.error(
-      "🛠️ ~ catalog-sync-worker ~ failed to sync reference data:",
+      "🛑 ~ catalog-sync-worker ~ failed to sync reference data:",
       error,
     );
     syncStatus.syncType = CatalogSyncType.Failure;
