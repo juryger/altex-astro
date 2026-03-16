@@ -1,10 +1,5 @@
 import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
-import {
-  EnvironmentNames,
-  getErrorMessage,
-  regexTrue,
-  selectEnvironment,
-} from "@/lib/domain";
+import { getErrorMessage } from "@/lib/domain";
 import {
   CACHE_ITEMS_LIMIT,
   CACHE_LOAD_RETRY_ATTEMPS,

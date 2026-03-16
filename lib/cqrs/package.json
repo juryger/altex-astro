@@ -5,8 +5,7 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -b .",
-    "preview": "node --env-file=.env.development ./dist/index.js"
+    "build": "rm -rf dist && tsc -b . -verbose"
   },
   "dependencies": {
     "html-entities": "^2.6.0",

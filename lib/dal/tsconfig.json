@@ -1,5 +1,5 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
+  "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
@@ -7,7 +7,10 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    // Environment Settings
+    // Specific settings for project libs
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
     "target": "es2022",

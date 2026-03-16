@@ -39,5 +39,7 @@ export async function fetchMeasurementUnits(): Promise<MeasurementUnit[]> {
     .where(isNull(measurementUnits.deletedAt))
     .orderBy(getSortCondition());
 
-  return queryResult.map((item) => mapQueryResultToDomainModel(item));
+  return queryResult.map((item: DbMeasurementUnit) =>
+    mapQueryResultToDomainModel(item),
+  );
 }

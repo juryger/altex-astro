@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"], // This maps "@/" to the "/" folder
+      "@/web": ["./web/src/index.ts"],
+      "@/lib/cqrs": ["./lib/cqrs/src/index.ts"],
+      "@/lib/domain": ["./lib/domain/src/index.ts"],
+      "@/lib/email": ["./lib/email/src/index.ts"],
+      "@/lib/dal": ["./lib/dal/src/index.ts"]
+    },
+    // Astro.build recommended options
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    // Node recommended Options
+    "strictNullChecks": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "preserveConstEnums": true
+  }
+}

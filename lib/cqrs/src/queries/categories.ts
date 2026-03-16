@@ -148,8 +148,8 @@ export async function fetchCategories(
   );
 
   return {
-    items: queryResult.map((item) =>
-      mapQueryResultToDomainModel(item as QueryResult),
+    items: queryResult.map((item: QueryResult) =>
+      mapQueryResultToDomainModel(item),
     ),
     pageInfo: {
       total: totalCount,

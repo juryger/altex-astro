@@ -1,6 +1,11 @@
 import type { CartItem, Discount } from "@/lib/domain";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
-import { createOperationsDb, cartCheckout, cartCheckoutItems } from "@/lib/dal";
+import {
+  createOperationsDb,
+  cartCheckout,
+  cartCheckoutItems,
+  type SQLiteTransaction,
+} from "@/lib/dal";
 
 export async function checkoutCart(
   items: Array<CartItem>,
@@ -17,7 +22,7 @@ export async function checkoutCart(
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
-  return db.transaction((tx) => {
+  return db.transaction((tx: any) => {
     const cart = tx
       .insert(cartCheckout)
       .values({

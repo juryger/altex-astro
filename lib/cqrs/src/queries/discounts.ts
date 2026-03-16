@@ -35,5 +35,7 @@ export async function fetchDiscounts(): Promise<Discount[]> {
     .where(isNull(discounts.deletedAt))
     .orderBy(getSortCondition());
 
-  return queryResult.map((item) => mapQueryResultToDomainModel(item));
+  return queryResult.map((item: DbDiscount) =>
+    mapQueryResultToDomainModel(item),
+  );
 }

@@ -84,7 +84,7 @@ export async function fetchAllCategories(): Promise<SearchResult[]> {
     .orderBy(categories.title)
     .limit(SEARCH_RECORDS_LIMIT);
 
-  return queryResult.map((item) =>
+  return queryResult.map((item: DbCategory) =>
     mapCategoryQueryResultToDomainModel(item),
   ) as SearchResult[];
 }
@@ -103,7 +103,7 @@ export async function fetchAllProducts(): Promise<SearchResult[]> {
     .orderBy(products.title)
     .limit(SEARCH_RECORDS_LIMIT);
 
-  return queryResult.map((item) =>
-    mapProductQueryResultToDomainModel(item as ProductsQueryResult),
+  return queryResult.map((item: ProductsQueryResult) =>
+    mapProductQueryResultToDomainModel(item),
   ) as SearchResult[];
 }

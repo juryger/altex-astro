@@ -19,6 +19,9 @@ export default getViteConfig({
     alias: {
       "@/": new URL("..", import.meta.url).pathname,
       "@/web": new URL("../web", import.meta.url).pathname,
+      "@/lib/domain": new URL("../lib/domain", import.meta.url).pathname,
+      "@/lib/dal": new URL("../lib/dal", import.meta.url).pathname,
+      "@/lib/cqrs": new URL("../lib/cqrs", import.meta.url).pathname,
     },
   },
 });

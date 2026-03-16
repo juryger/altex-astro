@@ -14,8 +14,7 @@
     "migrate:catalog": "drizzle-kit migrate --config=drizzle-catalog.config.ts",
     "migrate": "npm run migrate:operations && npm run migrate:general && npm run migrate:catalog",
     "replica": "cp /Users/iuriig/Sources/altex-astro/db/catalog.db /Users/iuriig/Sources/altex-astro/db/replicas/catalog-initial.db",
-    "build": "rm -rf dist && tsc -b .",
-    "preview": "node --env-file=.env.development ./dist/index.js"
+    "build": "rm -rf dist && tsc -b . --verbose"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.0",

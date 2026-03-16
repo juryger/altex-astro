@@ -37,5 +37,5 @@ export async function fetchProductColors(): Promise<ProductColor[]> {
     .where(isNull(colors.deletedAt))
     .orderBy(getSortCondition());
 
-  return queryResult.map((item) => mapQueryResultToDomainModel(item));
+  return queryResult.map((item: DbColor) => mapQueryResultToDomainModel(item));
 }

@@ -26,7 +26,7 @@ export async function fetchCompanyInfo(): Promise<Record<string, string>> {
     .from(info)
     .where(isNull(info.deletedAt));
   const result = parseCompanyInfo(
-    queryResult.map((item) => mapQueryResultToDomainModel(item)),
+    queryResult.map((item: Info) => mapQueryResultToDomainModel(item)),
   );
   return result;
 }

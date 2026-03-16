@@ -20,6 +20,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     resolve: {
+      // Need to keep it, otherwise build is failed
       alias: {
         "@/": new URL("..", import.meta.url).pathname,
         "@/lib": new URL("../lib", import.meta.url).pathname,
