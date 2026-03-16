@@ -5,9 +5,9 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
+    "build": "rm -rf dist && tsc -b . -verbose",
     "generate": "mjml ./src/templates/[!_]*.mjml -o /Users/iuriig/Sources/altex-astro/emails",
-    "xml": "cp ./src/xml/*.xml /Users/iuriig/Sources/altex-astro/emails",
-    "build": "rm -rf dist && tsc -b . -verbose"
+    "xml": "cp ./src/xml/*.xml /Users/iuriig/Sources/altex-astro/emails"
   },
   "dependencies": {
     "@types/nodemailer": "^7.0.11",

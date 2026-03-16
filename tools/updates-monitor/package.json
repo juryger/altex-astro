@@ -5,9 +5,9 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -b .",
-    "dev": "node --env-file=.env.development ./dist/index.js",
-    "preview": "node --env-file=.env.development ./dist/index.js"
+    "build": "rm -rf dist && tsc -b . -verbose",
+    "preview": "node --env-file=.env.development ./dist/index.js",
+    "dev": "node --experimental-transform-types --env-file=.env.development --watch ./src/index.ts"
   },
   "dependencies": {
     "typescript": "^5.9.3"

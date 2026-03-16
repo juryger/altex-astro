@@ -9,9 +9,10 @@
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
     "target": "es2022",
+    "moduleResolution": "nodenext",
     // For nodejs:
-    "lib": ["ESNext"],
-    "types": ["node"],
+    //"lib": ["ESNext"],
+    //"types": ["node"],
     // and npm install -D @types/node
 
     // Other Outputs
@@ -41,8 +42,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "preserveConstEnums": true,
-    "moduleResolution": "node"
+    "preserveConstEnums": true
   },
   "references": [
     {

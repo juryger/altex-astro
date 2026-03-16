@@ -14,6 +14,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
     "target": "es2022",
+    "moduleResolution": "node",
     // For nodejs:
     "lib": ["ESNext"],
     "types": ["node"],
@@ -46,7 +47,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "preserveConstEnums": true,
-    "moduleResolution": "node"
+    "preserveConstEnums": true
   }
 }
