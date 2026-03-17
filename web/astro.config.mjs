@@ -24,6 +24,7 @@ export default defineConfig({
       alias: {
         "@/": new URL("..", import.meta.url).pathname,
         "@/lib": new URL("../lib", import.meta.url).pathname,
+        "@/lib/domain": new URL("../lib/domain", import.meta.url).pathname,
       },
     },
   },

@@ -5,15 +5,15 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -b . -verbose",
-    "preview": "node --env-file=.env.development ./dist/index.js",
-    "dev": "node --experimental-transform-types --env-file=.env.development --watch ./src/index.ts"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "node --env-file=.env.development ./dist/index.js"
   },
-  "dependencies": {
-    "typescript": "^5.9.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^25.0.5"
+    "@types/node": "^25.0.5",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0"
   },
   "description": "Altex backend updates monitor",
   "keywords": [

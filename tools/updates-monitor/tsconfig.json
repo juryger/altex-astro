@@ -11,13 +11,9 @@
     "noEmit": false,
 
     // See also https://aka.ms/tsconfig/module
-    "module": "NodeNext",
-    "target": "es2022",
-    "moduleResolution": "nodenext",
-    // For nodejs:
-    //"lib": ["ESNext"],
-    //"types": ["node"],
-    // and npm install -D @types/node
+    "module": "ES2022",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
 
     // Other Outputs
     "sourceMap": true,
