@@ -32,6 +32,8 @@ const externalDependencies = Object.entries(dependencies)
   .map(([key]) => key);
 //console.log("externalDependencies", externalDependencies);
 
+// For details of setting up Vite integration see details below
+// https://medium.com/@robinviktorsson/setting-up-a-modern-typescript-project-with-vite-no-framework-07ea2d3a22b5
 export default defineConfig({
   root: "src",
   build: {
@@ -45,8 +47,10 @@ export default defineConfig({
     sourcemap: true,
     outDir: "../dist",
     emptyOutDir: true,
-    polyfillModulePreload: false,
+    polyfillModulePreload: false, // avoid browser API polifill generation for nodejs app
     rollupOptions: {
+      // don't nee index.html in output, so changed it to .ts file as mentioned below
+      // https://vite.dev/guide/backend-integration
       input: resolve(__dirname, "src/index.ts"),
       external: [...allCoreModules, ...externalDependencies],
       output: {
