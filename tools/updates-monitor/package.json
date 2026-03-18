@@ -9,7 +9,10 @@
     "build": "vite build",
     "preview": "node --env-file=.env.development ./dist/index.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/unzipper": "^0.10.11",
+    "unzipper": "^0.12.3"
+  },
   "devDependencies": {
     "@types/node": "^25.0.5",
     "typescript": "^5.9.3",

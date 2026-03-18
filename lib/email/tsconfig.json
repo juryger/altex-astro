@@ -3,16 +3,21 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "composite": true,
     "rootDir": "./src",
     "outDir": "./dist",
+
+    // Specific settings for project libs
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
 
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
     "target": "es2022",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     // For nodejs:
-    //"lib": ["ESNext"],
-    //"types": ["node"],
+    "lib": ["ESNext"],
+    "types": ["node"],
     // and npm install -D @types/node
 
     // Other Outputs

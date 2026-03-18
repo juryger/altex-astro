@@ -9,8 +9,12 @@ const OkResult = <T = any>(value?: T | undefined): Result<T> => ({
   data: value,
 });
 
-const FailedResult = <T = any>(error: Error): Result<T> => ({
+const FailedResult = <T = any>(
+  error: Error,
+  value?: T | undefined,
+): Result<T> => ({
   ok: false,
+  data: value,
   error,
 });
 

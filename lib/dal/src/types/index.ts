@@ -21,6 +21,7 @@ import {
   notifications,
   readReplicas,
   operationsVersion,
+  syncLog,
 } from "../schema/operations";
 
 import { info, generalVersion } from "../schema/general";
@@ -40,6 +41,7 @@ export type RelatedProduct = InferSelectModel<typeof relatedProducts>;
 // Operations
 export type OperationVersion = InferSelectModel<typeof operationsVersion>;
 export type ReadReplica = InferSelectModel<typeof readReplicas>;
+export type SyncLog = InferSelectModel<typeof syncLog>;
 export type Guest = InferSelectModel<typeof guests>;
 export type CartCheckout = InferSelectModel<typeof cartCheckout>;
 export type CartCheckoutItem = InferSelectModel<typeof cartCheckoutItems>;

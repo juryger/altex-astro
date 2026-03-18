@@ -1,5 +1,5 @@
 {
-  "name": "altex-email",
+  "name": "email",
   "type": "module",
   "version": "0.0.1",
   "exports": "./src/index.ts",

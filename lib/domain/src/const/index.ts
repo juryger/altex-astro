@@ -11,7 +11,13 @@ enum ImageContainers {
 }
 
 enum ReadReplicaTypes {
-  Catalog = "catalog",
+  Catalog = 0,
+}
+
+enum SyncTypes {
+  Catalog = 0,
+  CompanyInfo = 1,
+  Order = 2,
 }
 
 enum SearchTypes {
@@ -27,5 +33,6 @@ export {
   SEARCH_RECORDS_LIMIT,
   ImageContainers,
   ReadReplicaTypes,
+  SyncTypes,
   SearchTypes,
 };

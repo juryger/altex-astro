@@ -87,6 +87,7 @@ export {
   notificationAddressees,
   notifications,
   readReplicas,
+  syncLog,
   operationsVersion,
 } from "./schema/operations/index.js";
 
@@ -105,6 +106,7 @@ export type {
   ProductColor,
   OperationVersion,
   ReadReplica,
+  SyncLog,
   Guest,
   CartCheckout,
   CartCheckoutItem,

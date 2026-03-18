@@ -20,7 +20,7 @@ interface BaseReadReplicaManager {
 
 class ReadReplicaManager implements BaseReadReplicaManager {
   private static __instance: ReadReplicaManager;
-  private replicas: Map<string, ReadReplica> = new Map();
+  private replicas: Map<number, ReadReplica> = new Map();
   private queryManager = getQueryManager();
   private dbReplicasPath: string;
   private withTracing: boolean;

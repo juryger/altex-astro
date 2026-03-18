@@ -3,20 +3,26 @@ import { ReadReplicaTypes } from "../const";
 
 export const ReadReplicaSchema = z.object({
   id: z.number(),
-  type: z.string().default(ReadReplicaTypes.Catalog),
+  type: z.number().default(ReadReplicaTypes.Catalog),
   fileName: z.string(),
   createdAt: z.date(),
-  hasErrors: z.boolean().default(false),
-  syncLog: z.string().optional(),
 });
 
-function getInitialReplica(
-  type: string = ReadReplicaTypes.Catalog,
-): ReadReplica {
+function getInitialReplica(type: number): ReadReplica {
+  let name: string;
+  switch (type) {
+    case ReadReplicaTypes.Catalog:
+      name = "catalog";
+      break;
+    default:
+      console.error("Unsupported read replica type:", type);
+      name = "unsupported";
+      break;
+  }
   return {
     id: -1, // means not coming from db
     type,
-    fileName: `${type}-initial.db`,
+    fileName: `${name}-initial.db`,
     createdAt: new Date(Date.now()),
   } as ReadReplica;
 }

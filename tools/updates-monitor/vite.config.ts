@@ -49,7 +49,7 @@ export default defineConfig({
     emptyOutDir: true,
     polyfillModulePreload: false, // avoid browser API polifill generation for nodejs app
     rollupOptions: {
-      // don't nee index.html in output, so changed it to .ts file as mentioned below
+      // don't need index.html in output, so changed it to .ts file as mentioned below
       // https://vite.dev/guide/backend-integration
       input: resolve(__dirname, "src/index.ts"),
       external: [...allCoreModules, ...externalDependencies],
@@ -64,6 +64,7 @@ export default defineConfig({
       "@/": new URL("../../", import.meta.url).pathname,
       "@/lib": new URL("../../lib", import.meta.url).pathname,
       "@/lib/domain": new URL("../../lib/domain", import.meta.url).pathname,
+      "@/lib/cqrs": new URL("../../lib/cqrs", import.meta.url).pathname,
     },
   },
   define: {

@@ -15,16 +15,30 @@ export const readReplicas = table(
   "read_replicas",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    type: t.text().default("catalog").notNull(),
+    type: t.int().default(0).notNull(),
     fileName: t.text("file_name").notNull(),
     createdAt: t
       .int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
-    hasErrors: t.int("has_errors").default(0),
-    syncLog: t.text("sync_log"),
   },
   (table) => [t.uniqueIndex("idx_read_replicas_file_name").on(table.fileName)],
+);
+
+export const syncLog = table(
+  "sync_log",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    type: t.int(),
+    fileName: t.text("file_name").notNull(),
+    createdAt: t
+      .int("created_at", { mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+    isFailed: t.int("is_failed").default(0).notNull(),
+    logMessage: t.text("log_message"),
+  },
+  (table) => [t.uniqueIndex("idx_sync_log_file_name").on(table.fileName)],
 );
 
 export const guests = table(

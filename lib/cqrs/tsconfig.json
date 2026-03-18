@@ -3,8 +3,13 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "composite": true,
     "rootDir": "./src",
     "outDir": "./dist",
+
+    // Specific settings for project libs
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
 
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",

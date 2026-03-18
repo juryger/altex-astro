@@ -22,6 +22,27 @@
       "when": 1772595079998,
       "tag": "0002_operations",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1773722122774,
+      "tag": "0003_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1773722614199,
+      "tag": "0004_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1773732689904,
+      "tag": "0005_operations",
+      "breakpoints": true
     }
   ]
 }

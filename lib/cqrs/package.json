@@ -5,7 +5,7 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -b . -verbose"
+    "build": "rm -rf dist && tsc -b . --verbose"
   },
   "dependencies": {
     "html-entities": "^2.6.0",
