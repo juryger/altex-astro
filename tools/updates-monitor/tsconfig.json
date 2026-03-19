@@ -1,19 +1,31 @@
 {
-  "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "baseUrl": ".",
     "rootDir": "./src",
     "outDir": "./dist",
+    "paths": {
+      "@/lib/domain": ["../../lib/domain/dist"],
+      "@/lib/dal": ["../../lib/dal/dist"],
+      "@/lib/cqrs": ["../../lib/cqrs/dist"],
+      "@/lib/email": ["../../lib/email/dist"]
+    },
 
     // Specific settings for project libs
     "allowImportingTsExtensions": false,
     "noEmit": false,
 
     // See also https://aka.ms/tsconfig/module
-    "module": "ES2022",
-    "target": "ES2022",
+    "module": "es2022",
+    "target": "es2022",
     "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true, // Recommended alongside Bundler
+
+    // For nodejs:
+    "lib": ["esnext"],
+    "types": ["node"],
+    // and npm install -D @types/node
 
     // Other Outputs
     "sourceMap": true,
@@ -53,6 +65,9 @@
     },
     {
       "path": "../../lib/cqrs"
+    },
+    {
+      "path": "../../lib/email"
     }
   ]
 }

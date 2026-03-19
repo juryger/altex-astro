@@ -1,5 +1,5 @@
 import { defineAction } from "astro:actions";
-import { CacheManager } from "@/lib/cqrs/src";
+import { CacheManager } from "@/lib/cqrs";
 
 export const internalsActions = {
   revalidateQueryCache: defineAction({

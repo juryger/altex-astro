@@ -23,6 +23,7 @@ export default defineConfig({
       // Need to keep it, otherwise build is failed
       alias: {
         "@/": new URL("..", import.meta.url).pathname,
+        "@/web": new URL("../web", import.meta.url).pathname,
         "@/lib": new URL("../lib", import.meta.url).pathname,
         "@/lib/domain": new URL("../lib/domain", import.meta.url).pathname,
         "@/lib/dal": new URL("../lib/dal", import.meta.url).pathname,

@@ -21,6 +21,7 @@ import {
 } from "@/lib/cqrs";
 import { CompanyInfoKeys } from "@/lib/domain";
 import { EmailSubjects } from "../const/messages";
+import { encode } from "html-entities";
 
 interface CartCheckoutManager {
   checkoutCart: (
@@ -30,11 +31,29 @@ interface CartCheckoutManager {
   ) => Promise<Result<string>>;
 }
 
+const encodeUserInput = (guest: GuestUser): GuestUser => {
+  return {
+    id: guest.id,
+    fullName: encode(guest.fullName),
+    email: encode(guest.email),
+    phone: encode(guest.phone),
+    companyName: encode(guest.companyName),
+    address: encode(guest.address),
+    city: encode(guest.city),
+    postCode: encode(guest.postCode),
+    taxNumber: encode(guest.taxNumber),
+    createdAt: guest.createdAt,
+    uid: guest.uid,
+  } as GuestUser;
+};
+
 const saveGuestUser = async (
   commandManager: CommandManager,
   guest: GuestUser,
 ): Promise<Result<number>> => {
-  return await commandManager.mutate<number>(() => upsertGuestUser(guest));
+  return await commandManager.mutate<number>(() =>
+    upsertGuestUser(encodeUserInput(guest)),
+  );
 };
 
 const saveCartCheckout = async (

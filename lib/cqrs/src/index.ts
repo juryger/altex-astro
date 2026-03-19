@@ -1,11 +1,6 @@
-export type { CacheResult } from "./cache-manager";
-export { CacheManager } from "./cache-manager";
-
-export type { CommandManager } from "./command-manager";
-export { getCommandManager } from "./command-manager";
-
-export type { QueryManager } from "./query-manager";
-export { getQueryManager } from "./query-manager";
+export { type CacheResult, CacheManager } from "./cache-manager";
+export { type CommandManager, getCommandManager } from "./command-manager";
+export { type QueryManager, getQueryManager } from "./query-manager";
 
 export { ReadReplicaManager } from "./read-replica-manager";
 
@@ -20,5 +15,7 @@ export { fetchReadReplica } from "./queries/read-replica";
 
 export { checkoutCart } from "./commands/cart-checkout";
 export { upsertGuestUser } from "./commands/guest-user";
+export { setReadReplica } from "./commands/read-replica";
+export { setSyncLog } from "./commands/sync-log";
 
 export { fetchAllCategories, fetchAllProducts } from "./queries/search";

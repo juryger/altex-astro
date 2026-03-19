@@ -7,19 +7,17 @@ import {
   selectEnvironment,
 } from "@/lib/domain";
 import { guests } from "@/lib/dal";
-import { encode } from "html-entities";
 
 const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
   return {
-    fullName: encode(entity.fullName ?? NO_VALUE_ASSIGNED),
-    email: encode(entity.email ?? NO_VALUE_ASSIGNED),
-    phone: entity.phone !== undefined ? encode(entity.phone) : null,
-    companyName:
-      entity.companyName !== undefined ? encode(entity.companyName) : null,
-    address: entity.address !== undefined ? encode(entity.address) : null,
-    city: entity.city !== undefined ? encode(entity.city) : null,
-    postCode: entity.postCode !== undefined ? encode(entity.postCode) : null,
-    taxNumber: entity.taxNumber !== undefined ? encode(entity.taxNumber) : null,
+    fullName: entity.fullName ?? NO_VALUE_ASSIGNED,
+    email: entity.email ?? NO_VALUE_ASSIGNED,
+    phone: entity.phone !== undefined ? entity.phone : null,
+    companyName: entity.companyName !== undefined ? entity.companyName : null,
+    address: entity.address !== undefined ? entity.address : null,
+    city: entity.city !== undefined ? entity.city : null,
+    postCode: entity.postCode !== undefined ? entity.postCode : null,
+    taxNumber: entity.taxNumber !== undefined ? entity.taxNumber : null,
     uid: entity.uid,
   } as Guest;
 };
@@ -34,13 +32,13 @@ export async function upsertGuestUser(guest: GuestUser): Promise<number> {
     .onConflictDoUpdate({
       target: guests.email,
       set: {
-        fullName: encode(guest.fullName),
-        phone: encode(guest.phone),
-        companyName: encode(guest.companyName),
-        address: encode(guest.address),
-        city: encode(guest.city),
-        postCode: encode(guest.postCode),
-        taxNumber: encode(guest.taxNumber),
+        fullName: guest.fullName,
+        phone: guest.phone,
+        companyName: guest.companyName,
+        address: guest.address,
+        city: guest.city,
+        postCode: guest.postCode,
+        taxNumber: guest.taxNumber,
         uid: guest.uid,
       },
     })

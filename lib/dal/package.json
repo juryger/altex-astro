@@ -17,14 +17,14 @@
     "build": "rm -rf dist && tsc -b . --verbose"
   },
   "dependencies": {
-    "better-sqlite3": "^12.6.0",
-    "drizzle-orm": "^0.45.1",
-    "typescript": "^5.9.3"
+    "better-sqlite3": "^12.8.0",
+    "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^25.0.5",
-    "drizzle-kit": "^0.31.8"
+    "@types/node": "^25.5.0",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5.9.3"
   },
   "description": "Data Access Layer (DAL) package based on Sqlite and Drizzle ORM",
   "keywords": [

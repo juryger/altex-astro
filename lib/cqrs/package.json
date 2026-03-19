@@ -7,12 +7,9 @@
   "scripts": {
     "build": "rm -rf dist && tsc -b . --verbose"
   },
-  "dependencies": {
-    "html-entities": "^2.6.0",
-    "typescript": "^5.9.3"
-  },
   "devDependencies": {
-    "@types/node": "^25.0.5"
+    "@types/node": "^25.0.5",
+    "typescript": "^5.9.3"
   },
   "description": "ALTEX CQRS pattern implementation",
   "keywords": [

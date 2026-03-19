@@ -1,8 +1,8 @@
 import type { SyncLog as DBSyncLog } from "@/lib/dal";
 import { createOperationsDb, syncLog } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
-import type { SyncTypes } from "@/lib/domain/src/const";
-import type { SyncLog } from "@/lib/domain/src/models/sync-log";
+import type { SyncTypes } from "@/lib/domain";
+import type { SyncLog } from "@/lib/domain";
 
 const mapDomainToDatabaseModel = (
   entity: SyncLog,

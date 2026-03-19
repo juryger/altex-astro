@@ -1,5 +1,5 @@
-import type { Result } from "@/lib/domain/src";
-import type { SyncTypes } from "@/lib/domain/src/const";
+import type { Result } from "@/lib/domain";
+import type { SyncTypes } from "@/lib/domain";
 
 interface BaseSyncHandler {
   getType: () => SyncTypes;

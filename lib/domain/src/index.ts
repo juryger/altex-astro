@@ -7,6 +7,7 @@ export {
   SEARCH_RECORDS_LIMIT,
   ImageContainers,
   ReadReplicaTypes,
+  SyncTypes,
   SearchTypes,
 } from "./const";
 export {
@@ -25,7 +26,6 @@ export {
   CacheKeys,
 } from "./const/cache";
 export { CompanyInfoKeys } from "./const/company-info";
-
 export type {
   CacheInfo,
   CacheEntry,
@@ -33,16 +33,16 @@ export type {
 } from "./models/cache";
 export { getCacheInfo } from "./models/cache";
 
-export type {
-  CartCheckout,
-  CartCheckoutItem,
-  CartCheckoutAggregate,
+export {
+  type CartCheckout,
+  type CartCheckoutItem,
+  type CartCheckoutAggregate,
 } from "./models/cart-checkout";
 
-export type { CartItem, CartCheckoutRequest } from "./models/cart";
+export { type CartItem, type CartCheckoutRequest } from "./models/cart";
 export { CartCheckoutRequestSchema, CartSchema } from "./models/cart";
 
-export type { Catalog } from "./models/catalog";
+export { type Catalog } from "./models/catalog";
 
 export {
   type Category,
@@ -50,15 +50,15 @@ export {
   CategorySchema,
 } from "./models/category";
 
-export type { CompanyInfo } from "./models/company-info";
+export { type CompanyInfo } from "./models/company-info";
 
-export type { Discount } from "./models/discount";
+export { type Discount } from "./models/discount";
 
 export { FilterOperator } from "./const/filtering";
 
-export type { Filtering } from "./models/filtering";
+export { type Filtering } from "./models/filtering";
 
-export type { GuestUser } from "./models/guest-user";
+export { type GuestUser } from "./models/guest-user";
 
 export {
   GRAMS_IN_KG,
@@ -66,25 +66,27 @@ export {
   CENTIMETERS_IN_METER,
 } from "./const/measurements";
 
-export type { MeasurementUnit } from "./models/measurement-unit";
+export { type MeasurementUnit } from "./models/measurement-unit";
 
-export type { ProductColor } from "./models/product-color";
+export { type ProductColor } from "./models/product-color";
 
-export type { Product } from "./models/product";
+export { type Product } from "./models/product";
 export { ProductSchema } from "./models/product";
 
-export type { Paging, PagingResult } from "./models/paging";
+export { type Paging, type PagingResult } from "./models/paging";
 export { EmptyPagingResult } from "./models/paging";
 
-export type { Sorting } from "./models/sorting";
+export { type Sorting } from "./models/sorting";
 
-export type { Result } from "./models/result";
+export { type Result } from "./models/result";
 export { OkResult, FailedResult } from "./models/result";
 
-export type { ReadReplica } from "./models/read-replica";
+export { type ReadReplica } from "./models/read-replica";
 export { getInitialReplica } from "./models/read-replica";
 
-export type { SearchResult } from "./models/search-result";
+export { type SearchResult } from "./models/search-result";
+
+export { type SyncLog } from "./models/sync-log";
 
 export { selectEnvironment } from "./helpers/environment";
 export { constructNavigationPath } from "./helpers/navigation";

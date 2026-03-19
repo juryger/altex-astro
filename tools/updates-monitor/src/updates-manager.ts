@@ -3,18 +3,15 @@ import {
   getErrorMessage,
   OkResult,
   type Result,
-} from "@/lib/domain/src/index.js";
-import {
-  type CommandManager,
-  getCommandManager,
-} from "@/lib/cqrs/src/index.js";
+} from "@/lib/domain";
+import { type CommandManager, getCommandManager } from "@/lib/cqrs";
 import path from "path";
 import fs from "fs/promises";
 import unzipper from "unzipper";
 import { type BaseSyncHandler, type UpdatesManager } from "./core/index.js";
 import { getCatalogSyncHandler } from "./sync-handlers/catalog.js";
-import { setSyncLog } from "@/lib/cqrs/src/commands/sync-log.js";
-import { SyncTypes } from "@/lib/domain/src/const/index.js";
+import { setSyncLog } from "@/lib/cqrs";
+import { SyncTypes } from "@/lib/domain";
 import type { Dirent } from "fs";
 
 export function getUpdatesManager(): UpdatesManager {
@@ -81,6 +78,8 @@ const runInternal = async ({
     );
   }
 
+  console.log("files: %o", files);
+
   const results = await Promise.all(
     files.map((file) => {
       if (!isValideZipFile(file)) return OkResult();
@@ -108,7 +107,7 @@ const runInternal = async ({
         });
     }),
   ).catch((error) => {
-    console.error(error);
+    console.error(getErrorMessage(error));
     return undefined;
   });
 
@@ -122,7 +121,7 @@ const runInternal = async ({
 };
 
 const isValideZipFile = (file: Dirent<string>): boolean => {
-  return !file.isFile() || file.name.indexOf(".zip") === -1;
+  return file.isFile() && file.name.indexOf(".zip") > 0;
 };
 
 const finaliseSynchronisation = async ({

@@ -1,6 +1,6 @@
-import { SyncTypes } from "@/lib/domain/src/const";
+import { SyncTypes } from "@/lib/domain";
 import { type BaseSyncHandler } from "../core";
-import { FailedResult } from "@/lib/domain/src";
+import { FailedResult } from "@/lib/domain";
 
 const getCatalogSyncHandler = (monitorDirPath: string): BaseSyncHandler => {
   return {

@@ -15,8 +15,9 @@
     "module": "es2022",
     "target": "es2022",
     "moduleResolution": "node",
+
     // For nodejs:
-    "lib": ["ESNext"],
+    "lib": ["esnext"],
     "types": ["node"],
     // and npm install -D @types/node
 

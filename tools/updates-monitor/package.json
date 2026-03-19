@@ -5,18 +5,30 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "tsx watch --env-file=.env.development ./src/index.ts",
+    "build": "rm -rf dist && rollup --config rollup.config.ts --configPlugin typescript",
     "preview": "node --env-file=.env.development ./dist/index.js"
   },
   "dependencies": {
-    "@types/unzipper": "^0.10.11",
-    "unzipper": "^0.12.3"
+    "better-sqlite3": "^12.8.0",
+    "drizzle-orm": "^0.45.1",
+    "unzipper": "^0.12.3",
+    "zod": "3.25.76",
+    "googleapis": "^171.4.0",
+    "handlebars": "^4.7.8",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^25.0.5",
-    "typescript": "^5.9.3",
-    "vite": "^8.0.0"
+    "@types/unzipper": "^0.10.11",
+    "rollup": "^4.59.0",
+    "tslib": "^2.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
   "description": "Altex backend updates monitor",
   "keywords": [

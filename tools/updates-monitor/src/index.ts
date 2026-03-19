@@ -1,4 +1,4 @@
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain/src/index.js";
+import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import { getUpdatesManager } from "./updates-manager";
 
 getUpdatesManager()
