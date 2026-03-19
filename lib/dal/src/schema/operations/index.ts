@@ -25,21 +25,17 @@ export const readReplicas = table(
   (table) => [t.uniqueIndex("idx_read_replicas_file_name").on(table.fileName)],
 );
 
-export const syncLog = table(
-  "sync_log",
-  {
-    id: t.int().primaryKey({ autoIncrement: true }),
-    type: t.int(),
-    fileName: t.text("file_name").notNull(),
-    createdAt: t
-      .int("created_at", { mode: "timestamp" })
-      .default(sql`(unixepoch())`)
-      .notNull(),
-    isFailed: t.int("is_failed").default(0).notNull(),
-    logMessage: t.text("log_message"),
-  },
-  (table) => [t.uniqueIndex("idx_sync_log_file_name").on(table.fileName)],
-);
+export const syncLog = table("sync_log", {
+  id: t.int().primaryKey({ autoIncrement: true }),
+  type: t.int(),
+  fileName: t.text("file_name").notNull(),
+  createdAt: t
+    .int("created_at", { mode: "timestamp" })
+    .default(sql`(unixepoch())`)
+    .notNull(),
+  isFailed: t.int("is_failed").default(0).notNull(),
+  logMessage: t.text("log_message"),
+});
 
 export const guests = table(
   "guests",

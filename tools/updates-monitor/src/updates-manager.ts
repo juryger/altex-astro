@@ -24,31 +24,28 @@ export function getUpdatesManager(): UpdatesManager {
       monitoringDirPath: string;
       poisonedDirName: string;
     }) => {
-      if (
-        monitoringDirPath === undefined ||
-        monitoringDirPath.trimEnd() === ""
-      ) {
+      const defaultValue = 0;
+      if (!monitoringDirPath || monitoringDirPath.trim().length === 0) {
         console.error(
           "Monitoring directory path is not defined in the .env file.",
         );
-        return 0;
+        return defaultValue;
       }
-      if (poisonedDirName === undefined || poisonedDirName.trimEnd() === "") {
+      if (!poisonedDirName || poisonedDirName.trim().length === 0) {
         console.error(
           "Poisoned directory name is not defined in the .env file",
         );
-        return 0;
+        return defaultValue;
       }
       try {
         const result = await runInternal({
           monitoringDirPath,
           poisonedDirName,
         });
-        if (result.error !== undefined) console.error(result.error);
-        return result.ok ? (result.data ?? 0) : 0;
+        return result.ok ? (result.data ?? defaultValue) : defaultValue;
       } catch (error) {
-        console.error(error);
-        return 0;
+        console.error(getErrorMessage(error), error);
+        return defaultValue;
       }
     },
   };
@@ -72,7 +69,6 @@ const runInternal = async ({
       console.error(error);
       return null;
     });
-
   if (!files) {
     return FailedResult(
       new Error(`Failed to obtained content of '${monitoringDirPath}'`),
@@ -86,7 +82,7 @@ const runInternal = async ({
       const filePath = path.join(file.parentPath, file.name.toLowerCase());
       return processZipFile(filePath, allHandlers)
         .then((result) =>
-          finaliseSynchronisation({
+          finaliseSync({
             commandManager,
             filePath,
             poisonedDirName,
@@ -108,7 +104,7 @@ const runInternal = async ({
               );
         })
         .catch(async (error) => {
-          await finaliseSynchronisation({
+          await finaliseSync({
             commandManager,
             filePath,
             poisonedDirName,
@@ -117,11 +113,7 @@ const runInternal = async ({
           return FailedResult(error, 0);
         });
     }),
-  ).catch((error) => {
-    console.error("👇");
-    console.error(getErrorMessage(error));
-    return undefined;
-  });
+  );
 
   return results !== undefined && results.every((x) => x.ok)
     ? OkResult(results.reduce((acc, curr) => acc + (curr.data ?? 0), 0))
@@ -138,7 +130,7 @@ const isValideZipFile = (file: Dirent<string>): boolean => {
   );
 };
 
-const finaliseSynchronisation = async ({
+const finaliseSync = async ({
   commandManager,
   filePath,
   poisonedDirName,
@@ -153,20 +145,21 @@ const finaliseSynchronisation = async ({
   logMessage?: string | null;
   error?: Error | null;
 }): Promise<Result> => {
-  if (error) {
-    console.error(error);
+  if (error !== null) {
+    console.error(error.message, error.stack);
     await moveToPoisoned(filePath, poisonedDirName);
   }
 
   await deleteZipFileAndFolder(filePath);
+
   const result = await saveSyncLog({
     commandManager,
     fileName: path.basename(filePath),
     type: syncType,
     isFailed: error !== null,
-    logMessage:
-      error !== null ? (error?.toString() ?? null) : (logMessage ?? null),
+    logMessage: error !== null ? error.toString() : logMessage,
   });
+
   return result.ok
     ? OkResult()
     : FailedResult(
@@ -182,7 +175,6 @@ const moveToPoisoned = async (filePath: string, poisonedName: string) => {
 };
 
 const deleteZipFileAndFolder = async (filePath: string) => {
-  console.log("🧪 ~ deleteZipFileAndFolder, filePath:", filePath);
   const dirPath = path.dirname(filePath);
   await fs.rm(
     path.join(dirPath, path.basename(filePath, FILE_EXTENSIION_ZIP)),

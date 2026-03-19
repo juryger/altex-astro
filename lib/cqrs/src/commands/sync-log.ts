@@ -4,17 +4,13 @@ import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { SyncTypes } from "@/lib/domain";
 import type { SyncLog } from "@/lib/domain";
 
-const mapDomainToDatabaseModel = (
-  entity: SyncLog,
-  messageLog: string | null = null,
-  isFailed: boolean = false,
-): DBSyncLog => {
+const mapDomainToDatabaseModel = (entity: SyncLog): DBSyncLog => {
   return {
     id: entity.id,
     type: entity.type,
     fileName: entity.fileName,
-    isFailed: isFailed ? 1 : 0,
-    logMessage: messageLog !== undefined ? messageLog : null,
+    isFailed: entity.isFailed ? 1 : 0,
+    logMessage: entity.logMessage,
   } as DBSyncLog;
 };
 
@@ -36,10 +32,10 @@ export async function setSyncLog({
     .insert(syncLog)
     .values(
       mapDomainToDatabaseModel({
+        fileName,
         type,
-        fileName: `${fileName}.db`,
-        isFailed: isFailed,
-        logMessage: logMessage,
+        isFailed,
+        logMessage,
       } as SyncLog),
     )
     .returning({ insertedId: syncLog.id });

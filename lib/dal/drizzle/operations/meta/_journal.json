@@ -43,6 +43,13 @@
       "when": 1773732689904,
       "tag": "0005_operations",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1773957167354,
+      "tag": "0006_operations",
+      "breakpoints": true
     }
   ]
 }
