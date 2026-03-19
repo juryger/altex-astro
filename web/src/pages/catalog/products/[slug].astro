@@ -10,58 +10,65 @@ import { CacheKeys, getCacheInfo } from '@/lib/domain';
 import { fetchMeasurementUnits, fetchDiscounts, fetchProductColors, getQueryManager } from '@/lib/cqrs';
 
 const { slug } = Astro.params;
+const queryManager = getQueryManager();
 
-const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
-  const queryManager = getQueryManager();
-  return await Promise.all([
-    queryManager.fetch(
-      () => fetchMeasurementUnits(),
-      getCacheInfo(CacheKeys.MeasurementUnits),
-    ), 
-    queryManager.fetch(
-      () => fetchDiscounts(),
-      getCacheInfo(CacheKeys.Discounts),
-    ), 
-    queryManager.fetch(
-      () => fetchProductColors(),
-      getCacheInfo(CacheKeys.ProductColors),
-    ),
-  ]).then((data) => {        
-    if (data.some(x => x.error !== undefined)) {
-      const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
-      console.error("~ Product page ~", errorMessage);  
-      return undefined;
+const internals = {
+  fetchCatalogReferences: async (): Promise<Catalog | undefined> => {
+    let result: Catalog | undefined = undefined;
+    try {
+      result = await Promise.all([
+        queryManager.fetch(
+          () => fetchMeasurementUnits(),
+          getCacheInfo(CacheKeys.MeasurementUnits),
+        ), 
+        queryManager.fetch(
+          () => fetchDiscounts(),
+          getCacheInfo(CacheKeys.Discounts),
+        ), 
+        queryManager.fetch(
+          () => fetchProductColors(),
+          getCacheInfo(CacheKeys.ProductColors),
+        ),
+      ]).then((data) => {        
+        if (data.some(x => x.error !== undefined)) {
+          const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
+          console.error("~ Product page ~", errorMessage);  
+          return undefined;
+        }
+        return {
+          measurementUnits: data[0].data ?? [],
+          discounts: data[1].data ?? [],
+          productColors: data[2].data ?? [],
+        }
+      }).catch((err) => { 
+        console.error("~ Product page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+        return undefined;
+      });
+    } catch(error) {
+      console.error("🛑 ~ Product page ~ failed to fetch catalog references", error);
     }
-    return {
-      measurementUnits: data[0].data ?? [],
-      discounts: data[1].data ?? [],
-      productColors: data[2].data ?? [],
+    return result;
+  },
+  fetchProduct: async (): Promise<Product | undefined> => {
+    let result: Product | undefined;
+    try {
+      if (slug !== undefined) result = await getProduct(slug);
+    } catch(error) {
+      console.error("🛑 ~ Product page ~ failed to fetch product", error);
     }
-  }).catch((err) => { 
-    console.error("~ Product page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
-    return undefined;
-  });
-}
-
-const fetchProduct = async (): Promise<Product | undefined> => {
-  let result: Product | undefined;
-  try {
-    if (slug !== undefined) result = await getProduct(slug);
-  } catch(error) {
-    console.error("🛑 ~ Product page ~ failed to fetch product", error);
+    return result;
   }
-  return result;
 }
 
 const sessionManager = getSessionManager(Astro.session);
-const product = await fetchProduct();
+const product = await internals.fetchProduct();
 if (product === undefined)
 {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }
 
-const references = await fetchCatalogReferences();
+const references = await internals.fetchCatalogReferences();
 if (references === undefined) {
   return Astro.redirect("/500");
 }
@@ -71,7 +78,6 @@ sessionManager.setActiveCatalogItem({
   category: { slug: product.categorySlug, title: product.categoryTitle }, 
   product: { slug: product.slug, title: product.title }
 });
-//console.log("🌎 ~ Product page ~ product", product);
 ---
 
 <BaseLayout title=`Каталог - ${product?.title}`>

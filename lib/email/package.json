@@ -1,7 +1,7 @@
 {
   "name": "email",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {

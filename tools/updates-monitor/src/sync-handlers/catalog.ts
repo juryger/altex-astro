@@ -6,7 +6,7 @@ const getCatalogSyncHandler = (monitorDirPath: string): BaseSyncHandler => {
   return {
     getType: () => SyncTypes.Catalog,
     synchronise: async () => {
-      return FailedResult(new Error("CatalogSyncHandler not implemented"));
+      throw new Error("CatalogSyncHandler not implemented");
     },
   };
 };

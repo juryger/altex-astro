@@ -37,13 +37,13 @@ try {
   console.error("🛑 ~ Products component ~ failed to fetch products list", error);
 } 
 
-let rowStart = 0, rowEnd = 0, totalRows = 0;
+let firstRow = 0, lastRow = 0, totalRows = 0;
 if (products !== undefined) {
   totalRows = products.pageInfo.total;
-  rowStart = products.pageInfo.page * paging.pageSize + 1;
-  rowEnd = (products.pageInfo.page + 1) * paging.pageSize;
-  if (rowEnd > totalRows)
-    rowEnd = totalRows;
+  firstRow = products.pageInfo.page * paging.pageSize + 1;
+  lastRow = (products.pageInfo.page + 1) * paging.pageSize;
+  if (lastRow > totalRows)
+    lastRow = totalRows;
 }
 
 const nameSortDialog = "sort-dialog";
@@ -77,7 +77,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
   </p>
 </div>}
 {(products && products.items.length > 0) &&
-  <div data-products-root data-page_prev={rowStart > 0 ? products.pageInfo.page - 1 : -1} data-page_next={rowEnd < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
+  <div data-products-root data-page_prev={firstRow > 0 ? products.pageInfo.page - 1 : -1} data-page_next={lastRow < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
     {/* Header */}
     <div class="grid grid-cols-1 sm:grid-cols-2 mb-2 items-center">
       <h3 class="text-lg font-bold text-center sm:text-left py-2">
@@ -110,13 +110,13 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       <div class="flex flex-col sm:flex-row items-center justify-center">
         <span class="content-center text-nowrap mr-2">{titlePagingInfo}:</span>
         <div class="join">
-          <button name={namePageActionPrevious} class="join-item btn btn-ghost" class:list={[{'btn-disabled': rowStart === 1}]} title={titlePagingPrev}>
+          <button name={namePageActionPrevious} class="join-item btn btn-ghost" class:list={[{'btn-disabled': firstRow === 1}]} title={titlePagingPrev}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>          
-          <button class="join-item btn btn-disabled btn-ghost">{`${rowStart}-${rowEnd} ${titlePagingNumberOf} ${totalRows}`}</button>
-          <button name={namePageActionNext} class="join-item btn btn-ghost" class:list={[{'btn-disabled': rowEnd === totalRows}]} title={titlePagingNext}>
+          <button class="join-item btn btn-disabled btn-ghost">{`${firstRow}-${lastRow} ${titlePagingNumberOf} ${totalRows}`}</button>
+          <button name={namePageActionNext} class="join-item btn btn-ghost" class:list={[{'btn-disabled': lastRow === totalRows}]} title={titlePagingNext}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>

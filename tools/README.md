@@ -2,4 +2,4 @@
 
 NodeJS internal tools for Altex:
 
-- updates-monitor (to sync changes from backend store).
+- updates-monitor (to apply changes from backend store to website).

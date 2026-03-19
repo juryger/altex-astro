@@ -15,78 +15,85 @@ import { CacheKeys, EnvironmentNames, getCacheInfo, regexTrue, selectEnvironment
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 
 const { slug, params } = Astro.params;
+
+const queryManager = getQueryManager();
 const withTracing = regexTrue.test(
   selectEnvironment(EnvironmentNames.ENABLE_TRACING),
 );
 
-const parseRouteParams = (): { 
-  sorting: Sorting | undefined, 
-  paging: Paging | undefined,
-  filtering: Filtering[]
-} => {
-  const routeParser = getRouteParser(params);  
-  const sorting = routeParser.getCatalogSorting();
-  const paging = routeParser.getCatalogPaging();
-  const filtering = routeParser.getCatalogFiltering();  
-
-  withTracing && console.log("🐾 ~ Category page ~ slug %s, params: %o", slug, params);
-  withTracing && console.log("🐾 ~ Categories page ~ parsed sort", sorting);
-  withTracing && console.log("🐾 ~ Category page ~ parse paging", paging);
-  withTracing && console.log("🌎 ~ Category page ~ parsed filters", filtering);
-
-  return { sorting, paging, filtering };
-}
-
-const fetchCatalogReferences = async (): Promise<Catalog | undefined> => {
-  const queryManager = getQueryManager();
-  return await Promise.all([
-    queryManager.fetch(
-      () => fetchMeasurementUnits(),
-      getCacheInfo(CacheKeys.MeasurementUnits),
-    ), 
-    queryManager.fetch(
-      () => fetchDiscounts(), 
-      getCacheInfo(CacheKeys.Discounts),
-    ), 
-    queryManager.fetch(
-      () => fetchProductColors(),
-      getCacheInfo(CacheKeys.ProductColors)
-    ),
-  ]).then((data) => {        
-    if (data.some(x => x.error !== undefined)) {
-      const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
-      console.error("🛑 ~ Category page ~", errorMessage);  
-      return undefined;
+const internals = {
+  parseRouteParams: (): { 
+    sorting: Sorting | undefined, 
+    paging: Paging | undefined,
+    filtering: Filtering[] | undefined
+  } => {
+    const routeParser = getRouteParser(params);  
+    const sorting = routeParser.getCatalogSorting();
+    const paging = routeParser.getCatalogPaging();
+    const filtering = routeParser.getCatalogFiltering();  
+    withTracing && console.log("🐾 ~ Category page ~ slug %s, params: %o", slug, params);
+    withTracing && console.log("🐾 ~ Categories page ~ parsed sort", sorting);
+    withTracing && console.log("🐾 ~ Category page ~ parse paging", paging);
+    withTracing && console.log("🐾 ~ Category page ~ parsed filters", filtering);
+    return { sorting, paging, filtering };
+  },
+  fetchCatalogReferences: async (): Promise<Catalog | undefined> => {
+    let result: Catalog | undefined = undefined;
+    try {
+      result = await Promise.all([
+        queryManager.fetch(
+          () => fetchMeasurementUnits(),
+          getCacheInfo(CacheKeys.MeasurementUnits),
+        ), 
+        queryManager.fetch(
+          () => fetchDiscounts(), 
+          getCacheInfo(CacheKeys.Discounts),
+        ), 
+        queryManager.fetch(
+          () => fetchProductColors(),
+          getCacheInfo(CacheKeys.ProductColors)
+        ),
+      ]).then((data) => {        
+        if (data.some(x => x.error !== undefined)) {
+          const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
+          console.error("🛑 ~ Category page ~", errorMessage);  
+          return undefined;
+        }
+        return {
+          measurementUnits: data[0].data ?? [],
+          discounts: data[1].data ?? [],
+          productColors: data[2].data ?? [],
+        }
+      }).catch((err) => { 
+        console.error("🛑 ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+        return undefined;
+      });
     }
-    return {
-      measurementUnits: data[0].data ?? [],
-      discounts: data[1].data ?? [],
-      productColors: data[2].data ?? [],
+    catch(error) {
+     console.error("🛑 ~ Category page ~ failed to fetch catalog references", error);    
     }
-  }).catch((err) => { 
-    console.error("🛑 ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
-    return undefined;
-  });
-}
-
-const fetchCategory = async (): Promise<Category | undefined> => {
-  let result: Category | undefined;
-  try {
-    if (slug !== undefined) result = await getCategory(slug);
-  } catch(error) {
-    console.error("🛑 ~ Category page ~ failed to fetch category", error);
+    return result;
+  }, 
+  fetchCategory: async (): Promise<Category | undefined> => {
+    let result: Category | undefined;
+    try {
+      if (slug !== undefined) result = await getCategory(slug);
+    } catch(error) {
+      console.error("🛑 ~ Category page ~ failed to fetch category", error);
+    }
+    return result;
   }
-  return result;
-}
+};
 
 const sessionManager = getSessionManager(Astro.session);
-const category = await fetchCategory();
+
+const category = await internals.fetchCategory();
 if (category === undefined) {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/500");
 }
 
-const references = await fetchCatalogReferences();
+const references = await internals.fetchCatalogReferences();
 if (references === undefined) {
   return Astro.redirect("/500");
 }
@@ -99,7 +106,7 @@ sessionManager.setActiveCatalogItem({
   product: undefined
 });
 
-const { sorting, paging, filtering } = parseRouteParams();
+const { sorting, paging, filtering } = internals.parseRouteParams();
 const productsView = await sessionManager.getProductsView();
 const newProductsView = {
     sorting: sorting !== undefined 

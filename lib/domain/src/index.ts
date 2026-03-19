@@ -5,6 +5,8 @@ export {
   INPUT_DEBOUNCE_DELAY_MS,
   SEARCH_RESULTS_LIMIT,
   SEARCH_RECORDS_LIMIT,
+  FILE_EXTENSIION_XML,
+  FILE_EXTENSIION_ZIP,
   ImageContainers,
   ReadReplicaTypes,
   SyncTypes,
