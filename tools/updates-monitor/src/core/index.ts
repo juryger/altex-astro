@@ -1,9 +1,25 @@
-import type { Result } from "@/lib/domain";
 import type { SyncTypes } from "@/lib/domain";
 
 interface BaseSyncHandler {
-  getType: () => SyncTypes;
-  synchronise: () => Promise<Result>;
+  getSyncType: () => SyncTypes;
+  synchronise: () => Promise<void>;
+}
+
+interface BaseXmlHandler {
+  parse: <T = any>(filePath: string) => Promise<T>;
+}
+
+interface BaseArchiveManager {
+  extract: (filePath: string) => Promise<string>;
+  cleanUp: (filePath: string) => Promise<void>;
+}
+interface BaseFileManager {
+  lookupByExtension: (
+    dirPath: string,
+    fileExt: string,
+  ) => Promise<string | null>;
+  move: (srcPath: string, dstPath: string) => Promise<void>;
+  remove: (filePath: string, isDirectory?: boolean) => Promise<void>;
 }
 
 interface UpdatesManager {
@@ -16,4 +32,13 @@ interface UpdatesManager {
   }) => Promise<number>;
 }
 
-export { type BaseSyncHandler, type UpdatesManager };
+export {
+  type BaseSyncHandler,
+  type BaseXmlHandler,
+  type BaseArchiveManager,
+  type BaseFileManager,
+  type UpdatesManager,
+};
+export { FileManager } from "./file-manager";
+export { ZipManager } from "./archive-manager";
+export { getUpdatesManager } from "./updates-manager";
