@@ -14,6 +14,20 @@ interface BaseArchiveManager {
   extract: (filePath: string) => Promise<string>;
   cleanUp: (filePath: string) => Promise<void>;
 }
+
+interface SlugNamesConverter {
+  transliterate: (value: string) => string;
+}
+
+interface BaseImageUploader {
+  upload: (filePath: string, dstPath: string) => Promise<void>;
+}
+
+interface BaseReadReplicaManager {
+  createDbCopy: (srcPath: string, dstPath: string) => Promise<void>;
+  setActive: (filePath: string) => Promise<void>;
+}
+
 interface BaseFileManager {
   lookupByExtension: (
     dirPath: string,
@@ -39,4 +53,7 @@ export {
   type BaseArchiveManager,
   type BaseFileManager,
   type UpdatesManager,
+  type SlugNamesConverter,
+  type BaseImageUploader,
+  type BaseReadReplicaManager,
 };

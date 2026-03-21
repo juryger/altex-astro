@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import { type BaseXmlHandler } from "../core";
 import { XMLParser } from "fast-xml-parser";
-import type { CatalogUpdates } from "../models/catalog";
 
 const getCatalogXmlHandler = (): BaseXmlHandler => {
   return {
