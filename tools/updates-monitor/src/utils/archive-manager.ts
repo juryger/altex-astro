@@ -1,5 +1,5 @@
-import { FILE_EXTENSIION_ZIP } from "@/lib/domain";
-import { type BaseArchiveManager, type BaseFileManager } from "../core/";
+import { FILE_EXTENSIION_ZIP } from "../const";
+import { type BaseArchiveManager, type BaseFileManager } from "../core";
 import path from "path";
 import unzipper from "unzipper";
 import { FileManager } from "./file-manager";

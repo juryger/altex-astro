@@ -1,8 +1,9 @@
 import type { SyncTypes } from "@/lib/domain";
+import type { CatalogUpdates } from "../models/catalog";
 
 interface BaseSyncHandler {
   getSyncType: () => SyncTypes;
-  synchronise: () => Promise<void>;
+  synchronise: (monitorDirPath: string, data: CatalogUpdates) => Promise<void>;
 }
 
 interface BaseXmlHandler {
@@ -39,6 +40,3 @@ export {
   type BaseFileManager,
   type UpdatesManager,
 };
-export { FileManager } from "./file-manager";
-export { ZipManager } from "./archive-manager";
-export { getUpdatesManager } from "./updates-manager";

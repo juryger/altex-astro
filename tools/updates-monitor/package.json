@@ -12,11 +12,12 @@
   "dependencies": {
     "better-sqlite3": "^12.8.0",
     "drizzle-orm": "^0.45.1",
-    "unzipper": "^0.12.3",
-    "zod": "3.25.76",
+    "fast-xml-parser": "^5.5.8",
     "googleapis": "^171.4.0",
     "handlebars": "^4.7.8",
-    "nodemailer": "^8.0.1"
+    "nodemailer": "^8.0.1",
+    "unzipper": "^0.12.3",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^6.0.0",

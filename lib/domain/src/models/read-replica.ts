@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ReadReplicaTypes } from "../const";
+import { ReadReplicaTypes } from "../const/general";
 
 export const ReadReplicaSchema = z.object({
   id: z.number(),

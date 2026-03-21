@@ -7,7 +7,7 @@ import {
   CACHE_ITEM_LOCK_TIMEOUT_1MN,
 } from "@/lib/domain";
 import { delayWithRetry } from "@/lib/domain";
-import { getMostRecentEvictionStrategy } from "./cache/eviction/most-recent-eviction";
+import { getMostRecentEvictionStrategy } from "../cache/eviction/most-recent-eviction";
 
 type CacheResult<T = any> = {
   value?: T;

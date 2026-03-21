@@ -1,8 +1,11 @@
-export { type CacheResult, CacheManager } from "./cache-manager";
-export { type CommandManager, getCommandManager } from "./command-manager";
-export { type QueryManager, getQueryManager } from "./query-manager";
+export { type CacheResult, CacheManager } from "./utils/cache-manager";
+export {
+  type CommandManager,
+  getCommandManager,
+} from "./utils/command-manager";
+export { type QueryManager, getQueryManager } from "./utils/query-manager";
 
-export { ReadReplicaManager } from "./read-replica-manager";
+export { ReadReplicaManager } from "./utils/read-replica-manager";
 
 export { fetchCompanyInfo } from "./queries/company-info";
 export { fetchDiscounts } from "./queries/discounts";

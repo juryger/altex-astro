@@ -3,8 +3,6 @@ const NO_VALUE_ASSIGNED = "---";
 const INPUT_DEBOUNCE_DELAY_MS = 500;
 const SEARCH_RESULTS_LIMIT: number = 50;
 const SEARCH_RECORDS_LIMIT: number = 1000;
-const FILE_EXTENSIION_XML = ".xml";
-const FILE_EXTENSIION_ZIP = ".zip";
 
 enum ImageContainers {
   Categories = "categories",
@@ -33,8 +31,6 @@ export {
   INPUT_DEBOUNCE_DELAY_MS,
   SEARCH_RESULTS_LIMIT,
   SEARCH_RECORDS_LIMIT,
-  FILE_EXTENSIION_XML,
-  FILE_EXTENSIION_ZIP,
   ImageContainers,
   ReadReplicaTypes,
   SyncTypes,

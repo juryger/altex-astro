@@ -9,7 +9,7 @@ import {
   getInitialReplica,
 } from "@/lib/domain";
 import { getQueryManager } from "./query-manager";
-import { fetchReadReplica } from "./queries/read-replica";
+import { fetchReadReplica } from "../queries/read-replica";
 
 interface BaseReadReplicaManager {
   initReplicas: () => Promise<void>;

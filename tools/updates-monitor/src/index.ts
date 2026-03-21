@@ -1,5 +1,5 @@
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
-import { getUpdatesManager } from "./core";
+import { getUpdatesManager } from "./utils/updates-manager";
 
 const monitoringDirPath = selectEnvironment(
   EnvironmentNames.UPDATES_MONITORING_PATH,

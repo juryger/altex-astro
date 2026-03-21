@@ -21,7 +21,7 @@ import {
   selectEnvironment,
   SortOrder,
 } from "@/lib/domain";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 const columnId: SQLiteColumn = categories.id;
 const columnTitle: SQLiteColumn = categories.title;

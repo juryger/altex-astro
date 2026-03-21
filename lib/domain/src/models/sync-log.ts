@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SyncTypes } from "../const";
+import { SyncTypes } from "../const/general";
 
 export const SyncLogSchema = z.object({
   id: z.number(),

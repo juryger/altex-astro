@@ -9,7 +9,7 @@ import {
   selectEnvironment,
 } from "@/lib/domain";
 import type { SearchResult } from "@/lib/domain";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 import {
   eq,
   isNull,

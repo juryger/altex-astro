@@ -6,7 +6,7 @@ import {
   selectEnvironment,
   type ProductColor,
 } from "@/lib/domain";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 const columnTitle: SQLiteColumn = colors.title;
 

@@ -1,4 +1,4 @@
-import type { SearchTypes } from "../const";
+import type { SearchTypes } from "../const/general";
 
 type SearchResult = {
   type: SearchTypes;

@@ -36,7 +36,7 @@ import {
   productColors,
   products,
 } from "@/lib/dal";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 const columnId: SQLiteColumn = products.id;
 const columnTitle: SQLiteColumn = products.title;

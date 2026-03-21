@@ -27,7 +27,7 @@ import type {
   GuestUser,
 } from "@/lib/domain";
 import { formatCurrency } from "@/lib/domain";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 type QueryResult = {
   cart_checkout: DBCartCheckout;

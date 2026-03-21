@@ -9,7 +9,7 @@ import type {
   MeasurementUnit as DbMeasurementUnit,
   SQLiteColumn,
 } from "@/lib/dal";
-import { ReadReplicaManager } from "../read-replica-manager";
+import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 const columnTitle: SQLiteColumn = measurementUnits.title;
 

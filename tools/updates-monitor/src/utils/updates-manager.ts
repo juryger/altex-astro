@@ -4,20 +4,27 @@ import {
   OkResult,
   type Result,
 } from "@/lib/domain";
-import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "@/lib/domain";
+import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "../const";
 import { type CommandManager, getCommandManager } from "@/lib/cqrs";
 import path from "path";
 import fs from "fs/promises";
-import unzipper from "unzipper";
-import { type BaseSyncHandler, type UpdatesManager } from "./index.js";
-import { ZipManager, FileManager } from "./index.js";
+import {
+  type BaseSyncHandler,
+  type BaseXmlHandler,
+  type UpdatesManager,
+} from "../core";
+import { FileManager } from "./file-manager";
+import { ZipManager } from "./archive-manager";
 import { getCatalogSyncHandler } from "../sync-handlers/catalog.js";
 import { setSyncLog } from "@/lib/cqrs";
 import { SyncTypes } from "@/lib/domain";
 import type { Dirent } from "fs";
+import { getCatalogXmlHandler } from "../xml-handlers/catalog";
+import type { CatalogUpdates } from "../models/catalog";
 
 const archiveManager = ZipManager.instance();
 const fileManager = FileManager.instance();
+const commandManager = getCommandManager();
 
 export function getUpdatesManager(): UpdatesManager {
   return {
@@ -59,6 +66,10 @@ const runInternal = async ({
   monitoringDirPath: string;
   poisonedDirName: string;
 }): Promise<number> => {
+  const defaultResult = 0;
+  const syncHandlers = initSyncHandlers();
+  const xmlHandlers = initXmlHandlers();
+
   const files = await fs
     .readdir(monitoringDirPath, {
       withFileTypes: true,
@@ -74,26 +85,33 @@ const runInternal = async ({
     );
   }
 
-  const allHandlers = initHandlers(monitoringDirPath);
-  //const key = SyncTypes.Catalog;
-  //console.log("handler 0: ", allHandlers[key]);
-
-  const commandManager = getCommandManager();
   const results = await Promise.all(
     files.map((file) => {
-      if (!isFile(file, FILE_EXTENSIION_ZIP)) return OkResult(0);
+      if (!isFile(file, FILE_EXTENSIION_ZIP)) {
+        return OkResult(defaultResult);
+      }
+
       const filePath = path.join(file.parentPath, file.name.toLowerCase());
-      const syncType = getFileSyncType(filePath);
-      const syncHandler = syncType !== undefined ? allHandlers[0] : undefined;
-      if (syncType === undefined || syncHandler === undefined) {
+      const syncType = getSyncType(filePath);
+      const syncHandler =
+        syncType !== undefined ? syncHandlers[syncType] : undefined;
+      const xmlHandler =
+        syncType !== undefined ? xmlHandlers[syncType] : undefined;
+
+      if (
+        syncType === undefined ||
+        syncHandler === undefined ||
+        xmlHandler === undefined
+      ) {
         return FailedResult(
           new Error(`Could not find sync handler for type ID: ${syncType}`),
+          defaultResult,
         );
       }
 
-      return processZipFile(filePath, syncHandler)
+      return processArchive(filePath, syncHandler, xmlHandler)
         .then(async () => {
-          await finaliseSync({
+          await finalizeArchive({
             commandManager,
             filePath,
             poisonedDirName,
@@ -102,14 +120,14 @@ const runInternal = async ({
           return OkResult(1);
         })
         .catch(async (error) => {
-          await finaliseSync({
+          await finalizeArchive({
             commandManager,
             filePath,
             poisonedDirName,
             syncType,
             error,
           });
-          return FailedResult(error, 0);
+          return FailedResult(error, defaultResult);
         });
     }),
   );
@@ -117,20 +135,39 @@ const runInternal = async ({
   const failedIndex = results.findIndex((x) => !x.ok);
   if (failedIndex !== -1) return Promise.reject(results[failedIndex]?.error);
 
-  const defaultValue = 0;
   return results.every((x) => x.ok)
     ? results.reduce(
-        (acc, curr) => acc + (curr.data ?? defaultValue),
-        defaultValue,
+        (acc, curr) => acc + (curr.data ?? defaultResult),
+        defaultResult,
       )
-    : defaultValue;
+    : defaultResult;
 };
 
 const isFile = (file: Dirent<string>, extension: string) => {
   return file.isFile() && file.name.toLowerCase().indexOf(extension) > 0;
 };
 
-const finaliseSync = async ({
+const processArchive = async (
+  filePath: string,
+  syncHandler: BaseSyncHandler,
+  xmlHandler: BaseXmlHandler,
+): Promise<void> => {
+  const extractedPath = await archiveManager.extract(filePath);
+  if (extractedPath.trim().length === 0) {
+    return Promise.reject(`Could not extract ZIP file '${filePath}'`);
+  }
+  const xmlFilePath = await fileManager.lookupByExtension(
+    extractedPath,
+    FILE_EXTENSIION_XML,
+  );
+  if (xmlFilePath === null) {
+    return Promise.reject("Could not find XML file in extracted ZIP folder.");
+  }
+  const data = await xmlHandler.parse<CatalogUpdates>(xmlFilePath);
+  return await syncHandler.synchronise(extractedPath, data);
+};
+
+const finalizeArchive = async ({
   commandManager,
   filePath,
   poisonedDirName,
@@ -146,17 +183,31 @@ const finaliseSync = async ({
   error?: Error | null;
 }): Promise<void> => {
   if (error !== null) {
-    await moveToPoisoned(filePath, poisonedDirName);
+    const poisonedFilePath = path.join(
+      path.dirname(filePath),
+      poisonedDirName,
+      path.basename(filePath),
+    );
+    await fileManager.move(filePath, poisonedFilePath);
   }
 
-  await deleteZipFileAndFolder(filePath);
-  const result = await saveSyncLog({
-    commandManager,
-    fileName: path.basename(filePath),
-    type: syncType,
-    isFailed: error !== null,
-    logMessage: error !== null ? error.toString() : logMessage,
-  });
+  await fileManager.remove(filePath);
+  await fileManager.remove(
+    path.join(
+      path.dirname(filePath),
+      path.basename(filePath, FILE_EXTENSIION_ZIP),
+    ),
+    true,
+  );
+
+  var result = await commandManager.mutate<number>(() =>
+    setSyncLog({
+      fileName: path.basename(filePath),
+      type: syncType,
+      isFailed: error !== null,
+      logMessage: error !== null ? error.toString() : logMessage,
+    }),
+  );
 
   return !result.ok
     ? Promise.reject(
@@ -166,54 +217,23 @@ const finaliseSync = async ({
     : Promise.resolve();
 };
 
-const moveToPoisoned = async (filePath: string, poisonedName: string) => {
-  const destDir = path.join(path.dirname(filePath), poisonedName);
-  await fs.mkdir(destDir, { recursive: true });
-  await fs.copyFile(filePath, path.join(destDir, path.basename(filePath)));
-  await fs.unlink(filePath);
-};
-
-const deleteZipFileAndFolder = async (filePath: string) => {
-  const dirPath = path.dirname(filePath);
-  await fs.rm(
-    path.join(dirPath, path.basename(filePath, FILE_EXTENSIION_ZIP)),
-    {
-      recursive: true,
-      force: true,
-    },
-  );
-  await fs.rm(filePath, { force: true });
-};
-
-const saveSyncLog = async ({
-  commandManager,
-  fileName,
-  type = null,
-  isFailed = false,
-  logMessage = null,
-}: {
-  commandManager: CommandManager;
-  fileName: string;
-  type?: SyncTypes | null;
-  isFailed: boolean;
-  logMessage: string | null;
-}): Promise<Result<number>> => {
-  return await commandManager.mutate<number>(() =>
-    setSyncLog({ fileName, type, isFailed, logMessage }),
-  );
-};
-
-const initHandlers = (
-  monitorDirPath: string,
-): Record<SyncTypes, BaseSyncHandler | undefined> => {
+const initSyncHandlers = (): Record<SyncTypes, BaseSyncHandler | undefined> => {
   return {
-    [SyncTypes.Catalog]: getCatalogSyncHandler(monitorDirPath),
+    [SyncTypes.Catalog]: getCatalogSyncHandler(),
     [SyncTypes.CompanyInfo]: undefined,
     [SyncTypes.Order]: undefined,
   };
 };
 
-const getFileSyncType = (filePath: string): SyncTypes | undefined => {
+const initXmlHandlers = (): Record<SyncTypes, BaseXmlHandler | undefined> => {
+  return {
+    [SyncTypes.Catalog]: getCatalogXmlHandler(),
+    [SyncTypes.CompanyInfo]: undefined,
+    [SyncTypes.Order]: undefined,
+  };
+};
+
+const getSyncType = (filePath: string): SyncTypes | undefined => {
   const fileName = path.basename(filePath, FILE_EXTENSIION_ZIP);
   const delimeterIndex = fileName.indexOf("_");
   if (delimeterIndex === -1) return undefined;
@@ -225,27 +245,7 @@ const getFileSyncType = (filePath: string): SyncTypes | undefined => {
     case "order":
       return SyncTypes.Order;
     default:
-      console.error("Unsupported xml definition file: ", filePath);
+      console.error("Unsupported XML definition file: ", filePath);
       return undefined;
   }
-};
-
-const processZipFile = async (
-  filePath: string,
-  handler: BaseSyncHandler,
-): Promise<void> => {
-  const extractedPath = await archiveManager.extract(filePath);
-  if (extractedPath.trim().length === 0) {
-    return Promise.reject(
-      `Could not extract content of zip file '${filePath}'`,
-    );
-  }
-  const xmlFilePath = await fileManager.lookupByExtension(
-    extractedPath,
-    FILE_EXTENSIION_XML,
-  );
-  if (!xmlFilePath) {
-    return Promise.reject("Could not find xml file from extracted zip file.");
-  }
-  return await handler.synchronise();
 };

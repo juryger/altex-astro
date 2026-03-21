@@ -2,9 +2,8 @@ import { z } from "zod";
 
 const DiscountSchema = z.object({
   id: z.number(),
-  code: z.string(),
-  title: z.string(),
   fromSum: z.number(),
+  title: z.string(),
 });
 
 export type Discount = z.infer<typeof DiscountSchema>;

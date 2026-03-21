@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { type BaseFileManager } from "./index";
+import { type BaseFileManager } from "../core";
 
 export class FileManager implements BaseFileManager {
   private static __instance: BaseFileManager;
@@ -23,11 +23,15 @@ export class FileManager implements BaseFileManager {
   ): Promise<string | null> {
     const files = await fs.readdir(dirPath);
     const filtered = files.filter((file) => path.extname(file) === fileExt);
-    return filtered.length > 0 ? (filtered[0] ?? null) : null;
+    return filtered.length > 0
+      ? filtered[0] !== undefined
+        ? path.join(dirPath, filtered[0])
+        : null
+      : null;
   }
 
   async move(srcPath: string, dstPath: string): Promise<void> {
-    await fs.mkdir(dstPath, { recursive: true });
+    await fs.mkdir(path.dirname(dstPath), { recursive: true });
     await fs.copyFile(srcPath, dstPath);
     await fs.unlink(srcPath);
     return Promise.resolve();
