@@ -1,0 +1,2 @@
+ALTER TABLE `products` DROP COLUMN `code`;--> statement-breakpoint
+ALTER TABLE `products` ADD `code` text GENERATED ALWAYS AS (SUBSTRING("title", 1, IIF(LENGTH("title") >= 4, 4, LENGTH("title"))) || '-' || "id") VIRTUAL;

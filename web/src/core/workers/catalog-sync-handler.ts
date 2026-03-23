@@ -8,7 +8,7 @@ const CATEGORIES_PAGE_SIZE = 150;
 type CatalogSyncHandler = {
   syncCategories(): Promise<number>;
   syncDiscounts(): Promise<number>;
-  syncProductColors(): Promise<number>;
+  syncColors(): Promise<number>;
   cleanUpCache(): Promise<void>;
 };
 
@@ -59,9 +59,9 @@ const getCatalogSyncHandler = (config: {
       clientDb.discounts.clear();
       return clientDb.discounts.bulkAdd(data);
     },
-    async syncProductColors() {
+    async syncColors() {
       const response = await fetch(
-        new URL(`${config.baseUrl}/${APIEndpointNames.ProductColors}`),
+        new URL(`${config.baseUrl}/${APIEndpointNames.Colors}`),
       );
       if (!response.ok) {
         response.text().then((errorMessage) => {
@@ -71,8 +71,8 @@ const getCatalogSyncHandler = (config: {
         });
       }
       var data = await response.json();
-      clientDb.productColors.clear();
-      return clientDb.productColors.bulkAdd(data);
+      clientDb.colors.clear();
+      return clientDb.colors.bulkAdd(data);
     },
     async cleanUpCache() {
       clientDb.categories.clear();

@@ -6,7 +6,7 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
   return {
     getSyncType: () => SyncTypes.Catalog,
     synchronise: async (
-      monitorDirPath: string,
+      inputDirPath: string,
       data: CatalogUpdates,
     ): Promise<void> => {
       return Promise.reject("CatalogSyncHandler not implemented");

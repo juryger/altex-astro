@@ -1,6 +1,7 @@
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import { getUpdatesManager } from "./utils/updates-manager";
 import { getSlugNamesConverter } from "./utils/slug-names-converter";
+import { getS3ImageManager } from "./utils/s3-image-manager";
 
 const monitoringDirPath = selectEnvironment(
   EnvironmentNames.UPDATES_MONITORING_PATH,

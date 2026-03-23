@@ -1,8 +1,4 @@
-import {
-  EnvironmentNames,
-  ReadReplicaTypes,
-  selectEnvironment,
-} from "@/lib/domain";
+import { ReadReplicaTypes } from "@/lib/domain";
 import { asc, createCatalogDb, SQL, discounts, isNull } from "@/lib/dal";
 import type { Discount as DbDiscount, SQLiteColumn } from "@/lib/dal";
 import { type Discount } from "@/lib/domain";
@@ -17,6 +13,7 @@ const getSortCondition = (): SQL => {
 const mapQueryResultToDomainModel = (entity: DbDiscount): Discount => {
   return <Discount>{
     id: entity.id,
+    uid: entity.uid,
     fromSum: entity.fromSum,
     title: entity.title,
   };

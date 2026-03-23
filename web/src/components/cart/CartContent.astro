@@ -70,7 +70,7 @@ const titleSubtotal = "Итого:";
   import { formatCurrency } from "@/lib/domain";
   import { getButtonElementByName, getElementByDataAttribute } from '@/web/src/core/utils/dom-utils';
   import { clientDb } from '@/web/src/core/db/indexed-db';
-  import type { ProductColor } from '@/lib/domain';
+  import type { Color } from '@/lib/domain';
   import { NO_VALUE_ASSIGNED, regexTrue } from '@/lib/domain';
 
   const CART_VIEW_INIT_TIMEOUT_MS = 300;
@@ -78,7 +78,7 @@ const titleSubtotal = "Итого:";
   class CartContent extends HTMLElement {
     private controller: AbortController | undefined;
     private discounts: Discount[] = [];
-    private productColors: ProductColor[] = [];
+    private сolors: Color[] = [];
     private discountIndex: number = 0;
     private scrollContainerEl: Element | null = null;
     private discountedCostEl: Element | null = null;
@@ -189,7 +189,7 @@ const titleSubtotal = "Итого:";
           const cartItemMarkup = createCartItemMarkup(
             item, 
             this.discountIndex, 
-            this.productColors, 
+            this.сolors, 
             this.updateCartCommandName, 
             this.removeCartCommandName
           );
@@ -225,15 +225,15 @@ const titleSubtotal = "Итого:";
       });    
     }
 
-    private loadProductColorsFromIndexedDB(): void {
-      if (this.productColors.length > 0) return;
+    private loadColorsFromIndexedDB(): void {
+      if (this.сolors.length > 0) return;
 
-      clientDb.productColors.toArray((data) => { 
+      clientDb.colors.toArray((data) => { 
         if (data.length === 0) {
           console.warn("~ CartContent ~ Product Colors data are not available.");
           return;
         }
-        this.productColors = data;
+        this.сolors = data;
         this.syncCartContentFromStore();
       });
     }
@@ -303,7 +303,7 @@ const titleSubtotal = "Итого:";
           if (existingItem) { 
             updateCart({ ...existingItem, quantity: existingItem.quantity + quantity })
           } else {
-            const colorItem = this.productColors.find(x => x.id === colorId);
+            const colorItem = this.сolors.find(x => x.id === colorId);
             addToCart({ 
               ...cartItem, 
               colorId, 
@@ -367,7 +367,7 @@ const titleSubtotal = "Итого:";
       this.cartCheckoutEl?.addEventListener('click', this.cartCheckoutHandler, { signal: this.controller.signal });
       
       this.loadDiscountsFromIndexedDB();
-      this.loadProductColorsFromIndexedDB();
+      this.loadColorsFromIndexedDB();
 
       this.subscribeToCartStore();
       this.subscribeToCostStore();
@@ -378,7 +378,7 @@ const titleSubtotal = "Итого:";
     disconnectedCallback() {
       this.controller?.abort();
       this.discounts.length = 0;
-      this.productColors.length = 0;
+      this.сolors.length = 0;
       this.storeCartUnsubscribe && this.storeCartUnsubscribe();
       this.storeCostUnsubscribe && this.storeCostUnsubscribe();
       this.storeWhsCost1Unsubscribe && this.storeWhsCost1Unsubscribe()

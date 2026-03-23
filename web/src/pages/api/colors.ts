@@ -1,14 +1,14 @@
 import type { APIRoute } from "astro";
-import { getQueryManager, fetchProductColors } from "@/lib/cqrs";
-import type { ProductColor } from "@/lib/domain";
+import { getQueryManager, fetchColors } from "@/lib/cqrs";
+import type { Color } from "@/lib/domain";
 import { CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
-  const result = await getQueryManager().fetch<ProductColor[]>(
-    () => fetchProductColors(),
-    getCacheInfo(CacheKeys.ProductColors),
+  const result = await getQueryManager().fetch<Color[]>(
+    () => fetchColors(),
+    getCacheInfo(CacheKeys.Colors),
   );
 
   if (result.error) {

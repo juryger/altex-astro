@@ -15,7 +15,7 @@ enum APIEndpointNames {
   Categories = "categories",
   Products = "products",
   Discounts = "discounts",
-  ProductColors = "product-colors",
+  Colors = "colors",
 }
 
 enum APISearchParamNames {

@@ -31,7 +31,7 @@ self.onmessage = async (e) => {
         const result = await Promise.all([
           handler.syncCategories(),
           handler.syncDiscounts(),
-          handler.syncProductColors(),
+          handler.syncColors(),
         ]);
         syncStatus.resultMessage = SyncComplete;
         console.info(

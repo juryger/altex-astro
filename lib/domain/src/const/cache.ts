@@ -7,7 +7,7 @@ const CACHE_STALE_TIMEOUT_5MN = 300000;
 const CACHE_STALE_TIMEOUT_1HR = 3600000;
 
 enum CacheKeys {
-  ProductColors = "product-colors",
+  Colors = "colors",
   MeasurementUnits = "measurement-units",
   Discounts = "discounts",
   CompanyInfo = "company-info",

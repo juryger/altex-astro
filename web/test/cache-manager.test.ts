@@ -9,14 +9,9 @@ import {
   vi,
 } from "vitest";
 import { CacheManager } from "@/lib/cqrs";
-import productColors from "./data/product-colors.json" with { type: "json" };
+import сolors from "./data/colors.json" with { type: "json" };
 import { CACHE_ITEM_LOCK_TIMEOUT_1MN, CacheKeys } from "@/lib/domain";
-import type {
-  Category,
-  Discount,
-  ProductColor,
-  MeasurementUnit,
-} from "@/lib/domain";
+import type { Category, Discount, Color, MeasurementUnit } from "@/lib/domain";
 
 const CACHE_STALTE_TIME_MS = 10000;
 const CACHE_SIZE_LIMIT = 5;
@@ -44,34 +39,30 @@ describe("Cache manager", () => {
   afterEach(() => {});
 
   test(`Get item which is missed in cache`, () => {
-    const colors = cacheManager.contains(CacheKeys.ProductColors);
+    const colors = cacheManager.contains(CacheKeys.Colors);
     expect(colors).toBe(false);
   });
 
   test(`Add new item and retrieve it immediately`, async () => {
-    let getResult = await cacheManager.get<ProductColor[]>(
-      CacheKeys.ProductColors,
-    );
+    let getResult = await cacheManager.get<Color[]>(CacheKeys.Colors);
     expect(getResult.value).toBeUndefined();
     expect(getResult.error).toBeUndefined();
     expect(getResult.set).toBeDefined();
 
     if (getResult.set) {
-      getResult.set(productColors, CACHE_STALTE_TIME_MS);
-      expect(cacheManager.contains(CacheKeys.ProductColors)).toBe(true);
+      getResult.set(сolors, CACHE_STALTE_TIME_MS);
+      expect(cacheManager.contains(CacheKeys.Colors)).toBe(true);
       expect(cacheManager.getSize()).toBe(1);
     }
 
-    getResult = await cacheManager.get<ProductColor[]>(CacheKeys.ProductColors);
+    getResult = await cacheManager.get<Color[]>(CacheKeys.Colors);
     expect(getResult.value).toBeDefined();
     expect(getResult.error).toBeUndefined();
     expect(getResult.set).toBeUndefined();
   });
 
   test(`Get cache item after stale timeout`, async () => {
-    const getResult = await cacheManager.get<ProductColor[]>(
-      CacheKeys.ProductColors,
-    );
+    const getResult = await cacheManager.get<Color[]>(CacheKeys.Colors);
     expect(getResult.value).toBeDefined();
     expect(getResult.error).toBeUndefined();
     expect(getResult.set).toBeUndefined();
@@ -79,22 +70,20 @@ describe("Cache manager", () => {
 
     vi.useFakeTimers();
     vi.advanceTimersByTime(CACHE_STALTE_TIME_MS);
-    expect(cacheManager.contains(CacheKeys.ProductColors)).toBe(false);
+    expect(cacheManager.contains(CacheKeys.Colors)).toBe(false);
     expect(cacheManager.getSize()).toBe(0);
     vi.useRealTimers();
   });
 
   test(`Get cache item, then skip setting value and try to obtain item again immediately`, async () => {
-    let getResult = await cacheManager.get<ProductColor[]>(
-      CacheKeys.ProductColors,
-    );
+    let getResult = await cacheManager.get<Color[]>(CacheKeys.Colors);
     expect(getResult.value).toBeUndefined();
     expect(getResult.error).toBeUndefined();
     expect(getResult.set).toBeDefined();
     expect(cacheManager.getSize()).toBe(1);
-    expect(cacheManager.contains(CacheKeys.ProductColors)).toBe(true);
+    expect(cacheManager.contains(CacheKeys.Colors)).toBe(true);
 
-    getResult = await cacheManager.get<ProductColor[]>(CacheKeys.ProductColors);
+    getResult = await cacheManager.get<Color[]>(CacheKeys.Colors);
     expect(getResult.value).toBeUndefined();
     expect(getResult.set).toBeUndefined();
     expect(getResult.error).toBeDefined();
@@ -105,11 +94,11 @@ describe("Cache manager", () => {
 
   test(`Get cache item, then skip setting value and try to obtain item again after lock timeout`, async () => {
     expect(cacheManager.getSize()).toBe(1);
-    expect(cacheManager.contains(CacheKeys.ProductColors)).toBe(true);
+    expect(cacheManager.contains(CacheKeys.Colors)).toBe(true);
 
     vi.useFakeTimers();
     vi.advanceTimersByTime(CACHE_ITEM_LOCK_TIMEOUT_1MN);
-    expect(cacheManager.contains(CacheKeys.ProductColors)).toBe(false);
+    expect(cacheManager.contains(CacheKeys.Colors)).toBe(false);
     expect(cacheManager.getSize()).toBe(0);
     vi.useRealTimers();
   });
@@ -117,7 +106,7 @@ describe("Cache manager", () => {
   test(`Set number of cache items which exceeds the cache size '${CACHE_SIZE_LIMIT}' with evicting the least recent item`, async () => {
     vi.useFakeTimers();
     expect(cacheManager.getSize()).toBe(0);
-    await cacheManager.get<ProductColor[]>(CacheKeys.ProductColors);
+    await cacheManager.get<Color[]>(CacheKeys.Colors);
     vi.advanceTimersByTime(1000);
     await cacheManager.get<MeasurementUnit[]>(CacheKeys.MeasurementUnits);
     vi.advanceTimersByTime(1000);

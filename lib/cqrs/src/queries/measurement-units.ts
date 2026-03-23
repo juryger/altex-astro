@@ -1,10 +1,5 @@
 import { asc, createCatalogDb, SQL, isNull, measurementUnits } from "@/lib/dal";
-import {
-  EnvironmentNames,
-  ReadReplicaTypes,
-  selectEnvironment,
-  type MeasurementUnit,
-} from "@/lib/domain";
+import { ReadReplicaTypes, type MeasurementUnit } from "@/lib/domain";
 import type {
   MeasurementUnit as DbMeasurementUnit,
   SQLiteColumn,
@@ -22,6 +17,7 @@ const mapQueryResultToDomainModel = (
 ): MeasurementUnit => {
   return <MeasurementUnit>{
     id: entity.id,
+    uid: entity.uid,
     code: entity.code,
     title: entity.title,
   };

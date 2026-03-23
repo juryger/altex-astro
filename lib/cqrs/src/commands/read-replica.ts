@@ -17,8 +17,10 @@ const mapDomainToDatabaseModel = (entity: ReadReplica): DBReadReplica => {
 
 export async function setReadReplica({
   type,
+  fileName,
 }: {
   type: ReadReplicaTypes;
+  fileName: string;
 }): Promise<number> {
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
@@ -38,7 +40,7 @@ export async function setReadReplica({
     .values(
       mapDomainToDatabaseModel({
         type,
-        fileName: `${name}-${Date.now()}.db`,
+        fileName, //`${name}-${Date.now()}.db`,
       } as ReadReplica),
     )
     .returning({ insertedId: readReplicas.id });

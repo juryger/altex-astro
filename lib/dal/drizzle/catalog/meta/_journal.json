@@ -43,6 +43,34 @@
       "when": 1774053715132,
       "tag": "0005_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1774243028050,
+      "tag": "0006_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1774243479510,
+      "tag": "0007_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1774243569923,
+      "tag": "0008_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1774247071707,
+      "tag": "0009_catalog",
+      "breakpoints": true
     }
   ]
 }

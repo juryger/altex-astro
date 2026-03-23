@@ -9,7 +9,7 @@ import CollectionFallback from '@/web/src/components/CollectionFallback.astro';
 import getRouteParser from '@/web/src/core/utils/route-parser';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
-import { getQueryManager, fetchMeasurementUnits, fetchDiscounts, fetchProductColors } from '@/lib/cqrs';
+import { getQueryManager, fetchMeasurementUnits, fetchDiscounts, fetchColors } from '@/lib/cqrs';
 import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain';
 import { CacheKeys, EnvironmentNames, getCacheInfo, regexTrue, selectEnvironment } from '@/lib/domain';
 import { defaultSorting } from "@/web/src/core/utils/sorting";
@@ -50,8 +50,8 @@ const internals = {
           getCacheInfo(CacheKeys.Discounts),
         ), 
         queryManager.fetch(
-          () => fetchProductColors(),
-          getCacheInfo(CacheKeys.ProductColors)
+          () => fetchColors(),
+          getCacheInfo(CacheKeys.Colors)
         ),
       ]).then((data) => {        
         if (data.some(x => x.error !== undefined)) {
@@ -62,7 +62,7 @@ const internals = {
         return {
           measurementUnits: data[0].data ?? [],
           discounts: data[1].data ?? [],
-          productColors: data[2].data ?? [],
+          colors: data[2].data ?? [],
         }
       }).catch((err) => { 
         console.error("🛑 ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);

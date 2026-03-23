@@ -1,18 +1,136 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import imgTvRemoteControl from '../assets/tv-remote.png';
+import imgTvAntenna from '../assets/tv-antenna.jpg';
+import imgCables from '../assets/cables.png';
+import imgHouseholdGoods from '../assets/household-goods.png';
 
 const pageTitle = "О компании";
-const titleSummary = "Я занимаюсь продажой и поставкой хозяйственных товаров, инструментов, замков, скобяных изделий, мебельной, дверной и оконной фурнитуры по оптовым и розничным ценам. На веб-сайте представлены товары от различных производителей - Россия, Беларусь, Польша, Китай.";
-const titleDetails = "Моя деятельность берет свое начало с 1995 года, когда я начал увлекаться схемотехникой и поставкой на рынок дистанционных пультов управления для телевизоров советсткого производства. Ранние модели телевизоров еще не оснащались модулем дистанционного урпавления и я разработал свою модель. Позже я расширил свою деятельность с помощью антенно-кабельной продукции, а еще позднее добавил ассортимент хозяйственных товаров, мебельной фурнитуры и скобянных изделий.";
+const titleSummary = "В настоящее время я занимаюсь продажой и поставкой хозяйственных товаров, инструментов, замков, скобяных изделий, мебельной, дверной и оконной фурнитуры по оптовым и розничным ценам. На веб-сайте представлены товары от различных производителей - Россия, Беларусь, Польша, Китай.";
 ---
 
 <BaseLayout title={pageTitle}>
 	<section class="px-4 text-left">
-		<p class="pt-3">
+		<p class="p-3">
 			<span>{titleSummary}</span>
 		</p>
-		<p class="py-3">
-			<span>{titleDetails}</span>
-		</p>
+		<ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical m-2">
+			<li>
+				<div class="timeline-middle">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 20 20"
+						fill="currentColor"
+						class="h-5 w-5"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</div>
+				<div class="timeline-start mb-10 md:text-end">
+					<time class="font-mono italic">1995</time>					
+					<div class="text-lg font-black">Начало предринимательской деятельности</div>
+					Моё раннее увлечение радиоэлектроникой сподвигло меня к поставке на широкий рынок дистанционных пультов управления для телевизоров советсткого производства. Модели советских телевизоров не оснащались модулем дистанционного урпавления и я разработал свою модель. 					
+					<div class="flex justify-center md:justify-end">
+						<Image src={imgTvRemoteControl}
+							class="max-w-3xs md:max-w-xs rounded-lg shadow-2xl"
+							alt="Contact"
+						/>
+					</div>
+				</div>
+				<hr />				
+			</li>
+			<li>
+				<hr />
+				<div class="timeline-middle">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 20 20"
+						fill="currentColor"
+						class="h-5 w-5"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</div>
+				<div class="timeline-end md:mb-10">
+					<time class="font-mono italic">1998</time>
+					<div class="text-lg font-black">ТВ-антенны</div>					
+					Немного позднее я расширил свою деятельность путем поставок на рынок ТВ-антенн и впоследствии цифровых рессиверов.
+					<div class="flex justify-center md:justify-start">
+						<Image src={imgTvAntenna}
+							class="max-w-3xs justify-center md:md:max-w-xs rounded-lg shadow-2xl"
+							alt="Contact"
+						/>
+					</div>
+				</div>
+				<hr />
+			</li>
+			<li>
+				<hr />
+				<div class="timeline-middle">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 20 20"
+						fill="currentColor"
+						class="h-5 w-5"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</div>
+				<div class="timeline-start mb-10 md:text-end">
+					<time class="font-mono italic">2000</time>
+					<div class="text-lg font-black">Кабельная продукция</div>					
+					С этого времени я начал поставки кабельной продукции от ведущих российсих производителей.
+					<div class="flex justify-center md:justify-end">
+						<Image src={imgCables}
+							class="max-w-3xs md:max-w-xs rounded-lg shadow-2xl"
+							alt="Contact"
+						/>
+					</div>
+				</div>
+				<hr />
+			</li>
+			<li>
+				<hr />
+				<div class="timeline-middle">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 20 20"
+						fill="currentColor"
+						class="h-5 w-5"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+				</div>
+				<div class="timeline-end md:mb-10">
+					<time class="font-mono italic">2008 и по настоящее время</time>
+					<div class="text-lg font-black">Смена направления</div>
+					Развитие экономики и появление в нашей стране продукции международных прозводителей привели меня к идеи сменить ассортимент предлагаемых товаров. В резуьтате я начал поставки на рынок хозяйственных товаров, мебельной фурнитуры и скобянных изделий.
+					<div class="flex justify-center md:justify-start">
+						<Image src={imgHouseholdGoods}
+							class="max-w-3xs md:max-w-xs rounded-lg shadow-2xl"
+							alt="Contact"
+						/>
+					</div>
+				</div>
+				<hr />
+			</li>			 
+		</ul>
 	</div>
 </BaseLayout>

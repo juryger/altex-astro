@@ -42,18 +42,6 @@ export {
 export { type CartItem, type CartCheckoutRequest } from "./models/cart";
 export { CartCheckoutRequestSchema, CartSchema } from "./models/cart";
 
-export { type Catalog } from "./models/catalog";
-
-export {
-  type Category,
-  type CategoryCache,
-  CategorySchema,
-} from "./models/category";
-
-export { type CompanyInfo } from "./models/company-info";
-
-export { type Discount } from "./models/discount";
-
 export { FilterOperator } from "./const/filtering";
 
 export { type Filtering } from "./models/filtering";
@@ -66,12 +54,20 @@ export {
   CENTIMETERS_IN_METER,
 } from "./const/measurements";
 
+export { type Catalog } from "./models/catalog";
+export {
+  type Category,
+  type CategoryCache,
+  CategorySchema,
+} from "./models/category";
+export { type CompanyInfo } from "./models/company-info";
+export { type Discount } from "./models/discount";
 export { type MeasurementUnit } from "./models/measurement-unit";
-
+export { type MakeCountry } from "./models/make-country";
+export { type Maker } from "./models/maker";
+export { type Color } from "./models/color";
+export { type Product, ProductSchema } from "./models/product";
 export { type ProductColor } from "./models/product-color";
-
-export { type Product } from "./models/product";
-export { ProductSchema } from "./models/product";
 
 export { type Paging, type PagingResult } from "./models/paging";
 export { EmptyPagingResult } from "./models/paging";

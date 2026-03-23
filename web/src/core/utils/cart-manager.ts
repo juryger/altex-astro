@@ -1,8 +1,4 @@
-import {
-  NO_VALUE_ASSIGNED,
-  type CartItem,
-  type ProductColor,
-} from "@/lib/domain";
+import { NO_VALUE_ASSIGNED, type CartItem, type Color } from "@/lib/domain";
 import { trimEnd } from "./text-formatter";
 import { formatCurrency } from "@/lib/domain";
 
@@ -32,16 +28,13 @@ const getPriceWithDiscount = (
       <del class="text-xs text-info"></del>`;
 };
 
-const getColorSelectOptions = (
-  value: CartItem,
-  productColors: ProductColor[],
-): string => {
-  //console.log("~ cartManager ~ colors: %o, all %o", value.availableColors, productColors);
+const getColorSelectOptions = (value: CartItem, colors: Color[]): string => {
+  //console.log("~ cartManager ~ colors: %o, all %o", value.availableColors, colors);
   var result = `<option>${NO_VALUE_ASSIGNED}</option>`;
   value.availableColors
     ?.sort((a, b) => a - b)
     .forEach((item: number) => {
-      var metadata = productColors.find((x) => x.id === item);
+      var metadata = colors.find((x) => x.id === item);
       result = result.concat(
         `<option value="${item}"
           ${value.colorId !== undefined && value.colorId === item ? "selected" : ""}>
@@ -55,7 +48,7 @@ const getColorSelectOptions = (
 const createCartItemMarkup = (
   value: CartItem,
   discountIndex: number,
-  productColors: ProductColor[],
+  colors: Color[],
   updateCartCommandName: string,
   removeCarCommandtName: string,
 ): string => {
@@ -75,7 +68,7 @@ const createCartItemMarkup = (
           <span class="text-xs italic">
             ${titleProductCode}
           </span>
-          <span class="text-xs italic ml-1">${value.productCode}</span>
+          <span class="text-xs italic ml-1">${value.code}</span>
         </div>
       </div>
       <!-- Item details (title, price, color, quantity) -->
@@ -109,7 +102,7 @@ const createCartItemMarkup = (
                   : ""
               }
               class="select input-sm max-w-26">
-              ${getColorSelectOptions(value, productColors)}
+              ${getColorSelectOptions(value, colors)}
             </select>
           </div>
           <!-- Quantity -->

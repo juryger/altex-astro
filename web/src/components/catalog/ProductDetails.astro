@@ -32,7 +32,7 @@ const titleUnknown = "(?)";
 
 <product-details 
   data-btn_add_to_cart={btnAddToCartName} data-input_quatnity={inputQuantityName}
-  data-id={item.id} data-product_uid={item.uid} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
+  data-id={item.id} data-product_uid={item.uid} data-code={item.code} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
   data-image_url={item.imageUrl} data-thumbnail_image_url={item.thumbnailImageUrl} data-slug={item.slug}
@@ -42,7 +42,7 @@ const titleUnknown = "(?)";
       {/* Product code */}
       <div class="flex flex-row justify-center lg:justify-start pb-2">
         <span class="text-xs italic \">{titleProductCode}:</span>
-        <span class="text-xs italic ml-1">{item.productCode}</span>
+        <span class="text-xs italic ml-1">{item.code}</span>
       </div>
       {/* Gallery */}
       <figure class="self-center bg-base-100 aspect-square bject-cover lg:aspect-auto h-42 md:h-92">
@@ -80,7 +80,7 @@ const titleUnknown = "(?)";
       <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
-      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors} isDetailed={true} />  
+      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.colors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
       <div class="flex items-center justify-start my-4">
         <QuantitySelector inputControlName={inputQuantityName} quantity={1} />
@@ -98,14 +98,14 @@ const titleUnknown = "(?)";
   import { CartMessages } from "@/web/src/core/const/messages";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
   import { clientDb } from '@/web/src/core/db/indexed-db';
-  import type { CartItem, Product, ProductColor } from "@/lib/domain";
+  import type { CartItem, Product, Color } from "@/lib/domain";
   import { NO_VALUE_ASSIGNED } from "@/lib/domain";
 
   class ProductDetails extends HTMLElement {
     private addToCartEl: Element | null = null;
     private value: Product | undefined;
     private controller: AbortController | undefined;
-    private productColors: Array<ProductColor> = [];
+    private colors: Array<Color> = [];
 
     private onAddToCart = (): void => {
       if (!this.value) {
@@ -124,12 +124,12 @@ const titleUnknown = "(?)";
       const quanityEl = getInputElementByName(this, this.dataset.input_quatnity);
       
       const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
-      const colorItem = this.productColors.find(x => x.id === color);
+      const colorItem = this.colors.find(x => x.id === color);
       const quantity = quanityEl ? parseInt((quanityEl as HTMLInputElement).value) : 1;
 
       addToCart({
         productId: this.value.id,
-        productCode: this.value.productCode,
+        code: this.value.code,
         productUid: this.value.uid,
         title: this.value.title,
         availableColors: this.value.colors,
@@ -150,21 +150,21 @@ const titleUnknown = "(?)";
       });
     }
 
-    private loadProductColorsFromIndexedDB(): void {
-      if (this.productColors.length > 0) return;
+    private loadColorsFromIndexedDB(): void {
+      if (this.colors.length > 0) return;
 
-      clientDb.productColors.toArray((data) => { 
+      clientDb.colors.toArray((data) => { 
         if (data.length === 0) {
           console.warn("~ ProductDetails ~ Product Colors data are not available.");
           return;
         }
-        this.productColors = data;
+        this.colors = data;
       });
     }
 
     connectedCallback() {
       this.controller = new AbortController();
-      this.loadProductColorsFromIndexedDB();
+      this.loadColorsFromIndexedDB();
 
       this.value = parseProduct(this.dataset);
       if (!this.value) {

@@ -5,7 +5,7 @@ export const CartSchema = z
   .object({
     productId: z.number(),
     productUid: z.string(),
-    productCode: z.string(),
+    code: z.string(),
     title: z.string(),
     availableColors: z.array(z.number()).optional(),
     price: z.number(),

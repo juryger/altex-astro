@@ -30,9 +30,14 @@ export class FileManager implements BaseFileManager {
       : null;
   }
 
-  async move(srcPath: string, dstPath: string): Promise<void> {
+  async copy(srcPath: string, dstPath: string): Promise<void> {
     await fs.mkdir(path.dirname(dstPath), { recursive: true });
     await fs.copyFile(srcPath, dstPath);
+    return Promise.resolve();
+  }
+
+  async move(srcPath: string, dstPath: string): Promise<void> {
+    await this.copy(srcPath, dstPath);
     await fs.unlink(srcPath);
     return Promise.resolve();
   }

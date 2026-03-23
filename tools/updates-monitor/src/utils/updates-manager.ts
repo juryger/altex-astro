@@ -200,7 +200,7 @@ const finalizeArchive = async ({
     true,
   );
 
-  var result = await commandManager.mutate<number>(() =>
+  const result = await commandManager.mutate<number>(() =>
     setSyncLog({
       fileName: path.basename(filePath),
       type: syncType,

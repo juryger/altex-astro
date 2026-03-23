@@ -1,11 +1,6 @@
 import { asc, createCatalogDb, SQL, colors, isNull } from "@/lib/dal";
 import type { Color as DbColor, SQLiteColumn } from "@/lib/dal";
-import {
-  EnvironmentNames,
-  ReadReplicaTypes,
-  selectEnvironment,
-  type ProductColor,
-} from "@/lib/domain";
+import { ReadReplicaTypes, type Color } from "@/lib/domain";
 import { ReadReplicaManager } from "../utils/read-replica-manager";
 
 const columnTitle: SQLiteColumn = colors.title;
@@ -14,18 +9,19 @@ const getSortCondition = (): SQL => {
   return asc(columnTitle);
 };
 
-const mapQueryResultToDomainModel = (entity: DbColor): ProductColor => {
-  return <ProductColor>{
+const mapQueryResultToDomainModel = (entity: DbColor): Color => {
+  return {
     id: entity.id,
     code: entity.code,
     title: entity.title,
     fillColor: entity.fillColor,
     borderColor: entity.borderColor,
     uid: entity.uid,
-  };
+    deletedAt: entity.deletedAt,
+  } as Color;
 };
 
-export async function fetchProductColors(): Promise<ProductColor[]> {
+export async function fetchColors(): Promise<Color[]> {
   const dbCatalogPath = ReadReplicaManager.instance().getFilePath(
     ReadReplicaTypes.Catalog,
   );

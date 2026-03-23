@@ -70,7 +70,8 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
   const colorId = entity.product_colors?.colorId;
   return <Product>{
     id: entity.main.products.id,
-    productCode: entity.main.products.productCode,
+    uid: entity.main.products.uid,
+    code: entity.main.products.code,
     slug: entity.main.products.slug,
     title: entity.main.products.title,
     description:
@@ -107,11 +108,13 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     categorySlug: entity.categories?.slug,
     categoryTitle: entity.categories?.title,
     colors: colorId !== undefined ? [colorId] : [],
+    hasImage: entity.main.products.hasImage,
     imageUrl: constructNavigationPath({
       args: [
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
         ImageContainers.Products,
-        entity.main.products.hasImage
+        entity.main.products.hasImage !== null &&
+        entity.main.products.hasImage > 0
           ? entity.main.products.uid.concat(".png")
           : NO_IMAGE_FILE_NAME,
       ],
@@ -138,7 +141,6 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     makeCountry: entity.make_countries?.title,
     createdAt: entity.main.products.createdAt,
     modifiedAt: entity.main.products.modifiedAt,
-    uid: entity.main.products.uid,
   };
 };
 

@@ -7,7 +7,7 @@ import ProductDetails from '@/web/src/components/catalog/ProductDetails.astro';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import type { Catalog, Product } from '@/lib/domain';
 import { CacheKeys, getCacheInfo } from '@/lib/domain';
-import { fetchMeasurementUnits, fetchDiscounts, fetchProductColors, getQueryManager } from '@/lib/cqrs';
+import { fetchMeasurementUnits, fetchDiscounts, fetchColors, getQueryManager } from '@/lib/cqrs';
 
 const { slug } = Astro.params;
 const queryManager = getQueryManager();
@@ -26,8 +26,8 @@ const internals = {
           getCacheInfo(CacheKeys.Discounts),
         ), 
         queryManager.fetch(
-          () => fetchProductColors(),
-          getCacheInfo(CacheKeys.ProductColors),
+          () => fetchColors(),
+          getCacheInfo(CacheKeys.Colors),
         ),
       ]).then((data) => {        
         if (data.some(x => x.error !== undefined)) {
@@ -38,7 +38,7 @@ const internals = {
         return {
           measurementUnits: data[0].data ?? [],
           discounts: data[1].data ?? [],
-          productColors: data[2].data ?? [],
+          colors: data[2].data ?? [],
         }
       }).catch((err) => { 
         console.error("~ Product page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);

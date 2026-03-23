@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { SQL, sql } from "drizzle-orm";
 import {
   sqliteTable as table,
   type AnySQLiteColumn,
@@ -103,7 +103,12 @@ export const products = table(
   "products",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
-    productCode: t.text("product_code").notNull(),
+    code: t
+      .text()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`SUBSTRING(${products.slug}, 1, IIF(LENGTH(${products.slug}) >= 4, 4, LENGTH(${products.slug}))) || '-' || ${products.id}`,
+      ),
     slug: t.text().notNull(),
     categoryId: t
       .int("category_id")
@@ -119,7 +124,7 @@ export const products = table(
     dimensionLengthMm: t.int("dimension_length_mm"),
     dimensionWidthMm: t.int("dimension_width_mm"),
     dimensionHeightMm: t.int("dimension_height_mm"),
-    dimensionDiameterMm: t.numeric(""),
+    dimensionDiameterMm: t.int("dimension_diameter_mm"),
     weightGr: t.int("weight_gr"),
     quantityInPack: t.int("quantity_in_pack").default(1).notNull(),
     minQuantityToBuy: t.int("min_quantity_to_buy").default(1).notNull(),
@@ -167,4 +172,6 @@ export const productColors = table("product_colors", {
     .int("color_id")
     .notNull()
     .references(() => colors.id),
+  uid: t.text().notNull(),
+  deletedAt: t.int("deleted_at", { mode: "timestamp" }),
 });

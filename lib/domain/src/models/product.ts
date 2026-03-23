@@ -8,7 +8,8 @@ import {
 export const ProductSchema = z
   .object({
     id: z.number(),
-    productCode: z.string(),
+    uid: z.string(),
+    code: z.string(),
     slug: z.string(),
     title: z.string(),
     description: z.string().optional(),
@@ -17,12 +18,15 @@ export const ProductSchema = z
     dimensionLengthMm: z.number().optional(),
     dimensionWidthMm: z.number().optional(),
     dimensionHeightMm: z.number().optional(),
+    dimensionDiameterMm: z.number().optional(),
     dimensionLengthCm: z.number().optional(),
     dimensionWidthCm: z.number().optional(),
     dimensionHeightCm: z.number().optional(),
+    dimensionDiameterCm: z.number().optional(),
     dimensionLengthMeter: z.number().optional(),
     dimensionWidthMeter: z.number().optional(),
     dimensionHeightMeter: z.number().optional(),
+    dimensionDiameterMeter: z.number().optional(),
     weightGr: z.number().optional(),
     weightKg: z.number().optional(),
     quantityInPack: z.number().default(1),
@@ -34,6 +38,7 @@ export const ProductSchema = z
     categorySlug: z.string(),
     categoryTitle: z.string(),
     colors: z.array(z.number()).optional(),
+    hasImage: z.number().optional(),
     imageUrl: z.string(),
     thumbnailImageUrl: z.string(),
     makerId: z.number().optional(),
@@ -42,7 +47,7 @@ export const ProductSchema = z
     makeCountry: z.string().optional(),
     createdAt: z.date(),
     modifiedAt: z.date(),
-    uid: z.string(),
+    deletedAt: z.date().optional(),
     relatedProdcuts: z.array(z.string()).optional(),
   })
   .transform((data) => {
@@ -59,6 +64,10 @@ export const ProductSchema = z
       data.dimensionHeightMm !== undefined
         ? data.dimensionHeightMm / MILIMETERS_IN_CENTIMETER
         : undefined;
+    result.dimensionDiameterCm =
+      data.dimensionDiameterMm !== undefined
+        ? data.dimensionDiameterMm / MILIMETERS_IN_CENTIMETER
+        : undefined;
     result.dimensionLengthMeter =
       data.dimensionLengthMm !== undefined
         ? data.dimensionLengthMm /
@@ -72,6 +81,11 @@ export const ProductSchema = z
     result.dimensionHeightMeter =
       data.dimensionHeightMm !== undefined
         ? data.dimensionHeightMm /
+          (MILIMETERS_IN_CENTIMETER * CENTIMETERS_IN_METER)
+        : undefined;
+    result.dimensionDiameterMeter =
+      data.dimensionDiameterMm !== undefined
+        ? data.dimensionDiameterMm /
           (MILIMETERS_IN_CENTIMETER * CENTIMETERS_IN_METER)
         : undefined;
     result.weightKg =

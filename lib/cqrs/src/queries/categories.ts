@@ -45,17 +45,19 @@ type QueryResult = {
 const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
   return <Category>{
     id: entity.categories.id,
+    uid: entity.categories.uid,
     slug: entity.categories.slug,
     title: entity.categories.title,
     description:
       entity.categories.description !== null
         ? entity.categories.description
         : undefined,
+    hasImage: entity.categories.hasImage,
     imageUrl: constructNavigationPath({
       args: [
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
         ImageContainers.Categories,
-        entity.categories.hasImage
+        entity.categories.hasImage !== null && entity.categories.hasImage > 0
           ? entity.categories.uid.concat(".png")
           : NO_IMAGE_FILE_NAME,
       ],

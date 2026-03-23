@@ -10,6 +10,7 @@
     "preview": "node --env-file=.env.development ./dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1014.0",
     "better-sqlite3": "^12.8.0",
     "drizzle-orm": "^0.45.1",
     "fast-xml-parser": "^5.5.8",

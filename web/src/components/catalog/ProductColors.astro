@@ -1,10 +1,10 @@
 ---
-import { type ProductColor } from "@/lib/domain";
+import { type Color } from "@/lib/domain";
 
 interface Props {
   productId: number,
   colors?: number[],
-  colorsReference: ProductColor[]
+  colorsReference: Color[]
   isDetailed?: boolean
 }
 const { productId, colors = [], colorsReference, isDetailed = false } = Astro.props;
@@ -14,7 +14,7 @@ const defaultColorIndex = sortedColors.length > 0 ? sortedColors[0] : -1;
 const spanSelectedColorName = "data-selected-color";
 
 const titleColorOptions = "Цвет:";
-const titleNoProductColors = "Нет информации о цвете";
+const titleNoColors = "Нет информации о цвете";
 ---
 
 <product-colors data-selected_color={spanSelectedColorName}> 
@@ -41,7 +41,7 @@ const titleNoProductColors = "Нет информации о цвете";
   }
   {(!colors || colors?.length === 0) && 
     <div class:list={['flex', 'items-center', 'my-1', { 'justify-start': isDetailed }, {'justify-center': !isDetailed }]}>
-      <span class="italic text-sm">{titleNoProductColors}</span>
+      <span class="italic text-sm">{titleNoColors}</span>
     </div>
   }
 </product-colors>

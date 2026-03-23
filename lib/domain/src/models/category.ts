@@ -2,9 +2,11 @@ import { z } from "zod";
 
 export const CategorySchema = z.object({
   id: z.number(),
+  uid: z.string(),
   slug: z.string(),
   title: z.string(),
   description: z.string().optional(),
+  hasImage: z.number().optional(),
   imageUrl: z.string(),
   thumbnailImageUrl: z.string(),
   parentId: z.number().optional(),
@@ -13,6 +15,7 @@ export const CategorySchema = z.object({
   totalProducts: z.number(),
   createdAt: z.date(),
   modifiedAt: z.date(),
+  deletedAt: z.date().optional(),
 });
 
 const CategoryCacheSchema = z.object({

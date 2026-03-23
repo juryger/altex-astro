@@ -29,7 +29,7 @@ const titleUnknown = "(?)";
 
 <product-card 
   data-btn_add_to_cart={nameAddToCardAction} 
-  data-id={item.id} data-product_uid={item.uid} data-product_code={item.productCode} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
+  data-id={item.id} data-product_uid={item.uid} data-code={item.code} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
   data-image_url={item.imageUrl} data-thumbnail_image_url={item.thumbnailImageUrl} data-slug={item.slug}
@@ -43,7 +43,7 @@ const titleUnknown = "(?)";
       {/* Product code */}
       <div class="flex flex-row justify-center">
         <span class="text-xs italic">{titleProductCode}:</span>
-        <span class="text-xs italic ml-1">{item.productCode}</span>
+        <span class="text-xs italic ml-1">{item.code}</span>
       </div>
       {/* Ttitle */}
       <a href=`/catalog/products/${item.slug}`>
@@ -63,7 +63,7 @@ const titleUnknown = "(?)";
       {/* Maker */}
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       {/* Available colors */}
-      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.productColors}/>
+      <ProductColors productId={item.id} colors={item.colors} colorsReference={references.colors}/>
       {/* Add to Shopping Cart */}
       <button name={nameAddToCardAction} class="btn btn-active btn-primary">{titleAddToCart}</button>
     </div>
@@ -72,7 +72,7 @@ const titleUnknown = "(?)";
 
 <script>
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";
-  import type { CartItem, Product, ProductColor } from "@/lib/domain";
+  import type { CartItem, Product, Color } from "@/lib/domain";
   import { NO_VALUE_ASSIGNED} from "@/lib/domain";
   import { addAlert } from "@/web/src/core/stores/alert-store";
   import { AlertKind } from "@/web/src/core/const";
@@ -85,7 +85,7 @@ const titleUnknown = "(?)";
     private addToCardEl: Element | null = null;
     private value: Product | undefined;
     private controller: AbortController | undefined;
-    private productColors: Array<ProductColor> = [];
+    private colors: Array<Color> = [];
 
     private onAddToCart = (): void => {
       if (!this.value) {
@@ -96,13 +96,13 @@ const titleUnknown = "(?)";
       const selectedColorEl =  this.querySelector('input[type=radio]:checked');
       const selectedColor = selectedColorEl ? (selectedColorEl as HTMLInputElement).value : null;
       const color = selectedColor !== null ? parseInt(selectedColor) : undefined;
-      const colorItem = this.productColors.find(x => x.id === color);
+      const colorItem = this.colors.find(x => x.id === color);
       const quantity = 1;
 
       addToCart({
         productId: this.value.id,
         productUid: this.value.uid,
-        productCode: this.value.productCode,
+        code: this.value.code,
         title: this.value.title,
         availableColors: this.value.colors,
         price: this.value.price,
@@ -122,21 +122,21 @@ const titleUnknown = "(?)";
       });
     }
 
-    private loadProductColorsFromIndexedDB(): void {
-      if (this.productColors.length > 0) return;
+    private loadColorsFromIndexedDB(): void {
+      if (this.colors.length > 0) return;
 
-      clientDb.productColors.toArray((data) => { 
+      clientDb.colors.toArray((data) => { 
         if (data.length === 0) {
-          console.warn("~ ProductCard ~ Product Colors data are not available.");
+          console.warn("~ ProductCard ~ Colors data are not available.");
           return;
         }
-        this.productColors = data;
+        this.colors = data;
       });
     }
 
     connectedCallback() {
       this.controller = new AbortController();
-      this.loadProductColorsFromIndexedDB();
+      this.loadColorsFromIndexedDB();
 
       this.value = parseProduct(this.dataset);
       if (!this.value) {

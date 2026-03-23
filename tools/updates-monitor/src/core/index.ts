@@ -1,9 +1,9 @@
-import type { SyncTypes } from "@/lib/domain";
+import type { ReadReplicaTypes, SyncTypes } from "@/lib/domain";
 import type { CatalogUpdates } from "../models/catalog";
 
 interface BaseSyncHandler {
   getSyncType: () => SyncTypes;
-  synchronise: (monitorDirPath: string, data: CatalogUpdates) => Promise<void>;
+  synchronise: (inputDirPath: string, data: CatalogUpdates) => Promise<void>;
 }
 
 interface BaseXmlHandler {
@@ -19,13 +19,18 @@ interface SlugNamesConverter {
   transliterate: (value: string) => string;
 }
 
-interface BaseImageUploader {
-  upload: (filePath: string, dstPath: string) => Promise<void>;
+interface BaseImageManager {
+  upload: (filePath: string, isThumbnail?: boolean) => Promise<void>;
+  delete: (fileName: string, isThumbnail?: boolean) => Promise<void>;
 }
 
 interface BaseReadReplicaManager {
-  createDbCopy: (srcPath: string, dstPath: string) => Promise<void>;
-  setActive: (filePath: string) => Promise<void>;
+  createDbCopy: (
+    srcPath: string,
+    replicaDirName: string,
+    replicaName: string,
+  ) => Promise<string>;
+  setActive: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
 }
 
 interface BaseFileManager {
@@ -33,6 +38,7 @@ interface BaseFileManager {
     dirPath: string,
     fileExt: string,
   ) => Promise<string | null>;
+  copy: (srcPath: string, dstPath: string) => Promise<void>;
   move: (srcPath: string, dstPath: string) => Promise<void>;
   remove: (filePath: string, isDirectory?: boolean) => Promise<void>;
 }
@@ -54,6 +60,6 @@ export {
   type BaseFileManager,
   type UpdatesManager,
   type SlugNamesConverter,
-  type BaseImageUploader,
+  type BaseImageManager,
   type BaseReadReplicaManager,
 };

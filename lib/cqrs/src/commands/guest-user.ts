@@ -1,5 +1,5 @@
 import type { GuestUser } from "@/lib/domain";
-import type { Guest } from "@/lib/dal";
+import type { Guest as DBGuest } from "@/lib/dal";
 import { createOperationsDb } from "@/lib/dal";
 import {
   EnvironmentNames,
@@ -8,7 +8,7 @@ import {
 } from "@/lib/domain";
 import { guests } from "@/lib/dal";
 
-const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
+const mapDomainToDatabaseModel = (entity: GuestUser): DBGuest => {
   return {
     fullName: entity.fullName ?? NO_VALUE_ASSIGNED,
     email: entity.email ?? NO_VALUE_ASSIGNED,
@@ -19,7 +19,7 @@ const mapDomainToDatabaseModel = (entity: GuestUser): Guest => {
     postCode: entity.postCode !== undefined ? entity.postCode : null,
     taxNumber: entity.taxNumber !== undefined ? entity.taxNumber : null,
     uid: entity.uid,
-  } as Guest;
+  } as DBGuest;
 };
 
 export async function upsertGuestUser(guest: GuestUser): Promise<number> {
