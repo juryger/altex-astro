@@ -1,4 +1,5 @@
-import type { InferSelectModel } from "drizzle-orm";
+import type { ExtractTablesWithRelations, InferSelectModel } from "drizzle-orm";
+import type { SQLiteTransaction } from "drizzle-orm/sqlite-core";
 
 import {
   categories,
@@ -53,3 +54,20 @@ export type NotificationAddressee = InferSelectModel<
 // General
 export type GeneralVersion = InferSelectModel<typeof generalVersion>;
 export type Info = InferSelectModel<typeof info>;
+
+export enum DatabaseType {
+  Catalog = 0,
+  General = 1,
+  Operatons = 2,
+}
+
+export type DatabaseSchema = Record<string, unknown>;
+export type DatabaseTransaction<
+  TSchema extends DatabaseSchema,
+  TRunResult = unknown,
+> = SQLiteTransaction<
+  "async" | "sync",
+  TRunResult,
+  TSchema,
+  ExtractTablesWithRelations<TSchema>
+>;

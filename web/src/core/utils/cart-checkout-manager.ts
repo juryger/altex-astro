@@ -8,11 +8,20 @@ import {
   getQueryManager,
   fetchDiscounts,
   checkoutCart,
+  checkoutCartTx,
   upsertGuestUser,
+  upsertGuestUserTx,
   getCommandManager,
 } from "@/lib/cqrs";
 import { encode } from "html-entities";
 import { getEmailComposer } from "./email-composer";
+import { EmailBody } from "@/lib/email";
+import {
+  DatabaseType,
+  type CatalogDbTransaction,
+  type DbTransaction,
+  type OperationsDbTransaction,
+} from "@/lib/dal";
 
 interface CartCheckoutManager {
   checkoutCart: (
@@ -38,32 +47,46 @@ const encodeUserInput = (guest: GuestUser): GuestUser => {
   } as GuestUser;
 };
 
-const saveGuestUser = async (
-  commandManager: CommandManager,
-  guest: GuestUser,
-): Promise<Result<number>> => {
-  return await commandManager.mutate<number>(() =>
-    upsertGuestUser(encodeUserInput(guest)),
-  );
-};
+// const saveGuestUser = async (
+//   commandManager: CommandManager,
+//   guest: GuestUser,
+// ): Promise<Result<number>> => {
+//   return await commandManager.mutate<number>(() =>
+//     upsertGuestUser(encodeUserInput(guest)),
+//   );
+// };
 
 const saveCartCheckout = async (
   commandManager: CommandManager,
   items: Array<CartItem>,
   userUid?: string,
-  guestUid?: string,
+  guest?: GuestUser,
 ): Promise<Result<number>> => {
   const discounts = await getQueryManager().fetch(
     () => fetchDiscounts(),
     getCacheInfo(CacheKeys.Discounts),
   );
-
   if (discounts.error !== undefined) {
     return FailedResult(discounts.error);
   }
-
-  return await commandManager.mutate<number>(() =>
-    checkoutCart(items, discounts.data ?? [], userUid, guestUid),
+  const commands: Array<(tx: DbTransaction) => Promise<any>> = [];
+  if (guest !== undefined) {
+    commands.push((tx: DbTransaction) =>
+      upsertGuestUserTx(tx as OperationsDbTransaction, encodeUserInput(guest)),
+    );
+  }
+  commands.push((tx: DbTransaction, prevResult?: any) =>
+    checkoutCartTx(
+      tx as OperationsDbTransaction,
+      items,
+      discounts.data ?? [],
+      userUid,
+      prevResult,
+    ),
+  );
+  return await commandManager.mutateTransactional(
+    DatabaseType.Operatons,
+    commands,
   );
 };
 
@@ -81,20 +104,20 @@ function getCartCheckoutManager(): CartCheckoutManager {
         if (guest) {
           guestUid = crypto.randomUUID();
           guest.uid = guestUid;
-          const result = await saveGuestUser(commandManager, guest);
-          if (!result.ok) {
-            return FailedResult(
-              result.error ??
-                new Error("Failed to save guest user for checkout"),
-            );
-          }
+          // const result = await saveGuestUser(commandManager, guest);
+          // if (!result.ok) {
+          //   return FailedResult(
+          //     result.error ??
+          //       new Error("Failed to save guest user for checkout"),
+          //   );
+          // }
         }
 
         const cartCheckout = await saveCartCheckout(
           commandManager,
           items,
           userUid,
-          guestUid,
+          guest,
         );
         if (!cartCheckout.ok || cartCheckout.data === undefined) {
           return FailedResult(
@@ -117,7 +140,7 @@ function getCartCheckoutManager(): CartCheckoutManager {
         const errorMessage = getErrorMessage(err);
         console.error(errorMessage);
         await emailComposer.sendGeneralEmail(
-          `Failed to checkout cart, see the error details below. ${errorMessage}`,
+          `${EmailBody.CartCheckouFailure} ${errorMessage}`,
           true,
         );
         return FailedResult<string>(new Error(errorMessage));

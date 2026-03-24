@@ -23,6 +23,7 @@ import { getCatalogXmlHandler } from "../xml-handlers/catalog";
 import type { CatalogUpdates } from "../models/catalog";
 import { getReadReplicaManager } from "./read-replica-manager";
 import { getEmailComposer } from "./email-composer";
+import { EmailBody } from "@/lib/email";
 
 const archiveManager = ZipManager.instance();
 const fileManager = FileManager.instance();
@@ -208,8 +209,8 @@ const finalizeArchiveProcessing = async ({
 
   await emailComposer.sendGeneralEmail(
     error !== null
-      ? `Failed to update website, see the error details below. ${error.message}`
-      : "Website has been updated, changes are available online.",
+      ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
+      : EmailBody.WebsiteUpdateSuccess,
     error !== null,
   );
 

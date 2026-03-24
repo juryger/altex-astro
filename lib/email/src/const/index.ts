@@ -4,4 +4,10 @@ enum EmailSubjects {
   Success = "Уведомление об успешном завершении осблуживания вебсайта АЛТЕХ",
 }
 
-export { EmailSubjects };
+enum EmailBody {
+  CartCheckouFailure = "Не удалось завершить создание заказа на основе покупательской корзины, сообщение для отладки приведено ниже.",
+  WebsiteUpdateFailure = "Не удалось выполнить обновление вебсайта, сообщение для отладки приведено ниже.",
+  WebsiteUpdateSuccess = "Вебсайт был успешно обновлен, изменения уже доступны пользователям.",
+}
+
+export { EmailSubjects, EmailBody };

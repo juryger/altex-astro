@@ -1,4 +1,7 @@
-import type { MeasurementUnit as DBMeasurementUnit } from "@/lib/dal";
+import type {
+  CatalogDbTransaction,
+  MeasurementUnit as DBMeasurementUnit,
+} from "@/lib/dal";
 import { createCatalogDb, measurementUnits } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { MeasurementUnit } from "@/lib/domain";
@@ -31,6 +34,24 @@ export async function upsertMeasurementUnit(
       },
     })
     .returning({ insertedId: measurementUnits.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertMeasurementUnitTx(
+  tx: CatalogDbTransaction,
+  value: MeasurementUnit,
+): Promise<number> {
+  const result = await tx
+    .insert(measurementUnits)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: measurementUnits.uid,
+      set: {
+        code: value.code,
+        title: value.title,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: measurementUnits.id });
   return result.at(0)?.insertedId ?? 0;
 }

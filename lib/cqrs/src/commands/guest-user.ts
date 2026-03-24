@@ -1,5 +1,5 @@
 import type { GuestUser } from "@/lib/domain";
-import type { Guest as DBGuest } from "@/lib/dal";
+import type { Guest as DBGuest, OperationsDbTransaction } from "@/lib/dal";
 import { createOperationsDb } from "@/lib/dal";
 import {
   EnvironmentNames,
@@ -43,6 +43,29 @@ export async function upsertGuestUser(guest: GuestUser): Promise<number> {
       },
     })
     .returning({ id: guests.id });
+  return result.at(0)?.id ?? 0;
+}
 
+export async function upsertGuestUserTx(
+  tx: OperationsDbTransaction,
+  guest: GuestUser,
+): Promise<number> {
+  const result = await tx
+    .insert(guests)
+    .values(mapDomainToDatabaseModel(guest))
+    .onConflictDoUpdate({
+      target: guests.email,
+      set: {
+        fullName: guest.fullName,
+        phone: guest.phone,
+        companyName: guest.companyName,
+        address: guest.address,
+        city: guest.city,
+        postCode: guest.postCode,
+        taxNumber: guest.taxNumber,
+        uid: guest.uid,
+      },
+    })
+    .returning({ id: guests.id });
   return result.at(0)?.id ?? 0;
 }

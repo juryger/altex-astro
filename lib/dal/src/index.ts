@@ -1,54 +1,10 @@
 import Database from "better-sqlite3";
+import { sql } from "drizzle-orm";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalog from "./schema/catalog/index.js";
 import * as operations from "./schema/operations/index.js";
 import * as general from "./schema/general/index.js";
-import { sql } from "drizzle-orm";
-
-const createGeneralDb = (
-  path: string | undefined,
-): BetterSQLite3Database<typeof general> => {
-  const clientOperations = new Database(path, {
-    fileMustExist: true,
-  });
-  clientOperations.pragma("journal_mode = WAL");
-  return drizzle({ client: clientOperations, schema: general, logger: true });
-};
-
-const createOperationsDb = (
-  path: string | undefined,
-  catalogPath?: string,
-): BetterSQLite3Database<typeof operations> => {
-  const clientOperations = new Database(path, {
-    fileMustExist: true,
-  });
-  clientOperations.pragma("journal_mode = WAL");
-
-  if (catalogPath === undefined) {
-    return drizzle({ client: clientOperations, schema: operations });
-  }
-
-  const db = drizzle({
-    client: clientOperations,
-    schema: { ...operations, ...catalog },
-    logger: true,
-  });
-
-  const attachDatabase = `ATTACH DATABASE '${catalogPath}' AS catalog`;
-  db.run(sql.raw(attachDatabase));
-
-  return db;
-};
-
-const createCatalogDb = (
-  path: string | undefined,
-): BetterSQLite3Database<typeof catalog> => {
-  const clientCatalog = new Database(path, {
-    fileMustExist: true,
-  });
-  clientCatalog.pragma("journal_mode = WAL");
-  return drizzle({ client: clientCatalog, schema: catalog, logger: true });
-};
+import type { DatabaseTransaction } from "./types/index.js";
 
 export {
   eq,
@@ -64,7 +20,11 @@ export {
   and,
 } from "drizzle-orm";
 
-export type { SQLiteColumn, SQLiteTransaction } from "drizzle-orm/sqlite-core";
+export type {
+  SQLiteColumn,
+  SQLiteTransaction,
+  BaseSQLiteDatabase,
+} from "drizzle-orm/sqlite-core";
 export { SQL } from "drizzle-orm/sql";
 
 export {
@@ -115,5 +75,66 @@ export type {
   GeneralVersion,
   Info,
 } from "./types/index.js";
+
+export { DatabaseType } from "./types";
+
+export type GeneralDb = BetterSQLite3Database<typeof general>;
+export type GeneralDbTransaction = DatabaseTransaction<typeof general>;
+
+export type OperatioinsDb = BetterSQLite3Database<typeof operations>;
+export type OperationsDbTransaction = DatabaseTransaction<typeof operations>;
+
+export type CatalogDb = BetterSQLite3Database<typeof catalog>;
+export type CatalogDbTransaction = DatabaseTransaction<typeof catalog>;
+
+export type DbTransaction =
+  | CatalogDbTransaction
+  | GeneralDbTransaction
+  | OperationsDbTransaction;
+
+const createGeneralDb = (
+  path: string | undefined,
+): BetterSQLite3Database<typeof general> => {
+  const clientOperations = new Database(path, {
+    fileMustExist: true,
+  });
+  clientOperations.pragma("journal_mode = WAL");
+  return drizzle({ client: clientOperations, schema: general, logger: true });
+};
+
+const createOperationsDb = (
+  path: string | undefined,
+  catalogPath?: string,
+): BetterSQLite3Database<typeof operations> => {
+  const clientOperations = new Database(path, {
+    fileMustExist: true,
+  });
+  clientOperations.pragma("journal_mode = WAL");
+
+  if (catalogPath === undefined) {
+    return drizzle({ client: clientOperations, schema: operations });
+  }
+
+  const db = drizzle({
+    client: clientOperations,
+    schema: { ...operations, ...catalog },
+    logger: true,
+  });
+
+  const attachDatabase = `ATTACH DATABASE '${catalogPath}' AS catalog`;
+  db.run(sql.raw(attachDatabase));
+
+  return db;
+};
+
+const createCatalogDb = (
+  path: string | undefined,
+): BetterSQLite3Database<typeof catalog> => {
+  const clientCatalog = new Database(path, {
+    fileMustExist: true,
+  });
+  clientCatalog.pragma("journal_mode = WAL");
+  return drizzle({ client: clientCatalog, schema: catalog, logger: true });
+};
 
 export { createGeneralDb, createOperationsDb, createCatalogDb };

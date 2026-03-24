@@ -1,4 +1,7 @@
-import type { MakeCountry as DBMakeCountry } from "@/lib/dal";
+import type {
+  CatalogDbTransaction,
+  MakeCountry as DBMakeCountry,
+} from "@/lib/dal";
 import { createCatalogDb, makeCountries } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { MakeCountry } from "@/lib/domain";
@@ -25,6 +28,23 @@ export async function upsertMakeCountry(value: MakeCountry): Promise<number> {
       },
     })
     .returning({ insertedId: makeCountries.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertMakeCountryTx(
+  tx: CatalogDbTransaction,
+  value: MakeCountry,
+): Promise<number> {
+  const result = await tx
+    .insert(makeCountries)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: makeCountries.uid,
+      set: {
+        title: value.title,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: makeCountries.id });
   return result.at(0)?.insertedId ?? 0;
 }

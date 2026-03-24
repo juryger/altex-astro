@@ -172,5 +172,5 @@ const getEmailManager = (): EmailManager => {
   };
 };
 
-export { EmailSubjects } from "./const";
+export { EmailSubjects, EmailBody } from "./const";
 export { getEmailManager };

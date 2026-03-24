@@ -1,10 +1,14 @@
 import type { CartItem, Discount } from "@/lib/domain";
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
+import {
+  EnvironmentNames,
+  getErrorMessage,
+  selectEnvironment,
+} from "@/lib/domain";
 import {
   createOperationsDb,
   cartCheckout,
   cartCheckoutItems,
-  type SQLiteTransaction,
+  type OperationsDbTransaction,
 } from "@/lib/dal";
 
 export async function checkoutCart(
@@ -22,20 +26,21 @@ export async function checkoutCart(
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
-  return db.transaction((tx: any) => {
-    const cart = tx
-      .insert(cartCheckout)
-      .values({
-        userUid,
-        guestUid,
-      })
-      .returning({ id: cartCheckout.id })
-      .all();
-    const checkoutId = cart.at(0)?.id ?? 0;
-
-    for (const item of items) {
-      tx.insert(cartCheckoutItems)
+  let checkoutId = 0;
+  return await db.transaction(async (tx: any) => {
+    try {
+      const cart = await tx
+        .insert(cartCheckout)
         .values({
+          userUid,
+          guestUid,
+        })
+        .returning({ id: cartCheckout.id });
+      //.all();
+
+      checkoutId = cart.at(0)?.id ?? 0;
+      for (const item of items) {
+        await tx.insert(cartCheckoutItems).values({
           cartCheckoutId: checkoutId,
           productUid: item.productUid,
           colorUid: item.colorUid,
@@ -46,10 +51,55 @@ export async function checkoutCart(
               : discountIndex === 1
                 ? item.whsPrice1
                 : item.whsPrice2,
-        })
-        .run();
+        });
+        //.run();
+      }
+    } catch (error) {
+      tx.rollback();
+      const errorMessage = getErrorMessage(error);
+      console.error(errorMessage);
+      throw new Error(errorMessage);
     }
-
     return checkoutId;
   });
+}
+
+export async function checkoutCartTx(
+  tx: OperationsDbTransaction,
+  items: Array<CartItem>,
+  discounts: Array<Discount>,
+  userUid?: string,
+  guestUid?: string,
+): Promise<number> {
+  const cartSum = items.reduce(
+    (acc, curr) => acc + curr.price * curr.quantity,
+    0,
+  );
+  const discountIndex =
+    discounts.findLastIndex((x) => cartSum >= x.fromSum) ?? 0;
+  const cart = await tx
+    .insert(cartCheckout)
+    .values({
+      userUid,
+      guestUid,
+    })
+    .returning({ id: cartCheckout.id });
+  //.all();
+  const checkoutId = cart.at(0)?.id ?? 0;
+  for (const item of items) {
+    await tx.insert(cartCheckoutItems).values({
+      cartCheckoutId: checkoutId,
+      productUid: item.productUid,
+      colorUid: item.colorUid,
+      quantity: item.quantity,
+      price:
+        discountIndex === 0
+          ? item.price
+          : discountIndex === 1
+            ? item.whsPrice1
+            : item.whsPrice2,
+    });
+    //.run();
+  }
+  return checkoutId;
 }

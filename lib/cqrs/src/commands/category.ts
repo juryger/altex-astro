@@ -1,4 +1,4 @@
-import type { Category as DBCategory } from "@/lib/dal";
+import type { CatalogDbTransaction, Category as DBCategory } from "@/lib/dal";
 import { createCatalogDb, categories } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Category } from "@/lib/domain";
@@ -34,6 +34,28 @@ export async function upsertCategory(value: Category): Promise<number> {
       },
     })
     .returning({ insertedId: categories.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertCategoryTx(
+  tx: CatalogDbTransaction,
+  value: Category,
+): Promise<number> {
+  const result = await tx
+    .insert(categories)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: categories.uid,
+      set: {
+        slug: value.slug,
+        title: value.title,
+        description: value.description,
+        hasImage: value.hasImage,
+        parentId: value.parentId,
+        modifiedAt: value.modifiedAt,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: categories.id });
   return result.at(0)?.insertedId ?? 0;
 }

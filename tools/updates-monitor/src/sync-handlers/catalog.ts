@@ -29,4 +29,6 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
   };
 };
 
+const updateCatalog = async (data: CatalogUpdates): Promise<void> => {};
+
 export { getCatalogSyncHandler };

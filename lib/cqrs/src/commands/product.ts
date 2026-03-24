@@ -1,4 +1,8 @@
-import type { Product as DBProduct } from "@/lib/dal";
+import type {
+  CatalogDb,
+  CatalogDbTransaction,
+  Product as DBProduct,
+} from "@/lib/dal";
 import { createCatalogDb, products } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Product } from "@/lib/domain";
@@ -58,6 +62,40 @@ export async function upsertProduct(value: Product): Promise<number> {
       },
     })
     .returning({ insertedId: products.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertProductTx(
+  tx: CatalogDbTransaction,
+  value: Product,
+): Promise<number> {
+  const result = await tx
+    .insert(products)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: products.uid,
+      set: {
+        slug: value.slug,
+        title: value.title,
+        description: value.description,
+        hasImage: value.hasImage,
+        unitId: value.unitId,
+        dimensionLengthMm: value.dimensionLengthMm,
+        dimensionWidthMm: value.dimensionWidthMm,
+        dimensionHeightMm: value.dimensionHeightMm,
+        dimensionDiameterMm: value.dimensionDiameterMm,
+        weightGr: value.weightGr,
+        quantityInPack: value.quantityInPack,
+        minQuantityToBuy: value.minQuantityToBuy,
+        price: value.price,
+        whsPrice1: value.whsPrice1,
+        whsPrice2: value.whsPrice2,
+        makerId: value.makerId,
+        makeCountryId: value.makeCountryId,
+        modifiedAt: value.modifiedAt,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: products.id });
   return result.at(0)?.insertedId ?? 0;
 }

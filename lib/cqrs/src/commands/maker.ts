@@ -1,4 +1,4 @@
-import type { Maker as DBMaker } from "@/lib/dal";
+import type { CatalogDbTransaction, Maker as DBMaker } from "@/lib/dal";
 import { createCatalogDb, makers } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Maker } from "@/lib/domain";
@@ -25,6 +25,23 @@ export async function upsertMaker(value: Maker): Promise<number> {
       },
     })
     .returning({ insertedId: makers.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertMakerTx(
+  tx: CatalogDbTransaction,
+  value: Maker,
+): Promise<number> {
+  const result = await tx
+    .insert(makers)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: makers.uid,
+      set: {
+        title: value.title,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: makers.id });
   return result.at(0)?.insertedId ?? 0;
 }

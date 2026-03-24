@@ -1,4 +1,7 @@
-import type { ProductColor as DbProductColor } from "@/lib/dal";
+import type {
+  CatalogDbTransaction,
+  ProductColor as DbProductColor,
+} from "@/lib/dal";
 import { createCatalogDb, productColors } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { ProductColor } from "@/lib/domain";
@@ -27,6 +30,24 @@ export async function upsertProductColor(value: ProductColor): Promise<number> {
       },
     })
     .returning({ insertedId: productColors.id });
+  return result.at(0)?.insertedId ?? 0;
+}
 
+export async function upsertProductColorTx(
+  tx: CatalogDbTransaction,
+  value: ProductColor,
+): Promise<number> {
+  const result = await tx
+    .insert(productColors)
+    .values(mapDomainToDatabaseModel(value))
+    .onConflictDoUpdate({
+      target: productColors.uid,
+      set: {
+        productId: value.productId,
+        colorId: value.colorId,
+        deletedAt: value.deletedAt,
+      },
+    })
+    .returning({ insertedId: productColors.id });
   return result.at(0)?.insertedId ?? 0;
 }

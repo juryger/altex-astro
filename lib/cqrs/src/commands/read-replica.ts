@@ -25,16 +25,16 @@ export async function setReadReplica({
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
-  let name: string;
-  switch (type) {
-    case ReadReplicaTypes.Catalog:
-      name = "catalog";
-      break;
-    default:
-      console.error("Unsupported read replica type:", type);
-      name = "unsupported";
-      break;
-  }
+  // let name: string;
+  // switch (type) {
+  //   case ReadReplicaTypes.Catalog:
+  //     name = "catalog";
+  //     break;
+  //   default:
+  //     console.error("Unsupported read replica type:", type);
+  //     name = "unsupported";
+  //     break;
+  // }
   const result = await db
     .insert(readReplicas)
     .values(
