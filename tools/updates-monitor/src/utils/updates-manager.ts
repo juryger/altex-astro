@@ -21,10 +21,13 @@ import { SyncTypes } from "@/lib/domain";
 import type { Dirent } from "fs";
 import { getCatalogXmlHandler } from "../xml-handlers/catalog";
 import type { CatalogUpdates } from "../models/catalog";
+import { getReadReplicaManager } from "./read-replica-manager";
+import { getEmailComposer } from "./email-composer";
 
 const archiveManager = ZipManager.instance();
 const fileManager = FileManager.instance();
 const commandManager = getCommandManager();
+const emailComposer = getEmailComposer();
 
 export function getUpdatesManager(): UpdatesManager {
   return {
@@ -66,7 +69,6 @@ const runInternal = async ({
   monitoringDirPath: string;
   poisonedDirName: string;
 }): Promise<number> => {
-  const defaultResult = 0;
   const syncHandlers = initSyncHandlers();
   const xmlHandlers = initXmlHandlers();
 
@@ -78,26 +80,24 @@ const runInternal = async ({
       console.error(getErrorMessage(error), error);
       return null;
     });
-
   if (!files) {
     return Promise.reject(
       `Failed to obtained content of '${monitoringDirPath}'`,
     );
   }
 
+  const defaultResult = 0;
   const results = await Promise.all(
     files.map((file) => {
       if (!isFile(file, FILE_EXTENSIION_ZIP)) {
         return OkResult(defaultResult);
       }
-
       const filePath = path.join(file.parentPath, file.name.toLowerCase());
       const syncType = getSyncType(filePath);
       const syncHandler =
         syncType !== undefined ? syncHandlers[syncType] : undefined;
       const xmlHandler =
         syncType !== undefined ? xmlHandlers[syncType] : undefined;
-
       if (
         syncType === undefined ||
         syncHandler === undefined ||
@@ -108,11 +108,9 @@ const runInternal = async ({
           defaultResult,
         );
       }
-
       return processArchive(filePath, syncHandler, xmlHandler)
         .then(async () => {
-          await finalizeArchive({
-            commandManager,
+          await finalizeArchiveProcessing({
             filePath,
             poisonedDirName,
             syncType: syncType,
@@ -120,8 +118,7 @@ const runInternal = async ({
           return OkResult(1);
         })
         .catch(async (error) => {
-          await finalizeArchive({
-            commandManager,
+          await finalizeArchiveProcessing({
             filePath,
             poisonedDirName,
             syncType,
@@ -156,6 +153,7 @@ const processArchive = async (
   if (extractedPath.trim().length === 0) {
     return Promise.reject(`Could not extract ZIP file '${filePath}'`);
   }
+
   const xmlFilePath = await fileManager.lookupByExtension(
     extractedPath,
     FILE_EXTENSIION_XML,
@@ -163,19 +161,18 @@ const processArchive = async (
   if (xmlFilePath === null) {
     return Promise.reject("Could not find XML file in extracted ZIP folder.");
   }
+
   const data = await xmlHandler.parse<CatalogUpdates>(xmlFilePath);
   return await syncHandler.synchronise(extractedPath, data);
 };
 
-const finalizeArchive = async ({
-  commandManager,
+const finalizeArchiveProcessing = async ({
   filePath,
   poisonedDirName,
   syncType = null,
   logMessage = null,
   error = null,
 }: {
-  commandManager: CommandManager;
   filePath: string;
   poisonedDirName: string;
   syncType?: SyncTypes | null;
@@ -207,6 +204,13 @@ const finalizeArchive = async ({
       isFailed: error !== null,
       logMessage: error !== null ? error.toString() : logMessage,
     }),
+  );
+
+  await emailComposer.sendGeneralEmail(
+    error !== null
+      ? `Failed to update website, see the error details below. ${error.message}`
+      : "Website has been updated, changes are available online.",
+    error !== null,
   );
 
   return !result.ok

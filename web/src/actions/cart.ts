@@ -1,7 +1,6 @@
 import { defineAction } from "astro:actions";
 import { CartCheckoutRequestSchema } from "@/lib/domain";
 import { getCartCheckoutManager } from "../core/utils/cart-checkout-manager";
-import { sendFailureEmail } from "../core/utils/failure-manager";
 
 export const cartActions = {
   checkout: defineAction({
@@ -13,11 +12,6 @@ export const cartActions = {
         input.userId,
       );
       if (!result.ok) {
-        sendFailureEmail(
-          `Failed to checkout cart, see the error details below. ${result.error}`,
-        ).then((email) => {
-          if (!email.ok) console.error(email.error);
-        });
         throw result.error;
       }
       return result.data;

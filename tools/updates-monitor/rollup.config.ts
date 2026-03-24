@@ -48,12 +48,14 @@ export default {
     //terser(),
   ],
   external: [
-    "zod",
-    "unzipper",
+    "@aws-sdk/client-s3",
     "drizzle-orm",
     "better-sqlite3",
+    "fast-xml-parser",
     "googleapis",
     "handlebars",
     "nodemailer",
+    "zod",
+    "unzipper",
   ],
 };

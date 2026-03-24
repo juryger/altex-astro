@@ -25,15 +25,16 @@ const MainTitle = `АЛТЕХ - ${title}`;
 	</head>
 	<body>
 		<Header />
-		<AlertsContainer />
-		{currentPath !== "/" && 
-			<Breadcrumbs currentPath={currentPath} server:defer>
-				<div slot="fallback">
-					<div class="skeleton h-5 w-28"></div>
-				</div>
-			</Breadcrumbs>
-		}
+		<AlertsContainer />		
 		<div class="mx-auto max-w-7xl px-4 py-3 text-center">
+			{currentPath !== "/" 
+				? <Breadcrumbs currentPath={currentPath} server:defer>
+						<div slot="fallback">
+							<div class="skeleton h-5 w-28"></div>
+						</div>
+					</Breadcrumbs>
+				: <div class="h-9"></div>
+			}
 			<slot />
 		</div>
 		<Footer server:defer />

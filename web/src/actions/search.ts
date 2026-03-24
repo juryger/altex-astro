@@ -5,7 +5,6 @@ import {
   fetchAllProducts,
   getQueryManager,
 } from "@/lib/cqrs";
-import { sendFailureEmail } from "../core/utils/failure-manager";
 import { SEARCH_RESULTS_LIMIT } from "@/lib/domain";
 import Fuse from "fuse.js";
 
@@ -21,13 +20,7 @@ export const searchActions = {
         queryManager.fetch(() => fetchAllCategories()),
         queryManager.fetch(() => fetchAllProducts()),
       ]);
-
       if (!result[0].ok || !result[1].ok) {
-        sendFailureEmail(
-          `Failed to checkout cart, see the error details below. ${result[0].error ?? result[1].error}`,
-        ).then((email) => {
-          if (!email.ok) console.error(email.error);
-        });
         throw result[0].error ?? result[1].error;
       }
 

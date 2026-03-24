@@ -79,18 +79,18 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 {(products && products.items.length > 0) &&
   <div data-products-root data-page_prev={firstRow > 0 ? products.pageInfo.page - 1 : -1} data-page_next={lastRow < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
     {/* Header */}
-    <div class="grid grid-cols-1 sm:grid-cols-2 mb-2 items-center">
-      <h3 class="text-lg font-bold text-center sm:text-left py-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 my-2 items-center">
+      <h3 class="text-lg font-bold text-center sm:text-left">
         {titleProductsList}
       </h3>
       {/* Sort settings */}
       <div class="items-center justify-self-center sm:justify-self-end flex flex-row flex-nowrap">
         <span class="content-center text-nowrap mr-1">{titleSortBy}:</span>
-        <select name={nameSortFieldSelect} class="select w-38 mr-2">
+        <select name={nameSortFieldSelect} class="select w-38 mr-2 h-7">
           <option value={ProductsSortFields.Title} selected={productsView?.sorting?.field === ProductsSortFields.Title}>{titlSortByTitle}</option>
           <option value={ProductsSortFields.Price} selected={productsView?.sorting?.field === ProductsSortFields.Price}>{titleSortByPrice}</option>
         </select>
-        <label class="toggle toggle-xl" title={productsView?.sorting?.order === SortOrder.Ascending ? titleSortAscending : titleSortDescending}>
+        <label class="toggle toggle-xl h-7" title={productsView?.sorting?.order === SortOrder.Ascending ? titleSortAscending : titleSortDescending}>
           <input name={nameSortOrder} type="checkbox" checked={productsView?.sorting?.order === SortOrder.Ascending} />
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />

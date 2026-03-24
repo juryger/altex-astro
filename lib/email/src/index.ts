@@ -12,16 +12,7 @@ import {
   selectEnvironment,
 } from "@/lib/domain";
 import { getEmailTransport } from "./transport";
-
-// Values correspondes to template file names (*.html)
-enum EmailTemplates {
-  NewOrder = "new-order.html",
-  Failure = "failure.html",
-}
-
-enum XmlTEmplates {
-  NewOrder = "new-order.xml",
-}
+import { type EmailManager, EmailTemplates, XmlTEmplates } from "./core";
 
 const getTemplate = async (
   rootPath: string,
@@ -63,33 +54,6 @@ const prepareTemplate = async ({
 }): Promise<string> => {
   const content = await getTemplate(rootPath, fileName);
   return applyTemplateParams({ content, params });
-};
-
-type EmailManager = {
-  sendNewOrder: ({
-    from,
-    toCustomer,
-    toBackOffice,
-    subject,
-    templateParams,
-  }: {
-    from: string;
-    toCustomer: string;
-    toBackOffice: string;
-    subject: string;
-    templateParams?: Record<string, any>;
-  }) => Promise<Result>;
-  sendFailure: ({
-    from,
-    to,
-    subject,
-    templateParams,
-  }: {
-    from: string;
-    to: string;
-    subject: string;
-    templateParams?: Record<string, string>;
-  }) => Promise<Result>;
 };
 
 const getEmailManager = (): EmailManager => {
@@ -161,7 +125,7 @@ const getEmailManager = (): EmailManager => {
         })
         .catch((error) => FailedResult(error));
     },
-    sendFailure: async ({
+    sendGeneral: async ({
       from,
       to,
       subject,
@@ -173,7 +137,7 @@ const getEmailManager = (): EmailManager => {
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
       withTracing &&
-        console.log("🐾 ~ emailService ~ Failure email: %o", {
+        console.log("🐾 ~ emailService ~ General email: %o", {
           to,
           subject,
           templateParams,
@@ -194,7 +158,7 @@ const getEmailManager = (): EmailManager => {
             return !result.ok
               ? FailedResult(
                   new Error(
-                    "Failed to send email to admin regarding tehcnical issue.",
+                    "Failed to send email to admin regarding website servicing.",
                   ),
                 )
               : OkResult();
@@ -208,4 +172,5 @@ const getEmailManager = (): EmailManager => {
   };
 };
 
-export { getEmailManager, type EmailManager };
+export { EmailSubjects } from "./const";
+export { getEmailManager };

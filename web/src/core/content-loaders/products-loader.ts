@@ -66,7 +66,6 @@ const loadProducts = async (
 function createProductsLoader(config: {
   baseUrl: string;
 }): LiveLoader<Product, ProductEntryFilter, ProductCollectionFilter> {
-  //console.log("🛠️ ~ createProductsLoader ~ config:", config);
   return {
     name: "product-loader",
     loadCollection: async ({ filter }) => {

@@ -1,4 +1,4 @@
-import type { ReadReplicaTypes, SyncTypes } from "@/lib/domain";
+import type { ReadReplicaTypes, SyncTypes, Result } from "@/lib/domain";
 import type { CatalogUpdates } from "../models/catalog";
 
 interface BaseSyncHandler {
@@ -43,6 +43,10 @@ interface BaseFileManager {
   remove: (filePath: string, isDirectory?: boolean) => Promise<void>;
 }
 
+interface EmailComposer {
+  sendGeneralEmail(message: string, isFailure?: boolean): Promise<Result>;
+}
+
 interface UpdatesManager {
   run: ({
     monitoringDirPath,
@@ -62,4 +66,5 @@ export {
   type SlugNamesConverter,
   type BaseImageManager,
   type BaseReadReplicaManager,
+  type EmailComposer,
 };

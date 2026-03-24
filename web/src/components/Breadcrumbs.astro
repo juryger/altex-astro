@@ -15,7 +15,7 @@ const catalogItem = await sessionManager.getActiveCatalogItem();
 const breadcrumbs = getBreadcrumbsFromPath(currentPath, catalogItem);
 ---
 
-<div class="breadcrumbs text-sm px-6">
+<div class="breadcrumbs text-sm px-4">
   {breadcrumbs.length > 1 /* skip home page */ && 
     <ul class="list-disc">
       {breadcrumbs && breadcrumbs.map((x: BreadcrumbItem, index: number) => (

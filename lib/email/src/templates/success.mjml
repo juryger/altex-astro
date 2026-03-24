@@ -13,7 +13,7 @@
     >
       <mj-column border="none" vertical-align="top" padding="0px 0px 0px 0px">
         <mj-text align="center" padding="10px 0px 10px 0px"
-          >Уведомление об успешном завершении осблуживания сайта
+          >Уведомление об успешном завершении осблуживания вебсайта
           <a href="{{companyWeb}}">↗АЛТЕХ</a>.</mj-text
         >
       </mj-column>
