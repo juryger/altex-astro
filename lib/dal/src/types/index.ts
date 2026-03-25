@@ -1,6 +1,6 @@
 import type { ExtractTablesWithRelations, InferSelectModel } from "drizzle-orm";
 import type { SQLiteTransaction } from "drizzle-orm/sqlite-core";
-
+import type Database from "better-sqlite3";
 import {
   categories,
   colors,
@@ -24,7 +24,6 @@ import {
   operationsVersion,
   syncLog,
 } from "../schema/operations";
-
 import { info, generalVersion } from "../schema/general";
 
 // Catalog
@@ -62,12 +61,10 @@ export enum DatabaseType {
 }
 
 export type DatabaseSchema = Record<string, unknown>;
-export type DatabaseTransaction<
-  TSchema extends DatabaseSchema,
-  TRunResult = unknown,
-> = SQLiteTransaction<
-  "async" | "sync",
-  TRunResult,
-  TSchema,
-  ExtractTablesWithRelations<TSchema>
->;
+export type DatabaseTransaction<TSchema extends DatabaseSchema> =
+  SQLiteTransaction<
+    "sync",
+    Database.RunResult,
+    TSchema,
+    ExtractTablesWithRelations<TSchema>
+  >;

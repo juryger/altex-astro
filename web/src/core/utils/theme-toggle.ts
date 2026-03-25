@@ -18,19 +18,16 @@ interface ThemeToggleManager {
 
 const assertInputElements = (inputElements: ThemToggleComponents) => {
   const assertMessage = "⚠️ ~ theme-toggle ~ '%s' is not defined";
-
   console.assert(
     inputElements.coreEl !== null,
     assertMessage,
     Object.keys(inputElements)[0],
   );
-
   console.assert(
     inputElements.darkThemeEl !== null,
     assertMessage,
     Object.keys(inputElements)[1],
   );
-
   console.assert(
     inputElements.lightThemeEl !== null,
     assertMessage,

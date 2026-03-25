@@ -28,7 +28,6 @@ const getCatalogSyncHandler = (config: {
           );
         });
       }
-
       var data = await response.json();
       var dataCache = (data as PagingResult<Category>).items.map(
         (x) =>

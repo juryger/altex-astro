@@ -35,7 +35,7 @@ self.onmessage = async (e) => {
         ]);
         syncStatus.resultMessage = SyncComplete;
         console.info(
-          "🛑 ~ catalog-sync-worker ~ catalog references has been saved to IndexedDB, number of synced records:",
+          "~ catalog-sync-worker ~ catalog references has been saved to IndexedDB, number of synced records:",
           result.reduce((acc, curr) => acc + curr, 0),
         );
         break;

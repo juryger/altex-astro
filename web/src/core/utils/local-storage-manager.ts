@@ -103,7 +103,7 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(themeChangedDate), invalidateHours)
       ) {
         console.warn(
-          "~ local-storage-manger ~ theme settings reset is required as it's either expired or new setup ('%s').",
+          "~ local-storage-manger ~ theme settings reset as it's either expired or new setup ('%s').",
           themeChangedDate !== null ? new Date(themeChangedDate) : "not set",
         );
         localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);

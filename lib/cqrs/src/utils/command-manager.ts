@@ -5,22 +5,27 @@ import {
   type GeneralDb,
   createCatalogDb,
   type DbTransaction,
-} from "@/lib/dal/src";
+} from "@/lib/dal";
 import {
   EnvironmentNames,
   FailedResult,
   getErrorMessage,
   OkResult,
+  regexTrue,
   selectEnvironment,
   type Result,
 } from "@/lib/domain";
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 interface CommandManager {
   mutate: <T = any>(commandFn: () => Promise<T>) => Promise<Result<T>>;
   mutateTransactional: <T = any>(
     type: DatabaseType,
     commands: Array<(tx: DbTransaction, prevResult?: any) => Promise<any>>,
-  ) => Promise<Result<T>>;
+  ) => Result<T>;
 }
 
 function getCommandManager(): CommandManager {
@@ -39,24 +44,38 @@ function getCommandManager(): CommandManager {
         return FailedResult(new Error(errorMessage));
       }
     },
-    mutateTransactional: async <T = any>(
+    mutateTransactional: <T = any>(
       type: DatabaseType,
       commands: Array<(x: DbTransaction, prevResult?: any) => Promise<any>>,
-    ): Promise<Result<T>> => {
+    ): Result<T> => {
       const db = getDatabase(type);
       if (db === undefined) {
         return FailedResult(new Error(`Unsupported database type: ${type}`));
       }
-      return await db.transaction(async (tx) => {
+      return db.transaction((tx) => {
         try {
           let prevResult: any | undefined = undefined;
           for (let i = 0; i < commands.length; i++) {
+            withTracing &&
+              console.log(
+                "🐾 transaction command: %i of %i, prev command result: %s",
+                i + 1,
+                commands.length,
+                prevResult,
+              );
             const fn = commands[i];
             if (fn !== undefined) {
-              prevResult = await fn(tx, prevResult);
+              prevResult = fn(tx, prevResult);
+              withTracing &&
+                console.log(
+                  "🐾 transaction command: %i of %i, current command result: %s",
+                  i + 1,
+                  commands.length,
+                  prevResult,
+                );
             }
           }
-          return OkResult(prevResult as T);
+          return OkResult<T>(prevResult);
         } catch (error) {
           tx.rollback();
           const errorMessage = getErrorMessage(error);

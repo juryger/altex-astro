@@ -22,7 +22,7 @@ const mapDomainToDatabaseModel = (entity: GuestUser): DBGuest => {
   } as DBGuest;
 };
 
-export async function upsertGuestUser(guest: GuestUser): Promise<number> {
+export async function upsertGuestUser(guest: GuestUser): Promise<string> {
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
@@ -42,15 +42,15 @@ export async function upsertGuestUser(guest: GuestUser): Promise<number> {
         uid: guest.uid,
       },
     })
-    .returning({ id: guests.id });
-  return result.at(0)?.id ?? 0;
+    .returning({ uid: guests.uid });
+  return result.at(0)?.uid ?? "";
 }
 
-export async function upsertGuestUserTx(
+export function upsertGuestUserTx(
   tx: OperationsDbTransaction,
   guest: GuestUser,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(guests)
     .values(mapDomainToDatabaseModel(guest))
     .onConflictDoUpdate({
@@ -66,6 +66,8 @@ export async function upsertGuestUserTx(
         uid: guest.uid,
       },
     })
-    .returning({ id: guests.id });
-  return result.at(0)?.id ?? 0;
+    .returning({ uid: guests.uid })
+    .run();
+  console.log("🧪 ~ upsertGuestUserTx ~ result %o", result);
+  return result.changes > 0 ? (guest.uid ?? "") : "";
 }

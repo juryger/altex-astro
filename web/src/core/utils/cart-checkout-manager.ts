@@ -7,9 +7,7 @@ import type { CommandManager } from "@/lib/cqrs";
 import {
   getQueryManager,
   fetchDiscounts,
-  checkoutCart,
   checkoutCartTx,
-  upsertGuestUser,
   upsertGuestUserTx,
   getCommandManager,
 } from "@/lib/cqrs";
@@ -47,15 +45,6 @@ const encodeUserInput = (guest: GuestUser): GuestUser => {
   } as GuestUser;
 };
 
-// const saveGuestUser = async (
-//   commandManager: CommandManager,
-//   guest: GuestUser,
-// ): Promise<Result<number>> => {
-//   return await commandManager.mutate<number>(() =>
-//     upsertGuestUser(encodeUserInput(guest)),
-//   );
-// };
-
 const saveCartCheckout = async (
   commandManager: CommandManager,
   items: Array<CartItem>,
@@ -69,7 +58,7 @@ const saveCartCheckout = async (
   if (discounts.error !== undefined) {
     return FailedResult(discounts.error);
   }
-  const commands: Array<(tx: DbTransaction) => Promise<any>> = [];
+  const commands: Array<(tx: DbTransaction) => any> = [];
   if (guest !== undefined) {
     commands.push((tx: DbTransaction) =>
       upsertGuestUserTx(tx as OperationsDbTransaction, encodeUserInput(guest)),
@@ -84,10 +73,11 @@ const saveCartCheckout = async (
       prevResult,
     ),
   );
-  return await commandManager.mutateTransactional(
+  const result = commandManager.mutateTransactional(
     DatabaseType.Operatons,
     commands,
   );
+  return result;
 };
 
 function getCartCheckoutManager(): CartCheckoutManager {
@@ -99,20 +89,8 @@ function getCartCheckoutManager(): CartCheckoutManager {
       guest?: GuestUser,
       userUid?: string,
     ): Promise<Result<string>> => {
-      let guestUid: string | undefined = undefined;
       try {
-        if (guest) {
-          guestUid = crypto.randomUUID();
-          guest.uid = guestUid;
-          // const result = await saveGuestUser(commandManager, guest);
-          // if (!result.ok) {
-          //   return FailedResult(
-          //     result.error ??
-          //       new Error("Failed to save guest user for checkout"),
-          //   );
-          // }
-        }
-
+        if (guest) guest.uid = crypto.randomUUID();
         const cartCheckout = await saveCartCheckout(
           commandManager,
           items,
@@ -124,7 +102,6 @@ function getCartCheckoutManager(): CartCheckoutManager {
             cartCheckout.error ?? new Error("Failed to complete cart checkout"),
           );
         }
-
         await emailComposer
           .sendNewOrderEmail(cartCheckout.data)
           .then((result) => {
