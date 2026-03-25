@@ -1,9 +1,12 @@
 import type { ReadReplicaTypes, SyncTypes, Result } from "@/lib/domain";
-import type { CatalogUpdates } from "../models/catalog";
+import type { CatalogUpdatesRoot } from "../models/catalog";
 
 interface BaseSyncHandler {
   getSyncType: () => SyncTypes;
-  synchronise: (inputDirPath: string, data: CatalogUpdates) => Promise<void>;
+  synchronise: (
+    inputDirPath: string,
+    value: CatalogUpdatesRoot,
+  ) => Promise<void>;
 }
 
 interface BaseXmlHandler {
@@ -30,7 +33,8 @@ interface BaseReadReplicaManager {
     replicaDirName: string,
     replicaName: string,
   ) => Promise<string>;
-  setActive: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
+  set: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
+  rollback: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
 }
 
 interface BaseFileManager {

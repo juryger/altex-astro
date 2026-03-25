@@ -31,11 +31,11 @@ export async function upsertMakeCountry(value: MakeCountry): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertMakeCountryTx(
+export function upsertMakeCountryTx(
   tx: CatalogDbTransaction,
   value: MakeCountry,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(makeCountries)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -45,6 +45,7 @@ export async function upsertMakeCountryTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: makeCountries.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: makeCountries.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

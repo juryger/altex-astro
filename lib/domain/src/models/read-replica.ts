@@ -6,6 +6,7 @@ export const ReadReplicaSchema = z.object({
   type: z.number().default(ReadReplicaTypes.Catalog),
   fileName: z.string(),
   createdAt: z.date(),
+  deletedAt: z.date().optional(),
 });
 
 function getInitialReplica(type: number): ReadReplica {

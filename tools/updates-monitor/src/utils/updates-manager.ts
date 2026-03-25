@@ -1,13 +1,12 @@
-import {
-  FailedResult,
-  getErrorMessage,
-  OkResult,
-  type Result,
-} from "@/lib/domain";
-import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "../const";
-import { type CommandManager, getCommandManager } from "@/lib/cqrs";
 import path from "path";
 import fs from "fs/promises";
+import type { Dirent } from "fs";
+import { OkResult, FailedResult, getErrorMessage } from "@/lib/domain";
+import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "@/lib/domain";
+import { SyncTypes } from "@/lib/domain";
+import { getCommandManager } from "@/lib/cqrs";
+import { setSyncLog } from "@/lib/cqrs";
+import { EmailBody } from "@/lib/email";
 import {
   type BaseSyncHandler,
   type BaseXmlHandler,
@@ -16,21 +15,18 @@ import {
 import { FileManager } from "./file-manager";
 import { ZipManager } from "./archive-manager";
 import { getCatalogSyncHandler } from "../sync-handlers/catalog.js";
-import { setSyncLog } from "@/lib/cqrs";
-import { SyncTypes } from "@/lib/domain";
-import type { Dirent } from "fs";
 import { getCatalogXmlHandler } from "../xml-handlers/catalog";
 import type { CatalogUpdates } from "../models/catalog";
-import { getReadReplicaManager } from "./read-replica-manager";
 import { getEmailComposer } from "./email-composer";
-import { EmailBody } from "@/lib/email";
 
 const archiveManager = ZipManager.instance();
 const fileManager = FileManager.instance();
 const commandManager = getCommandManager();
 const emailComposer = getEmailComposer();
 
-export function getUpdatesManager(): UpdatesManager {
+export function getUpdatesManager(
+  withTracing: boolean = false,
+): UpdatesManager {
   return {
     run: async ({
       monitoringDirPath,
@@ -53,6 +49,7 @@ export function getUpdatesManager(): UpdatesManager {
         return await runInternal({
           monitoringDirPath,
           poisonedDirName,
+          withTracing,
         }).catch((error) => {
           return Promise.reject(getErrorMessage(error));
         });
@@ -66,12 +63,14 @@ export function getUpdatesManager(): UpdatesManager {
 const runInternal = async ({
   monitoringDirPath,
   poisonedDirName,
+  withTracing,
 }: {
   monitoringDirPath: string;
   poisonedDirName: string;
+  withTracing: boolean;
 }): Promise<number> => {
-  const syncHandlers = initSyncHandlers();
-  const xmlHandlers = initXmlHandlers();
+  const syncHandlers = initSyncHandlers(withTracing);
+  const xmlHandlers = initXmlHandlers(withTracing);
 
   const files = await fs
     .readdir(monitoringDirPath, {
@@ -109,12 +108,22 @@ const runInternal = async ({
           defaultResult,
         );
       }
+      withTracing &&
+        console.log(
+          "🐾 ~ updates-manager ~ start processing of archive '%s'",
+          filePath,
+        );
       return processArchive(filePath, syncHandler, xmlHandler)
         .then(async () => {
+          withTracing &&
+            console.log(
+              "🐾 ~ updates-manager ~ processing of archive is done '%s'",
+              filePath,
+            );
           await finalizeArchiveProcessing({
             filePath,
-            poisonedDirName,
             syncType: syncType,
+            withTracing,
           });
           return OkResult(1);
         })
@@ -124,6 +133,7 @@ const runInternal = async ({
             poisonedDirName,
             syncType,
             error,
+            withTracing,
           });
           return FailedResult(error, defaultResult);
         });
@@ -154,7 +164,6 @@ const processArchive = async (
   if (extractedPath.trim().length === 0) {
     return Promise.reject(`Could not extract ZIP file '${filePath}'`);
   }
-
   const xmlFilePath = await fileManager.lookupByExtension(
     extractedPath,
     FILE_EXTENSIION_XML,
@@ -162,33 +171,44 @@ const processArchive = async (
   if (xmlFilePath === null) {
     return Promise.reject("Could not find XML file in extracted ZIP folder.");
   }
-
   const data = await xmlHandler.parse<CatalogUpdates>(xmlFilePath);
-  return await syncHandler.synchronise(extractedPath, data);
+  return await syncHandler.synchronise(extractedPath, data.catalog);
 };
 
 const finalizeArchiveProcessing = async ({
   filePath,
-  poisonedDirName,
+  poisonedDirName = null,
   syncType = null,
   logMessage = null,
   error = null,
+  withTracing = false,
 }: {
   filePath: string;
-  poisonedDirName: string;
+  poisonedDirName?: string | null;
   syncType?: SyncTypes | null;
   logMessage?: string | null;
   error?: Error | null;
+  withTracing?: boolean;
 }): Promise<void> => {
-  if (error !== null) {
+  if (error !== null && poisonedDirName !== null) {
     const poisonedFilePath = path.join(
       path.dirname(filePath),
       poisonedDirName,
       path.basename(filePath),
     );
+    withTracing &&
+      console.log(
+        "🐾 ~ updates-manager ~ moving of failed archive to poisoned directory '%s'",
+        poisonedFilePath,
+      );
     await fileManager.move(filePath, poisonedFilePath);
   }
 
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ clean up of archive file and extracted directory '%s'",
+      filePath,
+    );
   await fileManager.remove(filePath);
   await fileManager.remove(
     path.join(
@@ -198,6 +218,12 @@ const finalizeArchiveProcessing = async ({
     true,
   );
 
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ save archive processing log: '%s', error: '%s'",
+      logMessage,
+      error?.toString(),
+    );
   const result = await commandManager.mutate<number>(() =>
     setSyncLog({
       fileName: path.basename(filePath),
@@ -207,6 +233,10 @@ const finalizeArchiveProcessing = async ({
     }),
   );
 
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ sending email regading archive processing to administrator",
+    );
   await emailComposer.sendGeneralEmail(
     error !== null
       ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
@@ -214,25 +244,24 @@ const finalizeArchiveProcessing = async ({
     error !== null,
   );
 
-  return !result.ok
-    ? Promise.reject(
-        result.error?.message ??
-          "Failed to complete sync by adding new SyncLog record.",
-      )
-    : Promise.resolve();
+  return Promise.resolve();
 };
 
-const initSyncHandlers = (): Record<SyncTypes, BaseSyncHandler | undefined> => {
+const initSyncHandlers = (
+  withTracing: boolean,
+): Record<SyncTypes, BaseSyncHandler | undefined> => {
   return {
-    [SyncTypes.Catalog]: getCatalogSyncHandler(),
+    [SyncTypes.Catalog]: getCatalogSyncHandler(withTracing),
     [SyncTypes.CompanyInfo]: undefined,
     [SyncTypes.Order]: undefined,
   };
 };
 
-const initXmlHandlers = (): Record<SyncTypes, BaseXmlHandler | undefined> => {
+const initXmlHandlers = (
+  withTracing: boolean,
+): Record<SyncTypes, BaseXmlHandler | undefined> => {
   return {
-    [SyncTypes.Catalog]: getCatalogXmlHandler(),
+    [SyncTypes.Catalog]: getCatalogXmlHandler(withTracing),
     [SyncTypes.CompanyInfo]: undefined,
     [SyncTypes.Order]: undefined,
   };

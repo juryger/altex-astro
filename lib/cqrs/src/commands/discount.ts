@@ -30,11 +30,11 @@ export async function upsertDiscount(value: Discount): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertDiscountTx(
+export function upsertDiscountTx(
   tx: CatalogDbTransaction,
   value: Discount,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(discounts)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -45,6 +45,7 @@ export async function upsertDiscountTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: discounts.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: discounts.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

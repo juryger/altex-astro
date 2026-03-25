@@ -21,6 +21,7 @@ export const readReplicas = table(
       .int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
   (table) => [t.uniqueIndex("idx_read_replicas_file_name").on(table.fileName)],
 );

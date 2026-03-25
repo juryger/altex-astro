@@ -33,11 +33,11 @@ export async function upsertProductColor(value: ProductColor): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertProductColorTx(
+export function upsertProductColorTx(
   tx: CatalogDbTransaction,
   value: ProductColor,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(productColors)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -48,6 +48,7 @@ export async function upsertProductColorTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: productColors.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: productColors.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

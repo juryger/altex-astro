@@ -1,49 +1,45 @@
-import type { ReadReplica } from "@/lib/domain";
 import type { ReadReplica as DBReadReplica } from "@/lib/dal";
 import { createOperationsDb, readReplicas } from "@/lib/dal";
-import {
-  EnvironmentNames,
-  selectEnvironment,
-  ReadReplicaTypes,
-} from "@/lib/domain";
+import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
+import { ReadReplicaTypes } from "@/lib/domain";
 
-const mapDomainToDatabaseModel = (entity: ReadReplica): DBReadReplica => {
+const mapDomainToDatabaseModel = ({
+  type,
+  fileName,
+  deletedAt,
+}: {
+  type: ReadReplicaTypes;
+  fileName: string;
+  deletedAt?: Date | undefined;
+}): DBReadReplica => {
   return {
-    id: entity.id,
-    type: entity.type,
-    fileName: entity.fileName,
+    type: type,
+    fileName: fileName,
+    deletedAt: deletedAt ?? null,
   } as DBReadReplica;
 };
 
 export async function setReadReplica({
   type,
   fileName,
+  deletedAt,
 }: {
   type: ReadReplicaTypes;
   fileName: string;
+  deletedAt?: Date | undefined;
 }): Promise<number> {
   const db = createOperationsDb(
     selectEnvironment(EnvironmentNames.DB_OPERATIONS_PATH),
   );
-  // let name: string;
-  // switch (type) {
-  //   case ReadReplicaTypes.Catalog:
-  //     name = "catalog";
-  //     break;
-  //   default:
-  //     console.error("Unsupported read replica type:", type);
-  //     name = "unsupported";
-  //     break;
-  // }
   const result = await db
     .insert(readReplicas)
-    .values(
-      mapDomainToDatabaseModel({
-        type,
-        fileName, //`${name}-${Date.now()}.db`,
-      } as ReadReplica),
-    )
+    .values(mapDomainToDatabaseModel({ type, fileName, deletedAt }))
+    .onConflictDoUpdate({
+      target: readReplicas.fileName,
+      set: {
+        deletedAt: deletedAt,
+      },
+    })
     .returning({ insertedId: readReplicas.id });
-
   return result.at(0)?.insertedId ?? 0;
 }

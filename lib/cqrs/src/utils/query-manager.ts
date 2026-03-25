@@ -28,7 +28,7 @@ const checkCache = async <T = any>(
     } catch (error) {
       cache.clearSetLock();
       const errorMessage = getErrorMessage(error);
-      console.error("~ queryManager ~ %s", errorMessage);
+      console.error("❌ ~ query-manager ~ %s", errorMessage);
       return FailedResult(new Error(errorMessage));
     }
   }
@@ -52,7 +52,7 @@ function getQueryManager(): QueryManager {
         return OkResult(await queryFn());
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        console.error("~ query-manager ~ %s", errorMessage);
+        console.error("❌ ~ query-manager ~ %s", errorMessage);
         return FailedResult(new Error(errorMessage));
       }
     },

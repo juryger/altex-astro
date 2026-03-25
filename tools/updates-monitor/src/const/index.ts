@@ -1,4 +1,0 @@
-const FILE_EXTENSIION_XML = ".xml";
-const FILE_EXTENSIION_ZIP = ".zip";
-
-export { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP };

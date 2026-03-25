@@ -1,19 +1,20 @@
 import {
-  fetchCompanyInfo,
-  fetchCartCheckout,
-  getQueryManager,
-} from "@/lib/cqrs";
-import {
   CacheKeys,
   CompanyInfoKeys,
+  EnvironmentNames,
   FailedResult,
-  formatCurrency,
   getCacheInfo,
-  OkResult,
+  regexTrue,
+  selectEnvironment,
   type Result,
 } from "@/lib/domain";
+import { fetchCompanyInfo, getQueryManager } from "@/lib/cqrs";
 import { EmailSubjects, getEmailManager } from "@/lib/email";
 import type { EmailComposer } from "../core";
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 export const getEmailComposer = (): EmailComposer => {
   const queryManager = getQueryManager();
@@ -23,6 +24,12 @@ export const getEmailComposer = (): EmailComposer => {
       message: string,
       isFailure: boolean = false,
     ): Promise<Result> => {
+      withTracing &&
+        console.log(
+          "🐾 ~ email-composer ~ send general email with message '%s' and failure flag '%s'",
+          message,
+          isFailure,
+        );
       return queryManager
         .fetch(() => fetchCompanyInfo(), getCacheInfo(CacheKeys.CompanyInfo))
         .then((companyInfo) => {
@@ -43,6 +50,13 @@ export const getEmailComposer = (): EmailComposer => {
               ),
             );
           }
+          withTracing &&
+            console.log(
+              "🐾 ~ email-composer ~ before send, from: '%s', to: '%s', companyInfo: %o",
+              fromEmail,
+              toEmail,
+              companyInfo,
+            );
           return emailManager.sendGeneral({
             from: fromEmail,
             to: toEmail,

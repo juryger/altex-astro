@@ -1,4 +1,5 @@
 export { EnvironmentNames } from "./const/environment";
+
 export {
   NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
@@ -10,11 +11,13 @@ export {
   SyncTypes,
   SearchTypes,
 } from "./const/general";
+
 export {
   CategoriesSortFields,
   ProductsSortFields,
   SortOrder,
 } from "./const/sorting";
+
 export {
   CACHE_LOAD_RETRY_ATTEMPS,
   CACHE_LOAD_RETRY_DELAY_MS,
@@ -25,7 +28,16 @@ export {
   CACHE_ITEMS_LIMIT,
   CacheKeys,
 } from "./const/cache";
+
+export {
+  FILE_EXTENSIION_XML,
+  FILE_EXTENSIION_ZIP,
+  FILE_EXTENSIION_JPG,
+  FILE_EXTENSIION_PNG,
+} from "./const/extensions";
+
 export { CompanyInfoKeys } from "./const/company-info";
+
 export type {
   CacheInfo,
   CacheEntry,

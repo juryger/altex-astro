@@ -1,4 +1,11 @@
-import { createGeneralDb, eq, desc, readReplicas } from "@/lib/dal";
+import {
+  createGeneralDb,
+  and,
+  eq,
+  isNull,
+  desc,
+  readReplicas,
+} from "@/lib/dal";
 import type { SQLiteColumn, ReadReplica as DBReadReplica } from "@/lib/dal";
 import {
   EnvironmentNames,
@@ -27,7 +34,7 @@ export async function fetchReadReplica(
   const replica = await db
     .select()
     .from(readReplicas)
-    .where(eq(readReplicas.type, type))
+    .where(and(eq(readReplicas.type, type), isNull(readReplicas.deletedAt)))
     .orderBy(desc(columnCreatedAt))
     .limit(1);
   const item = replica.at(0);

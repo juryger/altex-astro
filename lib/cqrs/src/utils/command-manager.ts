@@ -24,7 +24,7 @@ interface CommandManager {
   mutate: <T = any>(commandFn: () => Promise<T>) => Promise<Result<T>>;
   mutateTransactional: <T = any>(
     type: DatabaseType,
-    commands: Array<(tx: DbTransaction, prevResult?: any) => Promise<any>>,
+    commands: Array<(tx: DbTransaction, prevResult?: any) => any>,
   ) => Result<T>;
 }
 
@@ -46,7 +46,7 @@ function getCommandManager(): CommandManager {
     },
     mutateTransactional: <T = any>(
       type: DatabaseType,
-      commands: Array<(x: DbTransaction, prevResult?: any) => Promise<any>>,
+      commands: Array<(x: DbTransaction, prevResult?: any) => any>,
     ): Result<T> => {
       const db = getDatabase(type);
       if (db === undefined) {
@@ -58,7 +58,7 @@ function getCommandManager(): CommandManager {
           for (let i = 0; i < commands.length; i++) {
             withTracing &&
               console.log(
-                "🐾 transaction command: %i of %i, prev command result: %s",
+                "🐾 ~ command-manager ~ transaction command: %i of %i, prev command result: %s",
                 i + 1,
                 commands.length,
                 prevResult,
@@ -68,13 +68,18 @@ function getCommandManager(): CommandManager {
               prevResult = fn(tx, prevResult);
               withTracing &&
                 console.log(
-                  "🐾 transaction command: %i of %i, current command result: %s",
+                  "🐾 ~ command-manager ~ transaction command: %i of %i, current command result: %s",
                   i + 1,
                   commands.length,
                   prevResult,
                 );
             }
           }
+          withTracing &&
+            console.log(
+              "🐾 ~ command-manager ~ transaction result: %s",
+              prevResult,
+            );
           return OkResult<T>(prevResult);
         } catch (error) {
           tx.rollback();

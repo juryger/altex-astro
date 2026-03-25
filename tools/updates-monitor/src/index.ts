@@ -1,7 +1,5 @@
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
+import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
 import { getUpdatesManager } from "./utils/updates-manager";
-import { getSlugNamesConverter } from "./utils/slug-names-converter";
-import { getS3ImageManager } from "./utils/s3-image-manager";
 
 const monitoringDirPath = selectEnvironment(
   EnvironmentNames.UPDATES_MONITORING_PATH,
@@ -9,8 +7,11 @@ const monitoringDirPath = selectEnvironment(
 const poisonedDirName = selectEnvironment(
   EnvironmentNames.POISONED_DIRECOTRY_NAME,
 );
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
-getUpdatesManager()
+getUpdatesManager(withTracing)
   .run({
     monitoringDirPath,
     poisonedDirName,

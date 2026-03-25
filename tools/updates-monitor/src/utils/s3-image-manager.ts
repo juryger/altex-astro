@@ -1,12 +1,16 @@
-import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
-import type { BaseImageManager } from "../core";
-import path from "path";
 import fs from "fs";
+import path from "path";
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
+import type { BaseImageManager } from "../core";
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 export const getS3ImageManager = (): BaseImageManager => {
   const s3Client = new S3Client({
@@ -24,6 +28,12 @@ export const getS3ImageManager = (): BaseImageManager => {
       filePath: string,
       isThumbnail: boolean = false,
     ): Promise<void> => {
+      withTracing &&
+        console.log(
+          "🐾 ~ s3-image-uploader ~ uploading image file: '%s', isThumbnail: %s",
+          filePath,
+          isThumbnail,
+        );
       const content = fs.readFileSync(filePath);
       return await s3Client
         .send(
@@ -45,6 +55,12 @@ export const getS3ImageManager = (): BaseImageManager => {
       fileName: string,
       isThumbnail: boolean = false,
     ): Promise<void> => {
+      withTracing &&
+        console.log(
+          "🐾 ~ s3-image-uploader ~ delete image file with name: '%s', isThumbnail: %s",
+          fileName,
+          isThumbnail,
+        );
       const command = new DeleteObjectCommand({
         Bucket: selectEnvironment(
           isThumbnail

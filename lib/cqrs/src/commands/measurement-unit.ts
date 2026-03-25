@@ -37,11 +37,11 @@ export async function upsertMeasurementUnit(
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertMeasurementUnitTx(
+export function upsertMeasurementUnitTx(
   tx: CatalogDbTransaction,
   value: MeasurementUnit,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(measurementUnits)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -52,6 +52,7 @@ export async function upsertMeasurementUnitTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: measurementUnits.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: measurementUnits.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

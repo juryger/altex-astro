@@ -68,6 +68,5 @@ export function upsertGuestUserTx(
     })
     .returning({ uid: guests.uid })
     .run();
-  console.log("🧪 ~ upsertGuestUserTx ~ result %o", result);
   return result.changes > 0 ? (guest.uid ?? "") : "";
 }

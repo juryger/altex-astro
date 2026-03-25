@@ -73,7 +73,7 @@ class CacheManager implements BaseCacheManager {
     } as CacheEntry<T>);
     this.withTracing &&
       console.log(
-        "🐾 ~ cacheManager ~ set key '%s' with value %o, length %i",
+        "🐾 ~ cache-manager ~ set key '%s' with value %o, length %i",
         key,
         value,
         this.cache.size,
@@ -86,7 +86,7 @@ class CacheManager implements BaseCacheManager {
       value.staleTimestamp !== undefined &&
       value.staleTimestamp <= currDate.getTime();
     this.withTracing &&
-      console.log("🐾 ~ cacheManager ~ '%s' isExpired:", key, result);
+      console.log("🐾 ~ cache-manager ~ '%s' isExpired:", key, result);
     return result;
   }
 
@@ -99,7 +99,7 @@ class CacheManager implements BaseCacheManager {
       value.acquireTimestamp !== undefined &&
       value.acquireTimestamp <= currDate.getTime();
     this.withTracing &&
-      console.log("🐾 ~ cacheManager ~ '%s' isAcquireExpired:", key, result);
+      console.log("🐾 ~ cache-manager ~ '%s' isAcquireExpired:", key, result);
     return result;
   }
 
@@ -110,7 +110,7 @@ class CacheManager implements BaseCacheManager {
   private invalidate(key: string) {
     if (!this.cache.has(key)) return;
     this.withTracing &&
-      console.log("🐾 ~ cacheManager ~ invalidating the item with key:", key);
+      console.log("🐾 ~ cache-manager ~ invalidating the item with key:", key);
     this.cache.delete(key);
   }
 
@@ -119,7 +119,7 @@ class CacheManager implements BaseCacheManager {
 
     if (this.withTracing) {
       console.log(
-        "🐾 ~ cacheManager ~ evicting cache as cache size limit achieved %i, %o",
+        "🐾 ~ cache-manager ~ evicting cache as cache size limit achieved %i, %o",
         this.sizeLimit,
         this.cache.entries().toArray(),
       );
@@ -127,7 +127,7 @@ class CacheManager implements BaseCacheManager {
     const evictionKey = this.evictionStrategy?.findKey(this.cache);
     if (evictionKey === undefined) {
       console.warn(
-        "~ cacheManager ~ Coluld not obtain any key for the eviction operation from the cache.",
+        "⚠️ ~ cache-manager ~ Coluld not obtain any key for the eviction operation from the cache.",
       );
       return false;
     }
@@ -149,7 +149,7 @@ class CacheManager implements BaseCacheManager {
 
     if (this.withTracing) {
       console.log(
-        "🐾 ~ cacheManager ~ validate that loading of cache item with key '%s' is finished: %s",
+        "🐾 ~ cache-manager ~ validate that loading of cache item with key '%s' is finished: %s",
         key,
         result,
       );
@@ -160,7 +160,7 @@ class CacheManager implements BaseCacheManager {
   private aqcuireLock(key: string): Error | undefined {
     if (this.cache.size >= this.sizeLimit && !this.evict()) {
       const errorMessage = `Failed to acquire lock for cache item with key '${key}' because cache is full and eviction strategy failed`;
-      console.error("~ cacheManager ~ %s", errorMessage);
+      console.error("❌ ~ cache-manager ~ %s", errorMessage);
       return new Error(errorMessage);
     }
 
@@ -172,7 +172,7 @@ class CacheManager implements BaseCacheManager {
       });
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      console.error("~ cacheManager ~ %s", errorMessage);
+      console.error("❌ ~ cache-manager ~ %s", errorMessage);
       return new Error(
         `Failed to acquire lock for cache item with key '${key}, see error details below: ${errorMessage}`,
       );
@@ -182,7 +182,7 @@ class CacheManager implements BaseCacheManager {
   async get<T = any>(key: string): Promise<CacheResult<T>> {
     this.withTracing &&
       console.log(
-        "🐾 ~ cacheManager ~ obtaining cache item with key '%s'",
+        "🐾 ~ cache-manager ~ obtaining cache item with key '%s'",
         key,
       );
 
@@ -221,7 +221,7 @@ class CacheManager implements BaseCacheManager {
 
     this.withTracing &&
       console.log(
-        "🐾 ~ cacheManager ~ get key '%s', expire on '%s'",
+        "🐾 ~ cache-manager ~ get key '%s', expire on '%s'",
         key,
         cacheEntry.staleTimestamp
           ? new Date(cacheEntry.staleTimestamp).toLocaleString()
@@ -244,7 +244,7 @@ class CacheManager implements BaseCacheManager {
   contains(key: string): boolean {
     this.withTracing &&
       console.log(
-        "🐾 ~ cacheManager ~ checking that cache contains item with key '%s'",
+        "🐾 ~ cache-manager ~ checking that cache contains item with key '%s'",
         key,
       );
 
@@ -272,7 +272,7 @@ class CacheManager implements BaseCacheManager {
 
     if (currentSize < this.cache.size && this.withTracing) {
       console.log(
-        "🐾 ~ cacheManager ~ revalidate completed, the number of removed items: %i",
+        "🐾 ~ cache-manager ~ revalidate completed, the number of removed items: %i",
         currentSize - this.cache.size,
       );
     }
@@ -284,7 +284,7 @@ class CacheManager implements BaseCacheManager {
     this.cache.clear();
     this.withTracing &&
       console.log(
-        "🐾 ~ cacheManager ~ reset completed, the number of all items: %i",
+        "🐾 ~ cache-manager ~ reset completed, the number of all items: %i",
         this.cache.size,
       );
   }

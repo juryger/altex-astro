@@ -76,7 +76,7 @@ const getEmailManager = (): EmailManager => {
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
       withTracing &&
-        console.log("🐾 ~ email service ~ New Order email: %o", {
+        console.log("🐾 ~ email-service ~ New Order email: %o", {
           toCustomer,
           subject,
           templateParams,
@@ -137,7 +137,7 @@ const getEmailManager = (): EmailManager => {
       templateParams?: Record<string, any>;
     }): Promise<Result> => {
       withTracing &&
-        console.log("🐾 ~ emailService ~ General email: %o", {
+        console.log("🐾 ~ email-service ~ General email: %o", {
           to,
           subject,
           templateParams,

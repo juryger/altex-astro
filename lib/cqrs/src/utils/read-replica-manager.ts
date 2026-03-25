@@ -57,7 +57,7 @@ class ReadReplicaManager implements BaseReadReplicaManager {
       .then((replica) => {
         if (!replica.ok || replica.error !== undefined || !replica.data) {
           console.error(
-            "🛑 Failed to init Catalog read replicas, see more details below.",
+            "❌ ~ read-replica-manager ~ Failed to init Catalog read replicas, see more details below.",
             replica.error,
           );
           return;
@@ -71,7 +71,7 @@ class ReadReplicaManager implements BaseReadReplicaManager {
       })
       .catch((error) =>
         console.error(
-          "🛑 Failed to init Catalog read replicas, see more details below.",
+          "❌ ~ read-replica-manager ~ Failed to init Catalog read replicas, see more details below.",
           error,
         ),
       );

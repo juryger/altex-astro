@@ -20,7 +20,7 @@ const delayWithRetry = async (
 
   if (!isValidated) {
     console.warn(
-      "~ delayWithRetry ~ validate function is not fullfiled in %i attemp(s)",
+      "⚠️ ~ delay-with-reply ~ validate function is not fullfiled in %i attemp(s)",
       retries,
     );
   }

@@ -85,36 +85,38 @@ type product_color_item = {
   "@_deleted": number;
 };
 
-type CatalogUpdates = {
-  catalog: {
-    discounts: {
-      data: discount_item[];
-    };
-    measurements: {
-      data: measurement_item[];
-    };
-    colors: {
-      data: color_item[];
-    };
-    countries: {
-      data: country_item[];
-    };
-    makers: {
-      data: maker_item[];
-    };
-    groups: {
-      data: group_item[];
-    };
-    subgroups: {
-      data: subgroup_item[];
-    };
-    products: {
-      data: product_item[];
-    };
-    product_colors: {
-      data: product_color_item[];
-    };
+type CatalogUpdatesRoot = {
+  discounts: {
+    data: discount_item[];
+  };
+  measurements: {
+    data: measurement_item[];
+  };
+  colors: {
+    data: color_item[];
+  };
+  countries: {
+    data: country_item[];
+  };
+  makers: {
+    data: maker_item[];
+  };
+  groups: {
+    data: group_item[];
+  };
+  subgroups: {
+    data: subgroup_item[];
+  };
+  products: {
+    data: product_item[];
+  };
+  product_colors: {
+    data: product_color_item[];
   };
 };
 
-export type { CatalogUpdates };
+type CatalogUpdates = {
+  catalog: CatalogUpdatesRoot;
+};
+
+export type { CatalogUpdates, CatalogUpdatesRoot };

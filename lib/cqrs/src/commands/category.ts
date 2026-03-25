@@ -37,11 +37,11 @@ export async function upsertCategory(value: Category): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertCategoryTx(
+export function upsertCategoryTx(
   tx: CatalogDbTransaction,
   value: Category,
-): Promise<number> {
-  const result = await tx
+): string {
+  const result = tx
     .insert(categories)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -56,6 +56,7 @@ export async function upsertCategoryTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: categories.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: categories.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

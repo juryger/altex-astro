@@ -1,0 +1,1 @@
+ALTER TABLE `read_replicas` ADD `deleted_at` integer;

@@ -1,3 +1,4 @@
+import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
 import type { SlugNamesConverter } from "../core";
 
 const cyrillicToLatinMap: Record<string, string> = {
@@ -36,6 +37,10 @@ const cyrillicToLatinMap: Record<string, string> = {
   я: "ya",
 };
 
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
+
 export const getSlugNamesConverter = (): SlugNamesConverter => {
   return {
     transliterate: (value: string): string => {
@@ -47,7 +52,14 @@ export const getSlugNamesConverter = (): SlugNamesConverter => {
       for (const chr of normalizedValue) {
         result.push(cyrillicToLatinMap[chr] ?? chr);
       }
-      return result.join("");
+      const transformedResult = result.join("");
+      withTracing &&
+        console.log(
+          "🐾 ~ slug-names-converter ~ original: '%s', transformed: '%s'",
+          value,
+          transformedResult,
+        );
+      return transformedResult;
     },
   };
 };

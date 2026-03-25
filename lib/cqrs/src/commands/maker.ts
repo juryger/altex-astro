@@ -28,11 +28,8 @@ export async function upsertMaker(value: Maker): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export async function upsertMakerTx(
-  tx: CatalogDbTransaction,
-  value: Maker,
-): Promise<number> {
-  const result = await tx
+export function upsertMakerTx(tx: CatalogDbTransaction, value: Maker): string {
+  const result = tx
     .insert(makers)
     .values(mapDomainToDatabaseModel(value))
     .onConflictDoUpdate({
@@ -42,6 +39,7 @@ export async function upsertMakerTx(
         deletedAt: value.deletedAt,
       },
     })
-    .returning({ insertedId: makers.id });
-  return result.at(0)?.insertedId ?? 0;
+    .returning({ insertedId: makers.id })
+    .run();
+  return result.changes > 0 ? value.uid : "";
 }

@@ -5,7 +5,7 @@
   "exports": "./src/index.ts",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc -b . --verbose"
+    "build": "rm -rf dist && rm -f tsconfig.tsbuildinfo && tsc -b . --verbose"
   },
   "devDependencies": {
     "@types/node": "^25.0.5",
