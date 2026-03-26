@@ -1,4 +1,8 @@
-import type { CatalogDbTransaction, Maker as DBMaker } from "@/lib/dal";
+import type {
+  DatabaseTransaction,
+  DatabaseSchema,
+  Maker as DBMaker,
+} from "@/lib/dal";
 import { createCatalogDb, makers } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Maker } from "@/lib/domain";
@@ -28,7 +32,10 @@ export async function upsertMaker(value: Maker): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export function upsertMakerTx(tx: CatalogDbTransaction, value: Maker): string {
+export function upsertMakerTx(
+  tx: DatabaseTransaction<DatabaseSchema>,
+  value: Maker,
+): string {
   const result = tx
     .insert(makers)
     .values(mapDomainToDatabaseModel(value))

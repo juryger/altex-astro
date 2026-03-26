@@ -11,12 +11,27 @@ import {
 } from "@/lib/domain";
 import { FILE_EXTENSIION_JPG } from "@/lib/domain";
 import { getCommandManager } from "@/lib/cqrs";
-import { DatabaseType, type DbTransaction } from "@/lib/dal";
+import {
+  DatabaseType,
+  type DatabaseTransaction,
+  type DatabaseSchema,
+} from "@/lib/dal";
 import { type BaseSyncHandler } from "../core";
 import type { CatalogUpdatesRoot } from "../models/catalog";
 import { getReadReplicaManager } from "../utils/read-replica-manager";
 import { FileManager } from "../utils/file-manager";
 import { getS3ImageManager } from "../utils/s3-image-manager";
+import {
+  mapColorsToCommands,
+  mapCountriesToCommands,
+  mapDiscountsToCommands,
+  mapGroupsToCommands,
+  mapMakersToCommands,
+  mapMeasurementsToCommands,
+  mapProductColorsToCommands,
+  mapProductsToCommands,
+  mapSubgroupsToCommands,
+} from "src/models-mapping/catalog";
 
 const fileManager = FileManager.instance();
 const commandManager = getCommandManager();
@@ -31,6 +46,7 @@ const getCatalogSyncHandler = (
     synchronise: async (
       inputDirPath: string,
       updates: CatalogUpdatesRoot,
+      createdAt: Date | undefined,
     ): Promise<void> => {
       let replicaFilePath = "";
       const thumbnailsDirPath = path.join(
@@ -39,11 +55,12 @@ const getCatalogSyncHandler = (
       );
       withTracing &&
         console.log(
-          "🐾 ~ sync-handler ~ sync data from direcotry '%s'",
+          "🐾 ~ sync-handler ~ sync data from direcotry: '%s', thumbnails direcotry: '%s'",
           inputDirPath,
+          thumbnailsDirPath,
         );
       try {
-        saveToDatabase(updates, withTracing);
+        saveToDatabase(updates, withTracing, createdAt ?? new Date());
         replicaFilePath = await createReadReplica(inputDirPath);
         await uploadImages(inputDirPath, false, withTracing);
         await uploadImages(thumbnailsDirPath, true, withTracing);
@@ -77,15 +94,24 @@ const getCatalogSyncHandler = (
 const saveToDatabase = (
   value: CatalogUpdatesRoot,
   withTracing: boolean = false,
+  createdAt: Date,
 ): Result<void> => {
-  const commands: Array<(tx: DbTransaction, prevResult: any) => Promise<any>> =
-    [];
-  if (value.discounts.data.length > 0) {
-    commands.push();
-  }
+  const commands: Array<
+    (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
+  > = [];
+  commands.push(...mapDiscountsToCommands(value.discounts, createdAt));
+  commands.push(...mapMeasurementsToCommands(value.measurements, createdAt));
+  commands.push(...mapColorsToCommands(value.colors, createdAt));
+  commands.push(...mapCountriesToCommands(value.countries, createdAt));
+  commands.push(...mapMakersToCommands(value.makers, createdAt));
+  commands.push(...mapGroupsToCommands(value.groups, createdAt));
+  commands.push(...mapSubgroupsToCommands(value.subgroups, createdAt));
+  commands.push(...mapProductsToCommands(value.products, createdAt));
+  commands.push(...mapProductColorsToCommands(value.product_colors, createdAt));
   withTracing &&
     console.log(
-      "🐾 ~ sync-handler ~ saving parsed xml data to catalog databse",
+      "🐾 ~ sync-handler ~ saving parsed xml data to catalog databse, the number of commands to execute in transaction is %i",
+      commands.length,
     );
   return commandManager.mutateTransactional(DatabaseType.Catalog, commands);
 };

@@ -1,5 +1,9 @@
-import type { CatalogDbTransaction, Category as DBCategory } from "@/lib/dal";
-import { createCatalogDb, categories } from "@/lib/dal";
+import type {
+  DatabaseTransaction,
+  DatabaseSchema,
+  Category as DBCategory,
+} from "@/lib/dal";
+import { createCatalogDb, categories, eq } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Category } from "@/lib/domain";
 
@@ -38,20 +42,39 @@ export async function upsertCategory(value: Category): Promise<number> {
 }
 
 export function upsertCategoryTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: Category,
 ): string {
+  let parent: DBCategory | undefined = undefined;
+  if (value.parentUid !== undefined) {
+    parent = tx
+      .select()
+      .from(categories)
+      .where(eq(categories.uid, value.parentUid))
+      .limit(1)
+      .get();
+    if (parent === undefined) {
+      throw new Error(
+        `Unable to save category record as its parent category with id '${value.parentUid}' could not be retrieved.`,
+      );
+    }
+  }
   const result = tx
     .insert(categories)
-    .values(mapDomainToDatabaseModel(value))
+    .values(
+      mapDomainToDatabaseModel({
+        ...value,
+        parentId: parent?.id,
+      }),
+    )
     .onConflictDoUpdate({
       target: categories.uid,
       set: {
+        parentId: parent?.id,
         slug: value.slug,
         title: value.title,
         description: value.description,
         hasImage: value.hasImage,
-        parentId: value.parentId,
         modifiedAt: value.modifiedAt,
         deletedAt: value.deletedAt,
       },

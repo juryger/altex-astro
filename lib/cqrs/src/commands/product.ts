@@ -1,9 +1,20 @@
 import type {
   CatalogDb,
-  CatalogDbTransaction,
+  DatabaseTransaction,
+  DatabaseSchema,
+  MakeCountry as DBMakeCountry,
+  Maker as DBMaker,
   Product as DBProduct,
 } from "@/lib/dal";
-import { createCatalogDb, products } from "@/lib/dal";
+import {
+  categories,
+  createCatalogDb,
+  products,
+  eq,
+  measurementUnits,
+  makeCountries,
+  makers,
+} from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Product } from "@/lib/domain";
 
@@ -66,20 +77,83 @@ export async function upsertProduct(value: Product): Promise<number> {
 }
 
 export function upsertProductTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: Product,
 ): string {
+  const category = tx
+    .select()
+    .from(categories)
+    .where(eq(categories.uid, value.categoryUid))
+    .limit(1)
+    .get();
+  if (category === undefined) {
+    throw new Error(
+      `Unable to save product record as its category with id '${value.categoryUid}' could not be retrieved.`,
+    );
+  }
+
+  const measurement = tx
+    .select()
+    .from(measurementUnits)
+    .where(eq(measurementUnits.uid, value.unitUid))
+    .limit(1)
+    .get();
+  if (measurement === undefined) {
+    throw new Error(
+      `Unable to save product record as its measurment unit with id '${value.unitUid}' could not be retrieved.`,
+    );
+  }
+
+  let country: DBMakeCountry | undefined = undefined;
+  if (value.makeCountryUid !== undefined) {
+    country = tx
+      .select()
+      .from(makeCountries)
+      .where(eq(makeCountries.uid, value.makeCountryUid))
+      .limit(1)
+      .get();
+    if (country === undefined) {
+      throw new Error(
+        `Unable to save product record as its make country with id '${value.unitUid}' could not be retrieved.`,
+      );
+    }
+  }
+
+  let maker: DBMaker | undefined = undefined;
+  if (value.makerUid !== undefined) {
+    maker = tx
+      .select()
+      .from(makers)
+      .where(eq(makers.uid, value.makerUid))
+      .limit(1)
+      .get();
+    if (maker === undefined) {
+      throw new Error(
+        `Unable to save product record as its maker with id '${value.unitUid}' could not be retrieved.`,
+      );
+    }
+  }
+
   const result = tx
     .insert(products)
-    .values(mapDomainToDatabaseModel(value))
+    .values(
+      mapDomainToDatabaseModel({
+        ...value,
+        categoryId: category.id,
+        unitId: measurement.id,
+        makeCountryId: country?.id,
+        makerId: maker?.id,
+      }),
+    )
     .onConflictDoUpdate({
       target: products.uid,
       set: {
         slug: value.slug,
+        categoryId: category?.id,
         title: value.title,
         description: value.description,
         hasImage: value.hasImage,
-        unitId: value.unitId,
+        unitId: measurement?.id,
         dimensionLengthMm: value.dimensionLengthMm,
         dimensionWidthMm: value.dimensionWidthMm,
         dimensionHeightMm: value.dimensionHeightMm,
@@ -90,8 +164,8 @@ export function upsertProductTx(
         price: value.price,
         whsPrice1: value.whsPrice1,
         whsPrice2: value.whsPrice2,
-        makerId: value.makerId,
-        makeCountryId: value.makeCountryId,
+        makerId: maker?.id,
+        makeCountryId: country?.id,
         modifiedAt: value.modifiedAt,
         deletedAt: value.deletedAt,
       },

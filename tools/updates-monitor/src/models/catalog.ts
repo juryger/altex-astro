@@ -2,6 +2,7 @@ type discount_item = {
   "@_id": number;
   "@_uid": string;
   "@_start_summ": number;
+  "@_title": string;
   "@_deleted": number;
 };
 
@@ -75,48 +76,81 @@ type product_item = {
   "@_dim_height": number;
   "@_dim_diameter": number;
   "@_weight": number;
+  "@_parent_uid": string;
   "@_has_image": number;
   "@_deleted": number;
 };
 
 type product_color_item = {
+  "@_id": number;
+  "@_uid": string;
   "@_color_uid": string;
   "@_product_uid": string;
   "@_deleted": number;
-};
-
-type CatalogUpdatesRoot = {
-  discounts: {
-    data: discount_item[];
-  };
-  measurements: {
-    data: measurement_item[];
-  };
-  colors: {
-    data: color_item[];
-  };
-  countries: {
-    data: country_item[];
-  };
-  makers: {
-    data: maker_item[];
-  };
-  groups: {
-    data: group_item[];
-  };
-  subgroups: {
-    data: subgroup_item[];
-  };
-  products: {
-    data: product_item[];
-  };
-  product_colors: {
-    data: product_color_item[];
-  };
 };
 
 type CatalogUpdates = {
   catalog: CatalogUpdatesRoot;
 };
 
-export type { CatalogUpdates, CatalogUpdatesRoot };
+type CatalogUpdatesRoot = {
+  discounts: CatalogUpdatesDiscounts;
+  measurements: CatalogUpdatesMeasurements;
+  colors: CatalogUpdatesColors;
+  countries: CatalogUpdatesCountries;
+  makers: CatalogUpdatesMakers;
+  groups: CatalogUpdatesGroups;
+  subgroups: CatalogUpdatesSubgroups;
+  products: CatalogUpdatesProducts;
+  product_colors: CatalogUpdatesProductColors;
+};
+
+type CatalogUpdatesDiscounts = {
+  data: discount_item[];
+};
+
+type CatalogUpdatesMeasurements = {
+  data: measurement_item[];
+};
+
+type CatalogUpdatesColors = {
+  data: color_item[];
+};
+
+type CatalogUpdatesCountries = {
+  data: country_item[];
+};
+
+type CatalogUpdatesMakers = {
+  data: maker_item[];
+};
+
+type CatalogUpdatesGroups = {
+  data: group_item[];
+};
+
+type CatalogUpdatesSubgroups = {
+  data: subgroup_item[];
+};
+
+type CatalogUpdatesProducts = {
+  data: product_item[];
+};
+
+type CatalogUpdatesProductColors = {
+  data: product_color_item[];
+};
+
+export type {
+  CatalogUpdates,
+  CatalogUpdatesRoot,
+  CatalogUpdatesDiscounts,
+  CatalogUpdatesMeasurements,
+  CatalogUpdatesColors,
+  CatalogUpdatesCountries,
+  CatalogUpdatesMakers,
+  CatalogUpdatesGroups,
+  CatalogUpdatesSubgroups,
+  CatalogUpdatesProducts,
+  CatalogUpdatesProductColors,
+};

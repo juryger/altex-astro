@@ -6,6 +6,7 @@ interface BaseSyncHandler {
   synchronise: (
     inputDirPath: string,
     value: CatalogUpdatesRoot,
+    date: Date | undefined,
   ) => Promise<void>;
 }
 
@@ -42,6 +43,7 @@ interface BaseFileManager {
     dirPath: string,
     fileExt: string,
   ) => Promise<string | null>;
+  getCreatedDate: (filePath: string) => Promise<Date | undefined>;
   copy: (srcPath: string, dstPath: string) => Promise<void>;
   move: (srcPath: string, dstPath: string) => Promise<void>;
   remove: (filePath: string, isDirectory?: boolean) => Promise<void>;

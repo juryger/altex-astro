@@ -1,5 +1,6 @@
 import type {
-  CatalogDbTransaction,
+  DatabaseTransaction,
+  DatabaseSchema,
   MeasurementUnit as DBMeasurementUnit,
 } from "@/lib/dal";
 import { createCatalogDb, measurementUnits } from "@/lib/dal";
@@ -38,7 +39,7 @@ export async function upsertMeasurementUnit(
 }
 
 export function upsertMeasurementUnitTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: MeasurementUnit,
 ): string {
   const result = tx

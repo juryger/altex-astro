@@ -16,9 +16,8 @@ import { getEmailComposer } from "./email-composer";
 import { EmailBody } from "@/lib/email";
 import {
   DatabaseType,
-  type CatalogDbTransaction,
-  type DbTransaction,
-  type OperationsDbTransaction,
+  type DatabaseSchema,
+  type DatabaseTransaction,
 } from "@/lib/dal";
 
 interface CartCheckoutManager {
@@ -58,20 +57,14 @@ const saveCartCheckout = async (
   if (discounts.error !== undefined) {
     return FailedResult(discounts.error);
   }
-  const commands: Array<(tx: DbTransaction) => any> = [];
+  const commands: Array<
+    (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
+  > = [];
   if (guest !== undefined) {
-    commands.push((tx: DbTransaction) =>
-      upsertGuestUserTx(tx as OperationsDbTransaction, encodeUserInput(guest)),
-    );
+    commands.push((tx) => upsertGuestUserTx(tx, encodeUserInput(guest)));
   }
-  commands.push((tx: DbTransaction, prevResult?: any) =>
-    checkoutCartTx(
-      tx as OperationsDbTransaction,
-      items,
-      discounts.data ?? [],
-      userUid,
-      prevResult,
-    ),
+  commands.push((tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) =>
+    checkoutCartTx(tx, items, discounts.data ?? [], userUid, prevResult),
   );
   const result = commandManager.mutateTransactional(
     DatabaseType.Operatons,

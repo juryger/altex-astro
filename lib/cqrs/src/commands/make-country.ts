@@ -1,5 +1,6 @@
 import type {
-  CatalogDbTransaction,
+  DatabaseTransaction,
+  DatabaseSchema,
   MakeCountry as DBMakeCountry,
 } from "@/lib/dal";
 import { createCatalogDb, makeCountries } from "@/lib/dal";
@@ -32,7 +33,7 @@ export async function upsertMakeCountry(value: MakeCountry): Promise<number> {
 }
 
 export function upsertMakeCountryTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: MakeCountry,
 ): string {
   const result = tx

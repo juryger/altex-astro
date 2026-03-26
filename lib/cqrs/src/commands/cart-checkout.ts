@@ -8,7 +8,8 @@ import {
   createOperationsDb,
   cartCheckout,
   cartCheckoutItems,
-  type OperationsDbTransaction,
+  type DatabaseSchema,
+  type DatabaseTransaction,
 } from "@/lib/dal";
 
 export async function checkoutCart(
@@ -65,7 +66,7 @@ export async function checkoutCart(
 }
 
 export function checkoutCartTx(
-  tx: OperationsDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   items: Array<CartItem>,
   discounts: Array<Discount>,
   userUid?: string,

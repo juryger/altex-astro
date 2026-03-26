@@ -1,4 +1,8 @@
-import type { CatalogDbTransaction, Color as DBColor } from "@/lib/dal";
+import type {
+  DatabaseTransaction,
+  DatabaseSchema,
+  Color as DBColor,
+} from "@/lib/dal";
 import { createCatalogDb, colors } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Color } from "@/lib/domain";
@@ -34,7 +38,10 @@ export async function upsertColor(value: Color): Promise<number> {
   return result.at(0)?.insertedId ?? 0;
 }
 
-export function upsertColorTx(tx: CatalogDbTransaction, value: Color): string {
+export function upsertColorTx(
+  tx: DatabaseTransaction<DatabaseSchema>,
+  value: Color,
+): string {
   const result = tx
     .insert(colors)
     .values(mapDomainToDatabaseModel(value))

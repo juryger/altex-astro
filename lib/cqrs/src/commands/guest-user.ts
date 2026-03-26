@@ -1,5 +1,9 @@
 import type { GuestUser } from "@/lib/domain";
-import type { Guest as DBGuest, OperationsDbTransaction } from "@/lib/dal";
+import type {
+  DatabaseSchema,
+  DatabaseTransaction,
+  Guest as DBGuest,
+} from "@/lib/dal";
 import { createOperationsDb } from "@/lib/dal";
 import {
   EnvironmentNames,
@@ -47,7 +51,7 @@ export async function upsertGuestUser(guest: GuestUser): Promise<string> {
 }
 
 export function upsertGuestUserTx(
-  tx: OperationsDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   guest: GuestUser,
 ): string {
   const result = tx

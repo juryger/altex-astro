@@ -1,10 +1,10 @@
 import Database from "better-sqlite3";
 import { sql } from "drizzle-orm";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
-import * as catalog from "./schema/catalog/index.js";
-import * as operations from "./schema/operations/index.js";
-import * as general from "./schema/general/index.js";
-import type { DatabaseTransaction } from "./types/index.js";
+import * as catalog from "./schema/catalog";
+import * as operations from "./schema/operations";
+import * as general from "./schema/general";
+import type { DatabaseTransaction } from "./types";
 
 export {
   eq,
@@ -19,7 +19,6 @@ export {
   or,
   and,
 } from "drizzle-orm";
-
 export type {
   SQLiteColumn,
   SQLiteTransaction,
@@ -38,7 +37,7 @@ export {
   measurementUnits,
   relatedProducts,
   catalogVersion,
-} from "./schema/catalog/index.js";
+} from "./schema/catalog";
 
 export {
   cartCheckout,
@@ -49,11 +48,14 @@ export {
   readReplicas,
   syncLog,
   operationsVersion,
-} from "./schema/operations/index.js";
+} from "./schema/operations";
 
-export { info, generalVersion } from "./schema/general/index.js";
+export { info, generalVersion } from "./schema/general";
 
+export { DatabaseType } from "./types";
 export type {
+  DatabaseSchema,
+  DatabaseTransaction,
   CatalogVersion,
   MeasurementUnit,
   Color,
@@ -74,23 +76,11 @@ export type {
   NotificationAddressee,
   GeneralVersion,
   Info,
-} from "./types/index.js";
-
-export { DatabaseType } from "./types";
+} from "./types";
 
 export type GeneralDb = BetterSQLite3Database<typeof general>;
-export type GeneralDbTransaction = DatabaseTransaction<typeof general>;
-
 export type OperatioinsDb = BetterSQLite3Database<typeof operations>;
-export type OperationsDbTransaction = DatabaseTransaction<typeof operations>;
-
 export type CatalogDb = BetterSQLite3Database<typeof catalog>;
-export type CatalogDbTransaction = DatabaseTransaction<typeof catalog>;
-
-export type DbTransaction =
-  | CatalogDbTransaction
-  | GeneralDbTransaction
-  | OperationsDbTransaction;
 
 const createGeneralDb = (
   path: string | undefined,

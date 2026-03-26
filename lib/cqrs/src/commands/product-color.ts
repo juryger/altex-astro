@@ -1,8 +1,17 @@
 import type {
-  CatalogDbTransaction,
+  DatabaseTransaction,
+  DatabaseSchema,
+  Product as DBProduct,
+  Color as DBColor,
   ProductColor as DbProductColor,
 } from "@/lib/dal";
-import { createCatalogDb, productColors } from "@/lib/dal";
+import {
+  eq,
+  createCatalogDb,
+  productColors,
+  products,
+  colors,
+} from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { ProductColor } from "@/lib/domain";
 
@@ -34,17 +43,47 @@ export async function upsertProductColor(value: ProductColor): Promise<number> {
 }
 
 export function upsertProductColorTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: ProductColor,
 ): string {
+  const product = tx
+    .select()
+    .from(products)
+    .where(eq(products.uid, value.productUid))
+    .limit(1)
+    .get();
+  if (product === undefined) {
+    throw new Error(
+      `Unable to save product color as its based product with id '${value.productUid}' could not be retrieved.`,
+    );
+  }
+
+  const color = tx
+    .select()
+    .from(colors)
+    .where(eq(colors.uid, value.colorUid))
+    .limit(1)
+    .get();
+  if (color === undefined) {
+    throw new Error(
+      `Unable to save product color as its based color with id '${value.colorUid}' could not be retrieved.`,
+    );
+  }
+
   const result = tx
     .insert(productColors)
-    .values(mapDomainToDatabaseModel(value))
+    .values(
+      mapDomainToDatabaseModel({
+        ...value,
+        productId: product.id,
+        colorId: color.id,
+      }),
+    )
     .onConflictDoUpdate({
       target: productColors.uid,
       set: {
-        productId: value.productId,
-        colorId: value.colorId,
+        productId: product.id,
+        colorId: color.id,
         deletedAt: value.deletedAt,
       },
     })

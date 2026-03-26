@@ -39,6 +39,20 @@ export class FileManager implements BaseFileManager {
     return result;
   }
 
+  async getCreatedDate(filePath: string): Promise<Date | undefined> {
+    try {
+      const stats = await fs.stat(filePath);
+      const creationDate = stats.birthtime;
+      console.log("File created at:", creationDate);
+      return Promise.resolve(creationDate);
+    } catch (error) {
+      console.error("Error getting file stats:", error);
+      return Promise.reject(
+        `Failed to extract date of creation of the file '${filePath}'`,
+      );
+    }
+  }
+
   async copy(srcPath: string, dstPath: string): Promise<void> {
     this.withTracing &&
       console.log(

@@ -4,7 +4,8 @@ import {
   type OperatioinsDb,
   type GeneralDb,
   createCatalogDb,
-  type DbTransaction,
+  type DatabaseTransaction,
+  type DatabaseSchema,
 } from "@/lib/dal";
 import {
   EnvironmentNames,
@@ -24,7 +25,9 @@ interface CommandManager {
   mutate: <T = any>(commandFn: () => Promise<T>) => Promise<Result<T>>;
   mutateTransactional: <T = any>(
     type: DatabaseType,
-    commands: Array<(tx: DbTransaction, prevResult?: any) => any>,
+    commands: Array<
+      (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
+    >,
   ) => Result<T>;
 }
 
@@ -46,7 +49,9 @@ function getCommandManager(): CommandManager {
     },
     mutateTransactional: <T = any>(
       type: DatabaseType,
-      commands: Array<(x: DbTransaction, prevResult?: any) => any>,
+      commands: Array<
+        (x: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
+      >,
     ): Result<T> => {
       const db = getDatabase(type);
       if (db === undefined) {

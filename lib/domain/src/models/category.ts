@@ -10,6 +10,7 @@ export const CategorySchema = z.object({
   imageUrl: z.string(),
   thumbnailImageUrl: z.string(),
   parentId: z.number().optional(),
+  parentUid: z.string().optional(),
   parentSlug: z.string().optional(),
   parentTitle: z.string().optional(),
   totalProducts: z.number(),

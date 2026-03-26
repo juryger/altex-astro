@@ -1,4 +1,8 @@
-import type { CatalogDbTransaction, Discount as DBDiscount } from "@/lib/dal";
+import type {
+  DatabaseTransaction,
+  DatabaseSchema,
+  Discount as DBDiscount,
+} from "@/lib/dal";
 import { createCatalogDb, discounts } from "@/lib/dal";
 import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { Discount } from "@/lib/domain";
@@ -31,7 +35,7 @@ export async function upsertDiscount(value: Discount): Promise<number> {
 }
 
 export function upsertDiscountTx(
-  tx: CatalogDbTransaction,
+  tx: DatabaseTransaction<DatabaseSchema>,
   value: Discount,
 ): string {
   const result = tx

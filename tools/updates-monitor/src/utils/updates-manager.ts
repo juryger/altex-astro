@@ -160,6 +160,7 @@ const processArchive = async (
   syncHandler: BaseSyncHandler,
   xmlHandler: BaseXmlHandler,
 ): Promise<void> => {
+  const createdAt = await fileManager.getCreatedDate(filePath);
   const extractedPath = await archiveManager.extract(filePath);
   if (extractedPath.trim().length === 0) {
     return Promise.reject(`Could not extract ZIP file '${filePath}'`);
@@ -172,7 +173,7 @@ const processArchive = async (
     return Promise.reject("Could not find XML file in extracted ZIP folder.");
   }
   const data = await xmlHandler.parse<CatalogUpdates>(xmlFilePath);
-  return await syncHandler.synchronise(extractedPath, data.catalog);
+  return await syncHandler.synchronise(extractedPath, data.catalog, createdAt);
 };
 
 const finalizeArchiveProcessing = async ({

@@ -55,6 +55,7 @@ export const makeCountries = table(
   "make_countries",
   {
     id: t.int().primaryKey({ autoIncrement: true }),
+    code: t.text().notNull(),
     title: t.text().notNull(),
     uid: t.text().notNull(),
     deletedAt: t.int("deleted_at", { mode: "timestamp" }),
