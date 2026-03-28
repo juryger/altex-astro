@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1771972487301,
+      "when": 1774658878099,
       "tag": "0000_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1772450166911,
-      "tag": "0001_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1772595079998,
-      "tag": "0002_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1773722122774,
-      "tag": "0003_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1773722614199,
-      "tag": "0004_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1773732689904,
-      "tag": "0005_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1773957167354,
-      "tag": "0006_operations",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1774406960075,
-      "tag": "0007_operations",
       "breakpoints": true
     }
   ]

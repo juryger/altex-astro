@@ -25,7 +25,7 @@ const mapQueryResultToDomainModel = (entity: DBReadReplica): ReadReplica => {
   };
 };
 
-export async function fetchReadReplica(
+export async function fetchCurrentReadReplica(
   type: number = ReadReplicaTypes.Catalog,
 ): Promise<ReadReplica | undefined> {
   const db = createGeneralDb(

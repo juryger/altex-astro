@@ -37,7 +37,8 @@ export async function setReadReplica({
     .onConflictDoUpdate({
       target: readReplicas.fileName,
       set: {
-        deletedAt: deletedAt,
+        type,
+        deletedAt,
       },
     })
     .returning({ insertedId: readReplicas.id });

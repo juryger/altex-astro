@@ -34,6 +34,9 @@ export {
   FILE_EXTENSIION_ZIP,
   FILE_EXTENSIION_JPG,
   FILE_EXTENSIION_PNG,
+  FILE_EXTENSIION_DB,
+  FILE_EXTENSIION_DB_WAL,
+  FILE_EXTENSIION_DB_SHM,
 } from "./const/extensions";
 
 export { CompanyInfoKeys } from "./const/company-info";
@@ -80,6 +83,7 @@ export { type Maker } from "./models/maker";
 export { type Color } from "./models/color";
 export { type Product, ProductSchema } from "./models/product";
 export { type ProductColor } from "./models/product-color";
+export { type Version } from "./models/version";
 
 export { type Paging, type PagingResult } from "./models/paging";
 export { EmptyPagingResult } from "./models/paging";

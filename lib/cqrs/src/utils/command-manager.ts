@@ -8,6 +8,7 @@ import {
   type DatabaseSchema,
 } from "@/lib/dal";
 import {
+  delay,
   EnvironmentNames,
   FailedResult,
   getErrorMessage,
@@ -16,20 +17,11 @@ import {
   selectEnvironment,
   type Result,
 } from "@/lib/domain";
+import { type CommandManager } from "../core";
 
 const withTracing = regexTrue.test(
   selectEnvironment(EnvironmentNames.ENABLE_TRACING),
 );
-
-interface CommandManager {
-  mutate: <T = any>(commandFn: () => Promise<T>) => Promise<Result<T>>;
-  mutateTransactional: <T = any>(
-    type: DatabaseType,
-    commands: Array<
-      (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
-    >,
-  ) => Result<T>;
-}
 
 function getCommandManager(): CommandManager {
   return {
@@ -39,6 +31,7 @@ function getCommandManager(): CommandManager {
       try {
         return OkResult(await commandFn());
       } catch (error) {
+        console.error(error);
         const errorMessage = getErrorMessage(error);
         console.error(
           "~ command-manager ~ Failed to execute command against database, see deatils below.",
@@ -61,23 +54,16 @@ function getCommandManager(): CommandManager {
         try {
           let prevResult: any | undefined = undefined;
           for (let i = 0; i < commands.length; i++) {
+            const fn = commands[i];
             withTracing &&
               console.log(
                 "🐾 ~ command-manager ~ transaction command: %i of %i, prev command result: %s",
-                i + 1,
+                i,
                 commands.length,
                 prevResult,
               );
-            const fn = commands[i];
             if (fn !== undefined) {
               prevResult = fn(tx, prevResult);
-              withTracing &&
-                console.log(
-                  "🐾 ~ command-manager ~ transaction command: %i of %i, current command result: %s",
-                  i + 1,
-                  commands.length,
-                  prevResult,
-                );
             }
           }
           withTracing &&
@@ -126,4 +112,4 @@ const getDatabase = (
   return result;
 };
 
-export { type CommandManager, getCommandManager };
+export { getCommandManager };

@@ -12,9 +12,10 @@ const mapDomainToDatabaseModel = (entity: Category): DBCategory => {
     uid: entity.uid,
     slug: entity.slug,
     title: entity.title,
-    description: entity.description,
-    hasImage: entity.hasImage,
-    parentId: entity.parentId,
+    description: entity.description !== undefined ? entity.description : null,
+    hasImage: entity.hasImage !== undefined ? entity.hasImage : null,
+    parentId: entity.parentId !== undefined ? entity.parentId : null,
+    deletedAt: entity.deletedAt !== undefined ? entity.deletedAt : null,
   } as DBCategory;
 };
 
@@ -30,11 +31,11 @@ export async function upsertCategory(value: Category): Promise<number> {
       set: {
         slug: value.slug,
         title: value.title,
-        description: value.description,
-        hasImage: value.hasImage,
-        parentId: value.parentId,
+        description: value.description !== undefined ? value.description : null,
+        hasImage: value.hasImage !== undefined ? value.hasImage : null,
+        parentId: value.parentId !== undefined ? value.parentId : null,
         modifiedAt: value.modifiedAt,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: categories.id });
@@ -54,8 +55,12 @@ export function upsertCategoryTx(
       .limit(1)
       .get();
     if (parent === undefined) {
+      console.error(
+        "❌ ~ cqrs ~ parent category not found '%s'",
+        value.parentUid,
+      );
       throw new Error(
-        `Unable to save category record as its parent category with id '${value.parentUid}' could not be retrieved.`,
+        `Unable to save category record as related parent category with id '${value.parentUid}' could not be retrieved.`,
       );
     }
   }
@@ -64,19 +69,19 @@ export function upsertCategoryTx(
     .values(
       mapDomainToDatabaseModel({
         ...value,
-        parentId: parent?.id,
+        parentId: parent !== undefined ? parent.id : undefined,
       }),
     )
     .onConflictDoUpdate({
       target: categories.uid,
       set: {
-        parentId: parent?.id,
+        parentId: parent !== undefined ? parent.id : null,
         slug: value.slug,
         title: value.title,
-        description: value.description,
-        hasImage: value.hasImage,
+        description: value.description !== undefined ? value.description : null,
+        hasImage: value.hasImage !== undefined ? value.hasImage : 0,
         modifiedAt: value.modifiedAt,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: categories.id })

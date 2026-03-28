@@ -48,10 +48,13 @@ export class ZipManager implements BaseArchiveManager {
       filePath,
       dirPath,
     );
-    await this.fileManager.remove(filePath);
-    await this.fileManager.remove(
-      path.join(dirPath, path.basename(filePath, FILE_EXTENSIION_ZIP)),
-    );
+    await this.fileManager.remove({ filePath });
+    await this.fileManager.remove({
+      filePath: path.join(
+        dirPath,
+        path.basename(filePath, FILE_EXTENSIION_ZIP),
+      ),
+    });
     return Promise.resolve();
   }
 }

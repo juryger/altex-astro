@@ -1,16 +1,23 @@
 import path from "path";
 import fs from "fs/promises";
 import {
+  delay,
   EnvironmentNames,
   getErrorMessage,
   ImageContainers,
   ReadReplicaTypes,
+  regexTrue,
   selectEnvironment,
   SyncTypes,
   type Result,
 } from "@/lib/domain";
 import { FILE_EXTENSIION_JPG } from "@/lib/domain";
-import { getCommandManager } from "@/lib/cqrs";
+import {
+  fetchCurrentReadReplica,
+  getCommandManager,
+  getQueryManager,
+  setVersionTx,
+} from "@/lib/cqrs";
 import {
   DatabaseType,
   type DatabaseTransaction,
@@ -33,14 +40,17 @@ import {
   mapSubgroupsToCommands,
 } from "src/models-mapping/catalog";
 
-const fileManager = FileManager.instance();
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
+
+const fileManager = FileManager.instance(withTracing);
 const commandManager = getCommandManager();
+const queryManager = getQueryManager();
 const readReplicaManager = getReadReplicaManager();
 const s3ImageManager = getS3ImageManager();
 
-const getCatalogSyncHandler = (
-  withTracing: boolean = false,
-): BaseSyncHandler => {
+const getCatalogSyncHandler = (): BaseSyncHandler => {
   return {
     getSyncType: () => SyncTypes.Catalog,
     synchronise: async (
@@ -55,45 +65,53 @@ const getCatalogSyncHandler = (
       );
       withTracing &&
         console.log(
-          "🐾 ~ sync-handler ~ sync data from direcotry: '%s', thumbnails direcotry: '%s'",
+          "🐾 ~ sync-handler ~ sync updates data from direcotry: '%s', thumbnails direcotry: '%s', direcotry name: '%s'",
           inputDirPath,
           thumbnailsDirPath,
+          path.basename(inputDirPath),
         );
       try {
-        saveToDatabase(updates, withTracing, createdAt ?? new Date());
-        replicaFilePath = await createReadReplica(inputDirPath);
-        await uploadImages(inputDirPath, false, withTracing);
-        await uploadImages(thumbnailsDirPath, true, withTracing);
-        await deleteImages(
-          [
-            ...updates.groups.data
-              .filter((x) => x["@_deleted"] === 1)
-              .map((x) => x["@_uid"]),
-            ...updates.subgroups.data
-              .filter((x) => x["@_deleted"] === 1)
-              .map((x) => x["@_uid"]),
-            ...updates.products.data
-              .filter((x) => x["@_deleted"] === 1)
-              .map((x) => x["@_uid"]),
-          ],
-          withTracing,
+        saveToDatabase(
+          path.basename(inputDirPath),
+          updates,
+          createdAt ?? new Date(),
         );
+        replicaFilePath = await createReadReplicaDb(inputDirPath);
+        await uploadImages(inputDirPath, false);
+        await uploadImages(thumbnailsDirPath, true);
+        await deleteImages([
+          ...updates.groups.data
+            .filter((x) => x["@_deleted"] === 1)
+            .map((x) => x["@_uid"]),
+          ...updates.subgroups.data
+            .filter((x) => x["@_deleted"] === 1)
+            .map((x) => x["@_uid"]),
+          ...updates.products.data
+            .filter((x) => x["@_deleted"] === 1)
+            .map((x) => x["@_uid"]),
+        ]);
         return Promise.resolve();
       } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        console.error(errorMessage);
+        console.error(
+          "❌ ~ sync-handler ~ Failed to sync catalog updates from '%s', see error details below. %s",
+          inputDirPath,
+          error?.toString(),
+        );
         if (replicaFilePath.trim().length > 0) {
-          await rollbackReadReaplica(replicaFilePath, true);
+          await rollbackReadReplicaDb(replicaFilePath);
         }
-        return Promise.reject(errorMessage);
+        await rollbackMainWithReplicaDb();
+        return Promise.reject(
+          `Failed to apply changes from '${inputDirPath}', see more details below. ${error?.toString()}`,
+        );
       }
     },
   };
 };
 
 const saveToDatabase = (
+  dirName: string,
   value: CatalogUpdatesRoot,
-  withTracing: boolean = false,
   createdAt: Date,
 ): Result<void> => {
   const commands: Array<
@@ -108,6 +126,7 @@ const saveToDatabase = (
   commands.push(...mapSubgroupsToCommands(value.subgroups, createdAt));
   commands.push(...mapProductsToCommands(value.products, createdAt));
   commands.push(...mapProductColorsToCommands(value.product_colors, createdAt));
+  commands.push((tx) => setVersionTx(tx, dirName));
   withTracing &&
     console.log(
       "🐾 ~ sync-handler ~ saving parsed xml data to catalog databse, the number of commands to execute in transaction is %i",
@@ -116,50 +135,79 @@ const saveToDatabase = (
   return commandManager.mutateTransactional(DatabaseType.Catalog, commands);
 };
 
-const createReadReplica = async (
-  inputDirPath: string,
-  withTracing: boolean = false,
-): Promise<string> => {
+const createReadReplicaDb = async (inputDirPath: string): Promise<string> => {
+  const replicaName = path.basename(inputDirPath);
+  const dbCatalogPath = selectEnvironment(EnvironmentNames.DB_CATALOG_PATH);
+  withTracing &&
+    console.log(
+      "🐾 ~ sync-handler ~ creating read replica '%s' for '%s'.",
+      replicaName,
+      dbCatalogPath,
+    );
+  let replicaFilePath: string | undefined;
+  try {
+    replicaFilePath = await readReplicaManager.createDbCopy(
+      dbCatalogPath,
+      replicaName,
+    );
+    withTracing &&
+      console.log(
+        "🐾 ~ sync-handler ~ Initial read replica created: '%s'",
+        replicaFilePath,
+      );
+    await readReplicaManager.set(ReadReplicaTypes.Catalog, replicaFilePath);
+    withTracing &&
+      console.log("🐾 ~ sync-handler ~ new read replica registered.");
+  } catch (error) {
+    if (replicaFilePath !== undefined) {
+      await readReplicaManager.rollback(
+        ReadReplicaTypes.Catalog,
+        replicaFilePath,
+      );
+    }
+    return Promise.reject(error);
+  }
+  return replicaFilePath;
+};
+
+const rollbackReadReplicaDb = async (
+  replicaFilePath: string,
+): Promise<void> => {
+  withTracing &&
+    console.log("🐾 ~ sync-handler ~ roll back replica: '%s'", replicaFilePath);
+  await readReplicaManager.rollback(ReadReplicaTypes.Catalog, replicaFilePath);
+};
+
+const rollbackMainWithReplicaDb = async (): Promise<void> => {
+  const replica = await queryManager.fetch(() =>
+    fetchCurrentReadReplica(ReadReplicaTypes.Catalog),
+  );
+  if (!replica.ok) {
+    return Promise.reject(
+      `Cannot restore main catalog.db as there is no read replica exist. ${replica.error ?? ""}`,
+    );
+  }
   const catalogDbFilePath = selectEnvironment(EnvironmentNames.DB_CATALOG_PATH);
   const replicasDirPath = selectEnvironment(
     EnvironmentNames.DB_READ_REPLICAS_PATH,
   );
-  const replicaDbFilePath = await readReplicaManager.createDbCopy(
-    catalogDbFilePath,
+  const replicaFilePath = path.join(
     replicasDirPath,
-    path.basename(inputDirPath),
+    replica.data?.fileName ?? "",
   );
   withTracing &&
     console.log(
-      "🐾 ~ sync-handler ~ created read replica of catalog.db, replica file: '%s'",
-      replicaDbFilePath,
-    );
-  await readReplicaManager.set(ReadReplicaTypes.Catalog, replicaDbFilePath);
-  withTracing &&
-    console.log(
-      "🐾 ~ sync-handler ~ new read replica registered in operations.db",
-    );
-  return Promise.resolve(replicaDbFilePath);
-};
-
-const rollbackReadReaplica = async (
-  replicaFilePath: string,
-  withTracing: boolean = false,
-): Promise<void> => {
-  withTracing &&
-    console.log(
-      "🐾 ~ sync-handler ~ rolling back replica: '%s'",
+      "🐾 ~ sync-handler ~ rolling back main catalog database '%s' with read replica: '%s'",
+      catalogDbFilePath,
       replicaFilePath,
     );
-  await fileManager.remove(replicaFilePath);
-  await readReplicaManager.rollback(ReadReplicaTypes.Catalog, replicaFilePath);
-  return Promise.resolve();
+  await fileManager.remove({ filePath: catalogDbFilePath });
+  await fileManager.copy(replicaFilePath, catalogDbFilePath);
 };
 
 const uploadImages = async (
   inputDirPath: string,
   isThumbnails: boolean = false,
-  withTracing: boolean = false,
 ): Promise<void> => {
   const files = await fs.readdir(inputDirPath).catch((error) => {
     console.error(getErrorMessage(error), error);
@@ -183,10 +231,7 @@ const uploadImages = async (
   return Promise.resolve();
 };
 
-const deleteImages = async (
-  values: string[],
-  withTracing: boolean = false,
-): Promise<void> => {
+const deleteImages = async (values: string[]): Promise<void> => {
   withTracing &&
     console.log(
       "🐾 ~ sync-handler ~ deleteing image files from S3 bucket, files count: %i",

@@ -22,22 +22,31 @@ const mapDomainToDatabaseModel = (entity: Product): DBProduct => {
   return {
     uid: entity.uid,
     slug: entity.slug,
+    categoryId: entity.categoryId,
     title: entity.title,
-    description: entity.description ?? null,
-    hasImage: entity.hasImage,
+    description: entity.description !== undefined ? entity.description : null,
+    hasImage: entity.hasImage !== undefined ? entity.hasImage : 0,
     unitId: entity.unitId,
-    dimensionLengthMm: entity.dimensionLengthMm ?? null,
-    dimensionWidthMm: entity.dimensionWidthMm ?? null,
-    dimensionHeightMm: entity.dimensionHeightMm ?? null,
-    dimensionDiameterMm: entity.dimensionDiameterMm ?? null,
-    weightGr: entity.weightGr ?? null,
+    dimensionLengthMm:
+      entity.dimensionLengthMm !== undefined ? entity.dimensionLengthMm : null,
+    dimensionWidthMm:
+      entity.dimensionWidthMm !== undefined ? entity.dimensionWidthMm : null,
+    dimensionHeightMm:
+      entity.dimensionHeightMm !== undefined ? entity.dimensionHeightMm : null,
+    dimensionDiameterMm:
+      entity.dimensionDiameterMm !== undefined
+        ? entity.dimensionDiameterMm
+        : null,
+    weightGr: entity.weightGr !== undefined ? entity.weightGr : null,
     quantityInPack: entity.quantityInPack,
     minQuantityToBuy: entity.minQuantityToBuy,
     price: entity.price,
     whsPrice1: entity.whsPrice1,
     whsPrice2: entity.whsPrice2,
-    makerId: entity.makerId,
-    makeCountryId: entity.makeCountryId,
+    makerId: entity.makerId !== undefined ? entity.makerId : null,
+    makeCountryId:
+      entity.makeCountryId !== undefined ? entity.makeCountryId : null,
+    deletedAt: entity.deletedAt !== undefined ? entity.deletedAt : null,
   } as DBProduct;
 };
 
@@ -52,6 +61,7 @@ export async function upsertProduct(value: Product): Promise<number> {
       target: products.uid,
       set: {
         slug: value.slug,
+        categoryId: value.categoryId,
         title: value.title,
         description: value.description,
         hasImage: value.hasImage,
@@ -87,8 +97,9 @@ export function upsertProductTx(
     .limit(1)
     .get();
   if (category === undefined) {
+    console.error("❌ ~ cqrs ~ category not found '%s'", value.categoryUid);
     throw new Error(
-      `Unable to save product record as its category with id '${value.categoryUid}' could not be retrieved.`,
+      `Unable to save product record as related category with id '${value.categoryUid}' could not be retrieved.`,
     );
   }
 
@@ -99,13 +110,17 @@ export function upsertProductTx(
     .limit(1)
     .get();
   if (measurement === undefined) {
+    console.error("❌ ~ cqrs ~ measurement-unit not found '%s'", value.unitUid);
     throw new Error(
-      `Unable to save product record as its measurment unit with id '${value.unitUid}' could not be retrieved.`,
+      `Unable to save product record as related measurment unit with id '${value.unitUid}' could not be retrieved.`,
     );
   }
 
   let country: DBMakeCountry | undefined = undefined;
-  if (value.makeCountryUid !== undefined) {
+  if (
+    value.makeCountryUid !== undefined &&
+    value.makeCountryUid.trim().length > 0
+  ) {
     country = tx
       .select()
       .from(makeCountries)
@@ -113,14 +128,18 @@ export function upsertProductTx(
       .limit(1)
       .get();
     if (country === undefined) {
+      console.error(
+        "❌ ~ cqrs ~ make-country not found '%s'",
+        value.makeCountryUid,
+      );
       throw new Error(
-        `Unable to save product record as its make country with id '${value.unitUid}' could not be retrieved.`,
+        `Unable to save product record as related make country with id '${value.unitUid}' could not be retrieved.`,
       );
     }
   }
 
   let maker: DBMaker | undefined = undefined;
-  if (value.makerUid !== undefined) {
+  if (value.makerUid !== undefined && value.makerUid.trim().length > 0) {
     maker = tx
       .select()
       .from(makers)
@@ -128,8 +147,9 @@ export function upsertProductTx(
       .limit(1)
       .get();
     if (maker === undefined) {
+      console.error("❌ ~ cqrs ~ maker not found '%s'", value.unitUid);
       throw new Error(
-        `Unable to save product record as its maker with id '${value.unitUid}' could not be retrieved.`,
+        `Unable to save product record as related maker with id '${value.unitUid}' could not be retrieved.`,
       );
     }
   }
@@ -141,19 +161,19 @@ export function upsertProductTx(
         ...value,
         categoryId: category.id,
         unitId: measurement.id,
-        makeCountryId: country?.id,
-        makerId: maker?.id,
+        makeCountryId: country !== undefined ? country.id : undefined,
+        makerId: maker !== undefined ? maker.id : undefined,
       }),
     )
     .onConflictDoUpdate({
       target: products.uid,
       set: {
         slug: value.slug,
-        categoryId: category?.id,
+        categoryId: category.id,
         title: value.title,
         description: value.description,
         hasImage: value.hasImage,
-        unitId: measurement?.id,
+        unitId: measurement.id,
         dimensionLengthMm: value.dimensionLengthMm,
         dimensionWidthMm: value.dimensionWidthMm,
         dimensionHeightMm: value.dimensionHeightMm,
@@ -164,10 +184,10 @@ export function upsertProductTx(
         price: value.price,
         whsPrice1: value.whsPrice1,
         whsPrice2: value.whsPrice2,
-        makerId: maker?.id,
-        makeCountryId: country?.id,
+        makerId: maker !== undefined ? maker?.id : null,
+        makeCountryId: country !== undefined ? country.id : null,
         modifiedAt: value.modifiedAt,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: products.id })

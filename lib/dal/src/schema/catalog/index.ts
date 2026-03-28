@@ -5,14 +5,18 @@ import {
 } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 
-export const catalogVersion = table("__version", {
-  id: t.int().primaryKey(),
-  name: t.text().notNull(),
-  createdAt: t
-    .int({ mode: "timestamp" })
-    .default(sql`(unixepoch())`)
-    .notNull(),
-});
+export const catalogVersion = table(
+  "__version",
+  {
+    id: t.int().primaryKey(),
+    name: t.text().notNull(),
+    createdAt: t
+      .int({ mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_name").on(table.name)],
+);
 
 export const measurementUnits = table(
   "measurement_units",
@@ -163,16 +167,20 @@ export const relatedProducts = table(
   (table) => [t.uniqueIndex("idx_related_products_uid").on(table.uid)],
 );
 
-export const productColors = table("product_colors", {
-  id: t.int().primaryKey({ autoIncrement: true }),
-  productId: t
-    .int("product_id")
-    .notNull()
-    .references(() => products.id),
-  colorId: t
-    .int("color_id")
-    .notNull()
-    .references(() => colors.id),
-  uid: t.text().notNull(),
-  deletedAt: t.int("deleted_at", { mode: "timestamp" }),
-});
+export const productColors = table(
+  "product_colors",
+  {
+    id: t.int().primaryKey({ autoIncrement: true }),
+    productId: t
+      .int("product_id")
+      .notNull()
+      .references(() => products.id),
+    colorId: t
+      .int("color_id")
+      .notNull()
+      .references(() => colors.id),
+    uid: t.text().notNull(),
+    deletedAt: t.int("deleted_at", { mode: "timestamp" }),
+  },
+  (table) => [t.uniqueIndex("idx_product_colors_uid").on(table.uid)],
+);

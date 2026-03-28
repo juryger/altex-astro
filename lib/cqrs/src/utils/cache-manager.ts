@@ -8,24 +8,7 @@ import {
 } from "@/lib/domain";
 import { delayWithRetry } from "@/lib/domain";
 import { getMostRecentEvictionStrategy } from "../cache/eviction/most-recent-eviction";
-
-type CacheResult<T = any> = {
-  value?: T;
-  error?: Error;
-  set?: (value: T, staleTimeMs: number) => void;
-  clearSetLock?: () => void;
-};
-
-interface BaseCacheManager {
-  contains: (key: string) => boolean;
-  get: <T = any>(key: string) => Promise<CacheResult<T>>;
-  getSize: () => number;
-  getSizeLimit: () => number;
-  containsInvalid: () => boolean;
-  revalidate: () => boolean;
-  reset: () => void;
-  terminate: () => void;
-}
+import type { BaseCacheManager, CacheResult } from "../core";
 
 class CacheManager implements BaseCacheManager {
   private static __instance: CacheManager;
@@ -294,4 +277,4 @@ class CacheManager implements BaseCacheManager {
   }
 }
 
-export { type CacheResult, CacheManager };
+export { CacheManager };

@@ -1,1 +1,0 @@
-ALTER TABLE `make_countries` ADD `code` text NOT NULL;

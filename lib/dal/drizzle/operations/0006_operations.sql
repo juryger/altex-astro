@@ -1,1 +1,0 @@
-DROP INDEX `idx_sync_log_file_name`;

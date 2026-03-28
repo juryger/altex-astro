@@ -1,7 +1,15 @@
 import path from "path";
 import fs from "fs/promises";
 import type { Dirent } from "fs";
-import { OkResult, FailedResult, getErrorMessage } from "@/lib/domain";
+import {
+  OkResult,
+  FailedResult,
+  getErrorMessage,
+  selectEnvironment,
+  EnvironmentNames,
+  regexTrue,
+  ReadReplicaTypes,
+} from "@/lib/domain";
 import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "@/lib/domain";
 import { SyncTypes } from "@/lib/domain";
 import { getCommandManager } from "@/lib/cqrs";
@@ -18,15 +26,19 @@ import { getCatalogSyncHandler } from "../sync-handlers/catalog.js";
 import { getCatalogXmlHandler } from "../xml-handlers/catalog";
 import type { CatalogUpdates } from "../models/catalog";
 import { getEmailComposer } from "./email-composer";
+import { getReadReplicaManager } from "./read-replica-manager";
 
-const archiveManager = ZipManager.instance();
-const fileManager = FileManager.instance();
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
+
+const archiveManager = ZipManager.instance(withTracing);
+const fileManager = FileManager.instance(withTracing);
 const commandManager = getCommandManager();
 const emailComposer = getEmailComposer();
+const readReplicaManager = getReadReplicaManager();
 
-export function getUpdatesManager(
-  withTracing: boolean = false,
-): UpdatesManager {
+export function getUpdatesManager(): UpdatesManager {
   return {
     run: async ({
       monitoringDirPath,
@@ -46,12 +58,11 @@ export function getUpdatesManager(
         );
       }
       try {
+        const isReplicaValid = await validateReadReplica();
+        if (!isReplicaValid) await createReadReplica();
         return await runInternal({
           monitoringDirPath,
           poisonedDirName,
-          withTracing,
-        }).catch((error) => {
-          return Promise.reject(getErrorMessage(error));
         });
       } catch (error) {
         return Promise.reject(getErrorMessage(error));
@@ -63,11 +74,9 @@ export function getUpdatesManager(
 const runInternal = async ({
   monitoringDirPath,
   poisonedDirName,
-  withTracing,
 }: {
   monitoringDirPath: string;
   poisonedDirName: string;
-  withTracing: boolean;
 }): Promise<number> => {
   const syncHandlers = initSyncHandlers(withTracing);
   const xmlHandlers = initXmlHandlers(withTracing);
@@ -113,7 +122,7 @@ const runInternal = async ({
           "🐾 ~ updates-manager ~ start processing of archive '%s'",
           filePath,
         );
-      return processArchive(filePath, syncHandler, xmlHandler)
+      return processArchive({ filePath, syncHandler, xmlHandler, withTracing })
         .then(async () => {
           withTracing &&
             console.log(
@@ -128,6 +137,11 @@ const runInternal = async ({
           return OkResult(1);
         })
         .catch(async (error) => {
+          console.error(
+            "❌ ~ updates-manager ~ failed to process archive file '%s', see error details below. %s",
+            filePath,
+            error,
+          );
           await finalizeArchiveProcessing({
             filePath,
             poisonedDirName,
@@ -151,28 +165,89 @@ const runInternal = async ({
     : defaultResult;
 };
 
+const validateReadReplica = async (): Promise<boolean> => {
+  return await readReplicaManager
+    .validate(ReadReplicaTypes.Catalog)
+    .then(() => true)
+    .catch((reason) => {
+      console.warn(
+        "⚠️ ~ updates-manager ~ Could not validate that catalog read replica exists, see more details below. %s",
+        reason,
+      );
+      return false;
+    });
+};
+
+const createReadReplica = async (): Promise<string> => {
+  const replicaName = `catalog-initial`;
+  const dbCatalogPath =
+    (selectEnvironment(EnvironmentNames.DB_CATALOG_PATH) as string) ?? "";
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ creating read replica '%s' for '%s'.",
+      replicaName,
+      dbCatalogPath,
+    );
+  let replicaFilePath: string | undefined;
+  try {
+    replicaFilePath = await readReplicaManager.createDbCopy(
+      dbCatalogPath,
+      replicaName,
+    );
+    withTracing &&
+      console.log(
+        "🐾 ~ updates-manager ~ Initial read replica created: '%s'",
+        replicaFilePath,
+      );
+    await readReplicaManager.set(ReadReplicaTypes.Catalog, replicaFilePath);
+    withTracing &&
+      console.log("🐾 ~ updates-manager ~ new read replica registered.");
+  } catch (error) {
+    if (replicaFilePath !== undefined) {
+      await fileManager.remove({ filePath: replicaFilePath });
+    }
+    return Promise.reject(error);
+  }
+  return replicaFilePath;
+};
+
 const isFile = (file: Dirent<string>, extension: string) => {
   return file.isFile() && file.name.toLowerCase().indexOf(extension) > 0;
 };
 
-const processArchive = async (
-  filePath: string,
-  syncHandler: BaseSyncHandler,
-  xmlHandler: BaseXmlHandler,
-): Promise<void> => {
+const processArchive = async ({
+  filePath,
+  syncHandler,
+  xmlHandler,
+  withTracing = false,
+}: {
+  filePath: string;
+  syncHandler: BaseSyncHandler;
+  xmlHandler: BaseXmlHandler;
+  withTracing?: boolean;
+}): Promise<void> => {
   const createdAt = await fileManager.getCreatedDate(filePath);
   const extractedPath = await archiveManager.extract(filePath);
   if (extractedPath.trim().length === 0) {
     return Promise.reject(`Could not extract ZIP file '${filePath}'`);
   }
-  const xmlFilePath = await fileManager.lookupByExtension(
+  const xmlFiles = await fileManager.lookupByExtension(
     extractedPath,
     FILE_EXTENSIION_XML,
   );
-  if (xmlFilePath === null) {
-    return Promise.reject("Could not find XML file in extracted ZIP folder.");
+  const defaultFile = xmlFiles[0];
+  if (xmlFiles.length === 0 || defaultFile === undefined) {
+    return Promise.reject(
+      "Could not find any XML files in extracted ZIP folder.",
+    );
   }
-  const data = await xmlHandler.parse<CatalogUpdates>(xmlFilePath);
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ extracted path: '%s', xml file: '%s'",
+      extractedPath,
+      defaultFile,
+    );
+  const data = await xmlHandler.parse<CatalogUpdates>(defaultFile);
   return await syncHandler.synchronise(extractedPath, data.catalog, createdAt);
 };
 
@@ -199,33 +274,40 @@ const finalizeArchiveProcessing = async ({
     );
     withTracing &&
       console.log(
-        "🐾 ~ updates-manager ~ moving of failed archive to poisoned directory '%s'",
+        "🐾 ~ updates-manager ~ moving failed archive to poisoned directory '%s'",
         poisonedFilePath,
       );
     await fileManager.move(filePath, poisonedFilePath);
+  } else {
+    withTracing &&
+      console.log(
+        "🐾 ~ updates-manager ~ clean up of archive file '%s'",
+        filePath,
+      );
+    await fileManager.remove({ filePath });
   }
 
+  const extractedDirPath = path.join(
+    path.dirname(filePath),
+    path.basename(filePath, FILE_EXTENSIION_ZIP),
+  );
   withTracing &&
     console.log(
-      "🐾 ~ updates-manager ~ clean up of archive file and extracted directory '%s'",
-      filePath,
+      "🐾 ~ updates-manager ~ clean up of xtracted directory '%s'",
+      extractedDirPath,
     );
-  await fileManager.remove(filePath);
-  await fileManager.remove(
-    path.join(
-      path.dirname(filePath),
-      path.basename(filePath, FILE_EXTENSIION_ZIP),
-    ),
-    true,
-  );
+  await fileManager.remove({
+    filePath: extractedDirPath,
+    isDirectory: true,
+  });
 
   withTracing &&
     console.log(
-      "🐾 ~ updates-manager ~ save archive processing log: '%s', error: '%s'",
+      "🐾 ~ updates-manager ~ save archive processing log (message: '%s' or error: '%s')",
       logMessage,
       error?.toString(),
     );
-  const result = await commandManager.mutate<number>(() =>
+  await commandManager.mutate<number>(() =>
     setSyncLog({
       fileName: path.basename(filePath),
       type: syncType,
@@ -252,7 +334,7 @@ const initSyncHandlers = (
   withTracing: boolean,
 ): Record<SyncTypes, BaseSyncHandler | undefined> => {
   return {
-    [SyncTypes.Catalog]: getCatalogSyncHandler(withTracing),
+    [SyncTypes.Catalog]: getCatalogSyncHandler(),
     [SyncTypes.CompanyInfo]: undefined,
     [SyncTypes.Order]: undefined,
   };
@@ -262,7 +344,7 @@ const initXmlHandlers = (
   withTracing: boolean,
 ): Record<SyncTypes, BaseXmlHandler | undefined> => {
   return {
-    [SyncTypes.Catalog]: getCatalogXmlHandler(withTracing),
+    [SyncTypes.Catalog]: getCatalogXmlHandler(),
     [SyncTypes.CompanyInfo]: undefined,
     [SyncTypes.Order]: undefined,
   };

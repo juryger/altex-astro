@@ -16,11 +16,12 @@ import { EnvironmentNames, selectEnvironment } from "@/lib/domain";
 import type { ProductColor } from "@/lib/domain";
 
 const mapDomainToDatabaseModel = (entity: ProductColor): DbProductColor => {
-  return {
+  const result = {
     uid: entity.uid,
     productId: entity.productId,
     colorId: entity.colorId,
   } as DbProductColor;
+  return result;
 };
 
 export async function upsertProductColor(value: ProductColor): Promise<number> {
@@ -53,8 +54,9 @@ export function upsertProductColorTx(
     .limit(1)
     .get();
   if (product === undefined) {
+    console.error("❌ ~ cqrs ~ proudct not found '%s'", value.productUid);
     throw new Error(
-      `Unable to save product color as its based product with id '${value.productUid}' could not be retrieved.`,
+      `Unable to save product-color as related product with id '${value.productUid}' could not be retrieved.`,
     );
   }
 
@@ -65,8 +67,9 @@ export function upsertProductColorTx(
     .limit(1)
     .get();
   if (color === undefined) {
+    console.error("❌ ~ cqrs ~ color not found '%s'", value.colorUid);
     throw new Error(
-      `Unable to save product color as its based color with id '${value.colorUid}' could not be retrieved.`,
+      `Unable to save product-color as related color with id '${value.colorUid}' could not be retrieved.`,
     );
   }
 

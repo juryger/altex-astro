@@ -1,6 +1,8 @@
 import type { ReadReplicaTypes, SyncTypes, Result } from "@/lib/domain";
 import type { CatalogUpdatesRoot } from "../models/catalog";
 
+const POST_CATALOG_DB_UPDATE_DELAY_MS = 1000;
+
 interface BaseSyncHandler {
   getSyncType: () => SyncTypes;
   synchronise: (
@@ -29,24 +31,25 @@ interface BaseImageManager {
 }
 
 interface BaseReadReplicaManager {
-  createDbCopy: (
-    srcPath: string,
-    replicaDirName: string,
-    replicaName: string,
-  ) => Promise<string>;
+  validate: (type: ReadReplicaTypes) => Promise<void>;
+  createDbCopy: (srcPath: string, replicaName: string) => Promise<string>;
   set: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
   rollback: (type: ReadReplicaTypes, filePath: string) => Promise<void>;
 }
 
 interface BaseFileManager {
-  lookupByExtension: (
-    dirPath: string,
-    fileExt: string,
-  ) => Promise<string | null>;
+  lookupByExtension: (dirPath: string, fileExt: string) => Promise<string[]>;
   getCreatedDate: (filePath: string) => Promise<Date | undefined>;
+  checkExistence: (filePath: string) => Promise<boolean>;
   copy: (srcPath: string, dstPath: string) => Promise<void>;
   move: (srcPath: string, dstPath: string) => Promise<void>;
-  remove: (filePath: string, isDirectory?: boolean) => Promise<void>;
+  remove: ({
+    filePath,
+    isDirectory,
+  }: {
+    filePath: string;
+    isDirectory?: boolean;
+  }) => Promise<void>;
 }
 
 interface EmailComposer {
@@ -64,6 +67,7 @@ interface UpdatesManager {
 }
 
 export {
+  POST_CATALOG_DB_UPDATE_DELAY_MS,
   type BaseSyncHandler,
   type BaseXmlHandler,
   type BaseArchiveManager,

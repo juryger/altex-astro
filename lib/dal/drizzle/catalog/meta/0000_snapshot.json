@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "266b0806-7c2d-435d-b16f-5aeb03ac4589",
+  "id": "b14cae56-5a05-4df0-af02-9206adc81610",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "__version": {
@@ -30,7 +30,15 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_name": {
+          "name": "idx_name",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -218,13 +226,6 @@
           "notNull": true,
           "autoincrement": true
         },
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "fromSum": {
           "name": "fromSum",
           "type": "real",
@@ -330,13 +331,6 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
-        },
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         },
         "title": {
           "name": "title",
@@ -457,6 +451,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -510,12 +511,16 @@
           "notNull": true,
           "autoincrement": true
         },
-        "product_code": {
-          "name": "product_code",
+        "code": {
+          "name": "code",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "(SUBSTRING(\"slug\", 1, IIF(LENGTH(\"slug\") >= 4, 4, LENGTH(\"slug\"))) || '-' || \"id\")",
+            "type": "virtual"
+          }
         },
         "slug": {
           "name": "slug",
@@ -576,6 +581,13 @@
         },
         "dimension_height_mm": {
           "name": "dimension_height_mm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dimension_diameter_mm": {
+          "name": "dimension_diameter_mm",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -766,6 +778,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },

@@ -1,2 +1,0 @@
-ALTER TABLE `products` ADD `code` text GENERATED ALWAYS AS (SUBSTRING("title", 1, IIF(LEN("title") >= 4, 4, LEN("title"))) || '-' || "id") VIRTUAL;--> statement-breakpoint
-ALTER TABLE `products` DROP COLUMN `product_code`;

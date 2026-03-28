@@ -6,12 +6,28 @@ import {
   type Result,
 } from "@/lib/domain";
 import { CacheManager } from "./cache-manager";
+import type { QueryManager } from "../core";
 
-interface QueryManager {
-  fetch: <T = any>(
-    queryFn: () => Promise<T>,
-    cacheInfo?: CacheInfo,
-  ) => Promise<Result<T>>;
+function getQueryManager(): QueryManager {
+  const cacheManager = CacheManager.instance({});
+  return {
+    fetch: async <T = any>(
+      queryFn: () => Promise<T>,
+      cacheInfo?: CacheInfo,
+    ) => {
+      if (cacheInfo !== undefined) {
+        const cache = await checkCache(cacheManager, cacheInfo, queryFn);
+        return cache;
+      }
+      try {
+        return OkResult(await queryFn());
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        console.error("❌ ~ query-manager ~ %s", errorMessage);
+        return FailedResult(new Error(errorMessage));
+      }
+    },
+  };
 }
 
 const checkCache = async <T = any>(
@@ -37,26 +53,4 @@ const checkCache = async <T = any>(
     : FailedResult(cache.error);
 };
 
-function getQueryManager(): QueryManager {
-  const cacheManager = CacheManager.instance({});
-  return {
-    fetch: async <T = any>(
-      queryFn: () => Promise<T>,
-      cacheInfo?: CacheInfo,
-    ) => {
-      if (cacheInfo !== undefined) {
-        const cache = await checkCache(cacheManager, cacheInfo, queryFn);
-        return cache;
-      }
-      try {
-        return OkResult(await queryFn());
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        console.error("❌ ~ query-manager ~ %s", errorMessage);
-        return FailedResult(new Error(errorMessage));
-      }
-    },
-  };
-}
-
-export { type QueryManager, getQueryManager };
+export { getQueryManager };

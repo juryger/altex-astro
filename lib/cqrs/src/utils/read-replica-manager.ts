@@ -9,14 +9,8 @@ import {
   getInitialReplica,
 } from "@/lib/domain";
 import { getQueryManager } from "./query-manager";
-import { fetchReadReplica } from "../queries/read-replica";
-
-interface BaseReadReplicaManager {
-  initReplicas: () => Promise<void>;
-  getFilePath: (type: ReadReplicaTypes) => string;
-  get: (type: ReadReplicaTypes) => ReadReplica;
-  set: (type: ReadReplicaTypes, value: ReadReplica) => void;
-}
+import { fetchCurrentReadReplica } from "../queries/read-replica";
+import type { BaseReadReplicaManager } from "../core";
 
 class ReadReplicaManager implements BaseReadReplicaManager {
   private static __instance: ReadReplicaManager;
@@ -51,7 +45,7 @@ class ReadReplicaManager implements BaseReadReplicaManager {
       console.log("🐾 ~ read-replica-manager ~ obtaining current replicas.");
     this.queryManager
       .fetch(
-        () => fetchReadReplica(ReadReplicaTypes.Catalog),
+        () => fetchCurrentReadReplica(ReadReplicaTypes.Catalog),
         getCacheInfo(`${CacheKeys.ReadReplica}-${ReadReplicaTypes.Catalog}`),
       )
       .then((replica) => {

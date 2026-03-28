@@ -4,7 +4,6 @@ import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import * as catalog from "./schema/catalog";
 import * as operations from "./schema/operations";
 import * as general from "./schema/general";
-import type { DatabaseTransaction } from "./types";
 
 export {
   eq,
@@ -78,13 +77,17 @@ export type {
   Info,
 } from "./types";
 
-export type GeneralDb = BetterSQLite3Database<typeof general>;
-export type OperatioinsDb = BetterSQLite3Database<typeof operations>;
-export type CatalogDb = BetterSQLite3Database<typeof catalog>;
+export type GeneralDb = BetterSQLite3Database<typeof general> & {
+  $client: Database.Database;
+};
+export type OperatioinsDb = BetterSQLite3Database<typeof operations> & {
+  $client: Database.Database;
+};
+export type CatalogDb = BetterSQLite3Database<typeof catalog> & {
+  $client: Database.Database;
+};
 
-const createGeneralDb = (
-  path: string | undefined,
-): BetterSQLite3Database<typeof general> => {
+const createGeneralDb = (path: string): GeneralDb => {
   const clientOperations = new Database(path, {
     fileMustExist: true,
   });
@@ -93,33 +96,27 @@ const createGeneralDb = (
 };
 
 const createOperationsDb = (
-  path: string | undefined,
+  path: string,
   catalogPath?: string,
-): BetterSQLite3Database<typeof operations> => {
+): OperatioinsDb => {
   const clientOperations = new Database(path, {
     fileMustExist: true,
   });
   clientOperations.pragma("journal_mode = WAL");
-
   if (catalogPath === undefined) {
     return drizzle({ client: clientOperations, schema: operations });
   }
-
   const db = drizzle({
     client: clientOperations,
     schema: { ...operations, ...catalog },
     logger: true,
   });
-
   const attachDatabase = `ATTACH DATABASE '${catalogPath}' AS catalog`;
   db.run(sql.raw(attachDatabase));
-
   return db;
 };
 
-const createCatalogDb = (
-  path: string | undefined,
-): BetterSQLite3Database<typeof catalog> => {
+const createCatalogDb = (path: string): CatalogDb => {
   const clientCatalog = new Database(path, {
     fileMustExist: true,
   });

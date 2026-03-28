@@ -10,6 +10,7 @@ import type { MakeCountry } from "@/lib/domain";
 const mapDomainToDatabaseModel = (entity: MakeCountry): DBMakeCountry => {
   return {
     uid: entity.uid,
+    code: entity.code,
     title: entity.title,
   } as DBMakeCountry;
 };
@@ -42,6 +43,7 @@ export function upsertMakeCountryTx(
     .onConflictDoUpdate({
       target: makeCountries.uid,
       set: {
+        code: value.code,
         title: value.title,
         deletedAt: value.deletedAt,
       },

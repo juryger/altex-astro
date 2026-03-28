@@ -2,14 +2,18 @@ import { sql } from "drizzle-orm";
 import { sqliteTable as table } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
 
-export const generalVersion = table("__version", {
-  id: t.int().primaryKey(),
-  name: t.text().notNull(),
-  createdAt: t
-    .int({ mode: "timestamp" })
-    .default(sql`(unixepoch())`)
-    .notNull(),
-});
+export const generalVersion = table(
+  "__version",
+  {
+    id: t.int().primaryKey(),
+    name: t.text().notNull(),
+    createdAt: t
+      .int({ mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+  },
+  (table) => [t.uniqueIndex("idx_name").on(table.name)],
+);
 
 export const info = table(
   "info",

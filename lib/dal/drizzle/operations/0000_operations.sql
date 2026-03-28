@@ -51,13 +51,21 @@ CREATE TABLE `__version` (
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `idx_name` ON `__version` (`name`);--> statement-breakpoint
 CREATE TABLE `read_replicas` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text DEFAULT 'catalog' NOT NULL,
+	`type` integer DEFAULT 0 NOT NULL,
 	`file_name` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
-	`is_failed` integer DEFAULT 0,
-	`sync_log` text
+	`deleted_at` integer
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `idx_read_replicas_name` ON `read_replicas` (`name`);
+CREATE UNIQUE INDEX `idx_read_replicas_file_name` ON `read_replicas` (`file_name`);--> statement-breakpoint
+CREATE TABLE `sync_log` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`type` integer,
+	`file_name` text NOT NULL,
+	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
+	`is_failed` integer DEFAULT 0 NOT NULL,
+	`log_message` text
+);

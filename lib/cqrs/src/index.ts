@@ -1,9 +1,13 @@
-export { type CacheResult, CacheManager } from "./utils/cache-manager";
-export {
-  type CommandManager,
-  getCommandManager,
-} from "./utils/command-manager";
-export { type QueryManager, getQueryManager } from "./utils/query-manager";
+export { CacheManager } from "./utils/cache-manager";
+export type {
+  CommandManager,
+  BaseCacheManager,
+  CacheResult,
+  QueryManager,
+  BaseReadReplicaManager,
+} from "./core";
+export { getCommandManager } from "./utils/command-manager";
+export { getQueryManager } from "./utils/query-manager";
 
 export { ReadReplicaManager } from "./utils/read-replica-manager";
 
@@ -14,7 +18,8 @@ export { fetchColors } from "./queries/colors";
 export { fetchCategories, fetchCategoryBySlug } from "./queries/categories";
 export { fetchProducts, fetchProductBySlug } from "./queries/products";
 export { fetchCartCheckout } from "./queries/cart-checkout";
-export { fetchReadReplica } from "./queries/read-replica";
+export { fetchCurrentReadReplica } from "./queries/read-replica";
+export { fetchAllCategories, fetchAllProducts } from "./queries/search";
 
 export { checkoutCart, checkoutCartTx } from "./commands/cart-checkout";
 export { upsertGuestUser, upsertGuestUserTx } from "./commands/guest-user";
@@ -37,5 +42,4 @@ export {
 } from "./commands/product-color";
 export { setReadReplica } from "./commands/read-replica";
 export { setSyncLog } from "./commands/sync-log";
-
-export { fetchAllCategories, fetchAllProducts } from "./queries/search";
+export { setVersionTx } from "./commands/version";

@@ -1,6 +1,6 @@
 import {
   getQueryManager,
-  fetchReadReplica,
+  fetchCurrentReadReplica,
   ReadReplicaManager,
 } from "@/lib/cqrs";
 import { ReadReplicaTypes } from "@/lib/domain";
@@ -14,7 +14,7 @@ let replicaIntervalObj: NodeJS.RefCounted | undefined = undefined;
 
 const readReplicasUpdateMonitor = async () => {
   const replica = await queryManager.fetch(() =>
-    fetchReadReplica(ReadReplicaTypes.Catalog),
+    fetchCurrentReadReplica(ReadReplicaTypes.Catalog),
   );
   if (
     !replica.ok ||

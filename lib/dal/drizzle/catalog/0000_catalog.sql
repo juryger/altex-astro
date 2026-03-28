@@ -4,6 +4,7 @@ CREATE TABLE `__version` (
 	`createdAt` integer DEFAULT (unixepoch()) NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `idx_name` ON `__version` (`name`);--> statement-breakpoint
 CREATE TABLE `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`parent_id` integer,
@@ -32,7 +33,6 @@ CREATE TABLE `colors` (
 CREATE UNIQUE INDEX `idx_colors_uid` ON `colors` (`uid`);--> statement-breakpoint
 CREATE TABLE `discounts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`code` text NOT NULL,
 	`fromSum` real NOT NULL,
 	`title` text NOT NULL,
 	`uid` text NOT NULL,
@@ -51,7 +51,6 @@ CREATE TABLE `make_countries` (
 CREATE UNIQUE INDEX `idx_make_countries_uid` ON `make_countries` (`uid`);--> statement-breakpoint
 CREATE TABLE `makers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`code` text NOT NULL,
 	`title` text NOT NULL,
 	`uid` text NOT NULL,
 	`deleted_at` integer
@@ -72,6 +71,7 @@ CREATE TABLE `product_colors` (
 	`product_id` integer NOT NULL,
 	`color_id` integer NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`color_id`) REFERENCES `colors`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -79,7 +79,7 @@ CREATE TABLE `product_colors` (
 CREATE UNIQUE INDEX `idx_product_colors_uid` ON `product_colors` (`uid`);--> statement-breakpoint
 CREATE TABLE `products` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`product_code` text NOT NULL,
+	`code` text GENERATED ALWAYS AS (SUBSTRING("slug", 1, IIF(LENGTH("slug") >= 4, 4, LENGTH("slug"))) || '-' || "id") VIRTUAL,
 	`slug` text NOT NULL,
 	`category_id` integer NOT NULL,
 	`title` text NOT NULL,
@@ -89,6 +89,7 @@ CREATE TABLE `products` (
 	`dimension_length_mm` integer,
 	`dimension_width_mm` integer,
 	`dimension_height_mm` integer,
+	`dimension_diameter_mm` integer,
 	`weight_gr` integer,
 	`quantity_in_pack` integer DEFAULT 1 NOT NULL,
 	`min_quantity_to_buy` integer DEFAULT 1 NOT NULL,
@@ -113,6 +114,7 @@ CREATE TABLE `related_products` (
 	`product_id` integer NOT NULL,
 	`related_product_id` integer NOT NULL,
 	`uid` text NOT NULL,
+	`deleted_at` integer,
 	FOREIGN KEY (`related_product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
