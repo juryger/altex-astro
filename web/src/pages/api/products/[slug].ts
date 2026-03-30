@@ -17,7 +17,6 @@ const withTracing = regexTrue.test(
 );
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
-  withTracing && console.log("🐾 ~ API-GET ~ product ~ params:", params);
   const { slug } = params;
   if (!slug) {
     return new Response(null, {
@@ -25,12 +24,11 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
       statusText: "Not found",
     });
   }
-
+  withTracing && console.log("🐾 ~ API-GET:product ~ slug:", slug);
   const result = await getQueryManager().fetch<Product | undefined>(
     () => fetchProductBySlug(slug),
     getCacheInfo(`${CacheKeys.ProductItem}:${slug}`, CACHE_STALE_TIMEOUT_1MN),
   );
-
   if (result.error) {
     console.error(result.error);
     return new Response(null, {
@@ -38,8 +36,8 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
       statusText: "Not found",
     });
   }
-
-  withTracing && console.log("🐾 product by slug '%s', %o", slug, result);
+  withTracing &&
+    console.log("🐾 ~ API-GET:product ~ slug '%s', result: %o", slug, result);
   return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {

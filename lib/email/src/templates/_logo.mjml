@@ -16,7 +16,7 @@
       >
         <mj-image
           align="center"
-          src="{{companyWeb}}/altex-logo.png"
+          src="{{companyWebImagesUrl}}/altex-logo.png"
           href="{{companyWeb}}"
           title="АЛТЕХ"
           alt="altex logo"

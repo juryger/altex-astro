@@ -1,10 +1,8 @@
 import path from "path";
 import fs from "fs/promises";
 import {
-  delay,
   EnvironmentNames,
   getErrorMessage,
-  ImageContainers,
   ReadReplicaTypes,
   regexTrue,
   selectEnvironment,
@@ -43,6 +41,9 @@ import {
 const withTracing = regexTrue.test(
   selectEnvironment(EnvironmentNames.ENABLE_TRACING),
 );
+const thumbnailsDirName = selectEnvironment(
+  EnvironmentNames.THUMBNAILS_DIRECOTRY_NAME,
+);
 
 const fileManager = FileManager.instance(withTracing);
 const commandManager = getCommandManager();
@@ -59,10 +60,7 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
       createdAt: Date | undefined,
     ): Promise<void> => {
       let replicaFilePath = "";
-      const thumbnailsDirPath = path.join(
-        inputDirPath,
-        ImageContainers.Thumbnails,
-      );
+      const thumbnailsDirPath = path.join(inputDirPath, thumbnailsDirName);
       withTracing &&
         console.log(
           "🐾 ~ sync-handler ~ sync updates data from direcotry: '%s', thumbnails direcotry: '%s', direcotry name: '%s'",
@@ -77,8 +75,8 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
           createdAt ?? new Date(),
         );
         replicaFilePath = await createReadReplicaDb(inputDirPath);
-        await uploadImages(inputDirPath, false);
-        await uploadImages(thumbnailsDirPath, true);
+        //await uploadImages(inputDirPath, false);
+        //await uploadImages(thumbnailsDirPath, true);
         await deleteImages([
           ...updates.groups.data
             .filter((x) => x["@_deleted"] === 1)
@@ -111,21 +109,23 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
 
 const saveToDatabase = (
   dirName: string,
-  value: CatalogUpdatesRoot,
+  updates: CatalogUpdatesRoot,
   createdAt: Date,
 ): Result<void> => {
   const commands: Array<
     (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
   > = [];
-  commands.push(...mapDiscountsToCommands(value.discounts, createdAt));
-  commands.push(...mapMeasurementsToCommands(value.measurements, createdAt));
-  commands.push(...mapColorsToCommands(value.colors, createdAt));
-  commands.push(...mapCountriesToCommands(value.countries, createdAt));
-  commands.push(...mapMakersToCommands(value.makers, createdAt));
-  commands.push(...mapGroupsToCommands(value.groups, createdAt));
-  commands.push(...mapSubgroupsToCommands(value.subgroups, createdAt));
-  commands.push(...mapProductsToCommands(value.products, createdAt));
-  commands.push(...mapProductColorsToCommands(value.product_colors, createdAt));
+  commands.push(...mapDiscountsToCommands(updates.discounts, createdAt));
+  commands.push(...mapMeasurementsToCommands(updates.measurements, createdAt));
+  commands.push(...mapColorsToCommands(updates.colors, createdAt));
+  commands.push(...mapCountriesToCommands(updates.countries, createdAt));
+  commands.push(...mapMakersToCommands(updates.makers, createdAt));
+  commands.push(...mapGroupsToCommands(updates.groups, createdAt));
+  commands.push(...mapSubgroupsToCommands(updates.subgroups, createdAt));
+  commands.push(...mapProductsToCommands(updates.products, createdAt));
+  commands.push(
+    ...mapProductColorsToCommands(updates.product_colors, createdAt),
+  );
   commands.push((tx) => setVersionTx(tx, dirName));
   withTracing &&
     console.log(
@@ -152,7 +152,7 @@ const createReadReplicaDb = async (inputDirPath: string): Promise<string> => {
     );
     withTracing &&
       console.log(
-        "🐾 ~ sync-handler ~ Initial read replica created: '%s'",
+        "🐾 ~ sync-handler ~ read replica created: '%s'",
         replicaFilePath,
       );
     await readReplicaManager.set(ReadReplicaTypes.Catalog, replicaFilePath);
@@ -209,12 +209,14 @@ const uploadImages = async (
   inputDirPath: string,
   isThumbnails: boolean = false,
 ): Promise<void> => {
-  const files = await fs.readdir(inputDirPath).catch((error) => {
-    console.error(getErrorMessage(error), error);
-    return null;
-  });
+  const files = await fs
+    .readdir(inputDirPath, { withFileTypes: true })
+    .catch((error) => {
+      console.error(getErrorMessage(error), error);
+      return null;
+    });
   const filtered = files?.filter(
-    (file) => path.extname(file) === FILE_EXTENSIION_JPG,
+    (file) => path.extname(file.name).toLowerCase() === FILE_EXTENSIION_JPG,
   );
   if (filtered === undefined || filtered.length === 0) {
     return Promise.resolve();
@@ -226,7 +228,8 @@ const uploadImages = async (
       filtered.length,
     );
   for (const file of filtered) {
-    await s3ImageManager.upload(file, isThumbnails);
+    const filePath = path.join(file.parentPath, file.name.toLowerCase());
+    await s3ImageManager.upload(filePath, isThumbnails);
   }
   return Promise.resolve();
 };
@@ -241,7 +244,6 @@ const deleteImages = async (values: string[]): Promise<void> => {
     await s3ImageManager.delete(uid.concat(FILE_EXTENSIION_JPG));
     await s3ImageManager.delete(uid.concat(FILE_EXTENSIION_JPG), true); // thumbnails
   }
-  return Promise.resolve();
 };
 
 export { getCatalogSyncHandler };

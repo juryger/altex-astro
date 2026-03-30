@@ -293,7 +293,7 @@ const finalizeArchiveProcessing = async ({
   );
   withTracing &&
     console.log(
-      "🐾 ~ updates-manager ~ clean up of xtracted directory '%s'",
+      "🐾 ~ updates-manager ~ clean up of extracted directory '%s'",
       extractedDirPath,
     );
   await fileManager.remove({

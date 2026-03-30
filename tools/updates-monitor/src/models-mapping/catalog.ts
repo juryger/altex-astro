@@ -9,7 +9,6 @@ import {
   upsertProductTx,
 } from "@/lib/cqrs";
 import type { DatabaseSchema, DatabaseTransaction } from "@/lib/dal";
-import { FILE_EXTENSIION_JPG, ImageContainers } from "@/lib/domain";
 import type {
   Category,
   Color,
@@ -182,15 +181,9 @@ const mapGroupsToCommands = (
         uid: x["@_uid"],
         title: x["@_title"],
         slug: slugConverter.transliterate(x["@_title"]),
-        description: x["@_description"],
+        description: x["@_description"] !== "" ? x["@_description"] : undefined,
         hasImage: x["@_has_image"],
-        imageUrl: x["@_uid"].concat(FILE_EXTENSIION_JPG),
-        thumbnailImageUrl: ImageContainers.Thumbnails.concat(
-          "/",
-          x["@_uid"],
-          FILE_EXTENSIION_JPG,
-        ),
-        totalProducts: 0,
+        totalProducts: 0, // calculated during read
         createdAt: createdAt,
         modifiedAt: createdAt,
         deletedAt: x["@_deleted"] === 1 ? createdAt : undefined,
@@ -220,15 +213,9 @@ const mapSubgroupsToCommands = (
         uid: x["@_uid"],
         title: x["@_title"],
         slug: slugConverter.transliterate(x["@_title"]),
-        description: x["@_description"],
+        description: x["@_description"] !== "" ? x["@_description"] : undefined,
         hasImage: x["@_has_image"],
-        imageUrl: x["@_uid"].concat(FILE_EXTENSIION_JPG),
-        thumbnailImageUrl: ImageContainers.Thumbnails.concat(
-          "/",
-          x["@_uid"],
-          FILE_EXTENSIION_JPG,
-        ),
-        totalProducts: 0,
+        totalProducts: 0, // calculated during read
         createdAt: createdAt,
         modifiedAt: createdAt,
         parentUid: x["@_parent_uid"],
@@ -263,31 +250,38 @@ const mapProductsToCommands = (
           .concat(x["@_id"].toString()),
         title: x["@_title"],
         slug: slugConverter.transliterate(x["@_title"]),
-        description: x["@_description"],
-        categoryId: 0,
-        categorySlug: "",
-        categoryTitle: "",
+        description: x["@_description"] !== "" ? x["@_description"] : undefined,
         categoryUid: x["@_parent_uid"],
+        categoryId: 0, // category ID will be look up on insert/update by UID
         quantityInPack: x["@_pack"],
         minQuantityToBuy: x["@_pack_min"],
-        price: x["@_cost_whs1"],
-        whsPrice1: x["@_cost_whs2"],
-        whsPrice2: x["@_cost_whs3"],
-        unitUid: x["@_measurement_uid"],
-        dimensionLengthMm: x["@_dim_length"],
-        dimensionWidthMm: x["@_dim_width"],
-        dimensionHeightMm: x["@_dim_height"],
-        dimensionDiameterMm: x["@_dim_diameter"],
-        weightGr: x["@_weight"],
-        makeCountryUid: x["@_make_country_uid"],
-        makerUid: x["@_maker_uid"],
+        price: parseStringAsFloat(x["@_cost_whs1"]),
+        whsPrice1: parseStringAsFloat(x["@_cost_whs2"]),
+        whsPrice2: parseStringAsFloat(x["@_cost_whs3"]),
+        unitUid:
+          x["@_measurement_uid"] !== "" ? x["@_measurement_uid"] : undefined,
+        dimensionLengthMm:
+          x["@_dim_length"] !== ""
+            ? parseStringAsFloat(x["@_dim_length"])
+            : undefined,
+        dimensionWidthMm:
+          x["@_dim_width"] !== ""
+            ? parseStringAsFloat(x["@_dim_width"])
+            : undefined,
+        dimensionHeightMm:
+          x["@_dim_height"] !== ""
+            ? parseStringAsFloat(x["@_dim_height"])
+            : undefined,
+        dimensionDiameterMm:
+          x["@_dim_diameter"] !== ""
+            ? parseStringAsFloat(x["@_dim_diameter"])
+            : undefined,
+        weightGr:
+          x["@_weight"] !== "" ? parseStringAsFloat(x["@_weight"]) : undefined,
+        makeCountryUid:
+          x["@_make_country_uid"] !== "" ? x["@_make_country_uid"] : undefined,
+        makerUid: x["@_maker_uid"] !== "" ? x["@_maker_uid"] : undefined,
         hasImage: x["@_has_image"],
-        imageUrl: x["@_uid"].concat(FILE_EXTENSIION_JPG),
-        thumbnailImageUrl: ImageContainers.Thumbnails.concat(
-          "/",
-          x["@_uid"],
-          FILE_EXTENSIION_JPG,
-        ),
         createdAt: createdAt,
         modifiedAt: createdAt,
         deletedAt: x["@_deleted"] === 1 ? createdAt : undefined,
@@ -298,6 +292,12 @@ const mapProductsToCommands = (
     item !== undefined && result.push((tx) => upsertProductTx(tx, item));
   }
   return result;
+};
+
+const parseStringAsFloat = (value: string): number => {
+  const normalizedValue =
+    value.indexOf(",") !== -1 ? value.replace(",", ".") : value;
+  return parseFloat(normalizedValue);
 };
 
 const mapProductColorsToCommands = (
@@ -314,9 +314,9 @@ const mapProductColorsToCommands = (
       ({
         id: x["@_id"],
         uid: x["@_uid"],
-        productId: 0,
+        productId: -1,
         productUid: x["@_product_uid"],
-        colorId: 0,
+        colorId: -1,
         colorUid: x["@_color_uid"],
         deletedAt: x["@_deleted"] === 1 ? createdAt : undefined,
       }) as ProductColor,

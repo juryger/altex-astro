@@ -70,7 +70,7 @@
           <mj-image
             align="center"
             href="{{@root.companyWeb}}/catalog/products/{{this.productSlug}}"
-            src="{{@root.catalogImagesUrl}}/products/thumbnails/{{this.productImageFile}}"
+            src="{{@root.companyWebThumbnailsUrl}}/{{this.productImageFile}}"
             alt="{{this.productTitle}}"
             width="90px"
             height="auto"

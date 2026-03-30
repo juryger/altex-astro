@@ -4,6 +4,7 @@ import { type Result } from "@/lib/domain";
 enum EmailTemplates {
   NewOrder = "new-order.html",
   Failure = "failure.html",
+  Success = "success.html",
 }
 
 enum XmlTEmplates {
@@ -29,11 +30,13 @@ interface EmailManager {
     to,
     subject,
     templateParams,
+    isFailure,
   }: {
     from: string;
     to: string;
     subject: string;
     templateParams?: Record<string, string>;
+    isFailure?: boolean;
   }) => Promise<Result>;
 }
 

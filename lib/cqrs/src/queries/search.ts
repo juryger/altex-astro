@@ -1,7 +1,7 @@
 import {
   constructNavigationPath,
   EnvironmentNames,
-  ImageContainers,
+  FILE_EXTENSIION_JPG,
   NO_IMAGE_FILE_NAME,
   ReadReplicaTypes,
   SEARCH_RECORDS_LIMIT,
@@ -24,6 +24,10 @@ import type {
   MakeCountry as DbMakeCountry,
 } from "@/lib/dal";
 
+const thumbnailsDirPath = selectEnvironment(
+  EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL,
+);
+
 type ProductsQueryResult = {
   make_countries: DbMakeCountry | null;
   products: DbProduct;
@@ -38,11 +42,11 @@ const mapCategoryQueryResultToDomainModel = (
     title: entity.title,
     description: entity.description,
     thumbnailImageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Categories,
-        ImageContainers.Thumbnails,
-        entity.hasImage ? entity.uid.concat(".png") : NO_IMAGE_FILE_NAME,
+      items: [
+        thumbnailsDirPath,
+        entity.hasImage !== null && entity.hasImage > 0
+          ? entity.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          : NO_IMAGE_FILE_NAME,
       ],
     }),
   } as SearchResult;
@@ -59,12 +63,10 @@ const mapProductQueryResultToDomainModel = (
     country: entity.make_countries?.title,
     price: entity.products.price,
     thumbnailImageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Products,
-        ImageContainers.Thumbnails,
-        entity.products.hasImage
-          ? entity.products.uid.concat(".png")
+      items: [
+        thumbnailsDirPath,
+        entity.products.hasImage !== null && entity.products.hasImage > 0
+          ? entity.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),

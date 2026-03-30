@@ -70,6 +70,7 @@ export const getEmailComposer = (): EmailComposer => {
                   ...companyInfo.data,
                   successDescription: message,
                 },
+            isFailure,
           });
         })
         .catch((error) => FailedResult(error));

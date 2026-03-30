@@ -16,9 +16,9 @@ import {
   NO_IMAGE_FILE_NAME,
   selectEnvironment,
   EnvironmentNames,
-  ImageContainers,
   EmptyPagingResult,
   ReadReplicaTypes,
+  FILE_EXTENSIION_JPG,
 } from "@/lib/domain";
 import {
   createCatalogDb,
@@ -79,10 +79,13 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
         ? entity.main.products.description
         : undefined,
     unitId:
-      entity.main.products.unitId !== undefined
+      entity.main.products.unitId !== null
         ? entity.main.products.unitId
         : undefined,
-    unit: entity.measurement_units?.title,
+    unit:
+      entity.measurement_units !== null
+        ? entity.measurement_units.title
+        : undefined,
     dimensionLengthMm:
       entity.main.products.dimensionLengthMm !== null
         ? entity.main.products.dimensionLengthMm
@@ -105,27 +108,26 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
     whsPrice1: entity.main.products.whsPrice1,
     whsPrice2: entity.main.products.whsPrice2,
     categoryId: entity.main.products.categoryId,
-    categorySlug: entity.categories?.slug,
-    categoryTitle: entity.categories?.title,
+    categoryUid: entity.categories.uid,
+    categorySlug: entity.categories.slug,
+    categoryTitle: entity.categories.title,
     colors: colorId !== undefined ? [colorId] : [],
     hasImage: entity.main.products.hasImage,
     imageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Products,
+      items: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_IMAGES_URL),
         entity.main.products.hasImage !== null &&
         entity.main.products.hasImage > 0
-          ? entity.main.products.uid.concat(".png")
+          ? entity.main.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
     thumbnailImageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Products,
-        ImageContainers.Thumbnails,
-        entity.main.products.hasImage
-          ? entity.main.products.uid.concat(".png")
+      items: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL),
+        entity.main.products.hasImage !== null &&
+        entity.main.products.hasImage > 0
+          ? entity.main.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
@@ -153,7 +155,6 @@ export async function fetchProducts(
     ReadReplicaTypes.Catalog,
   );
   const db = createCatalogDb(dbCatalogPath);
-
   const parentCategorySq = db
     .select()
     .from(categories)
@@ -179,7 +180,6 @@ export async function fetchProducts(
     .limit(paging.pageSize)
     .offset(paging.page * paging.pageSize)
     .as("main");
-
   const queryResult = await db
     .select()
     .from(productsSq)
@@ -197,9 +197,7 @@ export async function fetchProducts(
       makeCountries,
       eq(productsSq.products.makeCountryId, makeCountries.id),
     );
-
   if (queryResult.length === 0) return EmptyPagingResult<Product>();
-
   const totalCount = await db.$count(
     db
       .select()
@@ -222,21 +220,17 @@ export async function fetchProducts(
   for (var i = 0; i < queryResult.length; i++) {
     const item = queryResult[i];
     if (item === undefined) continue;
-
     const colorId = item.product_colors?.colorId;
     const productIndex = result.findIndex(
       (x) => x !== undefined && x.id === item.main.products.id,
     );
-
     if (productIndex !== -1 && colorId !== undefined) {
       result[productIndex]?.colors?.push(colorId);
       continue;
     }
-
     const value = mapQueryResultToDomainModel(item as QueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
-
   return {
     items: result.filter((x) => x !== undefined),
     pageInfo: {
@@ -255,7 +249,6 @@ export async function fetchProductBySlug(
     ReadReplicaTypes.Catalog,
   );
   const db = createCatalogDb(dbCatalogPath);
-
   const productsSq = db
     .select()
     .from(products)
@@ -263,7 +256,6 @@ export async function fetchProductBySlug(
     .where(and(isNull(products.deletedAt), eq(products.slug, slug)))
     .limit(1)
     .as("main");
-
   var queryResult = await db
     .select()
     .from(productsSq)
@@ -281,7 +273,6 @@ export async function fetchProductBySlug(
       productColors,
       eq(productsSq.products.id, productColors.productId),
     );
-
   if (queryResult.length === 0) return undefined;
 
   var resultIndex = 0;
@@ -289,20 +280,16 @@ export async function fetchProductBySlug(
   for (var i = 0; i < queryResult.length; i++) {
     const item = queryResult[i];
     if (item === undefined) continue;
-
     const colorId = item.product_colors?.colorId;
     const productIndex = result.findIndex(
       (x) => x !== undefined && x.id === item.main.products.id,
     );
-
     if (productIndex !== -1 && colorId !== undefined) {
       result[productIndex]?.colors?.push(colorId);
       continue;
     }
-
     const value = mapQueryResultToDomainModel(item as QueryResult);
     result[resultIndex++] = ProductSchema.parse(value);
   }
-
   return result[0];
 }

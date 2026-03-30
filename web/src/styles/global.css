@@ -2,6 +2,7 @@
 
 @source inline("bg-black");
 @source inline("bg-white");
+@source inline("bg-[#E5E4E2]");
 @source inline("bg-amber-{50,{100..900..100},950}");
 @source inline("bg-orange-{50,{100..900..100},950}");
 @source inline("bg-slate-{50,{100..900..100},950}");
@@ -10,6 +11,9 @@
 @source inline("bg-white-{50,{100..900..100},950}");
 @source inline("bg-black-{50,{100..900..100},950}");
 @source inline("border-gray-{50,{100..900..100},950}");
+@source inline("bg-red-{50,{100..900..100},950}");
+@source inline("bg-blue-{50,{100..900..100},950}");
+@source inline("bg-green-{50,{100..900..100},950}");
 
 @plugin "daisyui" {
   themes:

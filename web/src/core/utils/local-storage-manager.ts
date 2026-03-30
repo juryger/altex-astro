@@ -27,11 +27,6 @@ const LocalStorageKeys = {
 const dateHandler = getDateHandler();
 
 function IsCacheValid(value: Date, invalidateHours: number) {
-  // console.log(
-  //   "🧪 isCacheValid, current: '%o' vs '%o'",
-  //   new Date(),
-  //   value,
-  // );
   const expiresOn = dateHandler.addHours(value, invalidateHours);
   return new Date() <= expiresOn;
 }
@@ -46,7 +41,7 @@ const getLocalStorageManager = (
       );
       if (isSyncing !== null && regexTrue.test(isSyncing)) {
         console.warn(
-          "~ local-storage-manager ~ catalog caching is in progress, cannot start another one.",
+          "⚠️ ~ local-storage-manager ~ catalog caching is in progress, cannot start another one.",
         );
         return false;
       }
@@ -59,7 +54,7 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(lastSyncDate), invalidateHours);
       isSyncRequired &&
         console.warn(
-          "~ local-storage-manager ~ catalog sync is required as it's either expired or new setup (%s))",
+          "⚠️ ~ local-storage-manager ~ catalog sync is required as it's either expired or new setup (%s))",
           lastSyncDate ? new Date(lastSyncDate) : "not set",
         );
       return isSyncRequired;
@@ -103,7 +98,7 @@ const getLocalStorageManager = (
         !IsCacheValid(new Date(themeChangedDate), invalidateHours)
       ) {
         console.warn(
-          "~ local-storage-manger ~ theme settings reset as it's either expired or new setup ('%s').",
+          "⚠️ ~ local-storage-manger ~ theme settings reset as it's either expired or new setup ('%s').",
           themeChangedDate !== null ? new Date(themeChangedDate) : "not set",
         );
         localStorage.removeItem(LocalStorageKeys.USER_THEME_PREFERENCE);

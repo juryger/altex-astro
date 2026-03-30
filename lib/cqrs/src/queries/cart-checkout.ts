@@ -1,5 +1,6 @@
 import {
   EnvironmentNames,
+  FILE_EXTENSIION_JPG,
   NO_IMAGE_FILE_NAME,
   NO_VALUE_ASSIGNED,
   ReadReplicaTypes,
@@ -59,7 +60,7 @@ const mapQueryResultToDomainModel = (
           productSlug: x.products.slug,
           productImageFile:
             x.products.hasImage === 1
-              ? `${x.products.uid}.png`
+              ? `${x.products.uid.toLowerCase()}${FILE_EXTENSIION_JPG}`
               : NO_IMAGE_FILE_NAME,
           colorUid: x.cart_checkout_items.colorUid ?? undefined,
           colorTitle: x.colors?.title ?? NO_VALUE_ASSIGNED,

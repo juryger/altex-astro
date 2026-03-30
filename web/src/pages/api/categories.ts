@@ -11,10 +11,17 @@ import {
   CACHE_STALE_TIMEOUT_1HR,
   CACHE_STALE_TIMEOUT_5MN,
   CacheKeys,
+  EnvironmentNames,
   getCacheInfo,
+  regexTrue,
+  selectEnvironment,
 } from "@/lib/domain";
 
 export const prerender = false;
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+);
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
   const url = URL.parse(request.url);
@@ -26,13 +33,20 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const sorting = extractUrlSorting(url);
   const paging = extractUrlPaging(url);
 
+  withTracing &&
+    console.log(
+      "🐾 ~ API-GET:categories ~ parent slug: '%s', paging: %o, sorging: %o",
+      parentSlug,
+      paging,
+      sorting,
+    );
+
   let cacheKey = skipParentMatch
     ? CacheKeys.CategoriesAll
     : parentSlug === undefined
       ? CacheKeys.CategoriesRoot
       : `${CacheKeys.CategoriesParent}:${parentSlug}`;
   cacheKey = `${cacheKey}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
-
   const result = await getQueryManager().fetch<PagingResult<Category>>(
     () => fetchCategories(skipParentMatch, parentSlug, sorting, paging),
     getCacheInfo(
@@ -43,6 +57,12 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     ),
   );
 
+  withTracing &&
+    console.log(
+      "🐾 ~ API-GET:categories ~ parent slug: '%s', result %o",
+      parentSlug,
+      result,
+    );
   if (result.error) {
     console.error(result.error);
     return new Response(null, {
@@ -50,7 +70,6 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
       statusText: "Not found",
     });
   }
-
   return new Response(JSON.stringify(result.data), {
     status: 200,
     headers: {

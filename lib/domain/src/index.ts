@@ -6,7 +6,6 @@ export {
   INPUT_DEBOUNCE_DELAY_MS,
   SEARCH_RESULTS_LIMIT,
   SEARCH_RECORDS_LIMIT,
-  ImageContainers,
   ReadReplicaTypes,
   SyncTypes,
   SearchTypes,

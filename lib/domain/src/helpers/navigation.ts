@@ -1,18 +1,20 @@
 const defaultPathSeparator: string = "/";
 
 function constructNavigationPath({
-  pathSeparator = defaultPathSeparator,
-  args,
+  items,
+  pathSeparator,
 }: {
-  pathSeparator?: string;
-  args: Array<string>;
+  items: Array<string>;
+  pathSeparator?: string | undefined;
 }): string {
   var result = "";
-  args.forEach(
+  items.forEach(
     (item, index) =>
       (result = result.concat(
         item,
-        index !== args.length - 1 ? pathSeparator : "",
+        index !== items.length - 1
+          ? (pathSeparator ?? defaultPathSeparator)
+          : "",
       )),
   );
   return result;

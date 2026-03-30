@@ -71,7 +71,7 @@ const handleSortOrderChange = (
   url =
     url.indexOf("/sort:") !== -1
       ? url.replace(regexSortParams, sortQuery)
-      : constructNavigationPath({ args: [url, sortQuery] });
+      : constructNavigationPath({ items: [url, sortQuery] });
 
   // reset paging on sort change
   if (url.indexOf("/page:") !== -1)
@@ -106,7 +106,7 @@ const handleDialogClose = (
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryAsc)
-          : constructNavigationPath({ args: [url, sortQueryAsc] });
+          : constructNavigationPath({ items: [url, sortQueryAsc] });
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
@@ -117,7 +117,7 @@ const handleDialogClose = (
       url =
         url.indexOf("/sort:") !== -1
           ? url.replace(regexSortParams, sortQueryDesc)
-          : constructNavigationPath({ args: [url, sortQueryDesc] });
+          : constructNavigationPath({ items: [url, sortQueryDesc] });
       // reset paging on sort change
       if (url.indexOf("/page:") !== -1)
         url = url.replace(regexPageParams, `page:${0}:${pageSize}`);
@@ -139,7 +139,7 @@ const handlePageNavigation = (pageQuery: string) => {
   url =
     url.indexOf("/page:") !== -1
       ? url.replace(regexPageParams, pageQuery)
-      : constructNavigationPath({ args: [url, pageQuery] });
+      : constructNavigationPath({ items: [url, pageQuery] });
   navigate(url);
 };
 

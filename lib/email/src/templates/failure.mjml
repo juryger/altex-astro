@@ -33,7 +33,7 @@
       >
         <mj-image
           align="center"
-          src="{{companyWeb}}/failure.png"
+          src="{{companyWebImagesUrl}}/failure.png"
           alt="Failure logo"
           width="60px"
           height="auto"

@@ -67,7 +67,7 @@ const getEmailManager = (): EmailManager => {
       toCustomer,
       toBackOffice,
       subject,
-      templateParams,
+      templateParams = {},
     }: {
       from: string;
       toCustomer: string;
@@ -129,12 +129,14 @@ const getEmailManager = (): EmailManager => {
       from,
       to,
       subject,
-      templateParams,
+      templateParams = {},
+      isFailure = false,
     }: {
       from: string;
       to: string;
       subject: string;
       templateParams?: Record<string, any>;
+      isFailure?: boolean;
     }): Promise<Result> => {
       withTracing &&
         console.log("🐾 ~ email-service ~ General email: %o", {
@@ -144,7 +146,7 @@ const getEmailManager = (): EmailManager => {
         });
       return prepareTemplate({
         rootPath: selectEnvironment(EnvironmentNames.EMAIL_TEMPLATES_PATH),
-        fileName: EmailTemplates.Failure,
+        fileName: isFailure ? EmailTemplates.Failure : EmailTemplates.Success,
         params: templateParams,
       })
         .then(async (content) => {

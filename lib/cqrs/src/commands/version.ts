@@ -4,7 +4,6 @@ import {
   type CatalogVersion as DBVersion,
   catalogVersion,
 } from "@/lib/dal";
-import type { Version } from "@/lib/domain";
 
 export function setVersionTx(
   tx: DatabaseTransaction<DatabaseSchema>,

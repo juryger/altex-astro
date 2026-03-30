@@ -45,7 +45,7 @@ export const getReadReplicaManager = (): BaseReadReplicaManager => {
         );
       const dstFilePath = path.join(
         replicasDirPath,
-        replicaName + path.extname(srcPath),
+        `${replicaName}${path.extname(srcPath)}`,
       );
       return fileManager.copy(srcPath, dstFilePath).then(() => dstFilePath);
     },

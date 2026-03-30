@@ -15,7 +15,7 @@ import {
   CategoriesSortFields,
   constructNavigationPath,
   EnvironmentNames,
-  ImageContainers,
+  FILE_EXTENSIION_JPG,
   NO_IMAGE_FILE_NAME,
   ReadReplicaTypes,
   selectEnvironment,
@@ -54,21 +54,18 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
         : undefined,
     hasImage: entity.categories.hasImage,
     imageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Categories,
+      items: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_IMAGES_URL),
         entity.categories.hasImage !== null && entity.categories.hasImage > 0
-          ? entity.categories.uid.concat(".png")
+          ? entity.categories.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
     thumbnailImageUrl: constructNavigationPath({
-      args: [
-        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_CATALOG_URL),
-        ImageContainers.Categories,
-        ImageContainers.Thumbnails,
-        entity.categories.hasImage
-          ? entity.categories.uid.concat(".png")
+      items: [
+        selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL),
+        entity.categories.hasImage !== null && entity.categories.hasImage > 0
+          ? entity.categories.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),

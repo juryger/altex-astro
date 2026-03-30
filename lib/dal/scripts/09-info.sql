@@ -63,9 +63,9 @@ SELECT 'CompanyWeb', 'https://altexweb.ru'
 WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyWeb');
 
 INSERT INTO info (name, value)
-SELECT 'CatalogImagesUrl', 'https://s3.regru.cloud/altexweb-images'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CatalogImagesUrl');
+SELECT 'CompanyWebImagesUrl', 'https://s3.regru.cloud/altexweb-images'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyWebImagesUrl');
 
 INSERT INTO info (name, value)
-SELECT 'CatalogThumbnailsUrl', 'https://s3.regru.cloud/altexweb-thumbnails'
-WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CatalogThumbnailsUrl');
+SELECT 'CompanyWebThumbnailsUrl', 'https://s3.regru.cloud/altexweb-thumbnails'
+WHERE NOT EXISTS (SELECT * FROM info WHERE name = 'CompanyWebThumbnailsUrl');

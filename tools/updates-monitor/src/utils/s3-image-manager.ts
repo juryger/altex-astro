@@ -15,6 +15,7 @@ const withTracing = regexTrue.test(
 export const getS3ImageManager = (): BaseImageManager => {
   const s3Client = new S3Client({
     apiVersion: "latest",
+    region: "ap-southeast-6",
     endpoint: selectEnvironment(EnvironmentNames.S3_ENDPOINT_URL),
     credentials: {
       accessKeyId: selectEnvironment(EnvironmentNames.S3_ACCESS_KEY_ID),

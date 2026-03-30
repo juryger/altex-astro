@@ -122,15 +122,12 @@ export const products = table(
     title: t.text().notNull(),
     description: t.text(),
     hasImage: t.int("has_image").default(0),
-    unitId: t
-      .int("unit_id")
-      .references(() => measurementUnits.id)
-      .notNull(),
-    dimensionLengthMm: t.int("dimension_length_mm"),
-    dimensionWidthMm: t.int("dimension_width_mm"),
-    dimensionHeightMm: t.int("dimension_height_mm"),
-    dimensionDiameterMm: t.int("dimension_diameter_mm"),
-    weightGr: t.int("weight_gr"),
+    unitId: t.int("unit_id").references(() => measurementUnits.id),
+    dimensionLengthMm: t.real("dimension_length_mm"),
+    dimensionWidthMm: t.real("dimension_width_mm"),
+    dimensionHeightMm: t.real("dimension_height_mm"),
+    dimensionDiameterMm: t.real("dimension_diameter_mm"),
+    weightGr: t.real("weight_gr"),
     quantityInPack: t.int("quantity_in_pack").default(1).notNull(),
     minQuantityToBuy: t.int("min_quantity_to_buy").default(1).notNull(),
     price: t.real().notNull(),

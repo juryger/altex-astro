@@ -1,7 +1,7 @@
 import type {
-  CatalogDb,
   DatabaseTransaction,
   DatabaseSchema,
+  MeasurementUnit as DBMeasurementUnit,
   MakeCountry as DBMakeCountry,
   Maker as DBMaker,
   Product as DBProduct,
@@ -103,17 +103,23 @@ export function upsertProductTx(
     );
   }
 
-  const measurement = tx
-    .select()
-    .from(measurementUnits)
-    .where(eq(measurementUnits.uid, value.unitUid))
-    .limit(1)
-    .get();
-  if (measurement === undefined) {
-    console.error("❌ ~ cqrs ~ measurement-unit not found '%s'", value.unitUid);
-    throw new Error(
-      `Unable to save product record as related measurment unit with id '${value.unitUid}' could not be retrieved.`,
-    );
+  let measurement: DBMeasurementUnit | undefined = undefined;
+  if (value.unitUid !== undefined && value.unitUid.trim().length > 0) {
+    measurement = tx
+      .select()
+      .from(measurementUnits)
+      .where(eq(measurementUnits.uid, value.unitUid))
+      .limit(1)
+      .get();
+    if (measurement === undefined) {
+      console.error(
+        "❌ ~ cqrs ~ measurement-unit not found '%s'",
+        value.unitUid,
+      );
+      throw new Error(
+        `Unable to save product record as related measurment unit with id '${value.unitUid}' could not be retrieved.`,
+      );
+    }
   }
 
   let country: DBMakeCountry | undefined = undefined;
@@ -160,9 +166,9 @@ export function upsertProductTx(
       mapDomainToDatabaseModel({
         ...value,
         categoryId: category.id,
-        unitId: measurement.id,
-        makeCountryId: country !== undefined ? country.id : undefined,
-        makerId: maker !== undefined ? maker.id : undefined,
+        unitId: measurement?.id,
+        makeCountryId: country?.id,
+        makerId: maker?.id,
       }),
     )
     .onConflictDoUpdate({
@@ -173,7 +179,7 @@ export function upsertProductTx(
         title: value.title,
         description: value.description,
         hasImage: value.hasImage,
-        unitId: measurement.id,
+        unitId: measurement !== undefined ? measurement.id : null,
         dimensionLengthMm: value.dimensionLengthMm,
         dimensionWidthMm: value.dimensionWidthMm,
         dimensionHeightMm: value.dimensionHeightMm,

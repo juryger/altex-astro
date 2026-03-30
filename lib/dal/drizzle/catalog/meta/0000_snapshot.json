@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "b14cae56-5a05-4df0-af02-9206adc81610",
+  "id": "88b78cf1-537e-4a56-8934-cddf11aedaca",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "__version": {
@@ -562,40 +562,40 @@
           "name": "unit_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "dimension_length_mm": {
           "name": "dimension_length_mm",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "dimension_width_mm": {
           "name": "dimension_width_mm",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "dimension_height_mm": {
           "name": "dimension_height_mm",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "dimension_diameter_mm": {
           "name": "dimension_diameter_mm",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "weight_gr": {
           "name": "weight_gr",
-          "type": "integer",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
