@@ -228,7 +228,11 @@ const uploadImages = async (
       filtered.length,
     );
   for (const file of filtered) {
-    const filePath = path.join(file.parentPath, file.name.toLowerCase());
+    const fileName = file.name.toLowerCase();
+    const filePath = path.join(file.parentPath, fileName);
+    if (await s3ImageManager.checkExistance(fileName, isThumbnails)) {
+      await s3ImageManager.delete(fileName, isThumbnails);
+    }
     await s3ImageManager.upload(filePath, isThumbnails);
   }
   return Promise.resolve();
@@ -241,8 +245,14 @@ const deleteImages = async (values: string[]): Promise<void> => {
       values.length,
     );
   for (const uid in values) {
-    await s3ImageManager.delete(uid.concat(FILE_EXTENSIION_JPG));
-    await s3ImageManager.delete(uid.concat(FILE_EXTENSIION_JPG), true); // thumbnails
+    const fileName = uid.concat(FILE_EXTENSIION_JPG).toLowerCase();
+    if (await s3ImageManager.checkExistance(fileName)) {
+      await s3ImageManager.delete(fileName);
+    }
+    // thumbnails
+    if (await s3ImageManager.checkExistance(fileName, true)) {
+      await s3ImageManager.delete(fileName, true);
+    }
   }
 };
 

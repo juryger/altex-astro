@@ -98,59 +98,68 @@ const runInternal = async ({
   const defaultResult = 0;
   const results = await Promise.all(
     files.map((file) => {
-      if (!isFile(file, FILE_EXTENSIION_ZIP)) {
-        return OkResult(defaultResult);
-      }
-      const filePath = path.join(file.parentPath, file.name.toLowerCase());
-      const syncType = getSyncType(filePath);
-      const syncHandler =
-        syncType !== undefined ? syncHandlers[syncType] : undefined;
-      const xmlHandler =
-        syncType !== undefined ? xmlHandlers[syncType] : undefined;
-      if (
-        syncType === undefined ||
-        syncHandler === undefined ||
-        xmlHandler === undefined
-      ) {
-        return FailedResult(
-          new Error(`Could not find sync handler for type ID: ${syncType}`),
-          defaultResult,
-        );
-      }
-      withTracing &&
-        console.log(
-          "🐾 ~ updates-manager ~ start processing of archive '%s'",
-          filePath,
-        );
-      return processArchive({ filePath, syncHandler, xmlHandler, withTracing })
-        .then(async () => {
-          withTracing &&
-            console.log(
-              "🐾 ~ updates-manager ~ processing of archive is done '%s'",
-              filePath,
-            );
-          await finalizeArchiveProcessing({
-            filePath,
-            syncType: syncType,
-            withTracing,
-          });
-          return OkResult(1);
-        })
-        .catch(async (error) => {
-          console.error(
-            "❌ ~ updates-manager ~ failed to process archive file '%s', see error details below. %s",
-            filePath,
-            error,
+      try {
+        if (!isFile(file, FILE_EXTENSIION_ZIP)) {
+          return OkResult(defaultResult);
+        }
+        const filePath = path.join(file.parentPath, file.name.toLowerCase());
+        const syncType = getSyncType(filePath);
+        const syncHandler =
+          syncType !== undefined ? syncHandlers[syncType] : undefined;
+        const xmlHandler =
+          syncType !== undefined ? xmlHandlers[syncType] : undefined;
+        if (
+          syncType === undefined ||
+          syncHandler === undefined ||
+          xmlHandler === undefined
+        ) {
+          return FailedResult(
+            new Error(`Could not find sync handler for type ID: ${syncType}`),
+            defaultResult,
           );
-          await finalizeArchiveProcessing({
+        }
+        withTracing &&
+          console.log(
+            "🐾 ~ updates-manager ~ start processing of archive '%s'",
             filePath,
-            poisonedDirName,
-            syncType,
-            error,
-            withTracing,
+          );
+        return processArchive({
+          filePath,
+          syncHandler,
+          xmlHandler,
+          withTracing,
+        })
+          .then(async () => {
+            withTracing &&
+              console.log(
+                "🐾 ~ updates-manager ~ processing of archive is done '%s'",
+                filePath,
+              );
+            await finalizeArchiveProcessing({
+              filePath,
+              syncType: syncType,
+              withTracing,
+            });
+            return OkResult(1);
+          })
+          .catch(async (error) => {
+            console.error(
+              "❌ ~ updates-manager ~ failed to process archive file '%s', see error details below. %s",
+              filePath,
+              error,
+            );
+            await finalizeArchiveProcessing({
+              filePath,
+              poisonedDirName,
+              syncType,
+              error,
+              withTracing,
+            });
+            return FailedResult(error, defaultResult);
           });
-          return FailedResult(error, defaultResult);
-        });
+      } catch (error) {
+        return FailedResult(new Error(getErrorMessage(error)), defaultResult);
+      }
     }),
   );
 

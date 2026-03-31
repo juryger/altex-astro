@@ -1,32 +1,45 @@
 ---
+interface Props {
+  isDialog?: boolean;
+}
+const { isDialog = false } = Astro.props;
 ---
 
-<alerts-container class="toast toast-top toast-center top-20 z-10 m-2 min-w-lg" >
+<alerts-container class:list={['toast', 'toast-top', 'toast-center', 'z-10', 'm-2', 'min-w-lg', {'top-10': isDialog }, {'top-20': !isDialog } ]} 
+  data-is_dialog={isDialog}
+>
 </alerts-container>
 
 <script>
   import { createAlertMarkup } from "@/web/src/core/utils/alerts-manager";
   import { $alerts } from "@/web/src/core/stores/alert-store";
+  import { regexTrue } from "@/lib/domain";
   
   class AlertsContainer extends HTMLElement {
     private storeUnsubscribe?: () => void;
-
+    private isDialog: boolean = false;
+    
     constructor() {
       super();
     }
 
     connectedCallback() {
+      console.log("🧪 ~ AlertContainer ~ ctor, is_dialog value: %s", this.dataset.is_dialog);
+      this.isDialog = regexTrue.test(this.dataset.is_dialog ?? "false");
+
       this.storeUnsubscribe = $alerts.listen((value) => {
         value.forEach((x, index) => {
-          const key = "alert-".concat(index.toString());
-          const divAlert = document.createElement("div");
-          this.appendChild(divAlert);
-          divAlert.outerHTML = createAlertMarkup(key, x.kind, x.message);
-
-          setTimeout(() => {
-            const alertEl = this.querySelector("#".concat(key));
-            alertEl?.remove();
-          }, 3000)
+          console.log("🧪 ~ AlertContainer ~ this.isDialog: %s,  message.isDialog: %s", this.isDialog, x.isDialog);
+          if (this.isDialog === x.isDialog) {
+            const key = "alert-".concat(index.toString());
+            const divAlert = document.createElement("div");
+            this.appendChild(divAlert);
+            divAlert.outerHTML = createAlertMarkup(key, x.kind, x.message);
+            setTimeout(() => {
+              const alertEl = this.querySelector("#".concat(key));
+              alertEl?.remove();
+            }, 3000)
+          }
         });
       });
     }

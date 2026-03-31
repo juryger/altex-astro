@@ -3,13 +3,15 @@ interface Props {
   length: number | undefined,
   width: number | undefined,
   height: number | undefined,
+  diameter: number | undefined,
 }
-const { length, width, height } = Astro.props;
+const { length, width, height, diameter } = Astro.props;
 
 const titleDimension = "Размеры (мм):";
 const titleLength = "Длина";
 const titleWidth = "Ширина";
 const titleHeight = "Высота";
+const titleDiameter = "Диаметр";
 const titleNone = "Нет";
 ---
 
@@ -20,7 +22,7 @@ const titleNone = "Нет";
     </svg>
     <span>{titleDimension}</span>
   </div>
-  <div class="grid grid-cols-2 gap-2 md:grid-cols-3 pl-5 pt-1 text-left max-w-lg">
+  <div class="grid grid-cols-2 gap-2 md:grid-cols-4 pl-5 pt-1 text-left max-w-lg">
     <div>
       <div class="stat-title">{titleLength}</div>
       <div class="text-sm">{length ?? titleNone}</div>
@@ -32,6 +34,10 @@ const titleNone = "Нет";
     <div>
       <div class="stat-title">{titleHeight}</div>
       <div class="text-sm">{height ?? titleNone}</div>
+    </div>
+    <div>
+      <div class="stat-title">{titleDiameter}</div>
+      <div class="text-sm">{diameter ?? titleNone}</div>
     </div>
   </div>
 </div>

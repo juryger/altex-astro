@@ -35,7 +35,7 @@ const titleUnknown = "(?)";
   data-id={item.id} data-product_uid={item.uid} data-code={item.code} data-title={item.title} data-colors={JSON.stringify(item.colors)} 
   data-price={item.price} data-whs_price1={item.whsPrice1} data-whs_price2={item.whsPrice2} 
   data-category_id={item.categoryId} data-category_slug={item.categorySlug}
-  data-image_url={item.imageUrl} data-thumbnail_image_url={item.thumbnailImageUrl} data-slug={item.slug}
+  data-image_url={item.imageUrl} data-thumbnail_image_url={item.thumbnailImageUrl} data-slug={item.slug} data-is_preview={isPreview}
 >
   <div class="grid grid-cols-1 gap-2 sm:gap-6 sm:grid-cols-3 px-2 py-2">
     <div class="flex flex-col gap-4 px-2 py-2">
@@ -79,7 +79,7 @@ const titleUnknown = "(?)";
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} isDetailed={true} />
       <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
-      <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} />
+      <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} diameter={item.dimensionDiameterMm} />
       <ProductColors productId={item.id} colors={item.colors} colorsReference={references.colors} isDetailed={true} />  
       {/* Add to Shopping Cart */}
       <div class="flex items-center justify-start my-4">
@@ -99,13 +99,14 @@ const titleUnknown = "(?)";
   import { getButtonElementByName, getInputElementByName } from "@/web/src/core/utils/dom-utils";
   import { clientDb } from '@/web/src/core/db/indexed-db';
   import type { CartItem, Product, Color } from "@/lib/domain";
-  import { NO_VALUE_ASSIGNED } from "@/lib/domain";
+  import { NO_VALUE_ASSIGNED, regexTrue } from "@/lib/domain";
 
   class ProductDetails extends HTMLElement {
     private addToCartEl: Element | null = null;
     private value: Product | undefined;
     private controller: AbortController | undefined;
     private colors: Array<Color> = [];
+    private isPreview: boolean = false;
 
     private onAddToCart = (): void => {
       if (!this.value) {
@@ -146,7 +147,8 @@ const titleUnknown = "(?)";
 
       addAlert({ 
         kind: AlertKind.Info, 
-        message: CartMessages.AddedToTheCart
+        message: CartMessages.AddedToTheCart,
+        isDialog: this.isPreview  
       });
     }
 
@@ -155,7 +157,7 @@ const titleUnknown = "(?)";
 
       clientDb.colors.toArray((data) => { 
         if (data.length === 0) {
-          console.warn("~ ProductDetails ~ Product Colors data are not available.");
+          console.warn("⚠️ ~ ProductDetails ~ Product Colors data are not available.");
           return;
         }
         this.colors = data;
@@ -168,12 +170,13 @@ const titleUnknown = "(?)";
 
       this.value = parseProduct(this.dataset);
       if (!this.value) {
-        console.warn(`~ ProductDetails ~ provided values of product via data attributes are not valid or complete.`);
+        console.warn(`⚠️ ~ ProductDetails ~ provided values of product via data attributes are not valid or complete.`);
         return;
       }
       
       this.addToCartEl = getButtonElementByName(this, this.dataset.btn_add_to_cart);
       this.addToCartEl?.addEventListener('click', this.onAddToCart, { signal: this.controller.signal });
+      this.isPreview = regexTrue.test(this.dataset.is_preview ?? "false");
     }
 
     disconnectedCallback() {

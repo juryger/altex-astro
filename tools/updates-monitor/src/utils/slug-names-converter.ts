@@ -2,7 +2,7 @@ import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
 import type { SlugNamesConverter } from "../core";
 
 const cyrillicToLatinMap: Record<string, string> = {
-  a: "a",
+  а: "a",
   б: "b",
   в: "v",
   г: "g",

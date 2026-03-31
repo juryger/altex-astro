@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import {
   S3Client,
+  HeadObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
@@ -25,6 +26,28 @@ export const getS3ImageManager = (): BaseImageManager => {
     },
   });
   return {
+    checkExistance: async (
+      fileName: string,
+      isThumbnail?: boolean,
+    ): Promise<boolean> => {
+      withTracing &&
+        console.log(
+          "🐾 ~ s3-image-uploader ~ check existence of image file with name: '%s', isThumbnail: %s",
+          fileName,
+          isThumbnail,
+        );
+      return await s3Client
+        .send(
+          new HeadObjectCommand({
+            Bucket: isThumbnail
+              ? EnvironmentNames.S3_BUCKET_THUMBNAILS
+              : EnvironmentNames.S3_BUCKET_IMAGES,
+            Key: fileName,
+          }),
+        )
+        .then((value) => Promise.resolve(true))
+        .catch((reason) => Promise.reject(reason));
+    },
     upload: async (
       filePath: string,
       isThumbnail: boolean = false,
@@ -62,16 +85,17 @@ export const getS3ImageManager = (): BaseImageManager => {
           fileName,
           isThumbnail,
         );
-      const command = new DeleteObjectCommand({
-        Bucket: selectEnvironment(
-          isThumbnail
-            ? EnvironmentNames.S3_BUCKET_THUMBNAILS
-            : EnvironmentNames.S3_BUCKET_IMAGES,
-        ),
-        Key: fileName,
-      });
       await s3Client
-        .send(command)
+        .send(
+          new DeleteObjectCommand({
+            Bucket: selectEnvironment(
+              isThumbnail
+                ? EnvironmentNames.S3_BUCKET_THUMBNAILS
+                : EnvironmentNames.S3_BUCKET_IMAGES,
+            ),
+            Key: fileName,
+          }),
+        )
         .then(() => Promise.resolve())
         .catch((reason) => Promise.reject(reason));
     },

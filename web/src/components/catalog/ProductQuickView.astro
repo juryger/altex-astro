@@ -4,6 +4,7 @@ import  { type Product, type Catalog } from '@/lib/domain';
 import ModalDialog from '../ModalDialog.astro';
 import ProductDetails from './ProductDetails.astro';
 import { DialogActionButtons, DialogSize } from '@/web/src/core/const';
+import AlertsContainer from '../alerts/AlertsContainer.astro';
 
 interface Props {
   item: Product;
@@ -30,6 +31,7 @@ const titleDialogHeader = "Карточка товара";
   </div>
 </figure>
 <ModalDialog id={nameProductDialogId} title={titleDialogHeader} size={DialogSize.Large} actionButtons={DialogActionButtons.OK}>
+  <AlertsContainer isDialog={true} />	
   <ProductDetails item={item} references={references} isPreview={true} />
 </ModalDialog>
 

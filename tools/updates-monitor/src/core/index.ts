@@ -26,6 +26,7 @@ interface SlugNamesConverter {
 }
 
 interface BaseImageManager {
+  checkExistance: (fileName: string, isThumbnail?: boolean) => Promise<boolean>;
   upload: (filePath: string, isThumbnail?: boolean) => Promise<void>;
   delete: (fileName: string, isThumbnail?: boolean) => Promise<void>;
 }
