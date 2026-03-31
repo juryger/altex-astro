@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import  { type Product, type Catalog } from "@/lib/domain";
+import  { type Product, type Catalog, NO_VALUE_ASSIGNED } from "@/lib/domain";
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -27,7 +27,6 @@ const inputQuantityName = "pd-quantity-value"
 const titleNoProductDescription = "Нет дополнительной информации о товаре";
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
-const titleUnknown = "(?)";
 ---
 
 <product-details 
@@ -77,7 +76,7 @@ const titleUnknown = "(?)";
         }
       </div>
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} isDetailed={true} />
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? NO_VALUE_ASSIGNED} />
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} diameter={item.dimensionDiameterMm} />
       <ProductColors productId={item.id} colors={item.colors} colorsReference={references.colors} isDetailed={true} />  

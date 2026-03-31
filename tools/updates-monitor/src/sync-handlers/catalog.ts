@@ -63,7 +63,7 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
       const thumbnailsDirPath = path.join(inputDirPath, thumbnailsDirName);
       withTracing &&
         console.log(
-          "🐾 ~ sync-handler ~ sync updates data from direcotry: '%s', thumbnails direcotry: '%s', direcotry name: '%s'",
+          "🐾 ~ sync-handler ~ processing direcotry: '%s', thumbnails direcotry: '%s', direcotry name: '%s'",
           inputDirPath,
           thumbnailsDirPath,
           path.basename(inputDirPath),
@@ -75,8 +75,8 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
           createdAt ?? new Date(),
         );
         replicaFilePath = await createReadReplicaDb(inputDirPath);
-        //await uploadImages(inputDirPath, false);
-        //await uploadImages(thumbnailsDirPath, true);
+        await uploadImages(inputDirPath, false);
+        await uploadImages(thumbnailsDirPath, true);
         await deleteImages([
           ...updates.groups.data
             .filter((x) => x["@_deleted"] === 1)
@@ -115,17 +115,30 @@ const saveToDatabase = (
   const commands: Array<
     (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
   > = [];
-  commands.push(...mapDiscountsToCommands(updates.discounts, createdAt));
-  commands.push(...mapMeasurementsToCommands(updates.measurements, createdAt));
-  commands.push(...mapColorsToCommands(updates.colors, createdAt));
-  commands.push(...mapCountriesToCommands(updates.countries, createdAt));
-  commands.push(...mapMakersToCommands(updates.makers, createdAt));
-  commands.push(...mapGroupsToCommands(updates.groups, createdAt));
-  commands.push(...mapSubgroupsToCommands(updates.subgroups, createdAt));
-  commands.push(...mapProductsToCommands(updates.products, createdAt));
-  commands.push(
-    ...mapProductColorsToCommands(updates.product_colors, createdAt),
-  );
+  withTracing &&
+    console.log("🐾 ~ sync-handler ~ saving parsed changes to database'");
+  updates.discounts !== undefined &&
+    commands.push(...mapDiscountsToCommands(updates.discounts, createdAt));
+  updates.measurements !== undefined &&
+    commands.push(
+      ...mapMeasurementsToCommands(updates.measurements, createdAt),
+    );
+  updates.colors !== undefined &&
+    commands.push(...mapColorsToCommands(updates.colors, createdAt));
+  updates.countries !== undefined &&
+    commands.push(...mapCountriesToCommands(updates.countries, createdAt));
+  updates.makers !== undefined &&
+    commands.push(...mapMakersToCommands(updates.makers, createdAt));
+  updates.groups !== undefined &&
+    commands.push(...mapGroupsToCommands(updates.groups, createdAt));
+  updates.subgroups !== undefined &&
+    commands.push(...mapSubgroupsToCommands(updates.subgroups, createdAt));
+  updates.products !== undefined &&
+    commands.push(...mapProductsToCommands(updates.products, createdAt));
+  updates.product_colors !== undefined &&
+    commands.push(
+      ...mapProductColorsToCommands(updates.product_colors, createdAt),
+    );
   commands.push((tx) => setVersionTx(tx, dirName));
   withTracing &&
     console.log(

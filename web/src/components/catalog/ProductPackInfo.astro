@@ -1,4 +1,5 @@
 ---
+import {NO_VALUE_ASSIGNED} from "@/lib/domain";
 interface Props {
   quantityInPack: number,
   minQuantityToBuy: number,
@@ -13,7 +14,6 @@ const {
 const titlePackaging = "Упаковка:";
 const titleQuantityInPack = "В упаковке:";
 const titleMinQuantityForOrder = "Мин. для заказ:";
-const titleNone = "Нет информации";
 
 ---
 
@@ -27,11 +27,11 @@ const titleNone = "Нет информации";
   <div class="grid grid-cols-2 gap-2 pl-5 pt-1 text-left max-w-lg">
     <div>
       <div class="stat-title">{titleQuantityInPack}</div>
-      <div class="text-sm">{quantityInPack ?? titleNone} {unitOfMeasurement}</div>
+      <div class="text-sm">{quantityInPack ?? NO_VALUE_ASSIGNED} {unitOfMeasurement}</div>
     </div>
     <div>
       <div class="stat-title">{titleMinQuantityForOrder}</div>
-      <div class="text-sm">{minQuantityToBuy ?? titleNone} {unitOfMeasurement}</div>
+      <div class="text-sm">{minQuantityToBuy ?? NO_VALUE_ASSIGNED} {unitOfMeasurement}</div>
     </div>
   </div>
 </div>

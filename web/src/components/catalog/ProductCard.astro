@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import type { Product, Catalog } from '@/lib/domain';
+import { type Product, type Catalog, NO_VALUE_ASSIGNED } from '@/lib/domain';
 import ProductColors from './ProductColors.astro';
 import ProductPrice from './ProductPrice.astro';
 import ProductPackInfo from './ProductPackInfo.astro';
@@ -24,7 +24,6 @@ const nameAddToCardAction = "pc-add-to-card";
 
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
-const titleUnknown = "(?)";
 ---
 
 <product-card 
@@ -59,7 +58,7 @@ const titleUnknown = "(?)";
       {/* Prices block */}
       <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} />
       {/* Pack qunatity details */}
-      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? titleUnknown} />
+      <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? NO_VALUE_ASSIGNED} />
       {/* Maker */}
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       {/* Available colors */}

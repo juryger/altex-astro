@@ -1,4 +1,5 @@
 ---
+import { NO_VALUE_ASSIGNED } from "@/lib/domain";
 interface Props {
   length: number | undefined,
   width: number | undefined,
@@ -12,7 +13,6 @@ const titleLength = "Длина";
 const titleWidth = "Ширина";
 const titleHeight = "Высота";
 const titleDiameter = "Диаметр";
-const titleNone = "Нет";
 ---
 
 <div class="flex flex-col my-2">
@@ -25,19 +25,19 @@ const titleNone = "Нет";
   <div class="grid grid-cols-2 gap-2 md:grid-cols-4 pl-5 pt-1 text-left max-w-lg">
     <div>
       <div class="stat-title">{titleLength}</div>
-      <div class="text-sm">{length ?? titleNone}</div>
+      <div class="text-sm">{length ?? NO_VALUE_ASSIGNED}</div>
     </div>
     <div>
       <div class="stat-title">{titleWidth}</div>
-      <div class="text-sm">{width ?? titleNone}</div>
+      <div class="text-sm">{width ?? NO_VALUE_ASSIGNED}</div>
     </div>
     <div>
       <div class="stat-title">{titleHeight}</div>
-      <div class="text-sm">{height ?? titleNone}</div>
+      <div class="text-sm">{height ?? NO_VALUE_ASSIGNED}</div>
     </div>
     <div>
       <div class="stat-title">{titleDiameter}</div>
-      <div class="text-sm">{diameter ?? titleNone}</div>
+      <div class="text-sm">{diameter ?? NO_VALUE_ASSIGNED}</div>
     </div>
   </div>
 </div>

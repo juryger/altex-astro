@@ -95,83 +95,94 @@ const runInternal = async ({
     );
   }
 
-  const defaultResult = 0;
-  const results = await Promise.all(
-    files.map((file) => {
-      try {
-        if (!isFile(file, FILE_EXTENSIION_ZIP)) {
-          return OkResult(defaultResult);
-        }
-        const filePath = path.join(file.parentPath, file.name.toLowerCase());
-        const syncType = getSyncType(filePath);
-        const syncHandler =
-          syncType !== undefined ? syncHandlers[syncType] : undefined;
-        const xmlHandler =
-          syncType !== undefined ? xmlHandlers[syncType] : undefined;
-        if (
-          syncType === undefined ||
-          syncHandler === undefined ||
-          xmlHandler === undefined
-        ) {
-          return FailedResult(
-            new Error(`Could not find sync handler for type ID: ${syncType}`),
-            defaultResult,
-          );
-        }
-        withTracing &&
-          console.log(
-            "🐾 ~ updates-manager ~ start processing of archive '%s'",
-            filePath,
-          );
-        return processArchive({
-          filePath,
-          syncHandler,
-          xmlHandler,
-          withTracing,
-        })
-          .then(async () => {
-            withTracing &&
-              console.log(
-                "🐾 ~ updates-manager ~ processing of archive is done '%s'",
-                filePath,
-              );
-            await finalizeArchiveProcessing({
-              filePath,
-              syncType: syncType,
-              withTracing,
-            });
-            return OkResult(1);
-          })
-          .catch(async (error) => {
-            console.error(
-              "❌ ~ updates-manager ~ failed to process archive file '%s', see error details below. %s",
-              filePath,
-              error,
-            );
-            await finalizeArchiveProcessing({
-              filePath,
-              poisonedDirName,
-              syncType,
-              error,
-              withTracing,
-            });
-            return FailedResult(error, defaultResult);
-          });
-      } catch (error) {
-        return FailedResult(new Error(getErrorMessage(error)), defaultResult);
-      }
+  const filesWithStats = await Promise.all(
+    files.map(async (file: Dirent<string>) => {
+      const fileName = file.name.toLowerCase();
+      const fullPath = path.join(file.parentPath, fileName);
+      const stats = await fs.stat(fullPath);
+      return {
+        name: fileName,
+        path: fullPath,
+        isArchiveFile:
+          file.isFile() && fileName.indexOf(FILE_EXTENSIION_ZIP) > 0,
+        creationTimeMs: stats.birthtimeMs,
+      };
     }),
   );
 
-  const failedIndex = results.findIndex((x) => !x.ok);
-  if (failedIndex !== -1) return Promise.reject(results[failedIndex]?.error);
+  const filesByCreationTime = filesWithStats.sort(
+    (a, b) => a.creationTimeMs - b.creationTimeMs,
+  );
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ files discovered in the following order: %o",
+      filesByCreationTime.filter((x) => x.isArchiveFile),
+    );
 
-  return results.every((x) => x.ok)
-    ? results.reduce(
-        (acc, curr) => acc + (curr.data ?? defaultResult),
-        defaultResult,
-      )
-    : defaultResult;
+  let result = 0;
+  for (const file of filesByCreationTime) {
+    if (!file.isArchiveFile) continue;
+
+    const syncType = getSyncType(file.path);
+    if (syncType === undefined) {
+      console.warn(
+        "⚠️ ~ update-manager ~ could not obtain SyncType for the file '%s'",
+        file.path,
+      );
+      continue;
+    }
+
+    const syncHandler =
+      syncType !== undefined ? syncHandlers[syncType] : undefined;
+    const xmlHandler =
+      syncType !== undefined ? xmlHandlers[syncType] : undefined;
+    if (syncHandler === undefined || xmlHandler === undefined) {
+      console.warn(
+        "⚠️ ~ update-manager ~ could not find sync handler by type '%i' for '%s'",
+        syncType,
+        file.path,
+      );
+      continue;
+    }
+    try {
+      withTracing &&
+        console.log(
+          "🐾 ~ updates-manager ~ start processing of archive '%s'",
+          file.name,
+        );
+      await processArchive({
+        filePath: file.path,
+        syncHandler,
+        xmlHandler,
+        withTracing,
+      });
+      withTracing &&
+        console.log(
+          "🐾 ~ updates-manager ~ processing of archive is done '%s'",
+          file.path,
+        );
+      await finalizeArchiveProcessing({
+        filePath: file.path,
+        syncType,
+        withTracing,
+      });
+      result += 1;
+    } catch (error) {
+      console.error(
+        "❌ ~ updates-manager ~ failed to process archive file '%s', see error details below. %s",
+        file.path,
+        error,
+      );
+      await finalizeArchiveProcessing({
+        filePath: file.path,
+        poisonedDirName,
+        syncType,
+        error: new Error(getErrorMessage(error)),
+        withTracing,
+      });
+    }
+  }
+  return result;
 };
 
 const validateReadReplica = async (): Promise<boolean> => {
@@ -218,10 +229,6 @@ const createReadReplica = async (): Promise<string> => {
     return Promise.reject(error);
   }
   return replicaFilePath;
-};
-
-const isFile = (file: Dirent<string>, extension: string) => {
-  return file.isFile() && file.name.toLowerCase().indexOf(extension) > 0;
 };
 
 const processArchive = async ({
@@ -325,16 +332,16 @@ const finalizeArchiveProcessing = async ({
     }),
   );
 
-  withTracing &&
-    console.log(
-      "🐾 ~ updates-manager ~ sending email regading archive processing to administrator",
-    );
-  await emailComposer.sendGeneralEmail(
-    error !== null
-      ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
-      : EmailBody.WebsiteUpdateSuccess,
-    error !== null,
-  );
+  // withTracing &&
+  //   console.log(
+  //     "🐾 ~ updates-manager ~ sending email regading archive processing to administrator",
+  //   );
+  // await emailComposer.sendGeneralEmail(
+  //   error !== null
+  //     ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
+  //     : EmailBody.WebsiteUpdateSuccess,
+  //   error !== null,
+  // );
 
   return Promise.resolve();
 };

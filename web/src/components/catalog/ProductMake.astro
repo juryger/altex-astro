@@ -1,4 +1,6 @@
 ---
+import {NO_VALUE_ASSIGNED} from "@/lib/domain";
+
 interface Props {
   maker: string | undefined,
   makeCountry: string | undefined,
@@ -8,7 +10,6 @@ const { maker, makeCountry } = Astro.props;
 const titleMakerInfo = "Производитель:";
 const titleMaker = "Бренд:";
 const titleMakeCountry = "Страна:";
-const titleNone = "Нет информации";
 ---
 
 <div class="flex flex-col">
@@ -22,11 +23,11 @@ const titleNone = "Нет информации";
   <div class="grid grid-cols-2 gap-2 pl-5 pt-1 text-left max-w-lg">
     <div>
       <div class="stat-title">{titleMaker}</div>
-      <div class="text-sm truncate max-w-30 md:max-w-60" title={maker ?? titleNone}>{maker ?? titleNone}</div>
+      <div class="text-sm truncate max-w-30 md:max-w-60" title={maker ?? ""}>{maker ?? NO_VALUE_ASSIGNED}</div>
     </div>
     <div>
       <div class="stat-title">{titleMakeCountry}</div>
-      <div class="text-sm truncate max-w-30 md:max-w-60" title={makeCountry ?? titleNone}>{makeCountry ?? titleNone}</div>
+      <div class="text-sm truncate max-w-30 md:max-w-60" title={makeCountry ?? ""}>{makeCountry ?? NO_VALUE_ASSIGNED}</div>
     </div>
   </div>
 </div>
