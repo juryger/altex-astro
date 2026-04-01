@@ -27,7 +27,7 @@ export async function upsertDiscount(value: Discount): Promise<number> {
       set: {
         fromSum: value.fromSum,
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: discounts.id });
@@ -46,7 +46,7 @@ export function upsertDiscountTx(
       set: {
         fromSum: value.fromSum,
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: discounts.id })

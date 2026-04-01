@@ -25,7 +25,7 @@ export async function upsertMaker(value: Maker): Promise<number> {
       target: makers.uid,
       set: {
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: makers.id });
@@ -43,7 +43,7 @@ export function upsertMakerTx(
       target: makers.uid,
       set: {
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: makers.id })

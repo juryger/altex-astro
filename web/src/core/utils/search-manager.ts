@@ -1,10 +1,16 @@
 import { SearchTypes, type SearchResult } from "@/lib/domain";
 import { trimEnd } from "./text-formatter";
-import { formatCurrency } from "@/lib/domain";
+import { formatCurrency, NO_VALUE_ASSIGNED } from "@/lib/domain";
 
 const titleCategory = "Раздел";
 const titleCountryMake = "🌍";
 const titleProductPrice = "Цена:";
+
+const createSearchResultMarkup = (value: SearchResult): string => {
+  return value.type === SearchTypes.Category
+    ? getCategoryItemMarkup(value)
+    : getProductItemMarkup(value);
+};
 
 const getCategoryItemMarkup = (value: SearchResult): string => {
   return `
@@ -70,7 +76,7 @@ const getProductItemMarkup = (value: SearchResult): string => {
       <span class="text-xs" title="${value.description}">
         ${trimEnd(value.description ?? "", 180)}
       </span>
-      <span class="text-xs">${value.country !== null ? titleCountryMake + "&nbsp;" + value.country : ""}</span>
+      <span class="text-xs">${value.country !== undefined ? titleCountryMake + "&nbsp;" + value.country : NO_VALUE_ASSIGNED}</span>
     </div>
     <div class="grow-0 flex flex-col items-end">
       <!-- Price -->
@@ -78,12 +84,6 @@ const getProductItemMarkup = (value: SearchResult): string => {
       <span class="text-xs">${formatCurrency(value.price ?? 0)}</span>
     </div>
   `;
-};
-
-const createSearchResultMarkup = (value: SearchResult): string => {
-  return value.type === SearchTypes.Category
-    ? getCategoryItemMarkup(value)
-    : getProductItemMarkup(value);
 };
 
 export { createSearchResultMarkup };

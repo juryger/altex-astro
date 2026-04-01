@@ -31,7 +31,7 @@ export async function upsertColor(value: Color): Promise<number> {
         title: value.title,
         fillColor: value.fillColor,
         borderColor: value.borderColor,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: colors.id });
@@ -52,7 +52,7 @@ export function upsertColorTx(
         title: value.title,
         fillColor: value.fillColor,
         borderColor: value.borderColor,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: colors.id })

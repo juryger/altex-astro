@@ -36,7 +36,7 @@ export async function upsertProductColor(value: ProductColor): Promise<number> {
       set: {
         productId: value.productId,
         colorId: value.colorId,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: productColors.id });
@@ -87,7 +87,7 @@ export function upsertProductColorTx(
       set: {
         productId: product.id,
         colorId: color.id,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: productColors.id })

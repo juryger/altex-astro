@@ -31,7 +31,7 @@ export async function upsertMeasurementUnit(
       set: {
         code: value.code,
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: measurementUnits.id });
@@ -50,7 +50,7 @@ export function upsertMeasurementUnitTx(
       set: {
         code: value.code,
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: measurementUnits.id })

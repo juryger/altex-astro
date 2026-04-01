@@ -12,11 +12,13 @@ const mapDomainToDatabaseModel = ({
   fileName: string;
   deletedAt?: Date | undefined;
 }): DBReadReplica => {
-  return {
+  const result = {
     type: type,
     fileName: fileName,
     deletedAt: deletedAt ?? null,
   } as DBReadReplica;
+  console.log("🧪 ~ command:read-replica ~ maping: %o", result);
+  return result;
 };
 
 export async function setReadReplica({
@@ -38,9 +40,11 @@ export async function setReadReplica({
       target: readReplicas.fileName,
       set: {
         type,
-        deletedAt,
+        createdAt: new Date(),
+        deletedAt: deletedAt !== undefined ? deletedAt : null,
       },
     })
     .returning({ insertedId: readReplicas.id });
+  console.log("🧪 ~ command:read-replica ~ result: %o", result);
   return result.at(0)?.insertedId ?? 0;
 }

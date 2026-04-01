@@ -4,9 +4,9 @@ type SearchResult = {
   type: SearchTypes;
   slug: string;
   title: string;
-  description?: string;
-  country?: string;
-  price?: number;
+  description?: string | undefined;
+  country?: string | undefined;
+  price?: number | undefined;
   thumbnailImageUrl: string;
 };
 

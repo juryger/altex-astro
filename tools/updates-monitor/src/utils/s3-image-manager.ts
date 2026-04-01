@@ -36,17 +36,23 @@ export const getS3ImageManager = (): BaseImageManager => {
           fileName,
           isThumbnail,
         );
-      return await s3Client
-        .send(
+      try {
+        await s3Client.send(
           new HeadObjectCommand({
             Bucket: isThumbnail
               ? EnvironmentNames.S3_BUCKET_THUMBNAILS
               : EnvironmentNames.S3_BUCKET_IMAGES,
             Key: fileName,
           }),
-        )
-        .then((value) => Promise.resolve(true))
-        .catch((reason) => Promise.reject(reason));
+        );
+        return true;
+      } catch (error) {
+        console.error(
+          "❌ ~ s3-image-manager ~ failed to check file existence",
+          error,
+        );
+        return false;
+      }
     },
     upload: async (
       filePath: string,
@@ -59,8 +65,8 @@ export const getS3ImageManager = (): BaseImageManager => {
           isThumbnail,
         );
       const content = fs.readFileSync(filePath);
-      return await s3Client
-        .send(
+      try {
+        await s3Client.send(
           new PutObjectCommand({
             Bucket: selectEnvironment(
               isThumbnail
@@ -71,9 +77,12 @@ export const getS3ImageManager = (): BaseImageManager => {
             ContentType: "image/jpeg",
             Body: content,
           }),
-        )
-        .then((value) => Promise.resolve())
-        .catch((reason) => Promise.reject(reason));
+        );
+        return Promise.resolve();
+      } catch (error) {
+        console.error("❌ ~ s3-image-manager ~ failed to upload file", error);
+        return Promise.reject(error);
+      }
     },
     delete: async (
       fileName: string,
@@ -85,8 +94,8 @@ export const getS3ImageManager = (): BaseImageManager => {
           fileName,
           isThumbnail,
         );
-      await s3Client
-        .send(
+      try {
+        await s3Client.send(
           new DeleteObjectCommand({
             Bucket: selectEnvironment(
               isThumbnail
@@ -95,9 +104,12 @@ export const getS3ImageManager = (): BaseImageManager => {
             ),
             Key: fileName,
           }),
-        )
-        .then(() => Promise.resolve())
-        .catch((reason) => Promise.reject(reason));
+        );
+        return Promise.resolve();
+      } catch (error) {
+        console.error("❌ ~ s3-image-manager ~ failed to delete file", error);
+        return Promise.reject(error);
+      }
     },
   };
 };

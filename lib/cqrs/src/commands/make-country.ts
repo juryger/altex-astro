@@ -26,7 +26,7 @@ export async function upsertMakeCountry(value: MakeCountry): Promise<number> {
       target: makeCountries.uid,
       set: {
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: makeCountries.id });
@@ -45,7 +45,7 @@ export function upsertMakeCountryTx(
       set: {
         code: value.code,
         title: value.title,
-        deletedAt: value.deletedAt,
+        deletedAt: value.deletedAt !== undefined ? value.deletedAt : null,
       },
     })
     .returning({ insertedId: makeCountries.id })

@@ -78,15 +78,21 @@ const getCatalogSyncHandler = (): BaseSyncHandler => {
         await uploadImages(inputDirPath, false);
         await uploadImages(thumbnailsDirPath, true);
         await deleteImages([
-          ...updates.groups.data
-            .filter((x) => x["@_deleted"] === 1)
-            .map((x) => x["@_uid"]),
-          ...updates.subgroups.data
-            .filter((x) => x["@_deleted"] === 1)
-            .map((x) => x["@_uid"]),
-          ...updates.products.data
-            .filter((x) => x["@_deleted"] === 1)
-            .map((x) => x["@_uid"]),
+          ...(Array.isArray(updates.groups.data)
+            ? updates.groups.data
+                .filter((x) => parseInt(x["@_deleted"], 10) === 1)
+                .map((x) => x["@_uid"])
+            : []),
+          ...(Array.isArray(updates.subgroups.data)
+            ? updates.subgroups.data
+                .filter((x) => parseInt(x["@_deleted"], 10) === 1)
+                .map((x) => x["@_uid"])
+            : []),
+          ...(Array.isArray(updates.products.data)
+            ? updates.products.data
+                .filter((x) => parseInt(x["@_deleted"], 10) === 1)
+                .map((x) => x["@_uid"])
+            : []),
         ]);
         return Promise.resolve();
       } catch (error) {
@@ -116,7 +122,10 @@ const saveToDatabase = (
     (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
   > = [];
   withTracing &&
-    console.log("🐾 ~ sync-handler ~ saving parsed changes to database'");
+    console.log(
+      "🐾 ~ sync-handler ~ saving parsed changes to database: %o",
+      updates,
+    );
   updates.discounts !== undefined &&
     commands.push(...mapDiscountsToCommands(updates.discounts, createdAt));
   updates.measurements !== undefined &&
@@ -243,9 +252,6 @@ const uploadImages = async (
   for (const file of filtered) {
     const fileName = file.name.toLowerCase();
     const filePath = path.join(file.parentPath, fileName);
-    if (await s3ImageManager.checkExistance(fileName, isThumbnails)) {
-      await s3ImageManager.delete(fileName, isThumbnails);
-    }
     await s3ImageManager.upload(filePath, isThumbnails);
   }
   return Promise.resolve();
@@ -257,15 +263,10 @@ const deleteImages = async (values: string[]): Promise<void> => {
       "🐾 ~ sync-handler ~ deleteing image files from S3 bucket, files count: %i",
       values.length,
     );
-  for (const uid in values) {
+  for (const uid of values) {
     const fileName = uid.concat(FILE_EXTENSIION_JPG).toLowerCase();
-    if (await s3ImageManager.checkExistance(fileName)) {
-      await s3ImageManager.delete(fileName);
-    }
-    // thumbnails
-    if (await s3ImageManager.checkExistance(fileName, true)) {
-      await s3ImageManager.delete(fileName, true);
-    }
+    await s3ImageManager.delete(fileName);
+    await s3ImageManager.delete(fileName, true); // thumbnails
   }
 };
 

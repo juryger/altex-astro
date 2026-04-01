@@ -24,12 +24,10 @@ const { isDialog = false } = Astro.props;
     }
 
     connectedCallback() {
-      console.log("🧪 ~ AlertContainer ~ ctor, is_dialog value: %s", this.dataset.is_dialog);
       this.isDialog = regexTrue.test(this.dataset.is_dialog ?? "false");
 
       this.storeUnsubscribe = $alerts.listen((value) => {
         value.forEach((x, index) => {
-          console.log("🧪 ~ AlertContainer ~ this.isDialog: %s,  message.isDialog: %s", this.isDialog, x.isDialog);
           if (this.isDialog === x.isDialog) {
             const key = "alert-".concat(index.toString());
             const divAlert = document.createElement("div");
