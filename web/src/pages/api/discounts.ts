@@ -5,7 +5,11 @@ import { CacheKeys, getCacheInfo } from "@/lib/domain";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ /*params, */ request }) => {
+export const GET: APIRoute = async (
+  {
+    /*params, request*/
+  },
+) => {
   const result = await getQueryManager().fetch<Discount[]>(
     () => fetchDiscounts(),
     getCacheInfo(CacheKeys.Discounts),

@@ -9,7 +9,11 @@ import {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ /*params, */ request }) => {
+export const GET: APIRoute = async (
+  {
+    /*params, request*/
+  },
+) => {
   const result = await getQueryManager().fetch<ReadReplica | undefined>(
     () => fetchCurrentReadReplica(),
     getCacheInfo(CacheKeys.ReadReplica, CACHE_STALE_TIMEOUT_15MN),

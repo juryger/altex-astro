@@ -49,7 +49,7 @@ export async function onStartup({ dev, host, port }: BootContext) {
   );
 }
 
-export async function onShutdown({ dev }: BootContext) {
+export async function onShutdown(/*{ dev }: BootContext*/) {
   console.log("⚙️ ~ Astro boot ~ shutting down...");
   replicaIntervalObj && replicaIntervalObj.unref();
 }

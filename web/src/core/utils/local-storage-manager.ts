@@ -1,5 +1,4 @@
 import { getDateHandler } from "./date-handler";
-import { regexTrue } from "@/lib/domain";
 
 type LocalStorageManager = {
   checkCataloSyncRequired(): boolean;
