@@ -3,11 +3,11 @@ import { regexTrue } from "@/lib/domain";
 
 type LocalStorageManager = {
   checkCataloSyncRequired(): boolean;
-  checkCatalogSyncInProgress(): boolean;
   getCatalogSyncDate(): Date | undefined;
   setCatalogSyncDate(value: Date): void;
   resetCatalogSyncDate(): void;
-  setCatalogSyncInProgress(value: boolean): void;
+  getCatalogReplicaDate(): Date | undefined;
+  setCatalogReplicaDate(value: Date): void;
   getUserThemePreference(): string | undefined;
   setUserThemePreference(value: string): void;
   getUserThemeChangeDate(): Date | undefined;
@@ -18,7 +18,7 @@ type LocalStorageManager = {
 
 const LocalStorageKeys = {
   CATALOG_SYNC_DATE: "catalog-sync-date",
-  CATALOG_SYNC_IN_PROGRESS: "catalog-sync-in-progress",
+  CATALOG_REPLICA_DATE: "catalog-replica-date",
   USER_THEME_PREFERENCE: "user-theme-preference",
   USER_THEME_CHANGED_DATE: "user-theme-changed-date",
   PRODUCTS_VIES_SCROLL_TOP: "products-view-scroll-top",
@@ -26,9 +26,17 @@ const LocalStorageKeys = {
 
 const dateHandler = getDateHandler();
 
-function IsCacheValid(value: Date, invalidateHours: number) {
-  const expiresOn = dateHandler.addHours(value, invalidateHours);
-  return new Date() <= expiresOn;
+function IsReplicaValid(replicaDate: Date, syncDate: Date) {
+  const result = replicaDate < syncDate;
+  console.log("~ local-storage-manager ~ isReplicaValid: ", result);
+  return result;
+}
+
+function IsCacheValid(syncDate: Date, invalidateHours: number) {
+  const expiresOn = dateHandler.addHours(syncDate, invalidateHours);
+  const result = new Date() <= expiresOn;
+  console.log("~ local-storage-manager ~ isCacheValid: ", result);
+  return result;
 }
 
 const getLocalStorageManager = (
@@ -36,34 +44,24 @@ const getLocalStorageManager = (
 ): LocalStorageManager => {
   return {
     checkCataloSyncRequired: (): boolean => {
-      const isSyncing = localStorage.getItem(
-        LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS,
-      );
-      if (isSyncing !== null && regexTrue.test(isSyncing)) {
-        console.warn(
-          "⚠️ ~ local-storage-manager ~ catalog caching is in progress, cannot start another one.",
-        );
-        return false;
-      }
-
       const lastSyncDate = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_DATE,
       );
+      const replicaDate = localStorage.getItem(
+        LocalStorageKeys.CATALOG_REPLICA_DATE,
+      );
       const isSyncRequired =
+        replicaDate === null ||
         lastSyncDate === null ||
+        !IsReplicaValid(new Date(replicaDate), new Date(lastSyncDate)) ||
         !IsCacheValid(new Date(lastSyncDate), invalidateHours);
       isSyncRequired &&
         console.warn(
-          "⚠️ ~ local-storage-manager ~ catalog sync is required as it's either expired or new setup (%s))",
-          lastSyncDate ? new Date(lastSyncDate) : "not set",
+          "⚠️ ~ local-storage-manager ~ catalog sync is required as it's either outdated, read replica updated or new setup. Last sync date: '%s', replicate date: '%s')",
+          lastSyncDate !== null ? new Date(lastSyncDate) : "not set",
+          replicaDate !== null ? new Date(replicaDate) : "not set",
         );
       return isSyncRequired;
-    },
-    checkCatalogSyncInProgress: (): boolean => {
-      const isSyncing = localStorage.getItem(
-        LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS,
-      );
-      return isSyncing !== null && regexTrue.test(isSyncing);
     },
     getCatalogSyncDate: (): Date | undefined => {
       const value = localStorage.getItem(LocalStorageKeys.CATALOG_SYNC_DATE);
@@ -75,14 +73,18 @@ const getLocalStorageManager = (
         value.toISOString(),
       );
     },
+    getCatalogReplicaDate: (): Date | undefined => {
+      const value = localStorage.getItem(LocalStorageKeys.CATALOG_REPLICA_DATE);
+      return value ? new Date(value) : undefined;
+    },
+    setCatalogReplicaDate: (value: Date): void => {
+      localStorage.setItem(
+        LocalStorageKeys.CATALOG_REPLICA_DATE,
+        value.toISOString(),
+      );
+    },
     resetCatalogSyncDate: (): void => {
       localStorage.removeItem(LocalStorageKeys.CATALOG_SYNC_DATE);
-    },
-    setCatalogSyncInProgress: (value: boolean): void => {
-      localStorage.setItem(
-        LocalStorageKeys.CATALOG_SYNC_IN_PROGRESS,
-        value.toString(),
-      );
     },
     getUserThemePreference: (): string | undefined => {
       const value = localStorage.getItem(

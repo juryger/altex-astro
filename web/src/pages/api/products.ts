@@ -19,7 +19,7 @@ import {
 export const prerender = false;
 
 const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
 );
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {

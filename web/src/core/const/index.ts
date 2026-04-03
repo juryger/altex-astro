@@ -16,6 +16,7 @@ enum APIEndpointNames {
   Products = "products",
   Discounts = "discounts",
   Colors = "colors",
+  ReplicaDate = "replica-date",
 }
 
 enum APISearchParamNames {
@@ -94,6 +95,7 @@ enum AlertKind {
 
 enum CatalogSyncType {
   Cache = "catalog-cache",
+  Replica = "catalog-replica",
   CleanUp = "catalog-clean-up",
   Failure = "catalog-failure",
 }

@@ -41,78 +41,90 @@ const MainTitle = `АЛТЕХ - ${title}`;
 	</body>
 </html>
 
-
 <script>
 	import { createWorker } from "../core/factories/worker-factory";
 	import { getLocalStorageManager } from "../core/utils/local-storage-manager";
 	import { CatalogSyncType, WorkerNames } from "../core/const";
-	import type { CatalogSyncStatus } from "../core/workers";
+	import type { CatalogSyncStatus } from "../core/web-workers";
 	import { EnvironmentNames, regexTrue, selectEnvironment } from '@/lib/domain';
 	
-	let catalogSyncWorker: Worker | undefined;
-	
-	// Need to open API endpoint to make request to WebAPI from script
 	const localStorageManager = getLocalStorageManager();
 	const withTracing = regexTrue.test(
-		selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+		selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
 	);
+
+	// Need to open API endpoint to make request to WebAPI from script
+	const catalogSyncWorker = createWorker(
+		WorkerNames.Catalog,
+		(msg) => processWorkerMessage(msg), 
+		(err) => processWorkerError(err),
+	);
+
+	const postCommandToWorker = (command: CatalogSyncType) => {
+		withTracing && console.log("🐾 ~ BaseLayout ~ send command to worker '%s'", command);	
+		try {
+			switch (command) {
+				case CatalogSyncType.Replica: 
+					catalogSyncWorker.postMessage(CatalogSyncType.Replica);
+					break;
+				case CatalogSyncType.Cache:
+					catalogSyncWorker.postMessage(CatalogSyncType.Cache);
+					break;
+				default:
+					console.error("❌ ~ BaseLayout ~ Failed to post unsupported command '%s' to web-worker", command);
+					break;
+			}
+		} catch(error) {
+			console.error("❌ ~ BaseLayout ~ Failed to post command '%s' to CatalogSync web-worker. See error details below. %o", command, error);	
+		}		
+	}
 	
-	const terminateWorker = () => {
+	if (localStorageManager.checkCataloSyncRequired()) {
+		withTracing && console.log("🐾 ~ BaseLayout ~ Preaparing to revalidate cache.");	
+		postCommandToWorker(CatalogSyncType.Cache);
+	} else {
+		withTracing && 
+			console.log("🐾 ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
+		postCommandToWorker(CatalogSyncType.Replica);
+	}
+
+	const terminateWorker = () => {		
 		catalogSyncWorker && catalogSyncWorker.terminate();
 	}
 
 	const processWorkerMessage = (msg: MessageEvent<any>): void => {				
+		withTracing && console.log("🐾 ~ BaseLayout ~ CatalogSync web-worker status update:", msg.data);
 		const syncStatus = msg.data as CatalogSyncStatus;
 			if (!msg.data || !syncStatus) {
-				console.error("🛑 ~ BaseLayout ~ CatalogSync worker, unsupported message", msg.data);
+				console.error("❌ ~ BaseLayout ~ CatalogSync web-worker, unsupported message", msg.data);
 				return;
 			}
-			withTracing && console.log("🐾 ~ BaseLayout ~ CatalogSync worker status update:", syncStatus);
 			switch (syncStatus.syncType)
 			{
+				case CatalogSyncType.Replica:
+					if (syncStatus.syncData !== undefined)
+					localStorageManager.setCatalogReplicaDate(syncStatus.syncData);
+					break;
 				case CatalogSyncType.Cache:
 					localStorageManager.setCatalogSyncDate(new Date());
-					localStorageManager.setCatalogSyncInProgress(false);
+					localStorageManager.setCatalogReplicaDate(syncStatus.syncData);
 					break;
 				case CatalogSyncType.CleanUp:
-					localStorageManager.setCatalogSyncInProgress(false);
+					// No action requried
 					break;
 				case CatalogSyncType.Failure:
-					console.error("🛑 ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
-					localStorageManager.setCatalogSyncInProgress(false);
+					console.error("❌ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
 					break;
 				default:
-					console.error("🛑 ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
-					localStorageManager.setCatalogSyncInProgress(false);
+					console.error("❌ ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
 					break;
 			}
 			terminateWorker();
 	}
 
 	const processWorkerError = (err: ErrorEvent): void => {
-		withTracing && console.error("🐾 ~ BaseLayout ~ Failed to save catalog data to IndexedDB", err.message);
-		localStorageManager.setCatalogSyncInProgress(false);
+		console.error("❌ ~ BaseLayout ~ Failed to process web-worker command", err.message);
 		terminateWorker();
-	}
-
-	if (localStorageManager.checkCataloSyncRequired()) {
-		withTracing && console.log("🐾 ~ BaseLayout ~ Catalog cache data is outdated, preaparing to revalidate cache.");	
-		try {
-			catalogSyncWorker = createWorker(
-				WorkerNames.Catalog,
-				(msg) => processWorkerMessage(msg), 
-				(err) => processWorkerError(err),
-			);
-			
-			// Performe sync process (pass CatalogSyncType.CleanUpCache if sync is not required and local store need to be cleaned)
-			catalogSyncWorker.postMessage(CatalogSyncType.Cache);
-			localStorageManager.setCatalogSyncInProgress(true);
-		} catch(error) {
-			console.error("🛑 ~ BaseLayout ~ Failed to create CatalogSync worker", error);	
-		}
-	} else {
-		withTracing && 
-			console.log("🐾 ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
 	}
 
 	window.addEventListener('pagehide', () => {

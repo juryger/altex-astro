@@ -9,7 +9,7 @@ const createWorker = (
   switch (name) {
     case WorkerNames.Catalog:
       result = new Worker(
-        new URL("../workers/catalog-sync-worker.ts", import.meta.url),
+        new URL("../web-workers/catalog-sync-worker.ts", import.meta.url),
         {
           name,
           type: "module",

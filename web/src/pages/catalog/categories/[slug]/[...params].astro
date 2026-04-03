@@ -18,7 +18,7 @@ const { slug, params } = Astro.params;
 
 const queryManager = getQueryManager();
 const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
 );
 
 const internals = {

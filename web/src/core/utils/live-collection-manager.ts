@@ -12,7 +12,7 @@ import {
 } from "@/lib/domain";
 
 const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.ENABLE_TRACING),
+  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
 );
 
 const getEntryBySlug = async <T>(

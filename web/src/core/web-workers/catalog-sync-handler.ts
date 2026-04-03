@@ -6,6 +6,7 @@ import { clientDb } from "../db/indexed-db";
 const CATEGORIES_PAGE_SIZE = 150;
 
 type CatalogSyncHandler = {
+  getReplicaDate(): Promise<Date | undefined>;
   syncCategories(): Promise<number>;
   syncDiscounts(): Promise<number>;
   syncColors(): Promise<number>;
@@ -16,10 +17,26 @@ const getCatalogSyncHandler = (config: {
   baseUrl: string;
 }): CatalogSyncHandler => {
   return {
+    async getReplicaDate(): Promise<Date | undefined> {
+      const apiUrl = `${config.baseUrl}/${APIEndpointNames.ReplicaDate}`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        response.text().then((errorMessage) => {
+          throw new Error(
+            `Failed to get Replica date: ${response.status} - ${errorMessage}`,
+          );
+        });
+      }
+      var data = await response.json();
+      return data !== undefined ? new Date(data) : undefined;
+    },
     async syncCategories() {
-      const apiUrl = new URL(
-        `${config.baseUrl}/${APIEndpointNames.Categories}?${APISearchParamNames.SortField}=${CategoriesSortFields.Id}&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
-      );
+      const apiUrl = `${config.baseUrl}/${APIEndpointNames.Categories}`
+        .concat(`?${APISearchParamNames.SortField}=${CategoriesSortFields.Id}`)
+        .concat(`&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}`)
+        .concat(
+          `&${APISearchParamNames.Page}=0&${APISearchParamNames.PageSize}=${CATEGORIES_PAGE_SIZE}`,
+        );
       const response = await fetch(apiUrl);
       if (!response.ok) {
         response.text().then((errorMessage) => {
@@ -39,14 +56,12 @@ const getCatalogSyncHandler = (config: {
             parentSlug: x.parentSlug,
           }) as CategoryCache,
       );
-
       clientDb.categories.clear();
       return clientDb.categories.bulkAdd(dataCache);
     },
     async syncDiscounts() {
-      const response = await fetch(
-        new URL(`${config.baseUrl}/${APIEndpointNames.Discounts}`),
-      );
+      const apiUrl = new URL(`${config.baseUrl}/${APIEndpointNames.Discounts}`);
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         response.text().then((errorMessage) => {
           throw new Error(
@@ -59,9 +74,8 @@ const getCatalogSyncHandler = (config: {
       return clientDb.discounts.bulkAdd(data);
     },
     async syncColors() {
-      const response = await fetch(
-        new URL(`${config.baseUrl}/${APIEndpointNames.Colors}`),
-      );
+      const apiUrl = new URL(`${config.baseUrl}/${APIEndpointNames.Colors}`);
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         response.text().then((errorMessage) => {
           throw new Error(
