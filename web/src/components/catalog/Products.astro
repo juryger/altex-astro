@@ -77,7 +77,12 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
   </p>
 </div>}
 {(products && products.items.length > 0) &&
-  <div data-products-root data-page_prev={firstRow > 0 ? products.pageInfo.page - 1 : -1} data-page_next={lastRow < totalRows ? products.pageInfo.page + 1 : -1} data-page_size={paging.pageSize} class="mx-4 mb-2 bg-base-100">
+  <div data-products-root 
+    data-page_prev={firstRow > 0 ? products.pageInfo.page - 1 : -1} 
+    data-page_next={lastRow < totalRows ? products.pageInfo.page + 1 : -1} 
+    data-page_size={paging.pageSize} 
+    class="mx-4 my-2 pt-2 bg-base-100"
+  >
     {/* Header */}
     <div class="grid grid-cols-1 sm:grid-cols-2 my-2 items-center">
       <h3 class="text-lg font-bold text-center sm:text-left">

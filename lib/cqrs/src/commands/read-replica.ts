@@ -17,7 +17,6 @@ const mapDomainToDatabaseModel = ({
     fileName: fileName,
     deletedAt: deletedAt ?? null,
   } as DBReadReplica;
-  console.log("🧪 ~ command:read-replica ~ maping: %o", result);
   return result;
 };
 
@@ -45,6 +44,5 @@ export async function setReadReplica({
       },
     })
     .returning({ insertedId: readReplicas.id });
-  console.log("🧪 ~ command:read-replica ~ result: %o", result);
   return result.at(0)?.insertedId ?? 0;
 }

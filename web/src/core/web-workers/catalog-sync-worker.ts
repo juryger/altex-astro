@@ -37,12 +37,12 @@ self.onmessage = async (e) => {
     switch (command) {
       case CatalogSyncType.Replica:
         const date = await handler.getReplicaDate();
-        syncStatus.syncData = date;
         withTracing &&
           console.info(
             "🐾 ~ catalog-sync-worker ~ obtained replica date:",
             date,
           );
+        syncStatus.syncData = date !== undefined ? date : undefined;
         break;
       case CatalogSyncType.Cache:
         const result = await Promise.all([
@@ -57,12 +57,13 @@ self.onmessage = async (e) => {
             result.reduce((acc, curr) => acc + curr, 0),
           );
         const replicaDate = await handler.getReplicaDate();
-        syncStatus.syncData = replicaDate;
         withTracing &&
           console.info(
             "🐾 ~ catalog-sync-worker ~ obtained replica date:",
-            date,
+            replicaDate,
           );
+        syncStatus.syncData =
+          replicaDate !== undefined ? replicaDate : undefined;
         break;
       case CatalogSyncType.CleanUp:
         await handler.cleanUpCache();
@@ -78,7 +79,7 @@ self.onmessage = async (e) => {
     }
   } catch (error: any) {
     console.error(
-      "🛑 ~ catalog-sync-worker ~ failed to sync reference data:",
+      "🛑 ~ catalog-sync-worker ~ failed to sync reference data: %o",
       error,
     );
     syncStatus.syncType = CatalogSyncType.Failure;

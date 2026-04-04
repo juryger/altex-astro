@@ -1,3 +1,5 @@
+import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
+import { CategoriesViewMode } from "../const";
 import { getDateHandler } from "./date-handler";
 
 type LocalStorageManager = {
@@ -11,8 +13,8 @@ type LocalStorageManager = {
   setUserThemePreference(value: string): void;
   getUserThemeChangeDate(): Date | undefined;
   setUserThemeChangeDate(value: Date): void;
-  getProductsViewScrollTop(): number | undefined;
-  setProductsViewScrollTop(value: number): void;
+  getCategoriesViewMode(): CategoriesViewMode;
+  setCategoriesViewMode(value: CategoriesViewMode): void;
 };
 
 const LocalStorageKeys = {
@@ -20,8 +22,12 @@ const LocalStorageKeys = {
   CATALOG_REPLICA_DATE: "catalog-replica-date",
   USER_THEME_PREFERENCE: "user-theme-preference",
   USER_THEME_CHANGED_DATE: "user-theme-changed-date",
-  PRODUCTS_VIES_SCROLL_TOP: "products-view-scroll-top",
+  CATEGORIES_VIEW_MODE: "categories-view-mode",
 } as const;
+
+const withTracing = regexTrue.test(
+  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
+);
 
 const dateHandler = getDateHandler();
 
@@ -64,9 +70,19 @@ const getLocalStorageManager = (
     },
     getCatalogSyncDate: (): Date | undefined => {
       const value = localStorage.getItem(LocalStorageKeys.CATALOG_SYNC_DATE);
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ get CATALOG_SYNC_DATE: ",
+          value,
+        );
       return value ? new Date(value) : undefined;
     },
     setCatalogSyncDate: (value: Date): void => {
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ set CATALOG_SYNC_DATE: ",
+          value,
+        );
       localStorage.setItem(
         LocalStorageKeys.CATALOG_SYNC_DATE,
         value.toISOString(),
@@ -74,15 +90,27 @@ const getLocalStorageManager = (
     },
     getCatalogReplicaDate: (): Date | undefined => {
       const value = localStorage.getItem(LocalStorageKeys.CATALOG_REPLICA_DATE);
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ get CATALOG_REPLICA_DATE: ",
+          value,
+        );
       return value ? new Date(value) : undefined;
     },
     setCatalogReplicaDate: (value: Date): void => {
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ set CATALOG_REPLICA_DATE: ",
+          value,
+        );
       localStorage.setItem(
         LocalStorageKeys.CATALOG_REPLICA_DATE,
         value.toISOString(),
       );
     },
     resetCatalogSyncDate: (): void => {
+      withTracing &&
+        console.log("🐾 ~ local-storage-manager ~ reseting CATALOG_SYNC_DATE");
       localStorage.removeItem(LocalStorageKeys.CATALOG_SYNC_DATE);
     },
     getUserThemePreference: (): string | undefined => {
@@ -110,29 +138,52 @@ const getLocalStorageManager = (
       return value;
     },
     setUserThemePreference: (value: string): void => {
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ set USER_THEME_PREFERENCE: ",
+          value,
+        );
       localStorage.setItem(LocalStorageKeys.USER_THEME_PREFERENCE, value);
     },
     getUserThemeChangeDate: (): Date | undefined => {
       const value = localStorage.getItem(
         LocalStorageKeys.USER_THEME_CHANGED_DATE,
       );
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ get USER_THEME_CHANGED_DATE: ",
+          value,
+        );
       return value ? new Date(value) : undefined;
     },
     setUserThemeChangeDate: (value: Date): void => {
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ set USER_THEME_CHANGED_DATE: ",
+          value,
+        );
       localStorage.setItem(
         LocalStorageKeys.USER_THEME_CHANGED_DATE,
         value.toISOString(),
       );
     },
-    getProductsViewScrollTop: (): number | undefined => {
-      const value = localStorage.getItem(
-        LocalStorageKeys.PRODUCTS_VIES_SCROLL_TOP,
-      );
-      return value ? Number.parseInt(value, 10) : undefined;
+    getCategoriesViewMode: (): CategoriesViewMode => {
+      const value = localStorage.getItem(LocalStorageKeys.CATEGORIES_VIEW_MODE);
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ get CATEGORIES_VIEW_MODE: ",
+          value,
+        );
+      return value ? Number.parseInt(value, 10) : CategoriesViewMode.Compact;
     },
-    setProductsViewScrollTop: (value: number): void => {
+    setCategoriesViewMode: (value: CategoriesViewMode): void => {
+      withTracing &&
+        console.log(
+          "🐾 ~ local-storage-manager ~ set CATEGORIES_VIEW_MODE: ",
+          value,
+        );
       localStorage.setItem(
-        LocalStorageKeys.PRODUCTS_VIES_SCROLL_TOP,
+        LocalStorageKeys.CATEGORIES_VIEW_MODE,
         value.toString(),
       );
     },
