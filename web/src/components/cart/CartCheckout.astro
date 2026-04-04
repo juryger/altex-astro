@@ -39,6 +39,7 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
   data-loading={dataLoadingName}
   data-error_popup_id={dataCheckoutErrorDialogID}
   data-error_details_id={dataCheckoutErrorDetailsId}
+  data-is_dev_mode={isDevMode}
 >
   <div class="fieldset flex flex-col md:flex-row gap-4 text-left">
     <div class="grow">
@@ -131,7 +132,7 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
   import { actions } from 'astro:actions';
   import { navigate } from 'astro:transitions/client';
   import { $cart, $cartCount } from "@/web/src/core/stores/cart-store";
-  import { getErrorMessage, type GuestUser } from '@/lib/domain';
+  import { getErrorMessage, regexTrue, type GuestUser } from '@/lib/domain';
   import { getButtonElementByName, getElementById, getFormElementByName } from '@/web/src/core/utils/dom-utils';
 
   class CartCheckout extends HTMLElement {
@@ -218,11 +219,12 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
     }
 
     connectedCallback() {
+      const isDevMode = regexTrue.test(this.dataset.is_dev_mode ?? "true");
       this.formCartCheckoutEl = getFormElementByName(this, this.dataset.form_checkout);
       this.orderConfirmEl = getButtonElementByName(this, this.dataset.order_confirm);
       this.loadingEl = getElementById(this, this.dataset.loading); 
       this.errorPopupEl = getElementById(this, this.dataset.error_popup_id);
-      this.errorDetailsEl = getElementById(this, this.dataset.error_details_id);
+      this.errorDetailsEl = getElementById(this, this.dataset.error_details_id, !isDevMode);
       this.subscribeToCountStore();
       this.syncCartCountFromStore();
 

@@ -1,5 +1,7 @@
 #! /usr/bin/bash
 
+# server-deply.sh should be places at /var/www/altexweb.ru/_updates
+
 # Install node packages
 corepack enable pnpm
 cd ../server
@@ -11,11 +13,11 @@ pm2 startup
 
 # Clean-up previous App installation
 #pm2 delete altex-nodejs
-pm2 delete ecosystem.config.js
+pm2 delete server.ecosystem.config.js
 
 # Create new App using pm2
 #HOST=127.0.0.1 PORT=4321 pm2 start ./entry.mjs --name altex-nodejs --watch
-pm2 start ecosystem.config.js
+pm2 start server.ecosystem.config.js
 
 # Freeze a process list for automatic respawn:
 pm2 save

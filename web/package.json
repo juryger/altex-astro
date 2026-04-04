@@ -22,7 +22,13 @@
     "fuse.js": "^7.1.0",
     "html-entities": "^2.6.0",
     "nanostores": "^1.2.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "zod": "3.25.76",
+    "better-sqlite3": "^12.8.0",
+    "drizzle-orm": "^0.45.1",
+    "googleapis": "^171.4.0",
+    "handlebars": "^4.7.8",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",

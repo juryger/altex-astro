@@ -2,6 +2,8 @@ ignoredBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
   - sharp
+onlyBuiltDependencies:
+  - better-sqlite3
 
 overrides:
   ajv@<8.18.0: '>=8.18.0'

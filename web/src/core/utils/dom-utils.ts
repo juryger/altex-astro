@@ -53,13 +53,15 @@ const getButtonElementByName = (
 const getElementById = (
   rootNode: Element | Document,
   id: string | undefined,
+  skipAssert: boolean = false,
 ): Element | null => {
   const result = rootNode.querySelector(`#${id}`);
-  console.assert(
-    result !== null,
-    "~ dom-utils ~ cannot find element by ID: [%s]",
-    id,
-  );
+  !skipAssert &&
+    console.assert(
+      result !== null,
+      "~ dom-utils ~ cannot find element by ID: [%s]",
+      id,
+    );
   return result;
 };
 

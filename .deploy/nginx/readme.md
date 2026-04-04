@@ -35,6 +35,11 @@ location /catalog {
   include /etc/nginx/proxy_params;
 }
 
+location /cart {
+  proxy_pass http://127.0.0.1:4321;
+  include /etc/nginx/proxy_params;
+}
+
 location /api {
   proxy_pass http://127.0.0.1:4321;
   include /etc/nginx/proxy_params;

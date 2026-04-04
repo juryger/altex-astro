@@ -31,9 +31,9 @@ sudo systemctl start litestream
    litestream replicate -config litestream.yml
 
 2. Restore db-file
-   litestream restore -config litestream.yml /Users/iuriig/Sources/altex-astro/db/catalog.db
+   litestream restore -config litestream.yml /var/www/altexweb.ru/db/catalog.db
 
-## Importatnt notes:
+## Importatnt notes
 
 - Update path to db file in litestream.yml
 - Defined environment variable poinitng to S3 bucket for stroing backup files.
@@ -41,7 +41,7 @@ sudo systemctl start litestream
   1. sudo nano /etc/environment
 
   2. Add values for following variables
-     export LITESTREAM_ACCESS_KEY_ID=""
+     export LITESTREAM_ACCESS_KEY_ID="https://s3.regru.cloud"
      export LITESTREAM_SECRET_ACCESS_KEY=""
      export LITESTREAM_REPLICA_ENDPOINT=""
 

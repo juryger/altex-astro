@@ -13,8 +13,8 @@ const { searchDialogId, searchResultDataAttribute } = Astro.props;
 const isDevMode = import.meta.env.DEV;
 const searchLoadingId = "search-loading";
 const searchInputName = "search-input";
-const dataCheckoutErrorDialogID = "cart-checkout-error-popup";
-const dataCheckoutErrorDetailsId = "cart-checkout-error-details";
+const dataSearchErrorDialogID = "search-error-popup";
+const dataSearchErrorDetailsId = "search-error-details";
 
 const titleSearchInput = "Введите ключевые слова";
 const titleSearchResultsCount = "Найдено";
@@ -29,9 +29,10 @@ const titleSearchFailed = "К сожалению у нас возникла те
   data-search_results={searchResultDataAttribute} 
   data-search_input={searchInputName} 
   data-search_loading={searchLoadingId}
-  data-error_popup_id={dataCheckoutErrorDialogID}
-  data-error_details_id={dataCheckoutErrorDetailsId}
+  data-error_popup_id={dataSearchErrorDialogID}
+  data-error_details_id={dataSearchErrorDetailsId}
   data-search_results_count={titleSearchResultsCount}
+  data-is_dev_mode={isDevMode}
 >
   <label class="input p-0 border-0 border-b-2 rounded-none focus-within:border-primary focus-within:outline-hidden w-full">
     <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -52,7 +53,7 @@ const titleSearchFailed = "К сожалению у нас возникла те
     </label>
     </div>
     <kbd class="kbd kbd-sm">esc</kbd>
-    <Modal id={dataCheckoutErrorDialogID} title={titleErrorHeader} actionButtons={DialogActionButtons.OK}>
+    <Modal id={dataSearchErrorDialogID} title={titleErrorHeader} actionButtons={DialogActionButtons.OK}>
       <div class="flex gap-2 mt-2">
         <div class="grow-0 content-start">
           <Image src={failureLogo}
@@ -64,7 +65,7 @@ const titleSearchFailed = "К сожалению у нас возникла те
           <span>{titleSearchFailed}</span>
           {isDevMode && <div class="font-semibold mt-2">{titleErrorDetailsHeader}</div>
             <div class="text-sm border-0 rounded-sm bg-base-300 my-2.5 p-2.5 min-h-20 overflow-auto">
-              <span id={dataCheckoutErrorDetailsId}>{titleErrorDetails}</span>
+              <span id={dataSearchErrorDetailsId}>{titleErrorDetails}</span>
             </div>
           </div>}
         </div>
@@ -75,7 +76,7 @@ const titleSearchFailed = "К сожалению у нас возникла те
 <script>
   import { actions } from 'astro:actions';
   import type { SearchResult } from "@/lib/domain";
-  import { debounce, INPUT_DEBOUNCE_DELAY_MS } from "@/lib/domain";
+  import { debounce, INPUT_DEBOUNCE_DELAY_MS, regexTrue } from "@/lib/domain";
   import { getElementByDataAttribute, getDialogElementById, getElementById, getInputElementByName } from "@/web/src/core/utils/dom-utils";
   import { createSearchResultMarkup } from "@/web/src/core/utils/search-manager";
   import { saveSearch } from "@/web/src/core/stores/search-store";
@@ -154,6 +155,7 @@ const titleSearchFailed = "К сожалению у нас возникла те
     }
 
     connectedCallback() {
+      const isDevMode = regexTrue.test(this.dataset.is_dev_mode ?? "true");
       this.titleSearchResultsCount = this.dataset.search_results_count ?? "";
       this.searchDialogEl = getDialogElementById(document, 
         this.dataset.search_dialog) as HTMLDialogElement;
@@ -170,7 +172,8 @@ const titleSearchFailed = "К сожалению у нас возникла те
         this.dataset.error_popup_id
       ) as HTMLDialogElement;
       this.errorDetailsEl = getElementById(this,
-        this.dataset.error_details_id
+        this.dataset.error_details_id,
+        !isDevMode        
       ) as HTMLSpanElement;
 
       const debouncedInput = debounce(this.onSearchInput, INPUT_DEBOUNCE_DELAY_MS);
