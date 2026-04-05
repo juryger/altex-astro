@@ -122,7 +122,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_IMAGES_URL),
         entity.main.products.hasImage !== null &&
         entity.main.products.hasImage > 0
-          ? entity.main.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.main.products.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
@@ -131,7 +131,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Product => {
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL),
         entity.main.products.hasImage !== null &&
         entity.main.products.hasImage > 0
-          ? entity.main.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.main.products.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),

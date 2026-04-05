@@ -57,7 +57,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
       items: [
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_IMAGES_URL),
         entity.categories.hasImage !== null && entity.categories.hasImage > 0
-          ? entity.categories.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.categories.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
@@ -65,7 +65,7 @@ const mapQueryResultToDomainModel = (entity: QueryResult): Category => {
       items: [
         selectEnvironment(EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL),
         entity.categories.hasImage !== null && entity.categories.hasImage > 0
-          ? entity.categories.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.categories.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),

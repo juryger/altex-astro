@@ -56,6 +56,16 @@ const _allNavPaths: Array<NavPathItem> = [
     displayOptions: { isMainMenu: true, isFooter: true, isBreadcrumbs: true },
   },
   {
+    path: `${NavPathNames.PrivacyPolicy}`,
+    value: "Конфиденциальность",
+    displayOptions: { isMainMenu: false, isFooter: true, isBreadcrumbs: true },
+  },
+  {
+    path: `${NavPathNames.ServiceTerms}`,
+    value: "Условия и положения",
+    displayOptions: { isMainMenu: false, isFooter: true, isBreadcrumbs: true },
+  },
+  {
     path: `${NavPathNames.ShoppingCart}`,
     value: "Корзина",
     displayOptions: { isMainMenu: false, isFooter: false, isBreadcrumbs: true },
@@ -106,7 +116,7 @@ const getNavPathManager = (): NavPathManager => {
 
       if (isBreadcrumbs)
         return result.filter(
-          (x) => x.displayOptions.isBreadcrumbs === isBreadcrumbs
+          (x) => x.displayOptions.isBreadcrumbs === isBreadcrumbs,
         );
 
       return result;
@@ -114,7 +124,7 @@ const getNavPathManager = (): NavPathManager => {
     resolvePathElement: (value: string): NavPathItem | undefined => {
       //const pathValue = value.indexOf("/") === 0 ? value : `/${value}`;
       const index: number = _allNavPaths.findIndex(
-        (x: NavPathItem) => x.path === value
+        (x: NavPathItem) => x.path === value,
       );
       return index != -1 ? _allNavPaths.at(index) : undefined;
     },

@@ -250,7 +250,7 @@ const uploadImages = async (
       filtered.length,
     );
   for (const file of filtered) {
-    const fileName = file.name.toLowerCase();
+    const fileName = file.name;
     const filePath = path.join(file.parentPath, fileName);
     await s3ImageManager.upload(filePath, isThumbnails);
   }
@@ -264,7 +264,7 @@ const deleteImages = async (values: string[]): Promise<void> => {
       values.length,
     );
   for (const uid of values) {
-    const fileName = uid.concat(FILE_EXTENSIION_JPG).toLowerCase();
+    const fileName = uid.concat(FILE_EXTENSIION_JPG);
     await s3ImageManager.delete(fileName);
     await s3ImageManager.delete(fileName, true); // thumbnails
   }

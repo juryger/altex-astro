@@ -37,6 +37,8 @@ enum NavPathNames {
   Products = "products",
   About = "about",
   Contacts = "contacts",
+  PrivacyPolicy = "privacy-policy",
+  ServiceTerms = "service-terms",
   ShoppingCart = "shopping-cart",
   MyProfile = "my-profile",
   PageNotFound = "404",

@@ -97,7 +97,7 @@ const runInternal = async ({
 
   const filesWithStats = await Promise.all(
     files.map(async (file: Dirent<string>) => {
-      const fileName = file.name.toLowerCase();
+      const fileName = file.name;
       const fullPath = path.join(file.parentPath, fileName);
       const stats = await fs.stat(fullPath);
       return {

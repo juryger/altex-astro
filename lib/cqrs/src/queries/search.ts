@@ -45,7 +45,7 @@ const mapCategoryQueryResultToDomainModel = (
       items: [
         thumbnailsDirPath,
         entity.hasImage !== null && entity.hasImage > 0
-          ? entity.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
@@ -66,7 +66,7 @@ const mapProductQueryResultToDomainModel = (
       items: [
         thumbnailsDirPath,
         entity.products.hasImage !== null && entity.products.hasImage > 0
-          ? entity.products.uid.toLowerCase().concat(FILE_EXTENSIION_JPG)
+          ? entity.products.uid.concat(FILE_EXTENSIION_JPG)
           : NO_IMAGE_FILE_NAME,
       ],
     }),
