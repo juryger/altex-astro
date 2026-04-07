@@ -3,17 +3,9 @@ import { LiveCollectionNames as CollectionNames } from "../const";
 import type { LiveCollectionNames } from "../const";
 import type { CategoryCollectionFilter } from "../content-loaders/categories-loader";
 import type { ProductCollectionFilter } from "../content-loaders/products-loader";
-import {
-  type Product,
-  type Category,
-  regexTrue,
-  selectEnvironment,
-  EnvironmentNames,
-} from "@/lib/domain";
+import { type Product, type Category, regexTrue } from "@/lib/domain";
 
-const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
-);
+const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 const getEntryBySlug = async <T>(
   collection: LiveCollectionNames,

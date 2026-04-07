@@ -11,7 +11,7 @@ const db = new Dexie(dbName) as Dexie & {
 };
 
 // Schema declaration:
-db.version(1).stores({
+db.version(2).stores({
   categories: "id, slug, title, parentId, parentSlug", // primary key "id" (for the runtime!)
   discounts: "id, code, title, fromSum",
   colors: "id, code, title, fillColor, borderColor, uid",

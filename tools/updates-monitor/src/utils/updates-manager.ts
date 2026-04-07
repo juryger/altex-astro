@@ -332,16 +332,16 @@ const finalizeArchiveProcessing = async ({
     }),
   );
 
-  // withTracing &&
-  //   console.log(
-  //     "🐾 ~ updates-manager ~ sending email regading archive processing to administrator",
-  //   );
-  // await emailComposer.sendGeneralEmail(
-  //   error !== null
-  //     ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
-  //     : EmailBody.WebsiteUpdateSuccess,
-  //   error !== null,
-  // );
+  withTracing &&
+    console.log(
+      "🐾 ~ updates-manager ~ sending email regading archive processing to administrator",
+    );
+  await emailComposer.sendGeneralEmail(
+    error !== null
+      ? `${EmailBody.WebsiteUpdateFailure} ${error.message}`
+      : EmailBody.WebsiteUpdateSuccess,
+    error !== null,
+  );
 
   return Promise.resolve();
 };

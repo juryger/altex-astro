@@ -137,20 +137,26 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 </ModalDialog>
 
 <script>
+  import { regexTrue } from "@/lib/domain";
   import { getProductsViewManager, type ProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
-  
-  const VIEW_MODE_INIT_DELAY_MS = 300;
+
+  const VIEW_MODE_INIT_DELAY_MS = parseInt(import.meta.env.PUBLIC_PRODUCTS_VIEW_INIT_DELAY_MS, 10);
+  const withTracing = regexTrue.test(
+		import.meta.env.PUBLIC_ENABLE_TRACING
+	);
 
   let timeoutId: NodeJS.Timeout | undefined;
   let controller: AbortController | undefined;
   let viewManager: ProductsViewManager | undefined;
 
-  const applyViewManager = ()=> {
-    controller?.abort();
+  const applyViewManager = () => {
+    withTracing && console.log("🐾 ~ Products.astro ~ applyViewManager");
+    controller && controller.abort();
 
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
+      withTracing && console.log("🐾 ~ Products.astro ~ data-products-root element: %o", productsRootEl);
       if (productsRootEl === null) return;
 
       const pagePrev = productsRootEl.dataset.page_prev 
@@ -177,16 +183,13 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
   } 
 
   // Need to call ViewManger to assing event handlers on initial page load
+  withTracing && console.log("🐾 ~ Products.astro ~ init");
   applyViewManager();
 
   document.addEventListener("astro:page-load", () => {
     // Need to re-apply view manager on Astro page transition as well
+    withTracing && console.log("🐾 ~ Products.astro ~ astro:page-load event");
     applyViewManager();
-  });
-
-  window.addEventListener('beforeunload', () => { 
-    // This instantly removes all listeners using 'signal' from themeToggleManager
-    controller?.abort(); 
   });
 
   window.addEventListener('pagehide', () => {     

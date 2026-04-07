@@ -87,10 +87,6 @@ const getBreadcrumbsFromPath = (
 
     const navPathItem = navPathManager.resolvePathElement(item);
     if (!navPathItem) {
-      console.warn(
-        "🛠️ ~ getBreadcrumbsFromPath ~ could not resolve path element:",
-        item,
-      );
       continue;
     }
 

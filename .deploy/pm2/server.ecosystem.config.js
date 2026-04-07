@@ -11,12 +11,12 @@ module.exports = {
         PORT: 4321,
         // Add another environment variables below
         PUBLIC_ENABLE_TRACING: "false",
-        PUBLIC_API_BASE_URL: "http://127.0.0.1:4321/api",
+        PUBLIC_API_BASE_URL: "https://altexweb.ru/api",
         PUBLIC_BLOB_STORAGE_IMAGES_URL:
           "https://s3.regru.cloud/altexweb-images",
         PUBLIC_BLOB_STORAGE_THUMBNAILS_URL:
           "https://s3.regru.cloud/altexweb-thumbnails",
-        ENABLE_TRACING: "flase",
+        ENABLE_TRACING: "false",
         BREADCRUMB_TITLE_MAX_LENGTH: 20,
         DATA_RECORDS_ON_PAGE: 20,
         DB_GENERAL_PATH: "/var/www/altexweb.ru/db/general.db",

@@ -182,5 +182,8 @@ const titleProductCode = "Артикул";
       this.controller && this.controller.abort();
     }
   }
-  customElements.define('product-details', ProductDetails);
+
+  if (!customElements.get('product-details')) {
+    customElements.define('product-details', ProductDetails);
+  }
 </script>

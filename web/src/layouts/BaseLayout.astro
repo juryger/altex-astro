@@ -37,7 +37,7 @@ const MainTitle = `АЛТЕХ - ${title}`;
 			}
 			<slot />
 		</div>
-		<Footer server:defer />
+		<Footer />
 	</body>
 </html>
 
@@ -46,11 +46,11 @@ const MainTitle = `АЛТЕХ - ${title}`;
 	import { getLocalStorageManager } from "../core/utils/local-storage-manager";
 	import { CatalogSyncType, WorkerNames } from "../core/const";
 	import type { CatalogSyncStatus } from "../core/web-workers";
-	import { EnvironmentNames, regexTrue, selectEnvironment } from '@/lib/domain';
+	import { regexTrue } from '@/lib/domain';
 	
 	const localStorageManager = getLocalStorageManager();
 	const withTracing = regexTrue.test(
-		selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
+		import.meta.env.PUBLIC_ENABLE_TRACING
 	);
 
 	// Need to open API endpoint to make request to WebAPI from script

@@ -47,5 +47,7 @@ const { isDialog = false } = Astro.props;
     }
   }
 
-  customElements.define('alerts-container', AlertsContainer);
+  if (!customElements.get('alerts-container')) {
+    customElements.define('alerts-container', AlertsContainer);
+  }
 </script>

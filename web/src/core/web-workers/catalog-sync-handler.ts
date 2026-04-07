@@ -11,6 +11,7 @@ type CatalogSyncHandler = {
   syncDiscounts(): Promise<number>;
   syncColors(): Promise<number>;
   cleanUpCache(): Promise<void>;
+  deleteDb(needRecreate: boolean): Promise<void>;
 };
 
 const getCatalogSyncHandler = (config: {
@@ -30,7 +31,7 @@ const getCatalogSyncHandler = (config: {
       var data = await response.json();
       return data !== undefined ? new Date(data) : undefined;
     },
-    async syncCategories() {
+    async syncCategories(): Promise<number> {
       const apiUrl = `${config.baseUrl}/${APIEndpointNames.Categories}`
         .concat(`?${APISearchParamNames.SortField}=${CategoriesSortFields.Id}`)
         .concat(`&${APISearchParamNames.SortOrder}=${SortOrder.Ascending}`)
@@ -59,7 +60,7 @@ const getCatalogSyncHandler = (config: {
       clientDb.categories.clear();
       return clientDb.categories.bulkAdd(dataCache);
     },
-    async syncDiscounts() {
+    async syncDiscounts(): Promise<number> {
       const apiUrl = new URL(`${config.baseUrl}/${APIEndpointNames.Discounts}`);
       const response = await fetch(apiUrl);
       if (!response.ok) {
@@ -73,7 +74,7 @@ const getCatalogSyncHandler = (config: {
       clientDb.discounts.clear();
       return clientDb.discounts.bulkAdd(data);
     },
-    async syncColors() {
+    async syncColors(): Promise<number> {
       const apiUrl = new URL(`${config.baseUrl}/${APIEndpointNames.Colors}`);
       const response = await fetch(apiUrl);
       if (!response.ok) {
@@ -87,8 +88,13 @@ const getCatalogSyncHandler = (config: {
       clientDb.colors.clear();
       return clientDb.colors.bulkAdd(data);
     },
-    async cleanUpCache() {
+    async cleanUpCache(): Promise<void> {
       clientDb.categories.clear();
+      clientDb.discounts.clear();
+      clientDb.colors.clear();
+    },
+    async deleteDb(needRecreate: boolean): Promise<void> {
+      clientDb.delete({ disableAutoOpen: !needRecreate });
     },
   };
 };

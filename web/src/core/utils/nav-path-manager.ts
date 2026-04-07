@@ -122,7 +122,6 @@ const getNavPathManager = (): NavPathManager => {
       return result;
     },
     resolvePathElement: (value: string): NavPathItem | undefined => {
-      //const pathValue = value.indexOf("/") === 0 ? value : `/${value}`;
       const index: number = _allNavPaths.findIndex(
         (x: NavPathItem) => x.path === value,
       );

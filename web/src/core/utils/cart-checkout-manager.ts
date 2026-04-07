@@ -95,17 +95,16 @@ function getCartCheckoutManager(): CartCheckoutManager {
             cartCheckout.error ?? new Error("Failed to complete cart checkout"),
           );
         }
-        await emailComposer
-          .sendNewOrderEmail(cartCheckout.data)
-          .then((result) => {
-            if (!result.ok) {
-              const errorMessage = `Failed to send new order email, see error details below. ${result.error}`;
-              console.error(errorMessage);
-              return FailedResult(new Error(errorMessage));
-            }
-          });
-
-        return OkResult(`${OrderTypes.Web}-${cartCheckout.data}`);
+        const orderId = `${OrderTypes.Web}-${cartCheckout.data}`;
+        const emailResult = await emailComposer.sendNewOrderEmail(
+          cartCheckout.data,
+        );
+        if (!emailResult.ok) {
+          const errorMessage = `Failed to send new order email, see error details below. ${emailResult.error}`;
+          console.error(errorMessage);
+          return FailedResult<string>(new Error(errorMessage), orderId);
+        }
+        return OkResult(orderId);
       } catch (err) {
         const errorMessage = getErrorMessage(err);
         console.error(errorMessage);

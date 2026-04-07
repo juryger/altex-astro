@@ -123,5 +123,7 @@ const increaseQauntity = "Увеличить количество";
     }
   }
 
-  customElements.define('quatnity-selector', QuantitySelector);
+  if (!customElements.get('quatnity-selector')) {
+    customElements.define('quatnity-selector', QuantitySelector);
+  }
 </script>

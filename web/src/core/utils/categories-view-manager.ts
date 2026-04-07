@@ -1,4 +1,4 @@
-import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
+import { regexTrue } from "@/lib/domain";
 import { CategoriesViewMode } from "../const";
 import {
   getLocalStorageManager,
@@ -19,9 +19,7 @@ type CategoriesViewComponents = {
   slideNextEl: Element | null;
 };
 
-const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
-);
+const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 const assertInputElements = (inputElements: CategoriesViewComponents) => {
   const assertMessage = "⚠️ ~ categories-view-manager ~ '%s' is not defined";

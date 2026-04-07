@@ -238,5 +238,7 @@ const titleCartCheckoutFailed = "К сожалению у нас возникл�
     }
   }
 
-  customElements.define('cart-checkout', CartCheckout);
+  if (!customElements.get('cart-checkout')) {
+    customElements.define('cart-checkout', CartCheckout);
+  }
 </script>

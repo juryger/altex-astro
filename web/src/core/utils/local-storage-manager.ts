@@ -1,4 +1,4 @@
-import { EnvironmentNames, regexTrue, selectEnvironment } from "@/lib/domain";
+import { regexTrue } from "@/lib/domain";
 import { CategoriesViewMode } from "../const";
 import { getDateHandler } from "./date-handler";
 
@@ -25,22 +25,22 @@ const LocalStorageKeys = {
   CATEGORIES_VIEW_MODE: "categories-view-mode",
 } as const;
 
-const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
-);
+const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 const dateHandler = getDateHandler();
 
 function IsReplicaValid(replicaDate: Date, syncDate: Date) {
   const result = replicaDate < syncDate;
-  console.log("~ local-storage-manager ~ isReplicaValid: ", result);
+  withTracing &&
+    console.log("🐾 ~ local-storage-manager ~ isReplicaValid: ", result);
   return result;
 }
 
 function IsCacheValid(syncDate: Date, invalidateHours: number) {
   const expiresOn = dateHandler.addHours(syncDate, invalidateHours);
   const result = new Date() <= expiresOn;
-  console.log("~ local-storage-manager ~ isCacheValid: ", result);
+  withTracing &&
+    console.log("🐾 ~ local-storage-manager ~ isCacheValid: ", result);
   return result;
 }
 

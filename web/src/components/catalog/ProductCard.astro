@@ -151,5 +151,8 @@ const titleProductCode = "Артикул";
       this.controller && this.controller.abort();
     }
   }
-  customElements.define('product-card', ProductCard);
+
+  if (!customElements.get('product-card')) {
+    customElements.define('product-card', ProductCard);
+  }
 </script>

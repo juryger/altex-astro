@@ -59,9 +59,14 @@ const getEmailTransport = (): EmailTransport => {
       try {
         withTracing &&
           console.log(
-            "🐾 ~ Email service ~ getting access token to connect to Gmail...",
+            "🐾 ~ Email service ~ getting access token to connect to Gmail.",
           );
         const accessToken = await oauth2Client.getAccessToken();
+        withTracing &&
+          console.log(
+            "🐾 ~ Email service ~ obtained access token: ",
+            accessToken,
+          );
         const transport = nodemailer.createTransport({
           service: "gmail",
           auth: {
@@ -108,8 +113,8 @@ const getEmailTransport = (): EmailTransport => {
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         console.error(
-          "Failed to send email using Nodemail transport: %s",
-          errorMessage,
+          "Failed to send email using Nodemail transport: %o",
+          error,
         );
         return FailedResult(new Error(errorMessage));
       }

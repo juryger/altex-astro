@@ -70,5 +70,8 @@ const titleSearchHistory = "История поиска";
       this.controller.abort();
     }
   }
-  customElements.define('search-conatiner', SearchContainer);
+  
+  if (!customElements.get('search-conatiner')) {
+    customElements.define('search-conatiner', SearchContainer);
+  }
 </script>

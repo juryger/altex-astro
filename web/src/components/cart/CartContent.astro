@@ -387,5 +387,7 @@ const titleSubtotal = "Итого:";
     }
   }
 
-  customElements.define('cart-content', CartContent);
+  if (!customElements.get('cart-content')) {
+    customElements.define('cart-content', CartContent);
+  }
 </script>

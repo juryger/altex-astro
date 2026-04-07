@@ -6,13 +6,18 @@ import { getBreadcrumbsFromPath, type BreadcrumbItem } from '../core/utils/bread
 import { trimEnd } from '../core/utils/text-formatter';
 import { getSessionManager } from '../core/utils/session-manager';
 
+interface Props {
+  currentPath?: string;
+}
 const { currentPath } = Astro.props;
-const maxLabelLength = Number.parseInt(import.meta.env.BREADCRUMB_TITLE_MAX_LENGTH, 10);
 
+const maxLabelLength = Number.parseInt(import.meta.env.BREADCRUMB_TITLE_MAX_LENGTH, 10);
 const sessionManager = getSessionManager(Astro.session);
 const catalogItem = await sessionManager.getActiveCatalogItem();
 
-const breadcrumbs = getBreadcrumbsFromPath(currentPath, catalogItem);
+const breadcrumbs = currentPath !== undefined 
+  ? getBreadcrumbsFromPath(currentPath, catalogItem)
+  : [];
 ---
 
 <div class="breadcrumbs text-sm px-4">

@@ -84,5 +84,7 @@ const titleNoColors = "Нет информации о цвете";
     }
   }
 
-  customElements.define('product-colors', ProductColors);
+  if (!customElements.get('product-colors')) {
+    customElements.define('product-colors', ProductColors);
+  }
 </script>

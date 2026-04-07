@@ -10,17 +10,13 @@ import type { Product, PagingResult } from "@/lib/domain";
 import {
   CACHE_STALE_TIMEOUT_5MN,
   CacheKeys,
-  EnvironmentNames,
   getCacheInfo,
   regexTrue,
-  selectEnvironment,
 } from "@/lib/domain";
 
 export const prerender = false;
 
-const withTracing = regexTrue.test(
-  selectEnvironment(EnvironmentNames.PUBLIC_ENABLE_TRACING),
-);
+const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 export const GET: APIRoute = async ({ /*params, */ request }) => {
   const url = URL.parse(request.url);

@@ -201,5 +201,7 @@ const dataCartShowCommandName = "cartmenu-show";
     }
   }
 
-  customElements.define('cart-menu', CartMenu);
+  if (!customElements.get('cart-menu')) {
+    customElements.define('cart-menu', CartMenu);
+  }
 </script>

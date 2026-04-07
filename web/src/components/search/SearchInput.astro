@@ -194,5 +194,8 @@ const titleSearchFailed = "К сожалению у нас возникла те
       this.controller.abort();
     }
   }
-  customElements.define('search-input', SearchInput);
+
+  if (!customElements.get('search-input')) {
+    customElements.define('search-input', SearchInput);
+  }
 </script>
