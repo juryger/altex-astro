@@ -100,12 +100,14 @@ const getEmailManager = (): EmailManager => {
               transport.sendEmail({
                 from,
                 to: toCustomer,
+                replyTo: from,
                 subject,
                 content: emailContent,
               }),
               transport.sendEmail({
                 from,
                 to: toBackOffice,
+                replyTo: toCustomer,
                 subject,
                 content: emailContent,
                 attachmentContent: xmlContent,
@@ -154,6 +156,7 @@ const getEmailManager = (): EmailManager => {
             const result = await transport.sendEmail({
               from,
               to,
+              replyTo: from,
               subject,
               content,
             });

@@ -15,12 +15,14 @@ type EmailTransport = {
   sendEmail: ({
     from,
     to,
+    replyTo,
     subject,
     content,
     attachmentContent,
   }: {
     from: string;
     to: string;
+    replyTo: string;
     subject: string;
     content: string;
     attachmentContent?: string;
@@ -32,26 +34,28 @@ const getEmailTransport = (): EmailTransport => {
     selectEnvironment(EnvironmentNames.ENABLE_TRACING),
   );
 
-  const oauth2Client = new google.Auth.OAuth2Client(
-    selectEnvironment(EnvironmentNames.EMAIL_CLIENT_ID),
-    selectEnvironment(EnvironmentNames.EMAIL_CLIENT_SECRET),
-    selectEnvironment(EnvironmentNames.EMAIL_REDIRECT_URI),
-  );
+  // const oauth2Client = new google.Auth.OAuth2Client(
+  //   selectEnvironment(EnvironmentNames.EMAIL_CLIENT_ID),
+  //   selectEnvironment(EnvironmentNames.EMAIL_CLIENT_SECRET),
+  //   selectEnvironment(EnvironmentNames.EMAIL_REDIRECT_URI),
+  // );
 
-  oauth2Client.setCredentials({
-    refresh_token: selectEnvironment(EnvironmentNames.EMAIL_REFRESH_TOKEN),
-  });
+  // oauth2Client.setCredentials({
+  //   refresh_token: selectEnvironment(EnvironmentNames.EMAIL_REFRESH_TOKEN),
+  // });
 
   return {
     sendEmail: async ({
       from,
       to,
+      replyTo,
       subject,
       content,
       attachmentContent,
     }: {
       from: string;
       to: string;
+      replyTo: string;
       subject: string;
       content: string;
       attachmentContent?: string;
@@ -61,25 +65,27 @@ const getEmailTransport = (): EmailTransport => {
           console.log(
             "🐾 ~ Email service ~ getting access token to connect to Gmail.",
           );
-        const accessToken = await oauth2Client.getAccessToken();
-        withTracing &&
-          console.log(
-            "🐾 ~ Email service ~ obtained access token: ",
-            accessToken,
-          );
+        // const accessToken = await oauth2Client.getAccessToken();
+        // withTracing &&
+        //   console.log(
+        //     "🐾 ~ Email service ~ obtained access token: ",
+        //     accessToken,
+        //   );
         const transport = nodemailer.createTransport({
-          service: "gmail",
+          service: "Yandex", // gmail
           auth: {
-            type: "OAuth2",
-            user: from,
-            clientId: selectEnvironment(EnvironmentNames.EMAIL_CLIENT_ID),
-            clientSecret: selectEnvironment(
-              EnvironmentNames.EMAIL_CLIENT_SECRET,
-            ),
-            refreshToken: selectEnvironment(
-              EnvironmentNames.EMAIL_REFRESH_TOKEN,
-            ),
-            accessToken: accessToken.token,
+            user: selectEnvironment(EnvironmentNames.EMAIL_ACCOUNT),
+            pass: selectEnvironment(EnvironmentNames.EMAIL_APP_PASSWORD),
+            //   type: "OAuth2",
+            //   user: from,
+            //   clientId: selectEnvironment(EnvironmentNames.EMAIL_CLIENT_ID),
+            //   clientSecret: selectEnvironment(
+            //     EnvironmentNames.EMAIL_CLIENT_SECRET,
+            //   ),
+            //   refreshToken: selectEnvironment(
+            //     EnvironmentNames.EMAIL_REFRESH_TOKEN,
+            //   ),
+            //   accessToken: accessToken.token,
           },
           logger: withTracing,
         } as SMTPTransport.Options);
@@ -87,6 +93,7 @@ const getEmailTransport = (): EmailTransport => {
         const mailOptions = {
           from,
           to,
+          replyTo,
           subject,
           html: content,
           attachments:
@@ -101,11 +108,8 @@ const getEmailTransport = (): EmailTransport => {
         };
         withTracing &&
           console.log(
-            "🐾 ~ nodemailer ~ email: %o via transport: %o",
-            {
-              mailOptions,
-              content,
-            },
+            "🐾 ~ nodemailer ~ sending email %o via transport: %o",
+            mailOptions,
             transport,
           );
         await transport.sendMail(mailOptions);
