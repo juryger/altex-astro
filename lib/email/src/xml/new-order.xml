@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Order id="{{orderId}}" created="{{createdAt}}">
+<Order id="{{orderId}}" created="{{orderCreatedAt}}">
   <Customer>
     {{#with client}}
     <Info name="uid" value="{{uid}}" />
