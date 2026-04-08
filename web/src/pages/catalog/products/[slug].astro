@@ -45,7 +45,7 @@ const internals = {
         return undefined;
       });
     } catch(error) {
-      console.error("🛑 ~ Product page ~ failed to fetch catalog references", error);
+      console.error("❌ ~ Product page ~ failed to fetch catalog references", error);
     }
     return result;
   },
@@ -54,7 +54,7 @@ const internals = {
     try {
       if (slug !== undefined) result = await getProduct(slug);
     } catch(error) {
-      console.error("🛑 ~ Product page ~ failed to fetch product", error);
+      console.error("❌ ~ Product page ~ failed to fetch product", error);
     }
     return result;
   }

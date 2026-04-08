@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import type { Product, Catalog, PagingResult, Paging, Sorting, Filtering } from "@/lib/domain";
-import { SortOrder, ProductsSortFields } from "@/lib/domain";
+import { SortOrder, ProductsSortFields, EmptyPagingResult } from "@/lib/domain";
 import ProductCard from "./ProductCard.astro";
 import { loadProducts, type ProductCollectionFilter } from "@/web/src/core/content-loaders/products-loader";
 import { DialogActionButtons, DialogSize } from "@/web/src/core/const";
@@ -10,6 +10,7 @@ import { getSessionManager } from "@/web/src/core/utils/session-manager";
 import ModalDialog from "../ModalDialog.astro";
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 import { defaultPaging } from "@/web/src/core/utils/paging";
+import ProductColors from "./ProductColors.astro";
 
 interface Props {
   categorySlug: string;
@@ -34,8 +35,8 @@ try {
   } as ProductCollectionFilter)
 } catch(error) {
   hasDataLoadError = true;
-  console.error("🛑 ~ Products component ~ failed to fetch products list", error);
-} 
+  console.error("❌ ~ Products component ~ failed to fetch products list", error);
+}
 
 let firstRow = 0, lastRow = 0, totalRows = 0;
 if (products !== undefined) {
@@ -76,7 +77,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
     <span class="text-error">{titleErrorMessage}</span>       
   </p>
 </div>}
-{(products && products.items.length > 0) &&
+{(products && products.items.length > 0) && 
   <div data-products-root 
     data-page_prev={firstRow > 0 ? products.pageInfo.page - 1 : -1} 
     data-page_next={lastRow < totalRows ? products.pageInfo.page + 1 : -1} 
@@ -107,8 +108,8 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       </div>
     </div>
     {/* Content */}
-    <div class="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-      {products && products.items.map(x => <ProductCard item={x} references={references} />)}      
+    <div class="grid grid-cols-1 mb-4 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      {products && products.items.map(x => <ProductCard item={x} references={references} />)}
     </div>
     {/* Paging */}
     {products && products.items.length > 0 && 

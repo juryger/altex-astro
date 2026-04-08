@@ -90,7 +90,9 @@ const getEmailComposer = (): EmailComposer => {
             orderId: cartCheckout.data.root.id,
             orderNo,
             orderCreatedAt:
-              cartCheckout.data.root.createdAt.toLocaleDateString("ru-RU"),
+              cartCheckout.data.root.createdAt !== undefined
+                ? cartCheckout.data.root.createdAt.toLocaleDateString("ru-RU")
+                : "",
             orderSum,
             orderSumLocal: formatCurrency(orderSum),
             items: cartCheckout.data.items,

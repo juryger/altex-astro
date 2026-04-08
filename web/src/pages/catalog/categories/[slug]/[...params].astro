@@ -56,7 +56,7 @@ const internals = {
       ]).then((data) => {        
         if (data.some(x => x.error !== undefined)) {
           const errorMessage = data.reduce((acc, curr) => acc + `${curr.error !== undefined ? curr.error?.message + ", " : ""}`, "").slice(0, -2);
-          console.error("🛑 ~ Category page ~", errorMessage);  
+          console.error("❌ ~ Category page ~", errorMessage);  
           return undefined;
         }
         return {
@@ -65,12 +65,12 @@ const internals = {
           colors: data[2].data ?? [],
         }
       }).catch((err) => { 
-        console.error("🛑 ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
+        console.error("❌ ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
         return undefined;
       });
     }
     catch(error) {
-     console.error("🛑 ~ Category page ~ failed to fetch catalog references", error);    
+     console.error("❌ ~ Category page ~ failed to fetch catalog references", error);    
     }
     return result;
   }, 
@@ -79,7 +79,7 @@ const internals = {
     try {
       if (slug !== undefined) result = await getCategory(slug);
     } catch(error) {
-      console.error("🛑 ~ Category page ~ failed to fetch category", error);
+      console.error("❌ ~ Category page ~ failed to fetch category", error);
     }
     return result;
   }

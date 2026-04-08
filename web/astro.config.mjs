@@ -13,7 +13,7 @@ export default defineConfig({
   }),
   integrations: [boot()],
   image: {
-    domains: ["altexweb.ru", "localhost:4321"],
+    domains: ["altexweb.ru", "localhost:4321", "s3.regru.cloud"],
     responsiveStyles: true,
   },
   vite: {

@@ -1,0 +1,14 @@
+{
+  "CORSRules": [
+    {
+      "AllowedHeaders": ["*"],
+      "AllowedMethods": ["GET", "PUT", "DELETE", "POST"],
+      "AllowedOrigins": [
+        "https://cloud.reg.ru",
+        "https://altexweb.ru",
+        "http://localhost:4321"
+      ],
+      "MaxAgeSeconds": 3000
+    }
+  ]
+}

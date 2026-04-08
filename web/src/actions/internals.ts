@@ -18,15 +18,15 @@ export const internalsActions = {
       cacheManager.reset();
     },
   }),
-  resendNewOrderEmail: defineAction({
-    input: z.number(),
-    handler: async (input) => {
-      const emailResult = await emailComposer.sendNewOrderEmail(input);
-      if (!emailResult.ok) {
-        const errorMessage = `Failed to send new order email, see error details below. ${emailResult.error}`;
-        console.error(errorMessage);
-        throw new Error(errorMessage);
-      }
-    },
-  }),
+  // resendNewOrderEmail: defineAction({
+  //   input: z.number(),
+  //   handler: async (input) => {
+  //     const emailResult = await emailComposer.sendNewOrderEmail(input);
+  //     if (!emailResult.ok) {
+  //       const errorMessage = `Failed to send new order email, see error details below. ${emailResult.error}`;
+  //       console.error(errorMessage);
+  //       throw new Error(errorMessage);
+  //     }
+  //   },
+  // }),
 };
