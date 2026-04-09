@@ -53,14 +53,12 @@ const loadProducts = async (
       );
     });
   }
-
   const response = await fetch(apiUrl.toString());
   if (!response.ok) {
     return Promise.reject(`Failed to fetch products: ${response.statusText}`);
   }
-
   const data = await response.json();
-  return data;
+  return Promise.resolve(data);
 };
 
 function createProductsLoader(config: {

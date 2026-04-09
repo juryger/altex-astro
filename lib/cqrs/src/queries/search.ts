@@ -4,7 +4,6 @@ import {
   FILE_EXTENSIION_JPG,
   NO_IMAGE_FILE_NAME,
   ReadReplicaTypes,
-  SEARCH_RECORDS_LIMIT,
   SearchTypes,
   selectEnvironment,
 } from "@/lib/domain";
@@ -26,6 +25,10 @@ import type {
 
 const thumbnailsDirPath = selectEnvironment(
   EnvironmentNames.PUBLIC_BLOB_STORAGE_THUMBNAILS_URL,
+);
+const searRecordsLimit = parseInt(
+  selectEnvironment(EnvironmentNames.SEARCH_RECORDS_LIMIT),
+  10,
 );
 
 type ProductsQueryResult = {
@@ -84,7 +87,7 @@ export async function fetchAllCategories(): Promise<SearchResult[]> {
     .from(categories)
     .where(isNull(categories.deletedAt))
     .orderBy(categories.title)
-    .limit(SEARCH_RECORDS_LIMIT);
+    .limit(searRecordsLimit);
 
   return queryResult.map((item: DbCategory) =>
     mapCategoryQueryResultToDomainModel(item),
@@ -103,7 +106,7 @@ export async function fetchAllProducts(): Promise<SearchResult[]> {
     .leftJoin(makeCountries, eq(products.makeCountryId, makeCountries.id))
     .where(isNull(products.deletedAt))
     .orderBy(products.title)
-    .limit(SEARCH_RECORDS_LIMIT);
+    .limit(searRecordsLimit);
 
   return queryResult.map((item: ProductsQueryResult) =>
     mapProductQueryResultToDomainModel(item),

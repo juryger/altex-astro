@@ -6,10 +6,16 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import AlertsContainer from '../components/alerts/AlertsContainer.astro';
 import { ClientRouter } from 'astro:transitions';
 
-const { title } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "" } = Astro.props;
 
 const currentPath = Astro.url.pathname;
-const MainTitle = `АЛТЕХ - ${title}`;
+const titleMain = `АЛТЕХ - ${title}`;
+const titleAuthor = "Герасимов А.В.";
+const titleKeywords = "Замки, Замочная фурнитура, Инструменты, Карабины, Мебельная фурнитура, Хозтовары, Хомуты";
 ---
 
 <!doctype html>
@@ -17,9 +23,12 @@ const MainTitle = `АЛТЕХ - ${title}`;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{MainTitle}</title>
+		<meta name="description" content={description} />
+		<meta name="keywords" content={titleKeywords} />
+		<meta name="author" content={titleAuthor} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{titleMain}</title>
 		<!-- Enable Astro view transitions -->
 		<ClientRouter /> 
 	</head>
@@ -40,6 +49,18 @@ const MainTitle = `АЛТЕХ - ${title}`;
 		<Footer />
 	</body>
 </html>
+
+<script is:inline>
+  document.addEventListener('click', (e) => {
+    if (!/iPad|iPhone|iPod/.test(navigator.userAgent)/*|| !/CriOS|EdgiOS/.test(navigator.userAgent)*/) return false;
+    const target = e.target;
+    const link = target.closest('a');
+    const shouldPushState = link && link.href && link.href.startsWith(window.location.origin) && !link.href.includes('#');
+    if (!shouldPushState) return;
+    history.pushState(null, '', link.href);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  });
+</script>
 
 <script>
 	import { createWorker } from "../core/factories/worker-factory";
@@ -113,6 +134,7 @@ const MainTitle = `АЛТЕХ - ${title}`;
 					// No action requried
 					break;
 				case CatalogSyncType.Failure:
+					localStorageManager.setCatalogSyncDate(undefined);
 					console.error("❌ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
 					break;
 				default:

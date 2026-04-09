@@ -5,7 +5,6 @@ export {
   NO_VALUE_ASSIGNED,
   INPUT_DEBOUNCE_DELAY_MS,
   SEARCH_RESULTS_LIMIT,
-  SEARCH_RECORDS_LIMIT,
   ReadReplicaTypes,
   SyncTypes,
   SearchTypes,

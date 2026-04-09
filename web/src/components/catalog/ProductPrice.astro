@@ -7,11 +7,8 @@ interface Props {
   whsPrice1: number,
   whsPrice2: number,
   discounts: Discount[],
-  isDetailed?: boolean
 }
-const { price, whsPrice1, discounts, isDetailed = false } = Astro.props;
-
-const textSize = isDetailed ? "text-base" : "text-sm";
+const { price, whsPrice1, discounts } = Astro.props;
 
 const titlePrice = "Цена:";
 const titleRetailPrice = "Розн. цена";
@@ -23,27 +20,26 @@ const wholeSalePrice = discounts.find(x => x.fromSum > 1);
 
 const priceTitle = standardPrice !== undefined ? standardPrice.title : titleRetailPrice;
 const whsPriceTitle =  wholeSalePrice !== undefined ? wholeSalePrice.title : titleWholeSalePrice;
-const tooltipText = discounts
-  .reduce((acc, curr) => 
-    acc + `'${curr.title}' ${titleForOrderStartingFrom} ${formatCurrency(curr.fromSum)}, `, "")
-  .slice(0, -2);
 ---
 
 <div class="flex flex-row gap-1 align-middle">
   <span>{titlePrice}</span>
-  <div class="text-info lg:tooltip lg:tooltip-right" data-tip={tooltipText}>
+  <div class="text-info tooltip lg:tooltip lg:tooltip-right">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-6 w-6 stroke-current">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
     </svg>
+    <div class="tooltip-content">
+      {discounts.map((x) => <span>{`'${x.title}' ${titleForOrderStartingFrom} ${formatCurrency(x.fromSum)}`}</span><br/>)}
+    </div>
   </div>
 </div>
 <div class="stats bg-base-100 border-base-300 border max-w-lg">
   <div class=`stat place-items-center pb-6 md:pb-4`>
     <div class="stat-title">{priceTitle}</div>
-    <div class=`stat-value ${textSize}`>{formatCurrency(price)}</div>
+    <div class=`stat-value text-sm md:text-xs lg:text-sm xl:text-base`>{formatCurrency(price)}</div>
   </div>
   <div class=`stat place-items-center pb-6 md:p-4`>
     <div class="stat-title">{whsPriceTitle}</div>
-    <div class=`stat-value ${textSize}`>{formatCurrency(whsPrice1)}</div>
+    <div class=`stat-value text-sm md:text-xs lg:text-sm xl:text-base`>{formatCurrency(whsPrice1)}</div>
   </div>
 </div>

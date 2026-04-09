@@ -4,10 +4,10 @@ import { DialogActionButtons, DialogActionResult, DialogSize } from '../core/con
 export interface Props {
   id: string,
   title: string,
-  size?: DialogSize,
-  actionButtons?: DialogActionButtons
+  size?: DialogSize,  
+  actionButtons?: DialogActionButtons,
 }
-const { id, title, size = DialogSize.Small, actionButtons = DialogActionButtons.None } = Astro.props;
+const { id, title, size = DialogSize.Small, actionButtons = DialogActionButtons.None, } = Astro.props;
 
 const actionClose = "action-close";
 const actionOk1 = "action-ok-1";
@@ -24,13 +24,17 @@ const titleCancelButton = "Отменить";
 ---
 
 <dialog id={id} class="modal">
-  <div class:list={['modal-box', 'text-left', {'max-w-5xl': size === DialogSize.Large }, {'max-w-2xl': size === DialogSize.Medium }, {'max-w-xl': size === DialogSize.Small}]}>
+  <div class:list={['modal-box', 'text-left', 'aspect-auto', {'max-w-5xl': size === DialogSize.Large }, {'max-w-2xl': size === DialogSize.Medium }, {'max-w-xl': size === DialogSize.Small}]}>
     <h3 class="text-lg font-bold mt-[-15px] mb-2.5">{title}</h3>
     <main>
       <slot />
       <div class="modal-action">
         <form method="dialog">
-          <button name={actionClose} value={DialogActionResult.None} class="btn btn-sm btn-circle btn-ghost absolute right-1 top-1 text-gray-400">✕</button>
+          <button name={actionClose} value={DialogActionResult.None} class="btn btn-sm btn-circle btn-ghost absolute right-1 top-1 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
           {actionButtons === DialogActionButtons.OK && 
             <button name={actionOk1} class="btn" value={DialogActionResult.OK}>{titleOKButton}</button>
           }

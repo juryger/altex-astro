@@ -8,11 +8,12 @@ import { extractUrlParam } from '@/web/src/core/utils/url-parser';
 
 const orderNumber = extractUrlParam(new URL(Astro.request.url), "order", "string"); 
 
-const titleOrderConfirmation = "Спасибо за раземещение заказа. В ближайшее время мы свяжемся с Вами по указанному email адресу для уточнения деталей. Также проверьте папку Спам на наличие письма, т.к. почтовые сервера не всегда правильно определяют тип отправителя.";
+const titlePageName = "Подтверждение размещения заявки на заказ продукции";
 const titleOrderReference = "Идентификатор заказа";
+const titleOrderConfirmation = "Спасибо за раземещение заказа. В ближайшее время мы свяжемся с Вами по указанному email адресу для уточнения деталей. Также проверьте папку Спам на наличие письма, т.к. почтовые сервера не всегда правильно определяют тип отправителя.";
 ---
 
-<BaseLayout title="Подтверждение заказа">
+<BaseLayout title={titlePageName}>
   <div class="flex gap-2 text-left">
     <div class="grow-0 content-start">
       <Image src={successLogo}

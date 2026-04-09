@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const sorting = extractUrlSorting(url);
   withTracing &&
     console.log(
-      "🐾 ~ API-GET:products ~ cateogry slug: '%s', paging: %o, sorging: %o",
+      "🐾 ~ API-GET:products ~ cateogry slug: '%s', paging: %o, sorting: %o",
       categorySlug,
       paging,
       sorting,
@@ -40,9 +40,9 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
 
   withTracing &&
     console.log(
-      "🐾 ~ API-GET:products ~ cateogry slug: '%s', result %o",
+      "🐾 ~ API-GET:products ~ cateogry slug: '%s', result %s",
       categorySlug,
-      result,
+      result.data?.items.length,
     );
   if (result.error) {
     console.error(result.error);

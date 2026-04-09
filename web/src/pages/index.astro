@@ -4,10 +4,11 @@ import CollectionFallback from '../components/CollectionFallback.astro';
 import Welcome from '../components/Welcome.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const pageTitle = "Главная";
+const titlePageName = "Главная";
+const titlePageDescription = "Продажа и поставке хозяйственных товаров, мебельной фурнитуры и скобяных изделей.";
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={titlePageName} description={titlePageDescription}>
 	<Welcome />
   <Categories server:defer>
 		<div slot="fallback" class="mx-3.5">

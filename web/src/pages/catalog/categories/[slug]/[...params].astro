@@ -11,7 +11,7 @@ import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import CategoryDetails from '@/web/src/components/catalog/CategoryDetails.astro';
 import { getQueryManager, fetchMeasurementUnits, fetchDiscounts, fetchColors } from '@/lib/cqrs';
 import type { Category, Catalog, Paging, Sorting, Filtering } from '@/lib/domain';
-import { CacheKeys, getCacheInfo, regexTrue } from '@/lib/domain';
+import { CacheKeys, getCacheInfo, getErrorMessage, regexTrue } from '@/lib/domain';
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 
 const { slug, params } = Astro.params;
@@ -68,34 +68,51 @@ const internals = {
         console.error("❌ ~ Category page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
         return undefined;
       });
+      return Promise.resolve(result);
     }
     catch(error) {
-     console.error("❌ ~ Category page ~ failed to fetch catalog references", error);    
+      console.error("❌ ~ Category page ~ failed to fetch catalog references", error); 
+      return Promise.reject(getErrorMessage(error));
     }
-    return result;
   }, 
-  fetchCategory: async (): Promise<Category | undefined> => {
-    let result: Category | undefined;
+  fetchCategory: async (): Promise<Category| undefined> => {
     try {
-      if (slug !== undefined) result = await getCategory(slug);
+      if (slug !== undefined) return await getCategory(slug);
+      return Promise.reject("Could not retrieve product as slug is undefined.");
     } catch(error) {
       console.error("❌ ~ Category page ~ failed to fetch category", error);
+      return Promise.reject(getErrorMessage(error));
     }
-    return result;
   }
 };
 
 const sessionManager = getSessionManager(Astro.session);
-
-const category = await internals.fetchCategory();
-if (category === undefined) {
+let category : Category | undefined = undefined;
+try {
+  category = await internals.fetchCategory();
+} 
+catch (error) {
+  console.error(error);
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/500");
 }
+if (category === undefined) {
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/404");
+}
 
-const references = await internals.fetchCatalogReferences();
-if (references === undefined) {
+let references: Catalog | undefined = undefined;
+try {
+  references = await internals.fetchCatalogReferences();
+} 
+catch (error) {
+  console.error(error);
+  sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/500");
+}
+if (references === undefined) {
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/404");
 }
 
 sessionManager.setActiveCatalogItem({ 
@@ -117,9 +134,12 @@ const newProductsView = {
     : productsView?.filtering,
 };
 sessionManager.setProductsView(newProductsView);
+
+const titlePageName = `Каталог - ${category?.title ?? ""}`;
+const titlePageDescription = category?.description ?? "";
 ---
 
-<BaseLayout title=`Каталог - ${category?.title}`>
+<BaseLayout title={titlePageName} description={titlePageDescription}>
   <CategoryDetails item={category} />
   <Categories parentSlug={category?.slug} server:defer>
 		<div slot="fallback" class="mx-3.5">

@@ -5,11 +5,9 @@ Backup service of SQLite databases based on litestream.
 ## Install
 
 Debian/Ubuntu
-
 `wget https://github.com/benbjohnson/litestream/releases/download/v0.5.8/litestream-0.5.8-linux-x86_64.deb`
 
 Then install using dpkg:
-
 `sudo dpkg -i litestream-0.5.8-linux-x86_64.deb`
 
 Install as a service
@@ -36,17 +34,44 @@ sudo systemctl start litestream
 ## Importatnt notes
 
 - Update path to db file in litestream.yml
-- Defined environment variable poinitng to S3 bucket for stroing backup files.
+- Defined environment variables to access S3 bucket with backup files.
   For ubuntu:
-  1. sudo nano /etc/environment
-
+  1. Open for edit environment varialbes files
+     ```
+     sudo nano /etc/environment
+     ```
   2. Add values for following variables
-     export LITESTREAM_ACCESS_KEY_ID="https://s3.regru.cloud"
-     export LITESTREAM_SECRET_ACCESS_KEY=""
-     export LITESTREAM_REPLICA_ENDPOINT=""
-
+     ```
+     LITESTREAM_ACCESS_KEY_ID=""
+     LITESTREAM_SECRET_ACCESS_KEY=""
+     ```
   3. Save file and apply variables to current session
+     ```
      source /etc/environment
+     ```
+  4. Validate variable
+     ```
+     echo $LITESTREAM_S3_ENDPOINT
+     ```
+  5. Edit systemd service definition for litestream
+     If you are running Litestream as a service, use the EnvironmentFile directive in your service unit to load the file directly:
+     ```
+     [Service]
+     EnvironmentFile=/etc/environment
+     ExecStart=/usr/local/bin/litestream replicate
+     ```
+  6. Restart litestrem service
+     ```
+     systemctl daemon-reload
+     sudo systemctl restart litestream
+     ```
+  7. Check litestream logs
+     ```
+     sudo journalctl -u litestream -f
+     ```
+  8. Optionally add firewall output rule
+     `sudo ufw allow out 443/tcp`
 
-  4. Validate
-     echo $LITESTREAM_REPLICA_ENDPOINT
+  ```
+
+  ```

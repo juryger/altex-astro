@@ -5,10 +5,10 @@ import { getDateHandler } from "./date-handler";
 type LocalStorageManager = {
   checkCataloSyncRequired(): boolean;
   getCatalogSyncDate(): Date | undefined;
-  setCatalogSyncDate(value: Date): void;
+  setCatalogSyncDate(value: Date | undefined): void;
   resetCatalogSyncDate(): void;
   getCatalogReplicaDate(): Date | undefined;
-  setCatalogReplicaDate(value: Date): void;
+  setCatalogReplicaDate(value: Date | undefined): void;
   getUserThemePreference(): string | undefined;
   setUserThemePreference(value: string): void;
   getUserThemeChangeDate(): Date | undefined;
@@ -26,6 +26,10 @@ const LocalStorageKeys = {
 } as const;
 
 const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
+const cacheInvalidateDays = parseInt(
+  import.meta.env.PUBLIC_CACHE_INVALIDATE_DAYS,
+  10,
+);
 
 const dateHandler = getDateHandler();
 
@@ -36,17 +40,15 @@ function IsReplicaValid(replicaDate: Date, syncDate: Date) {
   return result;
 }
 
-function IsCacheValid(syncDate: Date, invalidateHours: number) {
-  const expiresOn = dateHandler.addHours(syncDate, invalidateHours);
+function IsCacheValid(syncDate: Date) {
+  const expiresOn = dateHandler.addDays(syncDate, cacheInvalidateDays);
   const result = new Date() <= expiresOn;
   withTracing &&
     console.log("🐾 ~ local-storage-manager ~ isCacheValid: ", result);
   return result;
 }
 
-const getLocalStorageManager = (
-  invalidateHours: number = 4,
-): LocalStorageManager => {
+const getLocalStorageManager = (): LocalStorageManager => {
   return {
     checkCataloSyncRequired: (): boolean => {
       const lastSyncDate = localStorage.getItem(
@@ -59,7 +61,7 @@ const getLocalStorageManager = (
         replicaDate === null ||
         lastSyncDate === null ||
         !IsReplicaValid(new Date(replicaDate), new Date(lastSyncDate)) ||
-        !IsCacheValid(new Date(lastSyncDate), invalidateHours);
+        !IsCacheValid(new Date(lastSyncDate));
       isSyncRequired &&
         console.warn(
           "⚠️ ~ local-storage-manager ~ catalog sync is required as it's either outdated, read replica updated or new setup. Last sync date: '%s', replicate date: '%s')",
@@ -77,16 +79,20 @@ const getLocalStorageManager = (
         );
       return value ? new Date(value) : undefined;
     },
-    setCatalogSyncDate: (value: Date): void => {
+    setCatalogSyncDate: (value: Date | undefined): void => {
       withTracing &&
         console.log(
           "🐾 ~ local-storage-manager ~ set CATALOG_SYNC_DATE: ",
           value,
         );
-      localStorage.setItem(
-        LocalStorageKeys.CATALOG_SYNC_DATE,
-        value.toISOString(),
-      );
+      if (value !== undefined) {
+        localStorage.setItem(
+          LocalStorageKeys.CATALOG_SYNC_DATE,
+          value.toISOString(),
+        );
+      } else {
+        localStorage.removeItem(LocalStorageKeys.CATALOG_SYNC_DATE);
+      }
     },
     getCatalogReplicaDate: (): Date | undefined => {
       const value = localStorage.getItem(LocalStorageKeys.CATALOG_REPLICA_DATE);
@@ -97,16 +103,20 @@ const getLocalStorageManager = (
         );
       return value ? new Date(value) : undefined;
     },
-    setCatalogReplicaDate: (value: Date): void => {
+    setCatalogReplicaDate: (value: Date | undefined): void => {
       withTracing &&
         console.log(
           "🐾 ~ local-storage-manager ~ set CATALOG_REPLICA_DATE: ",
           value,
         );
-      localStorage.setItem(
-        LocalStorageKeys.CATALOG_REPLICA_DATE,
-        value.toISOString(),
-      );
+      if (value !== undefined) {
+        localStorage.setItem(
+          LocalStorageKeys.CATALOG_REPLICA_DATE,
+          value.toISOString(),
+        );
+      } else {
+        localStorage.removeItem(LocalStorageKeys.CATALOG_REPLICA_DATE);
+      }
     },
     resetCatalogSyncDate: (): void => {
       withTracing &&
@@ -124,7 +134,7 @@ const getLocalStorageManager = (
       );
       if (
         themeChangedDate === null ||
-        !IsCacheValid(new Date(themeChangedDate), invalidateHours)
+        !IsCacheValid(new Date(themeChangedDate))
       ) {
         console.warn(
           "⚠️ ~ local-storage-manger ~ theme settings reset as it's either expired or new setup ('%s').",

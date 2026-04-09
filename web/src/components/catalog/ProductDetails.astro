@@ -8,6 +8,8 @@ import QuantitySelector from '../QuantitySelector.astro';
 import { trimEnd } from '@/web/src/core/utils/text-formatter';
 import ProductMake from './ProductMake.astro';
 import ProductDimensions from './ProductDimensions.astro';
+import { DialogActionButtons, DialogSize } from '@/web/src/core/const';
+import ModalDialog from '../ModalDialog.astro';
 
 interface Props {
   item: Product;
@@ -21,12 +23,15 @@ if (unitItem === undefined) {
   console.warn("~ ProductDetails ~ unable to obtain reference of measurement unit with Id", item.unitId);
 }
 
+const productImageDialogId = "product-image-dialog";
 const btnAddToCartName = "pd-add-to-cart";
 const inputQuantityName = "pd-quantity-value"
 
 const titleNoProductDescription = "Нет дополнительной информации о товаре";
+const titleProductImageTitle = "Просмотр изображения товара";
 const titleAddToCart = "В корзину";
 const titleProductCode = "Артикул";
+const titleImageView = "Просмотр";
 ---
 
 <product-details 
@@ -44,9 +49,21 @@ const titleProductCode = "Артикул";
         <span class="text-xs italic ml-1">{item.code}</span>
       </div>
       {/* Gallery */}
-      <figure class="self-center bg-base-100 aspect-square bject-cover lg:aspect-auto h-42 md:h-64 lg:h-92">
-        <Image src=`${item.imageUrl}` alt=`${item.title}` width="350" height="350" class="rounded-xl" />
-      </figure>
+      <div class="group">
+        <figure class="flex items-center justify-center aspect-square w-full object-cover group-hover:opacity-90 lg:aspect-auto h-[350px]">
+        <!-- <figure class="group-hover:opacity-90 self-center bg-base-100 object-cover aspect-square lg:aspect-auto h-42 md:h-64 lg:h-92"> -->
+          <Image src=`${item.imageUrl}` alt=`${item.title}` width="350" height="350" class="rounded-xl" />
+          {!isPreview && <div class="absolute flex items-start p-4">
+            <button type="button" class="flex flex-row gap-1 justify-center cursor-pointer outline-none relative z-10 w-full rounded-md bg-white/75 px-4 py-2 text-sm text-gray-900 opacity-0 group-hover:opacity-100 focus:opacity-100"
+              onclick=`document.getElementById("${productImageDialogId}").showModal()`>
+              <span>{titleImageView}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+              </svg>
+            </button>
+          </div>}
+        </figure>
+      </div>
     </div>
     <div class="flex flex-col gap-2 col-span-2">
       <div>
@@ -75,7 +92,7 @@ const titleProductCode = "Артикул";
           : <span class="italic text-sm">{titleNoProductDescription}</span>
         }
       </div>
-      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} isDetailed={true} />
+      <ProductPrice price={item.price} whsPrice1={item.whsPrice1} whsPrice2={item.whsPrice2} discounts={references.discounts} />
       <ProductPackInfo quantityInPack={item.quantityInPack} minQuantityToBuy={item.minQuantityToBuy} unitOfMeasurement={unitItem?.title ?? NO_VALUE_ASSIGNED} />
       <ProductMake maker={item.maker} makeCountry={item.makeCountry} />
       <ProductDimensions length={item.dimensionLengthMm} width={item.dimensionWidthMm} height={item.dimensionHeightMm} diameter={item.dimensionDiameterMm} />
@@ -88,6 +105,12 @@ const titleProductCode = "Артикул";
     </div>
   </div>
 </product-details>
+<ModalDialog id={productImageDialogId} title={titleProductImageTitle} size={DialogSize.Small} actionButtons={DialogActionButtons.OK}>
+  <figure class="bg-base-100">
+    <Image src=`${item.imageUrl}` alt=`${item.title}` width="600" height="600" class="rounded-xl" />
+  </figure>
+</ModalDialog>
+
 
 <script>
   import { parseProduct } from "@/web/src/core/utils/data-attributes-parser";

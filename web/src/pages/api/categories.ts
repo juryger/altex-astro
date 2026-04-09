@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
 
   withTracing &&
     console.log(
-      "🐾 ~ API-GET:categories ~ parent slug: '%s', paging: %o, sorging: %o",
+      "🐾 ~ API-GET:categories ~ parent slug: '%s', paging: %o, sorting: %o",
       parentSlug,
       paging,
       sorting,
@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
 
   withTracing &&
     console.log(
-      "🐾 ~ API-GET:categories ~ parent slug: '%s', result %o",
+      "🐾 ~ API-GET:categories ~ parent slug: '%s', result %s",
       parentSlug,
       result.data?.items.length,
     );

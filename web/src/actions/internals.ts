@@ -1,9 +1,9 @@
-import { z } from "astro/zod";
+//import { z } from "astro/zod";
 import { defineAction } from "astro:actions";
 import { CacheManager } from "@/lib/cqrs";
-import { getEmailComposer } from "../core/utils/email-composer";
+//import { getEmailComposer } from "../core/utils/email-composer";
 
-const emailComposer = getEmailComposer();
+//const emailComposer = getEmailComposer();
 
 export const internalsActions = {
   revalidateQueryCache: defineAction({

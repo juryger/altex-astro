@@ -44,14 +44,12 @@ const loadCategories = async (
       filter.paging.pageSize.toString(),
     );
   }
-
   const response = await fetch(apiUrl.toString());
   if (!response.ok) {
     return Promise.reject(`Failed to fetch categories: ${response.statusText}`);
   }
-
   const data = await response.json();
-  return data;
+  return Promise.resolve(data);
 };
 
 function createCategoriesLoader(config: {

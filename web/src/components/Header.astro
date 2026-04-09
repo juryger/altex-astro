@@ -56,7 +56,8 @@ const titleDialog = "Поиск по каталогу товаров"
           d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
       </svg>
       <kbd class="kbd kbd-sm font-mono opacity-60">
-        <span data-keyboard-prefix class="mr-0.5">⌘</span>K
+        <span data-keyboard-prefix class="mr-0.5">⌘</span>
+        K
       </kbd>
     </button>
     {/* Shopping cart */}
@@ -95,10 +96,9 @@ const titleDialog = "Поиск по каталогу товаров"
 </Modal>
 
 <script>
-  import { getThemeToggleManager, type ThemeToggleManager } from "../core/utils/theme-toggle";
+  import { getThemeToggleManager } from "../core/utils/theme-toggle";
 
-  let controller: AbortController | undefined;  
-  let themeToggleManager: ThemeToggleManager | undefined ;
+  let controller: AbortController = new AbortController();
 
   const showSearchDialog = () => {
     const searchDialogEl = document.querySelector("#search-dialog") as HTMLDialogElement;
@@ -106,42 +106,51 @@ const titleDialog = "Поиск по каталогу товаров"
   }
 
   const applyThemeToggler = () => {
-    themeToggleManager = getThemeToggleManager({
+    getThemeToggleManager({
       coreEl: document.querySelector('[data-theme-toggle]'),
       darkThemeEl: document.querySelector('[data-theme-toggle-dark]'),
-      lightThemeEl: document.querySelector('[data-theme-toggle-light]')})
-    themeToggleManager.apply(controller?.signal);
+      lightThemeEl: document.querySelector('[data-theme-toggle-light]')
+    }).apply(controller?.signal);
   }
 
   const applyKeyboardShortcuts = () => {
-    const isMacOs = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone";
+    const isMacOs = /iPad|iPhone|iPod|Mac/.test(navigator.userAgent);
     const modifierKeyPrefix = isMacOs
       ? "⌘"
-      : "Ctrl";
+      : "ctrl";
 
     const keyboardPrefixEl = document.querySelector('[data-keyboard-prefix]');
-    if (keyboardPrefixEl !== null) keyboardPrefixEl.textContent = modifierKeyPrefix;
+    if (keyboardPrefixEl !== null) { 
+      keyboardPrefixEl.textContent = modifierKeyPrefix;
+      if (isMacOs) keyboardPrefixEl.classList.add("text-lg")
+      else keyboardPrefixEl.classList.add("text-xs");
+    }
 
     const searchButtonEl = document.querySelector(`#searchButton`);
     searchButtonEl?.addEventListener("click",
       showSearchDialog,
-      { signal: controller?.signal });
+      { signal: controller.signal });
 
     document.addEventListener("keydown", (e) => {
       if (isMacOs && e.metaKey && e.key.toLowerCase() === 'k') {
-        showSearchDialog()
-        return;
-      }
-      if (!isMacOs && e.ctrlKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
         showSearchDialog();
         return;
       }
-    }, { signal: controller?.signal });
+      if (!isMacOs && e.ctrlKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        showSearchDialog();
+        return;
+      }
+    }, { signal: controller.signal });
   }
+
+  applyThemeToggler();
+  applyKeyboardShortcuts();
 
   document.addEventListener("astro:page-load", () => {
     // Need to apply ThemeToggler on Astro page transition (will hit on page load as well, so it's enough to have it here)
-    controller?.abort()
+    controller.abort()
     controller = new AbortController();
     applyThemeToggler();
     applyKeyboardShortcuts();

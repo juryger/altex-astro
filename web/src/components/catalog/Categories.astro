@@ -6,7 +6,6 @@ import { CategoriesViewMode } from "@/web/src/core/const";
 import { loadCategories } from "@/web/src/core/content-loaders/categories-loader";
 import type { Category, Sorting, PagingResult, Paging } from "@/lib/domain";
 import { defaultSorting } from "@/web/src/core/utils/sorting";
-import { defaultPaging } from "@/web/src/core/utils/paging";
 
 // Categories horizontal scrolling is based on
 // https://ryanmulligan.dev/blog/project-keyboard-navigation/
@@ -18,7 +17,11 @@ interface Props {
   sorting?: Sorting | undefined;
   paging?: Paging | undefined;
 }
-const { parentSlug, sorting = defaultSorting, paging = defaultPaging } = Astro.props;
+const { 
+  parentSlug, 
+  sorting = defaultSorting, 
+  paging = { page: 0, pageSize: 50} 
+} = Astro.props; // cannot use defaultPaging as need more than 20 records somitems
 
 let hasDataLoadError = false;
 let categories: PagingResult<Category> | undefined = undefined;
@@ -94,7 +97,7 @@ const titleErrorMessage = "Не удалось загрузить список �
 
 <script>
   import { regexTrue } from "@/lib/domain";
-  import { getCategoriesViewManager, type CategoriesViewManager } from "@/web/src/core/utils/categories-view-manager";  
+  import { getCategoriesViewManager } from "@/web/src/core/utils/categories-view-manager";  
 
   const VIEW_MODE_INIT_DELAY_MS = parseInt(import.meta.env.PUBLIC_CATEGORIES_VIEW_INIT_DELAY_MS, 10);
 	const withTracing = regexTrue.test(
@@ -102,29 +105,22 @@ const titleErrorMessage = "Не удалось загрузить список �
 	);
 
   let timeoutId: NodeJS.Timeout | undefined;
-  let controller: AbortController | undefined;
-  let viewManager: CategoriesViewManager | undefined;
+  let controller: AbortController = new AbortController();
 
   const applyViewManager = () => {
-    withTracing && console.log("🐾 ~ Categoreis.astro ~ applyViewManager");
-    controller && controller.abort();
-
+    withTracing && console.log("🐾 ~ Categoreis.astro ~ applyViewManager");    
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       const categoriesRootEl = document.querySelector('[data-categories-root]');
       withTracing && console.log("🐾 ~ Categoreis.astro ~ data-categoires-root element %o", categoriesRootEl);
       if (categoriesRootEl === null) return;
-      
-      viewManager = getCategoriesViewManager({
+      getCategoriesViewManager({
         selectModeEl: document.querySelector('select[name="categories-view-select"]'),
         containerEl: document.querySelector('[data-categories-container]'),
         sliderEl: document.querySelector('[data-categories-slider]'),
         slidePrevEl: document.querySelector('button[name="categories-scroll-prev"]'),
         slideNextEl: document.querySelector('button[name="categories-scroll-next"]')
-      });      
-      
-      controller = new AbortController();
-      viewManager.apply(controller.signal);
+      }).apply(controller.signal);
     }, VIEW_MODE_INIT_DELAY_MS)
   }
 
@@ -135,6 +131,8 @@ const titleErrorMessage = "Не удалось загрузить список �
   document.addEventListener("astro:page-load", () => {    
     // Need to re-apply view manager on Astro page transition as well
     withTracing && console.log("🐾 ~ Categoreis.astro ~ astro:page-load event");
+    controller.abort();
+    controller = new AbortController();
     applyViewManager();
   });
 

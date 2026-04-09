@@ -9,7 +9,7 @@ import { formatDate, NO_VALUE_ASSIGNED, ReadReplicaTypes } from '@/lib/domain';
 const cacheManager = CacheManager.instance({});
 const catalogReadReplica = ReadReplicaManager.instance().get(ReadReplicaTypes.Catalog);
 
-const pageTitle = "Системные данные";
+const titlePageName = "Системные данные";
 const titleQueryCache = "Кэш запросов";
 const titleQueryCacheOf = "из";
 const titleBrowserCache = "Кэш браузера";
@@ -18,7 +18,7 @@ const titleRevalidateQueryCache = "Оптимизировать";
 const titleResetCache = "Сбросить";
 ---
 
-<BaseLayout title={pageTitle}>
+<BaseLayout title={titlePageName}>
 	<div class="stats stats-vertical lg:stats-horizontal bg-base-100 border-base-300 border text-center">
 		<div class="stat">
 			<div class="stat-figure text-info">

@@ -6,7 +6,7 @@ import { getProduct } from '@/web/src/core/utils/live-collection-manager';
 import ProductDetails from '@/web/src/components/catalog/ProductDetails.astro';
 import { getSessionManager } from '@/web/src/core/utils/session-manager';
 import type { Catalog, Product } from '@/lib/domain';
-import { CacheKeys, getCacheInfo } from '@/lib/domain';
+import { CacheKeys, getCacheInfo, getErrorMessage } from '@/lib/domain';
 import { fetchMeasurementUnits, fetchDiscounts, fetchColors, getQueryManager } from '@/lib/cqrs';
 
 const { slug } = Astro.params;
@@ -44,32 +44,49 @@ const internals = {
         console.error("~ Product page ~ failed to load dictionaries (measurement units, discounts, product colors))", err);
         return undefined;
       });
+      return Promise.resolve(result);
     } catch(error) {
       console.error("❌ ~ Product page ~ failed to fetch catalog references", error);
+      return Promise.reject(getErrorMessage(error));
     }
-    return result;
   },
   fetchProduct: async (): Promise<Product | undefined> => {
-    let result: Product | undefined;
     try {
-      if (slug !== undefined) result = await getProduct(slug);
+      if (slug !== undefined) return await getProduct(slug);
+      return Promise.reject("Could not retrieve product as slug is undefined.");
     } catch(error) {
       console.error("❌ ~ Product page ~ failed to fetch product", error);
+      return Promise.reject(getErrorMessage(error));
     }
-    return result;
   }
 }
 
 const sessionManager = getSessionManager(Astro.session);
-const product = await internals.fetchProduct();
-if (product === undefined)
-{
+let product: Product | undefined = undefined;
+try {
+  product = await internals.fetchProduct();
+}
+catch (error) {
+  console.error(error);
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/500");
+}
+if (product === undefined) {
   sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/404");
 }
 
-const references = await internals.fetchCatalogReferences();
+let references: Catalog | undefined = undefined;
+try {
+  references = await internals.fetchCatalogReferences();
+}
+catch(error) {
+  console.error(error);
+  sessionManager.resetActiveCatalogItem();
+  return Astro.redirect("/404");
+}
 if (references === undefined) {
+  sessionManager.resetActiveCatalogItem();
   return Astro.redirect("/500");
 }
 
@@ -78,9 +95,12 @@ sessionManager.setActiveCatalogItem({
   category: { slug: product.categorySlug, title: product.categoryTitle }, 
   product: { slug: product.slug, title: product.title }
 });
+
+const titlePageName = `Каталог - ${product?.title ?? ""}`;
+const titlePageDescription = product?.description ?? "";
 ---
 
-<BaseLayout title=`Каталог - ${product?.title}`>
+<BaseLayout title={titlePageName} description={titlePageDescription}>
     <div id="product-container" class="px-4">
       {product && 
         <ProductDetails item={product} references={references} isPreview={false} />

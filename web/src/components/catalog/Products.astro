@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import type { Product, Catalog, PagingResult, Paging, Sorting, Filtering } from "@/lib/domain";
-import { SortOrder, ProductsSortFields, EmptyPagingResult } from "@/lib/domain";
+import { SortOrder, ProductsSortFields } from "@/lib/domain";
 import ProductCard from "./ProductCard.astro";
 import { loadProducts, type ProductCollectionFilter } from "@/web/src/core/content-loaders/products-loader";
 import { DialogActionButtons, DialogSize } from "@/web/src/core/const";
@@ -10,7 +10,6 @@ import { getSessionManager } from "@/web/src/core/utils/session-manager";
 import ModalDialog from "../ModalDialog.astro";
 import { defaultSorting } from "@/web/src/core/utils/sorting";
 import { defaultPaging } from "@/web/src/core/utils/paging";
-import ProductColors from "./ProductColors.astro";
 
 interface Props {
   categorySlug: string;
@@ -139,7 +138,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 
 <script>
   import { regexTrue } from "@/lib/domain";
-  import { getProductsViewManager, type ProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
+  import { getProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
 
   const VIEW_MODE_INIT_DELAY_MS = parseInt(import.meta.env.PUBLIC_PRODUCTS_VIEW_INIT_DELAY_MS, 10);
   const withTracing = regexTrue.test(
@@ -147,13 +146,10 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 	);
 
   let timeoutId: NodeJS.Timeout | undefined;
-  let controller: AbortController | undefined;
-  let viewManager: ProductsViewManager | undefined;
+  let controller: AbortController = new AbortController();
 
   const applyViewManager = () => {
     withTracing && console.log("🐾 ~ Products.astro ~ applyViewManager");
-    controller && controller.abort();
-
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
@@ -169,17 +165,16 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
       const pageSize = productsRootEl.dataset.page_size 
         ? Number.parseInt(productsRootEl.dataset.page_size, 10) 
         : 0;
-
-      viewManager = getProductsViewManager({
-        selectSortEl: document.querySelector('select[name="sort-field-select"]'),
-        sortOrderEl: document.querySelector('input[name="sort-order"]'),
-        sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
-        pageActionPrevEl: document.querySelector('button[name="page-action-previous"]'),
-        pageActionNextEl: document.querySelector('button[name="page-action-next"]'),
-      }, pagePrev, pageNext, pageSize);
-      
-      controller = new AbortController();
-      viewManager.apply(controller.signal);
+      getProductsViewManager(
+        {
+          selectSortEl: document.querySelector('select[name="sort-field-select"]'),
+          sortOrderEl: document.querySelector('input[name="sort-order"]'),
+          sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
+          pageActionPrevEl: document.querySelector('button[name="page-action-previous"]'),
+          pageActionNextEl: document.querySelector('button[name="page-action-next"]'),
+        }, 
+        pagePrev, pageNext, pageSize
+      ).apply(controller.signal);
     }, VIEW_MODE_INIT_DELAY_MS)
   } 
 
@@ -190,6 +185,8 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
   document.addEventListener("astro:page-load", () => {
     // Need to re-apply view manager on Astro page transition as well
     withTracing && console.log("🐾 ~ Products.astro ~ astro:page-load event");
+    controller.abort()
+    controller = new AbortController();
     applyViewManager();
   });
 
