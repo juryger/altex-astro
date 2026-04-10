@@ -62,8 +62,6 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 	</body>
 </html>
 
-
-
 <script is:inline>
   document.addEventListener('click', (e) => {
     if (!/iPad|iPhone|iPod/.test(navigator.userAgent)/*|| !/CriOS|EdgiOS/.test(navigator.userAgent)*/) return false;
@@ -96,7 +94,7 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 	);
 
 	const postCommandToWorker = (command: CatalogSyncType) => {
-		withTracing && console.log("🐾 ~ BaseLayout ~ send command to worker '%s'", command);	
+		withTracing && console.log("🐾 ~ BaseLayout ~ send command to CatalogSync web-worker '%s'", command);	
 		try {
 			switch (command) {
 				case CatalogSyncType.Replica: 
@@ -106,12 +104,12 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 					catalogSyncWorker.postMessage(CatalogSyncType.Cache);
 					break;
 				default:
-					console.error("❌ ~ BaseLayout ~ Failed to post unsupported command '%s' to web-worker", command);
+					console.error("❌ ~ BaseLayout ~ Unsupported command '%s' for CatalogSync web-worker", command);
 					break;
 			}
 		} catch(error) {
 			console.error("❌ ~ BaseLayout ~ Failed to post command '%s' to CatalogSync web-worker. See error details below. %o", command, error);	
-		}		
+		}
 	}
 	
 	if (localStorageManager.checkCataloSyncRequired()) {
@@ -119,7 +117,7 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 		postCommandToWorker(CatalogSyncType.Cache);
 	} else {
 		withTracing && 
-			console.log("🐾 ~ BaseLayout ~ Catalog data in IndexedDb are up to date, sync is not required.");
+			console.log("🐾 ~ BaseLayout ~ Catalog data in IndexedDb are up to date, preparing to check for replica update.");
 		postCommandToWorker(CatalogSyncType.Replica);
 	}
 
@@ -128,7 +126,7 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 	}
 
 	const processWorkerMessage = (msg: MessageEvent<any>): void => {				
-		withTracing && console.log("🐾 ~ BaseLayout ~ CatalogSync web-worker status update:", msg.data);
+		withTracing && console.log("🐾 ~ BaseLayout ~ CatalogSync web-worker response:", msg.data);
 		const syncStatus = msg.data as CatalogSyncStatus;
 			if (!msg.data || !syncStatus) {
 				console.error("❌ ~ BaseLayout ~ CatalogSync web-worker, unsupported message", msg.data);
@@ -137,30 +135,33 @@ const titleKeywords = "Замки, Замочная фурнитура, Инст
 			switch (syncStatus.syncType)
 			{
 				case CatalogSyncType.Replica:
-					if (syncStatus.syncData !== undefined)
-					localStorageManager.setCatalogReplicaDate(syncStatus.syncData);
+					const currentReplicateDate = localStorageManager.getCatalogReplicaDate();
+					const newReplicaDate = syncStatus.syncData;
+					withTracing && console.log("🐾 ~ BaseLayout ~ Replica new date '%s', earlier saved date '%s'", newReplicaDate, currentReplicateDate);
+					if (currentReplicateDate !== undefined && currentReplicateDate < newReplicaDate) { 
+						withTracing && console.log("🐾 ~ BaseLayout ~ server has new Catalog read replica available, prepare to revalidate cache");
+						postCommandToWorker(CatalogSyncType.Cache);
+					}
+					localStorageManager.setCatalogReplicaDate(newReplicaDate);
 					break;
 				case CatalogSyncType.Cache:
 					localStorageManager.setCatalogSyncDate(new Date());
-					localStorageManager.setCatalogReplicaDate(syncStatus.syncData);
 					break;
 				case CatalogSyncType.CleanUp:
 					// No action requried
 					break;
 				case CatalogSyncType.Failure:
 					localStorageManager.setCatalogSyncDate(undefined);
-					console.error("❌ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.resultMessage);
+					console.error("❌ ~ BaseLayout ~ Failed to save catalog data to IndexedDB", syncStatus.message);
 					break;
 				default:
 					console.error("❌ ~ BaseLayout ~ CatalogSync worker, unsupported sync status", syncStatus.syncType);
 					break;
 			}
-			terminateWorker();
 	}
 
 	const processWorkerError = (err: ErrorEvent): void => {
 		console.error("❌ ~ BaseLayout ~ Failed to process web-worker command", err.message);
-		terminateWorker();
 	}
 
 	window.addEventListener('pagehide', () => {

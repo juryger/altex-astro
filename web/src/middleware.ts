@@ -3,11 +3,31 @@ import { NotFoundError, ServerError } from "./core/errors";
 
 export const onRequest = defineMiddleware(async (context, next) => {
   try {
-    // if (context.session) {
-    //   console.log("⚙️ ~ middlewear ~ operates on session: %o", context.session);
-    //   context.session.set("lastVisit", new Date());
-    // }
-    return await next();
+    const response = await next();
+
+    // Set CORS headers
+    response.headers.set(
+      "Access-Control-Allow-Origin",
+      "https://www.altexweb.ru",
+    );
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS",
+    );
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization",
+    );
+
+    // Handle preflight requests
+    if (context.request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: response.headers,
+      });
+    }
+
+    return response;
   } catch (e) {
     console.error("⚙️ ~ middlewear ~ exception occured:", e);
     if (e instanceof NotFoundError) {

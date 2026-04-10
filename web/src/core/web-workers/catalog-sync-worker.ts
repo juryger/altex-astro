@@ -1,11 +1,11 @@
-import { regexTrue } from "@/lib/domain/src";
+import { regexTrue, getErrorMessage } from "@/lib/domain";
 import { getCatalogSyncHandler, type CatalogSyncStatus } from ".";
 import { CatalogSyncType } from "../const";
 
 const SyncComplete = "Catalog data has been saved to IndexedDB.";
-const SyncFailed = "Failed to save catalog data to IndexedDB";
+const SyncFailed = "Failed to save catalog data to IndexedDB.";
 const CleanUpComplete = "Catalog data has been removed from IndexedDB.";
-const SyncUnsupprtedCommand = "Cannot process unsupported command";
+const SyncUnsupprtedCommand = "Cannot process unsupported command.";
 
 const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
@@ -22,58 +22,36 @@ self.onmessage = async (e) => {
     );
     return;
   }
-  const syncStatus: CatalogSyncStatus = {
+  const result: CatalogSyncStatus = {
     syncType: command,
     syncData: undefined,
-    resultMessage: "",
+    message: "",
   };
-  try {
-    switch (command) {
-      case CatalogSyncType.Replica:
-        syncStatus.syncData = await getReplicaDate();
-        break;
-      case CatalogSyncType.Cache:
-        const isOk = await syncReferences();
-        syncStatus.resultMessage = isOk ? SyncComplete : SyncFailed;
-        syncStatus.syncData = await getReplicaDate();
-        break;
-      case CatalogSyncType.CleanUp:
-        await handler.cleanUpCache();
-        syncStatus.resultMessage = CleanUpComplete;
-        break;
-      default:
-        syncStatus.resultMessage = SyncUnsupprtedCommand + `: ${command}.`;
-        console.error(
-          "❌ ~ catalog-sync-worker ~ %s",
-          syncStatus.resultMessage,
-        );
-        break;
-    }
-  } catch (error: any) {
-    console.error(
-      "❌ ~ catalog-sync-worker ~ failed to sync reference data: %o",
-      error,
-    );
-    withTracing &&
-      console.info(
-        "🐾 ~ catalog-sync-worker ~ preapre to clean up cache and sync again.",
-      );
-    await handler.deleteDb(true);
-    const isOk = await syncReferences(true);
-    syncStatus.syncType = isOk
-      ? CatalogSyncType.Cache
-      : CatalogSyncType.Failure;
-    syncStatus.resultMessage = isOk ? SyncComplete : SyncFailed;
-    syncStatus.syncData = await getReplicaDate(true);
+  switch (command) {
+    case CatalogSyncType.Replica:
+      result.syncData = await getReplicaDate();
+      break;
+    case CatalogSyncType.Cache:
+      await syncReferences()
+        .then(() => (result.message = SyncComplete))
+        .catch((reason) => (result.message = `${SyncFailed} ${reason}`));
+      break;
+    case CatalogSyncType.CleanUp:
+      await resetCacheStore()
+        .then(() => (result.message = CleanUpComplete))
+        .catch((reason) => (result.message = `${SyncFailed} ${reason}`));
+      break;
+    default:
+      result.message = SyncUnsupprtedCommand + `: ${command}.`;
+      console.error("❌ ~ catalog-sync-worker ~ %s", result.message);
+      break;
   }
   withTracing &&
-    console.log("🐾 ~ catalog-sync-worker ~ sending response %o", syncStatus);
-  self.postMessage(syncStatus);
+    console.log("🐾 ~ catalog-sync-worker ~ sending response %o", result);
+  self.postMessage(result);
 };
 
-const getReplicaDate = async (
-  preventException: boolean = false,
-): Promise<Date | undefined> => {
+const getReplicaDate = async (): Promise<Date | undefined> => {
   try {
     const date = await handler.getReplicaDate();
     withTracing &&
@@ -84,14 +62,25 @@ const getReplicaDate = async (
       "❌ ~ catalog-sync-worker ~ failed to get replica date %o",
       error,
     );
-    if (!preventException) throw error;
     return undefined;
   }
 };
 
-const syncReferences = async (
-  preventException: boolean = false,
-): Promise<boolean> => {
+const resetCacheStore = async (): Promise<void> => {
+  try {
+    await handler.cleanUpCache();
+    withTracing &&
+      console.info("🐾 ~ catalog-sync-worker ~ chache store reset");
+  } catch (error) {
+    console.error(
+      "❌ ~ catalog-sync-worker ~ failed to reset cache store. %o",
+      error,
+    );
+    return Promise.reject(getErrorMessage(error));
+  }
+};
+
+const syncReferences = async (): Promise<void> => {
   try {
     const result = await Promise.all([
       handler.syncCategories(),
@@ -104,13 +93,12 @@ const syncReferences = async (
         "🐾 ~ catalog-sync-worker ~ catalog references has been saved to IndexedDB, number of synced records:",
         totalSavedRecords,
       );
-    return true;
   } catch (error) {
     console.error(
-      "❌ ~ catalog-sync-worker ~ failed to sync references %o",
+      "❌ ~ catalog-sync-worker ~ failed to sync references, see more details below. %o",
       error,
     );
-    if (!preventException) throw error;
-    return false;
+    await handler.deleteDb(true);
+    return Promise.reject(getErrorMessage(error));
   }
 };

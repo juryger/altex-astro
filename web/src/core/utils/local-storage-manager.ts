@@ -33,12 +33,12 @@ const cacheInvalidateDays = parseInt(
 
 const dateHandler = getDateHandler();
 
-function IsReplicaValid(replicaDate: Date, syncDate: Date) {
-  const result = replicaDate < syncDate;
-  withTracing &&
-    console.log("🐾 ~ local-storage-manager ~ isReplicaValid: ", result);
-  return result;
-}
+// function IsReplicaValid(replicaDate: Date, syncDate: Date) {
+//   const result = replicaDate < syncDate;
+//   withTracing &&
+//     console.log("🐾 ~ local-storage-manager ~ isReplicaValid: ", result);
+//   return result;
+// }
 
 function IsCacheValid(syncDate: Date) {
   const expiresOn = dateHandler.addDays(syncDate, cacheInvalidateDays);
@@ -54,19 +54,12 @@ const getLocalStorageManager = (): LocalStorageManager => {
       const lastSyncDate = localStorage.getItem(
         LocalStorageKeys.CATALOG_SYNC_DATE,
       );
-      const replicaDate = localStorage.getItem(
-        LocalStorageKeys.CATALOG_REPLICA_DATE,
-      );
       const isSyncRequired =
-        replicaDate === null ||
-        lastSyncDate === null ||
-        !IsReplicaValid(new Date(replicaDate), new Date(lastSyncDate)) ||
-        !IsCacheValid(new Date(lastSyncDate));
+        lastSyncDate === null || !IsCacheValid(new Date(lastSyncDate));
       isSyncRequired &&
         console.warn(
-          "⚠️ ~ local-storage-manager ~ catalog sync is required as it's either outdated, read replica updated or new setup. Last sync date: '%s', replicate date: '%s')",
+          "⚠️ ~ local-storage-manager ~ catalog sync is required. Last sync date: '%s')",
           lastSyncDate !== null ? new Date(lastSyncDate) : "not set",
-          replicaDate !== null ? new Date(replicaDate) : "not set",
         );
       return isSyncRequired;
     },
