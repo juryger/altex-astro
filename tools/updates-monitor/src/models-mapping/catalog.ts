@@ -514,18 +514,34 @@ const mapProductColorsToCommands = (
   const result: Array<
     (tx: DatabaseTransaction<DatabaseSchema>, prevResult?: any) => any
   > = [];
-  const productColors = value.data.map(
-    (x) =>
-      ({
-        id: parseInt(x["@_id"], 10),
-        uid: x["@_uid"],
-        productId: 0, // calculated field
-        productUid: x["@_product_uid"],
-        colorId: 0, // calculated field
-        colorUid: x["@_color_uid"],
-        deletedAt: parseInt(x["@_deleted"], 10) === 1 ? createdAt : undefined,
-      }) as ProductColor,
-  );
+  withTracing && console.log("🐾 ~ modesl-mapping ~ product colors");
+  const productColors = Array.isArray(value.data)
+    ? value.data.map(
+        (x) =>
+          ({
+            id: parseInt(x["@_id"], 10),
+            uid: x["@_uid"],
+            productId: 0, // calculated field
+            productUid: x["@_product_uid"],
+            colorId: 0, // calculated field
+            colorUid: x["@_color_uid"],
+            deletedAt:
+              parseInt(x["@_deleted"], 10) === 1 ? createdAt : undefined,
+          }) as ProductColor,
+      )
+    : [
+        {
+          id: parseInt(value.data["@_id"], 10),
+          uid: value.data["@_uid"],
+          productId: 0, // calculated field
+          productUid: value.data["@_product_uid"],
+          colorId: 0, // calculated field
+          colorUid: value.data["@_color_uid"],
+          deletedAt:
+            parseInt(value.data["@_deleted"], 10) === 1 ? createdAt : undefined,
+        } as ProductColor,
+      ];
+
   for (let i = 0; i < productColors.length; i++) {
     const item = productColors[i];
     item !== undefined && result.push((tx) => upsertProductColorTx(tx, item));
