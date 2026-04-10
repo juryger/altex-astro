@@ -190,16 +190,28 @@ export async function fetchProducts(
     .innerJoin(categories, eq(productsSq.products.categoryId, categories.id))
     .leftJoin(
       productColors,
-      eq(productsSq.products.id, productColors.productId),
+      and(
+        eq(productsSq.products.id, productColors.productId),
+        isNull(productColors.deletedAt),
+      ),
     )
     .leftJoin(
       measurementUnits,
-      eq(productsSq.products.unitId, measurementUnits.id),
+      and(
+        eq(productsSq.products.unitId, measurementUnits.id),
+        isNull(measurementUnits.deletedAt),
+      ),
     )
-    .leftJoin(makers, eq(productsSq.products.makerId, makers.id))
+    .leftJoin(
+      makers,
+      and(eq(productsSq.products.makerId, makers.id), isNull(makers.deletedAt)),
+    )
     .leftJoin(
       makeCountries,
-      eq(productsSq.products.makeCountryId, makeCountries.id),
+      and(
+        eq(productsSq.products.makeCountryId, makeCountries.id),
+        isNull(makeCountries.deletedAt),
+      ),
     );
   if (queryResult.length === 0) return EmptyPagingResult<Product>();
   const totalCount = await db.$count(
@@ -256,7 +268,10 @@ export async function fetchProductBySlug(
   const productsSq = db
     .select()
     .from(products)
-    .innerJoin(categories, eq(products.categoryId, categories.id))
+    .innerJoin(
+      categories,
+      and(eq(products.categoryId, categories.id), isNull(categories.deletedAt)),
+    )
     .where(and(isNull(products.deletedAt), eq(products.slug, slug)))
     .limit(1)
     .as("main");
@@ -266,16 +281,28 @@ export async function fetchProductBySlug(
     .innerJoin(categories, eq(productsSq.products.categoryId, categories.id))
     .leftJoin(
       measurementUnits,
-      eq(productsSq.products.unitId, measurementUnits.id),
+      and(
+        eq(productsSq.products.unitId, measurementUnits.id),
+        isNull(measurementUnits.deletedAt),
+      ),
     )
-    .leftJoin(makers, eq(productsSq.products.makerId, makers.id))
+    .leftJoin(
+      makers,
+      and(eq(productsSq.products.makerId, makers.id), isNull(makers.deletedAt)),
+    )
     .leftJoin(
       makeCountries,
-      eq(productsSq.products.makeCountryId, makeCountries.id),
+      and(
+        eq(productsSq.products.makeCountryId, makeCountries.id),
+        isNull(makeCountries.deletedAt),
+      ),
     )
     .leftJoin(
       productColors,
-      eq(productsSq.products.id, productColors.productId),
+      and(
+        eq(productsSq.products.id, productColors.productId),
+        isNull(productColors.deletedAt),
+      ),
     );
   if (queryResult.length === 0) return undefined;
 

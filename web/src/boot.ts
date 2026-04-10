@@ -13,8 +13,8 @@ const readReplicaManager = ReadReplicaManager.instance();
 let replicaIntervalObj: NodeJS.RefCounted | undefined = undefined;
 
 const readReplicasUpdateMonitor = async () => {
-  const replica = await queryManager.fetch(() =>
-    fetchCurrentReadReplica(ReadReplicaTypes.Catalog),
+  const replica = await queryManager.fetch(
+    () => fetchCurrentReadReplica(ReadReplicaTypes.Catalog), // avoid cache by omiting cache key
   );
   if (
     !replica.ok ||

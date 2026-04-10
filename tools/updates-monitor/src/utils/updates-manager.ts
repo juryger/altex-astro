@@ -9,6 +9,7 @@ import {
   EnvironmentNames,
   regexTrue,
   ReadReplicaTypes,
+  getInitialReplica,
 } from "@/lib/domain";
 import { FILE_EXTENSIION_XML, FILE_EXTENSIION_ZIP } from "@/lib/domain";
 import { SyncTypes } from "@/lib/domain";
@@ -59,7 +60,7 @@ export function getUpdatesManager(): UpdatesManager {
       }
       try {
         const isReplicaValid = await validateReadReplica();
-        if (!isReplicaValid) await createReadReplica();
+        if (!isReplicaValid) await createInitialReplica();
         return await runInternal({
           monitoringDirPath,
           poisonedDirName,
@@ -198,8 +199,8 @@ const validateReadReplica = async (): Promise<boolean> => {
     });
 };
 
-const createReadReplica = async (): Promise<string> => {
-  const replicaName = `catalog-initial`;
+const createInitialReplica = async (): Promise<string> => {
+  const replicaName = getInitialReplica(ReadReplicaTypes.Catalog).fileName;
   const dbCatalogPath =
     (selectEnvironment(EnvironmentNames.DB_CATALOG_PATH) as string) ?? "";
   withTracing &&
