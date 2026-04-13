@@ -14,12 +14,11 @@ import { CACHE_ITEM_LOCK_TIMEOUT_1MN, CacheKeys } from "@/lib/domain";
 import type { Category, Discount, Color, MeasurementUnit } from "@/lib/domain";
 
 const CACHE_STALTE_TIME_MS = 10000;
-const CACHE_SIZE_LIMIT = 5;
 
 describe("Cache manager", () => {
   const cacheManager = CacheManager.instance({
-    sizeLimit: CACHE_SIZE_LIMIT,
-    withTracing: true,
+    withTracing: import.meta.env.ENABLE_TRACING,
+    cacheSizeLimit: import.meta.env.CACHE_SIZE_LIMIT,
   });
   const controller = new AbortController();
   //const signal = controller.signal;
@@ -103,21 +102,21 @@ describe("Cache manager", () => {
     vi.useRealTimers();
   });
 
-  test(`Set number of cache items which exceeds the cache size '${CACHE_SIZE_LIMIT}' with evicting the least recent item`, async () => {
+  test(`Set number of cache items which exceeds the cache size ${import.meta.env.CACHE_SIZE_LIMIT} with evicting the least recent item`, async () => {
     vi.useFakeTimers();
     expect(cacheManager.getSize()).toBe(0);
     await cacheManager.get<Color[]>(CacheKeys.Colors);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1);
     await cacheManager.get<MeasurementUnit[]>(CacheKeys.MeasurementUnits);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(0);
     await cacheManager.get<Discount[]>(CacheKeys.Discounts);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1);
     await cacheManager.get<Category[]>(CacheKeys.CategoriesAll);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1);
     await cacheManager.get<Category[]>(CacheKeys.CategoriesRoot);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1);
     await cacheManager.get<number>(`${CacheKeys.CategoriesParent}:zamk`);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1);
     const getResult = await cacheManager.get<number>(
       `${CacheKeys.CategoriesParent}:lich`,
     );

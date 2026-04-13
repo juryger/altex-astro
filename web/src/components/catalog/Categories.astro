@@ -96,7 +96,7 @@ const titleErrorMessage = "Не удалось загрузить список �
 }
 
 <script>
-  import { regexTrue } from "@/lib/domain";
+  import { delayWithRetry, regexTrue } from "@/lib/domain";
   import { getCategoriesViewManager } from "@/web/src/core/utils/categories-view-manager";  
 
   const VIEW_MODE_INIT_DELAY_MS = parseInt(import.meta.env.PUBLIC_CATEGORIES_VIEW_INIT_DELAY_MS, 10);
@@ -104,24 +104,25 @@ const titleErrorMessage = "Не удалось загрузить список �
 		import.meta.env.PUBLIC_ENABLE_TRACING
 	);
 
-  let timeoutId: NodeJS.Timeout | undefined;
   let controller: AbortController = new AbortController();
 
-  const applyViewManager = () => {
+  const applyViewManager = async () => {
     withTracing && console.log("🐾 ~ Categoreis.astro ~ applyViewManager");    
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      const categoriesRootEl = document.querySelector('[data-categories-root]');
-      withTracing && console.log("🐾 ~ Categoreis.astro ~ data-categoires-root element %o", categoriesRootEl);
-      if (categoriesRootEl === null) return;
-      getCategoriesViewManager({
-        selectModeEl: document.querySelector('select[name="categories-view-select"]'),
-        containerEl: document.querySelector('[data-categories-container]'),
-        sliderEl: document.querySelector('[data-categories-slider]'),
-        slidePrevEl: document.querySelector('button[name="categories-scroll-prev"]'),
-        slideNextEl: document.querySelector('button[name="categories-scroll-next"]')
-      }).apply(controller.signal);
-    }, VIEW_MODE_INIT_DELAY_MS)
+    await delayWithRetry(
+      VIEW_MODE_INIT_DELAY_MS, 
+      3, 
+      () => document.querySelector('[data-categories-root]') !== null
+    );
+    const categoriesRootEl = document.querySelector('[data-categories-root]');
+    withTracing && console.log("🐾 ~ Categoreis.astro ~ data-categoires-root element %o", categoriesRootEl);
+    if (categoriesRootEl === null) return;
+    getCategoriesViewManager({
+      selectModeEl: document.querySelector('select[name="categories-view-select"]'),
+      containerEl: document.querySelector('[data-categories-container]'),
+      sliderEl: document.querySelector('[data-categories-slider]'),
+      slidePrevEl: document.querySelector('button[name="categories-scroll-prev"]'),
+      slideNextEl: document.querySelector('button[name="categories-scroll-next"]')
+    }).apply(controller.signal);
   }
 
   // Need to call ViewManger to assing event handlers on initial page load

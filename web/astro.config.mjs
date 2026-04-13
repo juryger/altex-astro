@@ -12,6 +12,14 @@ export default defineConfig({
     experimentalDisableStreaming: true,
   }),
   integrations: [boot()],
+  security: {
+    allowedDomains: [
+      {
+        hostname: "altexweb.ru",
+        protocol: "https",
+      },
+    ],
+  },
   image: {
     domains: ["altexweb.ru", "localhost:4321", "s3.regru.cloud"],
     responsiveStyles: true,

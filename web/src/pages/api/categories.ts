@@ -8,8 +8,8 @@ import {
 import { fetchCategories, getQueryManager } from "@/lib/cqrs";
 import type { Category, PagingResult } from "@/lib/domain";
 import {
-  CACHE_STALE_TIMEOUT_1HR,
-  CACHE_STALE_TIMEOUT_5MN,
+  CACHE_STALE_TIMEOUT_30MN,
+  CACHE_STALE_TIMEOUT_3MN,
   CacheKeys,
   getCacheInfo,
   regexTrue,
@@ -48,8 +48,8 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     getCacheInfo(
       cacheKey,
       parentSlug !== undefined
-        ? CACHE_STALE_TIMEOUT_5MN
-        : CACHE_STALE_TIMEOUT_1HR,
+        ? CACHE_STALE_TIMEOUT_3MN
+        : CACHE_STALE_TIMEOUT_30MN,
     ),
   );
 

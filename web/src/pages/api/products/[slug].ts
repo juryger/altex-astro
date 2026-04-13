@@ -1,12 +1,7 @@
 import type { APIRoute } from "astro";
 import { getQueryManager, fetchProductBySlug } from "@/lib/cqrs";
 import type { Product } from "@/lib/domain";
-import {
-  CACHE_STALE_TIMEOUT_1MN,
-  CacheKeys,
-  getCacheInfo,
-  regexTrue,
-} from "@/lib/domain";
+import { regexTrue } from "@/lib/domain";
 
 export const prerender = false;
 
@@ -21,9 +16,8 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
     });
   }
   withTracing && console.log("🐾 ~ API-GET:product ~ slug:", slug);
-  const result = await getQueryManager().fetch<Product | undefined>(
-    () => fetchProductBySlug(slug),
-    getCacheInfo(`${CacheKeys.ProductItem}:${slug}`, CACHE_STALE_TIMEOUT_1MN),
+  const result = await getQueryManager().fetch<Product | undefined>(() =>
+    fetchProductBySlug(slug),
   );
   if (result.error) {
     console.error(result.error);

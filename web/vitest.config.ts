@@ -23,5 +23,9 @@ export default getViteConfig({
       "@/lib/dal": new URL("../lib/dal", import.meta.url).pathname,
       "@/lib/cqrs": new URL("../lib/cqrs", import.meta.url).pathname,
     },
+    env: {
+      ENABLE_TRACING: "true",
+      CACHE_SIZE_LIMIT: "5",
+    },
   },
 });

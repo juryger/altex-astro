@@ -137,7 +137,7 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 </ModalDialog>
 
 <script>
-  import { regexTrue } from "@/lib/domain";
+  import { delayWithRetry, regexTrue } from "@/lib/domain";
   import { getProductsViewManager } from "@/web/src/core/utils/products-view-manager";  
 
   const VIEW_MODE_INIT_DELAY_MS = parseInt(import.meta.env.PUBLIC_PRODUCTS_VIEW_INIT_DELAY_MS, 10);
@@ -145,37 +145,39 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
 		import.meta.env.PUBLIC_ENABLE_TRACING
 	);
 
-  let timeoutId: NodeJS.Timeout | undefined;
   let controller: AbortController = new AbortController();
 
-  const applyViewManager = () => {
+  const applyViewManager = async () => {
     withTracing && console.log("🐾 ~ Products.astro ~ applyViewManager");
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
-      withTracing && console.log("🐾 ~ Products.astro ~ data-products-root element: %o", productsRootEl);
-      if (productsRootEl === null) return;
+    await delayWithRetry(
+      VIEW_MODE_INIT_DELAY_MS, 
+      3, 
+      () => document.querySelector('[data-products-root]') !== null
+    );
 
-      const pagePrev = productsRootEl.dataset.page_prev 
-        ? Number.parseInt(productsRootEl.dataset.page_prev, 10) 
-        : -1;
-      const pageNext = productsRootEl.dataset.page_next 
-        ? Number.parseInt(productsRootEl.dataset.page_next, 10) 
-        : -1;
-      const pageSize = productsRootEl.dataset.page_size 
-        ? Number.parseInt(productsRootEl.dataset.page_size, 10) 
-        : 0;
-      getProductsViewManager(
-        {
-          selectSortEl: document.querySelector('select[name="sort-field-select"]'),
-          sortOrderEl: document.querySelector('input[name="sort-order"]'),
-          sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
-          pageActionPrevEl: document.querySelector('button[name="page-action-previous"]'),
-          pageActionNextEl: document.querySelector('button[name="page-action-next"]'),
-        }, 
-        pagePrev, pageNext, pageSize
-      ).apply(controller.signal);
-    }, VIEW_MODE_INIT_DELAY_MS)
+    const productsRootEl = document.querySelector('[data-products-root]') as HTMLElement;
+    withTracing && console.log("🐾 ~ Products.astro ~ data-products-root element: %o", productsRootEl);
+    if (productsRootEl === null) return;
+
+    const pagePrev = productsRootEl.dataset.page_prev 
+      ? Number.parseInt(productsRootEl.dataset.page_prev, 10) 
+      : -1;
+    const pageNext = productsRootEl.dataset.page_next 
+      ? Number.parseInt(productsRootEl.dataset.page_next, 10) 
+      : -1;
+    const pageSize = productsRootEl.dataset.page_size 
+      ? Number.parseInt(productsRootEl.dataset.page_size, 10) 
+      : 0;
+    getProductsViewManager(
+      {
+        selectSortEl: document.querySelector('select[name="sort-field-select"]'),
+        sortOrderEl: document.querySelector('input[name="sort-order"]'),
+        sortDialogEl: document.querySelector('dialog[id="sort-dialog"]'),
+        pageActionPrevEl: document.querySelector('button[name="page-action-previous"]'),
+        pageActionNextEl: document.querySelector('button[name="page-action-next"]'),
+      }, 
+      pagePrev, pageNext, pageSize
+    ).apply(controller.signal);
   } 
 
   // Need to call ViewManger to assing event handlers on initial page load
@@ -190,7 +192,16 @@ const titleApplyDefatulSorting = "Для сортировки по возрас�
     applyViewManager();
   });
 
-  window.addEventListener('pagehide', () => {     
+  document.addEventListener("astro:before-swap", () => {
+     console.log("🧪 ~ Products.astro ~ before swap");
+  });
+  
+
+  document.addEventListener("astro:after-swap", () => {
+     console.log("🧪 ~ Products.astro ~ after swap");
+  });
+  
+  document.addEventListener('pagehide', () => {     
     // This instantly removes all listeners using 'signal' from themeToggleManager
     controller?.abort(); 
   });

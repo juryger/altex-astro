@@ -8,7 +8,7 @@ import {
 import { getQueryManager, fetchProducts } from "@/lib/cqrs";
 import type { Product, PagingResult } from "@/lib/domain";
 import {
-  CACHE_STALE_TIMEOUT_5MN,
+  CACHE_STALE_TIMEOUT_3MN,
   CacheKeys,
   getCacheInfo,
   regexTrue,
@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
   const cacheKey = `${CacheKeys.Products}:parent:${categorySlug}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
   const result = await getQueryManager().fetch<PagingResult<Product>>(
     () => fetchProducts(categorySlug, sorting, paging),
-    getCacheInfo(cacheKey, CACHE_STALE_TIMEOUT_5MN),
+    getCacheInfo(cacheKey, CACHE_STALE_TIMEOUT_3MN),
   );
 
   withTracing &&
