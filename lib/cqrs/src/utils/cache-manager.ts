@@ -1,6 +1,7 @@
 import type { CacheEntry, CacheEvictionStrategy } from "@/lib/domain";
 import {
   EnvironmentNames,
+  getBinaryLock,
   getErrorMessage,
   regexTrue,
   selectEnvironment,
@@ -11,8 +12,8 @@ import {
   CACHE_ITEM_LOCK_TIMEOUT_1MN,
 } from "@/lib/domain";
 import { delayWithRetry } from "@/lib/domain";
-import { getMostRecentEvictionStrategy } from "../cache/eviction/most-recent-eviction";
 import type { BaseCacheManager, CacheResult } from "../core";
+import { getLeasRecentEvictionStrategy } from "../cache/eviction/least-recent-eviction";
 
 class CacheManager implements BaseCacheManager {
   private static __instance: CacheManager;
@@ -20,8 +21,9 @@ class CacheManager implements BaseCacheManager {
   private withTracing: boolean;
   private cache: Map<string, CacheEntry<any>> = new Map();
   private evictionStrategy: CacheEvictionStrategy | undefined;
+  private binaryLock = getBinaryLock();
 
-  constructor(
+  private constructor(
     evictionStrategy: CacheEvictionStrategy,
     withTracing?: boolean,
     cacheSizeLimit?: number,
@@ -37,7 +39,7 @@ class CacheManager implements BaseCacheManager {
   }
 
   static instance({
-    evictionStrategy = getMostRecentEvictionStrategy(),
+    evictionStrategy = getLeasRecentEvictionStrategy(),
     withTracing = false,
     cacheSizeLimit = 50,
   }: {
@@ -65,9 +67,8 @@ class CacheManager implements BaseCacheManager {
     } as CacheEntry<T>);
     this.withTracing &&
       console.log(
-        "🐾 ~ cache-manager ~ set key '%s' with value %o, length %i",
+        "🐾 ~ cache-manager ~ set key '%s', cache size: %i",
         key,
-        value,
         this.cache.size,
       );
   }
@@ -77,8 +78,6 @@ class CacheManager implements BaseCacheManager {
     const result =
       value.staleTimestamp !== undefined &&
       value.staleTimestamp <= currDate.getTime();
-    this.withTracing &&
-      console.log("🐾 ~ cache-manager ~ '%s' isExpired:", key, result);
     return result;
   }
 
@@ -90,13 +89,20 @@ class CacheManager implements BaseCacheManager {
     const result =
       value.acquireTimestamp !== undefined &&
       value.acquireTimestamp <= currDate.getTime();
-    this.withTracing &&
-      console.log("🐾 ~ cache-manager ~ '%s' isAcquireExpired:", key, result);
     return result;
   }
 
   private isValid<T = any>(key: string, value: CacheEntry<T>): boolean {
-    return !this.isExpired(key, value) && !this.isAcquireExpired(key, value);
+    const isExpired = this.isExpired(key, value);
+    const isAcquireExpired = this.isAcquireExpired(key, value);
+    this.withTracing &&
+      console.log(
+        "🐾 ~ cache-manager ~ key: '%s', isExpired: '%s', isAcquireExpired: '%s' isAcquireExpired:",
+        key,
+        isExpired,
+        isAcquireExpired,
+      );
+    return !isExpired && !isAcquireExpired;
   }
 
   private invalidate(key: string) {
@@ -111,9 +117,8 @@ class CacheManager implements BaseCacheManager {
 
     if (this.withTracing) {
       console.log(
-        "🐾 ~ cache-manager ~ evicting cache as cache size limit achieved %i, %o",
+        "🐾 ~ cache-manager ~ evicting cache as cache size limit achieved %i",
         this.sizeLimit,
-        this.cache.entries().toArray(),
       );
     }
     const evictionKey = this.evictionStrategy?.findKey(this.cache);
@@ -149,14 +154,14 @@ class CacheManager implements BaseCacheManager {
     return result;
   }
 
-  private aqcuireLock(key: string): Error | undefined {
-    if (this.cache.size >= this.sizeLimit && !this.evict()) {
-      const errorMessage = `Failed to acquire lock for cache item with key '${key}' because cache is full and eviction strategy failed`;
-      console.error("❌ ~ cache-manager ~ %s", errorMessage);
-      return new Error(errorMessage);
-    }
-
+  private async acquireLock(key: string): Promise<Error | undefined> {
+    await this.binaryLock.acquire();
     try {
+      if (this.cache.size >= this.sizeLimit && !this.evict()) {
+        const errorMessage = `Failed to acquire lock for cache item with key '${key}' because cache is full and eviction strategy failed`;
+        console.error("❌ ~ cache-manager ~ %s", errorMessage);
+        return new Error(errorMessage);
+      }
       const currDate = new Date();
       this.cache.set(key, {
         isLoading: true,
@@ -168,6 +173,8 @@ class CacheManager implements BaseCacheManager {
       return new Error(
         `Failed to acquire lock for cache item with key '${key}, see error details below: ${errorMessage}`,
       );
+    } finally {
+      this.binaryLock.release();
     }
   }
 
@@ -187,7 +194,7 @@ class CacheManager implements BaseCacheManager {
 
     if (cacheEntry === undefined || nonValid) {
       if (nonValid) this.invalidate(key);
-      const error = this.aqcuireLock(key);
+      const error = await this.acquireLock(key);
       return {
         error,
         set:

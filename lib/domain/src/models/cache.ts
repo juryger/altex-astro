@@ -1,4 +1,4 @@
-import { CACHE_STALE_TIMEOUT_1HR } from "../const/cache";
+import { CACHE_STALE_TIMEOUT_30MN } from "../const/cache";
 
 type CacheInfo = {
   key: string;
@@ -7,7 +7,7 @@ type CacheInfo = {
 
 const getCacheInfo = (
   key: string,
-  staleTimeMs: number = CACHE_STALE_TIMEOUT_1HR,
+  staleTimeMs: number = CACHE_STALE_TIMEOUT_30MN,
 ): CacheInfo => {
   return { key, staleTimeMs };
 };

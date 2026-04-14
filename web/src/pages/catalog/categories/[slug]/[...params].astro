@@ -22,7 +22,7 @@ const withTracing = regexTrue.test(
 );
 
 const internals = {
-  parseRouteParams: (): { 
+  parseRouteParams: (params: string | undefined): { 
     sorting: Sorting | undefined, 
     paging: Paging | undefined,
     filtering: Filtering[] | undefined
@@ -32,7 +32,7 @@ const internals = {
     const paging = routeParser.getCatalogPaging();
     const filtering = routeParser.getCatalogFiltering();  
     withTracing && console.log("🐾 ~ Category page ~ slug %s, params: %o", slug, params);
-    withTracing && console.log("🐾 ~ Categories page ~ parsed sort", sorting);
+    withTracing && console.log("🐾 ~ Category page ~ parsed sort", sorting);
     withTracing && console.log("🐾 ~ Category page ~ parse paging", paging);
     withTracing && console.log("🐾 ~ Category page ~ parsed filters", filtering);
     return { sorting, paging, filtering };
@@ -75,10 +75,9 @@ const internals = {
       return Promise.reject(getErrorMessage(error));
     }
   }, 
-  fetchCategory: async (): Promise<Category| undefined> => {
+  fetchCategory: async (slug: string): Promise<Category| undefined> => {
     try {
-      if (slug !== undefined) return await getCategory(slug);
-      return Promise.reject("Could not retrieve product as slug is undefined.");
+      return await getCategory(slug);
     } catch(error) {
       console.error("❌ ~ Category page ~ failed to fetch category", error);
       return Promise.reject(getErrorMessage(error));
@@ -89,7 +88,8 @@ const internals = {
 const sessionManager = getSessionManager(Astro.session);
 let category : Category | undefined = undefined;
 try {
-  category = await internals.fetchCategory();
+  if (slug === undefined || slug === "undefined") return Astro.redirect("/404");
+  category = await internals.fetchCategory(slug);
 } 
 catch (error) {
   console.error(error);
@@ -123,7 +123,7 @@ sessionManager.setActiveCatalogItem({
   product: undefined
 });
 
-const { sorting, paging, filtering } = internals.parseRouteParams();
+const { sorting, paging, filtering } = internals.parseRouteParams(params);
 const productsView = await sessionManager.getProductsView();
 const newProductsView = {
     sorting: sorting !== undefined 

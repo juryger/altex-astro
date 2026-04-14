@@ -9,15 +9,15 @@ const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
   const { slug } = params;
-  if (!slug) {
+  if (slug === undefined || slug === "undfined") {
     return new Response(null, {
       status: 404,
       statusText: "Not found",
     });
   }
   withTracing && console.log("🐾 ~ API-GET:product ~ slug:", slug);
-  const result = await getQueryManager().fetch<Product | undefined>(() =>
-    fetchProductBySlug(slug),
+  const result = await getQueryManager().fetch<Product | undefined>(
+    () => fetchProductBySlug(slug), // omit caching for individual products
   );
   if (result.error) {
     console.error(result.error);

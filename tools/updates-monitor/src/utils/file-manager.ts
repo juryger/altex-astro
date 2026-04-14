@@ -11,7 +11,7 @@ export class FileManager implements BaseFileManager {
   private static __instance: BaseFileManager;
   private withTracing: boolean;
 
-  constructor(withTracing: boolean) {
+  private constructor(withTracing: boolean) {
     this.withTracing = withTracing;
   }
 

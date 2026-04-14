@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { fetchCategoryBySlug, getQueryManager } from "@/lib/cqrs";
 import type { Category } from "@/lib/domain";
 import {
-  CACHE_STALE_TIMEOUT_1MN,
+  CACHE_STALE_TIMEOUT_5MN,
   CacheKeys,
   getCacheInfo,
   regexTrue,
@@ -14,7 +14,7 @@ const withTracing = regexTrue.test(import.meta.env.PUBLIC_ENABLE_TRACING);
 
 export const GET: APIRoute = async ({ params /*, request*/ }) => {
   const { slug } = params;
-  if (!slug) {
+  if (slug === undefined || slug === "undfined") {
     return new Response(null, {
       status: 404,
       statusText: "Not found",
@@ -23,7 +23,7 @@ export const GET: APIRoute = async ({ params /*, request*/ }) => {
   withTracing && console.log("🐾 ~ API-GET:category ~ slug:", slug);
   const result = await getQueryManager().fetch<Category | undefined>(
     () => fetchCategoryBySlug(slug),
-    getCacheInfo(`${CacheKeys.CategoryItem}:${slug}`, CACHE_STALE_TIMEOUT_1MN),
+    getCacheInfo(`${CacheKeys.CategoryItem}:${slug}`, CACHE_STALE_TIMEOUT_5MN),
   );
   if (result.error) {
     console.error(result.error);

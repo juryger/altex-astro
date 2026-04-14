@@ -9,7 +9,7 @@ import { fetchCategories, getQueryManager } from "@/lib/cqrs";
 import type { Category, PagingResult } from "@/lib/domain";
 import {
   CACHE_STALE_TIMEOUT_30MN,
-  CACHE_STALE_TIMEOUT_3MN,
+  CACHE_STALE_TIMEOUT_5MN,
   CacheKeys,
   getCacheInfo,
   regexTrue,
@@ -39,7 +39,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
 
   let cacheKey = skipParentMatch
     ? CacheKeys.CategoriesAll
-    : parentSlug === undefined
+    : parentSlug === ""
       ? CacheKeys.CategoriesRoot
       : `${CacheKeys.CategoriesParent}:${parentSlug}`;
   cacheKey = `${cacheKey}:page:${paging.page}:${paging.pageSize}:sort:${sorting.field}:${sorting.order}`;
@@ -47,9 +47,7 @@ export const GET: APIRoute = async ({ /*params, */ request }) => {
     () => fetchCategories(skipParentMatch, parentSlug, sorting, paging),
     getCacheInfo(
       cacheKey,
-      parentSlug !== undefined
-        ? CACHE_STALE_TIMEOUT_3MN
-        : CACHE_STALE_TIMEOUT_30MN,
+      parentSlug === "" ? CACHE_STALE_TIMEOUT_30MN : CACHE_STALE_TIMEOUT_5MN,
     ),
   );
 

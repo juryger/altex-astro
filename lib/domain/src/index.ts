@@ -39,6 +39,8 @@ export {
   FILE_EXTENSIION_DB_SHM,
 } from "./const/extensions";
 
+export { type BinaryLock, getBinaryLock } from "./helpers/binary-lock";
+
 export { CompanyInfoKeys } from "./const/company-info";
 
 export type {

@@ -9,7 +9,7 @@ export class ZipManager implements BaseArchiveManager {
   private fileManager: BaseFileManager;
   private withTracing: boolean;
 
-  constructor(withTracing: boolean) {
+  private constructor(withTracing: boolean) {
     this.withTracing = withTracing;
     this.fileManager = FileManager.instance();
   }

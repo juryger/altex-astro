@@ -50,10 +50,9 @@ const internals = {
       return Promise.reject(getErrorMessage(error));
     }
   },
-  fetchProduct: async (): Promise<Product | undefined> => {
+  fetchProduct: async (slug: string): Promise<Product | undefined> => {
     try {
-      if (slug !== undefined) return await getProduct(slug);
-      return Promise.reject("Could not retrieve product as slug is undefined.");
+      return await getProduct(slug);
     } catch(error) {
       console.error("❌ ~ Product page ~ failed to fetch product", error);
       return Promise.reject(getErrorMessage(error));
@@ -64,7 +63,8 @@ const internals = {
 const sessionManager = getSessionManager(Astro.session);
 let product: Product | undefined = undefined;
 try {
-  product = await internals.fetchProduct();
+  if (slug === undefined || slug === "undefined") return Astro.redirect("/404");
+  product = await internals.fetchProduct(slug);
 }
 catch (error) {
   console.error(error);

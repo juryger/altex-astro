@@ -127,7 +127,7 @@ describe("Cache manager", () => {
     expect(getResult.set).toBeDefined();
     expect(getResult.error).toBeUndefined();
 
-    let containsCheck = cacheManager.contains(CacheKeys.CategoriesRoot);
+    let containsCheck = cacheManager.contains(CacheKeys.Colors);
     expect(containsCheck).toBe(false);
     containsCheck = cacheManager.contains(CacheKeys.CategoriesParent + ":lich");
     expect(containsCheck).toBe(true);

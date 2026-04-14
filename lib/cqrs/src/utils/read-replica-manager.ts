@@ -19,20 +19,20 @@ class ReadReplicaManager implements BaseReadReplicaManager {
   private dbReplicasPath: string;
   private withTracing: boolean;
 
-  static instance() {
-    if (!ReadReplicaManager.__instance) {
-      ReadReplicaManager.__instance = new ReadReplicaManager();
-    }
-    return ReadReplicaManager.__instance;
-  }
-
-  constructor() {
+  private constructor() {
     this.dbReplicasPath = selectEnvironment(
       EnvironmentNames.DB_READ_REPLICAS_PATH,
     );
     this.withTracing = regexTrue.test(
       selectEnvironment(EnvironmentNames.ENABLE_TRACING),
     );
+  }
+
+  static instance() {
+    if (!ReadReplicaManager.__instance) {
+      ReadReplicaManager.__instance = new ReadReplicaManager();
+    }
+    return ReadReplicaManager.__instance;
   }
 
   private checkReplicasInitialized() {
