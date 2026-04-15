@@ -101,7 +101,13 @@ export const categories = table(
     uid: t.text().notNull(),
     deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
-  (table) => [t.uniqueIndex("idx_categories_uid").on(table.uid)],
+  (table) => [
+    t.uniqueIndex("idx_categories_uid").on(table.uid),
+    t.index("idx_categories_title").on(table.title),
+    t
+      .index("idx_categories_parent_id_slug_deleted_at")
+      .on(table.parentId, table.slug, table.deletedAt),
+  ],
 );
 
 export const products = table(
@@ -146,7 +152,17 @@ export const products = table(
     uid: t.text().notNull(),
     deletedAt: t.int("deleted_at", { mode: "timestamp" }),
   },
-  (table) => [t.uniqueIndex("idx_products_uid").on(table.uid)],
+  (table) => [
+    t.uniqueIndex("idx_products_uid").on(table.uid),
+    t.index("idx_products_title").on(table.title),
+    t.index("idx_products_price").on(table.price),
+    t.index("idx_products_category_id").on(table.categoryId),
+    t
+      .index("idx_products_category_id_slug_deleted_at")
+      .on(table.categoryId, table.slug, table.deletedAt),
+    t.index("idx_products_category_id_title").on(table.categoryId, table.title),
+    t.index("idx_products_category_id_price").on(table.categoryId, table.price),
+  ],
 );
 
 export const relatedProducts = table(
