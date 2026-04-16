@@ -37,41 +37,61 @@ sudo systemctl start litestream
 - Defined environment variables to access S3 bucket with backup files.
   For ubuntu:
   1. Open for edit environment varialbes files
+
      ```
      sudo nano /etc/environment
      ```
+
   2. Add values for following variables
-     ```
-     LITESTREAM_ACCESS_KEY_ID=""
-     LITESTREAM_SECRET_ACCESS_KEY=""
-     ```
-  3. Save file and apply variables to current session
-     ```
-     source /etc/environment
-     ```
-  4. Validate variable
-     ```
-     echo $LITESTREAM_S3_ENDPOINT
-     ```
-  5. Edit systemd service definition for litestream
-     If you are running Litestream as a service, use the EnvironmentFile directive in your service unit to load the file directly:
-     ```
-     [Service]
-     EnvironmentFile=/etc/environment
-     ExecStart=/usr/local/bin/litestream replicate
-     ```
-  6. Restart litestrem service
-     ```
-     systemctl daemon-reload
-     sudo systemctl restart litestream
-     ```
-  7. Check litestream logs
-     ```
-     sudo journalctl -u litestream -f
-     ```
-  8. Optionally add firewall output rule
-     `sudo ufw allow out 443/tcp`
 
   ```
+  LITESTREAM_ACCESS_KEY_ID=""
+  LITESTREAM_SECRET_ACCESS_KEY=""
+  ```
 
+  3. Save file and apply variables to current session
+
+  ```
+  source /etc/environment
+  ```
+
+  4. Validate variable
+
+  ```
+  echo $LITESTREAM_S3_ENDPOINT
+  ```
+
+  5. Edit systemd service definition file for litestream at `/lib/systemd/system/litestream.service`
+     If you are running Litestream as a service, use the EnvironmentFile directive in your service unit to load the file directly:
+
+  ```
+  [Unit]
+  Description=Litestream
+
+  [Service]
+  Restart=always
+  EnvironmentFile=/etc/environment
+  ExecStart=/usr/bin/litestream replicate
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+
+  6. Restart litestrem service
+
+  ```
+  systemctl daemon-reload
+  sudo systemctl restart litestream
+  ```
+
+  7. Check litestream logs
+
+  ```
+  sudo journalctl -u litestream -f
+  ```
+
+  8. Optionally add firewall output rule
+
+  ```
+  sudo ufw allow out 443/tcp
   ```
